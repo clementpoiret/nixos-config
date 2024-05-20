@@ -2,38 +2,44 @@
 {
   programs.zsh = {
     enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-    oh-my-zsh = {
+    dotDir = ".config/zsh";
+    antidote = {
       enable = true;
-      plugins = [ "git" "fzf" ];
+      plugins = [
+        "belak/zsh-utils path:completion"
+        "belak/zsh-utils path:editor"
+        "belak/zsh-utils path:history"
+        "belak/zsh-utils path:prompt"
+        "belak/zsh-utils path:utility"
+        "romkatv/powerlevel10k"
+	"zdharma-continuum/fast-syntax-highlighting kind:defer"
+	"zsh-users/zsh-autosuggestions"
+	"zsh-users/zsh-completions"
+      ];
     };
-    initExtraFirst = ''
-      DISABLE_MAGIC_FUNCTIONS=true
-      export "MICRO_TRUECOLOR=1"
+    initExtra = ''
+      [[ ! -f ~/nixos-config/modules/home/files/.p10k.zsh ]] || source ~/nixos-config/modules/home/files/.p10k.zsh
     '';
-    shellAliases = {
-      # record = "wf-recorder --audio=alsa_output.pci-0000_08_00.6.analog-stereo.monitor -f $HOME/Videos/$(date +'%Y%m%d%H%M%S_1.mp4')";
 
+    shellAliases = {
       # Utils
       c = "clear";
       cd = "z";
       tt = "gtrash put";
       cat = "bat";
       nano = "micro";
-      code = "codium";
       py = "python";
       icat = "kitten icat";
       dsize = "du -hs";
       findw = "grep -rl";
 
-      l = "eza --icons  -a --group-directories-first -1"; #EZA_ICON_SPACING=2
-      ll = "eza --icons  -a --group-directories-first -1 --no-user --long";
-      tree = "eza --icons --tree --group-directories-first";
+      ls = "lsd --group-directories-first";
+      ll = "lsd -l --group-directories-first";
+      la = "lsd -la --group-directories-first";
+      tree = "lsd -l --group-directories-first --tree --depth=2";
 
       # Nixos
-      cdnix = "cd ~/nixos-config && codium ~/nixos-config";
+      cdnix = "cd ~/nixos-config && nvim ~/nixos-config";
       ns = "nix-shell --run zsh";
       nix-shell = "nix-shell --run zsh";
       nix-switch = "sudo nixos-rebuild switch --flake ~/nixos-config#${host}";
@@ -68,6 +74,11 @@
   };
 
   programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.fzf = {
     enable = true;
     enableZshIntegration = true;
   };
