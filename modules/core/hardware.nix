@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ host, lib, pkgs, ... }:
 {  
   hardware.opengl.enable = true;
   hardware.opengl.driSupport = true;
@@ -24,4 +24,9 @@
     powerOnBoot = true;
   };
   services.blueman.enable = true;
+
+  # f2fs check
+  boot.initrd = lib.mkIf (host == "desktop") {
+    checkJournalingFS = false; 
+  };
 }
