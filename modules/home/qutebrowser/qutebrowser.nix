@@ -131,8 +131,8 @@
 
       BLOCKING_FILTERS = [
         "https://small.oisd.nl",
-        "https://malware-filter.gitlab.io/malware-filter/phishing-filter.txt",
-        "https://malware-filter.gitlab.io/malware-filter/urlhaus-filter.txt",
+        # "https://malware-filter.gitlab.io/malware-filter/phishing-filter.txt",
+        # "https://malware-filter.gitlab.io/malware-filter/urlhaus-filter.txt",
         # "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=1&mimetype=plaintext",
         # "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt",
         # "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt",

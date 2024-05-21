@@ -8,6 +8,7 @@
     file                              # Show file information 
     fzf                               # fuzzy finder
     gtt                               # google translate TUI
+    killall                           # to kill our little friends
     gtrash                            # rm replacement, put deleted files in system trash
     hexdump
     lazygit
@@ -20,6 +21,8 @@
     yazi                              # terminal file manager
     gnome.zenity
     magic-wormhole                    # magic file transfer
+    gh                                # github cli
+    tldr                              # user-friendly help
 
     # C / C++
     gcc
