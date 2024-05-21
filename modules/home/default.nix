@@ -16,5 +16,6 @@
     ++ [(import ./swaylock.nix)]                  # lock screen
     ++ [(import ./waybar)]                        # status bar
     ++ [(import ./wofi.nix)]                      # launcher
+    ++ [(import ./yazi.nix)]                      # terminal file manager
     ++ [(import ./zsh.nix)];                      # shell
 }

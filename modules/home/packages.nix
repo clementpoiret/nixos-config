@@ -18,7 +18,6 @@
     nix-prefetch-github
     ripgrep                           # grep replacement
     toipe                             # typing test in the terminal
-    yazi                              # terminal file manager
     gnome.zenity
     magic-wormhole                    # magic file transfer
     gh                                # github cli
