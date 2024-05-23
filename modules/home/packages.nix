@@ -20,6 +20,7 @@
     magic-wormhole                    # magic file transfer
     nitch                             # systhem fetch util
     nix-prefetch-github
+    pciutils
     ripgrep                           # grep replacement
     toipe                             # typing test in the terminal
     tldr                              # user-friendly help

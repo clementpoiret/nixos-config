@@ -1,4 +1,4 @@
-{ host, lib, pkgs, ... }:
+{ config, host, lib, pkgs, ... }:
 {  
   hardware.opengl.enable = true;
   hardware.opengl.driSupport = true;
@@ -8,15 +8,16 @@
   ];
 
   # nvidia
-  services.xserver.videoDrivers = [ "nvidia-dkms" ];
+  #services.xserver.videoDrivers = [ "nvidia" ];
 
-  hardware.nvidia = {
-    modesetting.enable = true;
-    powerManagement.enable = false;
-    powerManagement.finegrained = false;
-    open = false;
-    nvidiaSettings = true;
-  };
+  #hardware.nvidia = {
+  #  package = config.boot.kernelPackages.nvidiaPackages.beta;
+  #  modesetting.enable = true;
+  #  powerManagement.enable = false;
+  #  powerManagement.finegrained = false;
+  #  open = true;
+  #  nvidiaSettings = true;
+  #};
 
   # bluetooth
   hardware.bluetooth = {

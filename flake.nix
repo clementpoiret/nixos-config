@@ -10,10 +10,11 @@
   
     alejandra.url = "github:kamadorueda/alejandra/3.0.0";
   
-    #hyprland = {
-    #  url = "github:hyprwm/Hyprland";
-    #  inputs.nixpkgs.follows = "nixpkgs";
-    #};
+    hyprland = {
+      #url = "github:hyprwm/Hyprland";
+      url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     
     qbpm.url = github:pvsr/qbpm;
     qbpm.inputs.nixpkgs.follows = "nixpkgs";
