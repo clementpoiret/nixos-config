@@ -1,8 +1,14 @@
 { inputs, pkgs, ... }: 
 {
   home.packages = (with pkgs; [
+    aerc                              # for emails
+    awscli2
+    beeper
+    bruno                             # for REST APIs tests
     bitwise                           # cli tool for bit / hex manipulation
     cinnamon.nemo-with-extensions     # file manager
+    # copyq
+    drawio
     entr                              # perform action when file change
     fd                                # find replacement
     file                              # Show file information 
@@ -20,16 +26,22 @@
     magic-wormhole                    # magic file transfer
     nitch                             # systhem fetch util
     nix-prefetch-github
+    obsidian
     pciutils
     ripgrep                           # grep replacement
+    spotify-player
+    syncthing
     toipe                             # typing test in the terminal
     tldr                              # user-friendly help
+    # wl-clipboard
+    zellij
 
     # C / C++
     gcc
     gnumake
 
     # Python
+    micromamba
     python3
 
     bleachbit                         # cache cleaner

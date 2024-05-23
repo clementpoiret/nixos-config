@@ -20,11 +20,14 @@
 
       input = {
         kb_layout = "us";
+        kb_options = "compose:ralt";
         numlock_by_default = true;
         follow_mouse = 1;
         sensitivity = 0;
         touchpad = {
           natural_scroll = true;
+          disable_while_typing = true;
+          tap-to-click = true;
         };
       };
 
@@ -36,9 +39,9 @@
       general = {
         "$mainMod" = "SUPER";
         layout = "dwindle";
-        gaps_in = 0;
-        gaps_out = 0;
-        border_size = 2;
+        gaps_in = 8;
+        gaps_out = 8;
+        border_size = 3;
         "col.active_border" = "rgb(cba6f7) rgb(94e2d5) 45deg";
         "col.inactive_border" = "0x00000000";
         border_part_of_window = false;
@@ -53,6 +56,12 @@
         animate_manual_resizes = false;
         enable_swallow = true;
         focus_on_activate = true;
+      };
+
+      gestures = {
+        workspace_swipe = true;
+        workspace_swipe_fingers = 3;
+        workspace_swipe_forever = true;
       };
 
       dwindle = {
@@ -72,15 +81,15 @@
       };
 
       decoration = {
-        rounding = 0;
-        # active_opacity = 0.90;
-        # inactive_opacity = 0.90;
+        rounding = 8;
+        active_opacity = 1.0;
+        inactive_opacity = 0.80;
         # fullscreen_opacity = 1.0;
 
         blur = {
           enabled = true;
-          size = 1;
-          passes = 1;
+          size = 2;
+          passes = 4;
           # size = 4;
           # passes = 2;
           brightness = 1;
@@ -95,8 +104,8 @@
 
         shadow_ignore_window = true;
         shadow_offset = "0 2";
-        shadow_range = 20;
-        shadow_render_power = 3;
+        shadow_range = 15;
+        shadow_render_power = 2;
         "col.shadow" = "rgba(00000055)";
       };
 
@@ -135,25 +144,21 @@
         # keybindings
         "$mainMod, Return, exec, kitty"
         "ALT, Return, exec, kitty --title float_kitty"
-        "$mainMod SHIFT, Return, exec, kitty --start-as=fullscreen -o 'font_size=16'"
-        "$mainMod, B, exec, hyprctl dispatch exec '[workspace 1 silent] floorp'"
+        "$mainMod, D, exec, pkill wofi || wofi --show drun"
+        "$mainMod, P, pseudo,"
         "$mainMod, Q, killactive,"
         "$mainMod, F, fullscreen, 0"
         "$mainMod SHIFT, F, fullscreen, 1"
+        "$mainMod, B, exec, qbpm launch pers"
+        "$mainMod SHIFT, B, exec, qbpm launch work"
         "$mainMod, Space, togglefloating,"
-        "$mainMod, D, exec, pkill wofi || wofi --show drun"
-        "$mainMod SHIFT, D, exec, hyprctl dispatch exec '[workspace 4 silent] discord'"
-        "$mainMod SHIFT, S, exec, hyprctl dispatch exec '[workspace 5 silent] SoundWireServer'"
         "$mainMod, Escape, exec, swaylock"
         "$mainMod SHIFT, Escape, exec, shutdown-script"
-        "$mainMod, P, pseudo,"
         "$mainMod, J, togglesplit,"
-        "$mainMod, E, exec, nemo"
-        "$mainMod SHIFT, B, exec, pkill -SIGUSR1 .waybar-wrapped"
-        "$mainMod, C ,exec, hyprpicker -a"
-        "$mainMod, G,exec, $HOME/.local/bin/toggle_layout"
-        "$mainMod, W,exec, pkill wofi || wallpaper-picker"
-        "$mainMod SHIFT, W, exec, vm-start"
+        "$mainMod, E, exec, kitty -e yazi"
+        "$mainMod ALT, B, exec, pkill -SIGUSR1 .waybar-wrapped"
+        "$mainMod, C, exec, hyprpicker -a"
+        "$mainMod, W, exec, pkill wofi || wallpaper-picker"
 
         # screenshot
         "$mainMod, Print, exec, grimblast --notify --cursor save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
@@ -205,8 +210,8 @@
         "$mainMod ALT, down, moveactive, 0 80"
 
         # media and volume controls
-        ",XF86AudioRaiseVolume,exec, pamixer -i 2"
-        ",XF86AudioLowerVolume,exec, pamixer -d 2"
+        ",XF86AudioRaiseVolume, exec, pamixer -i 2"
+        ",XF86AudioLowerVolume, exec, pamixer -d 2"
         ",XF86AudioMute,exec, pamixer -t"
         ",XF86AudioPlay,exec, playerctl play-pause"
         ",XF86AudioNext,exec, playerctl next"
@@ -235,7 +240,6 @@
         "size 1200 725,imv"
         "float,mpv"
         "center,mpv"
-        "tile,Aseprite"
         "size 1200 725,mpv"
         "float,title:^(float_kitty)$"
         "center,title:^(float_kitty)$"
@@ -245,9 +249,11 @@
         "pin,wofi"
         "float,wofi"
         "noborder,wofi"
-        "tile, neovide"
         "idleinhibit focus,mpv"
         "float,udiskie"
+        "float,^(pavucontrol)$"
+        "float,^(blueman-manager)$"
+        "float,^(nm-connection-editor)$"
         "float,title:^(Transmission)$"
         "float,title:^(Volume Control)$"
         "float,title:^(Firefox — Sharing Indicator)$"

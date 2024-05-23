@@ -42,8 +42,6 @@ in {
     
     show-keybinds
 
-    vm-start
-
     ascii
   ];
 }
