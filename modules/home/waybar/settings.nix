@@ -1,61 +1,55 @@
 { ... }:
 {
   programs.waybar.settings.mainBar = {
-    position= "bottom";
-    layer= "top";
-    height= 5;
-    margin-top= 0;
-    margin-bottom= 0;
-    margin-left= 0;
-    margin-right= 0;
-    modules-left= [
+    position = "top";
+    layer = "top";
+    height = 30;
+    spacing = 15;
+    margin-top = 0;
+    margin-bottom = 0;
+    margin-left = 0;
+    margin-right = 0;
+    modules-left = [
         "custom/launcher" 
         "hyprland/workspaces"
+        "cpu"
+        "memory"
+        "temperature"
+        "disk"
     ];
     modules-center= [
         "clock"
     ];
     modules-right= [
-        "tray" 
-        "cpu"
-        "memory"
-        "disk"
+        "tray"
         "pulseaudio" 
         "battery"
         "network"
     ];
     clock= {
+        timezone = "Europe/Paris";
         calendar = {
           format = { today = "<span color='#b4befe'><b><u>{}</u></b></span>"; };
         };
-        format = " {:%H:%M}";
+        format = " {:%H:%M:%S}";
         tooltip= "true";
         tooltip-format= "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
         format-alt= " {:%d/%m}";
     };
     "hyprland/workspaces"= {
-        active-only= false;
-        disable-scroll= true;
-        format = "{icon}";
-        on-click= "activate";
-        format-icons= {
-            "1"= "󰈹";
-            "2"= "";
-            "3"= "󰘙";
-            "4"= "󰙯";
-            "5"= "";
-            "6"= "";
-            urgent= "";
-            default = "";
-            sort-by-number= true;
+        format = "{icon} {name}";
+        format-icons = {
+          "active" = "";
+          "default" = "";
         };
-        persistent-workspaces = {
-            "1"= [];
-            "2"= [];
-            "3"= [];
-            "4"= [];
-            "5"= [];
-        };
+        on-scroll-up = "hyprctl dispatch workspace e+1";
+        on-scroll-down = "hyprctl dispatch workspace e-1";
+        on-click = "activate";
+    };
+    "hyprland/window" = {
+        format = "{}";
+        separate-outputs = true;
+        max-length = 35;
     };
     memory= {
         format= "󰟜 {}%";
@@ -80,8 +74,8 @@
         format-disconnected = "󰖪 ";
     };
     tray= {
-        icon-size= 20;
-        spacing= 8;
+        icon-size = 15;
+        spacing = 15;
     };
     pulseaudio= {
         format= "{icon} {volume}%";
@@ -105,6 +99,14 @@
         format-time = "{H}h{M}m";
         tooltip = true;
         tooltip-format = "{time}";
+    };
+    backlight = {
+        # "device": "acpi_video1",
+        format = "{percent}% {icon}";
+        format-icons = [ "" "" ];
+        # on-scroll-up = "/home/cp264607/.config/hypr/scripts/tools/brightness_ctl.sh up";
+        # on-scroll-down = "/home/cp264607/.config/hypr/scripts/tools/brightness_ctl.sh down";
+        interval = 1;
     };
     "custom/launcher"= {
         format= "";

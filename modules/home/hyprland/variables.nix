@@ -26,9 +26,8 @@
     CLUTTER_BACKEND = "wayland";
     GTK_THEME = "Catppuccin-Mocha-Compact-Lavender-Dark";
     ELECTRON_OZONE_PLATFORM_HINT = "auto";
+    WLR_NO_HARDWARE_CURSORS = "0";
 
-    # WLR_NO_HARDWARE_CURSORS = "0";
-    #
     # LIBVA_DRIVER_NAME = "nvidia";
     # GBM_BACKEND = "nvidia-drm";
     # __GLX_VENDOR_LIBRARY_NAME = "nvidia";

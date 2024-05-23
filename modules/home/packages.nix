@@ -60,6 +60,7 @@
     qalculate-gtk                     # calculator
     unzip
     wget
+    wl-clipboard
     xdg-utils
     xxd
     inputs.alejandra.defaultPackage.${system}

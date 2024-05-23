@@ -1,12 +1,14 @@
 { ... }:
 let custom = {
     font = "JetBrainsMono Nerd Font";
-    font_size = "15px";
+    font_size = "12px";
     font_weight = "bold";
     text_color = "#cdd6f4";
-    secondary_accent= "89b4fa";
-    tertiary_accent = "f5f5f5";
-    background = "11111B";
+    secondary_accent= "#89b4fa";
+    tertiary_accent = "#f5f5f5";
+    background = "#11111b";
+    active_background = "#27273f";
+    hover_background = "#373758";
     opacity = "0.98";
 };
 in 
@@ -19,35 +21,85 @@ in
         padding: 0;
         margin: 0;
         min-height: 0px;
+        font-size: ${custom.font_size};
         font-family: ${custom.font};
         font-weight: ${custom.font_weight};
         opacity: ${custom.opacity};
     }
 
     window#waybar {
-        background: none;
+        background: transparent;
+        color: ${custom.text_color};
+        margin: 5px 0;
+        font-size: ${custom.font_size};
     }
 
     #workspaces {
-        font-size: 18px;
-        padding-left: 15px;
-        
+        border-radius: 1rem;
+        margin: 5px;
+        margin-left: 1rem;
     }
     #workspaces button {
+        background: ${custom.background};
         color: ${custom.text_color};
-        padding-left:  6px;
-        padding-right: 6px;
-    }
-    #workspaces button.empty {
-        color: #6c7086;
+        border-radius: 1rem;
+        margin: 0px 5px;
+        padding: 0px 10px;
+        transition: all 0.5s cubic-bezier(0.33, 1.0, 0.68, 1.0); /* easeInOutCubic */
     }
     #workspaces button.active {
         color: #b4befe;
+        border-radius: 1rem;
+        padding: 0rem 1rem;
+    }
+    #workspaces button.active {
+        color: #b4befe;
+        border-radius: 1rem;
     }
 
-    #tray, #pulseaudio, #network, #cpu, #memory, #disk, #clock, #battery {
+    #window,
+    #tray,
+    #backlight,
+    #pulseaudio,
+    #network,
+    #mpd,
+    #cpu,
+    #memory,
+    #disk,
+    #temperature,
+    #idle_inhibitor,
+    #clock,
+    #battery,
+    #custom-music,
+    #custom-launcher,
+    #custom-updates,
+    #custom-nordvpn,
+    #custom-notifications,
+    #custom-power,
+    #custom-weather {
+        /* background: ${custom.background}; */
         font-size: ${custom.font_size};
         color: ${custom.text_color};
+        border-radius: 1rem;
+        padding: 0.5rem 1rem;
+        margin: 5px 0;
+    }
+
+    #battery {
+       /* color: @green; */
+    }
+    #battery.charging {
+       /* color: @green; */
+    }
+    #battery.warning:not(.charging) {
+       /* color: @maroon; */
+    }
+    #battery.critical:not(.charging) {
+       /* color: @red; */
+    }
+
+    #backlight {
+        padding-right: 1.25rem;
     }
 
     #cpu {
@@ -74,10 +126,6 @@ in
         padding-right: 9px;
         margin-left: 7px;
     }
-    #battery {
-        padding-left: 9px;
-        padding-right: 9px;
-    }
     #network {
         padding-left: 9px;
         padding-right: 15px;
@@ -89,7 +137,7 @@ in
     }
 
     #custom-launcher {
-        font-size: 20px;
+        font-size: 16px;
         color: #b4befe;
         font-weight: ${custom.font_weight};
         padding-left: 10px;
