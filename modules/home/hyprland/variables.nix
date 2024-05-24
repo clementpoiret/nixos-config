@@ -26,16 +26,16 @@
     CLUTTER_BACKEND = "wayland";
     GTK_THEME = "Catppuccin-Mocha-Compact-Lavender-Dark";
     ELECTRON_OZONE_PLATFORM_HINT = "auto";
-    WLR_NO_HARDWARE_CURSORS = "0";
+    # WLR_NO_HARDWARE_CURSORS = "0";
 
-    # LIBVA_DRIVER_NAME = "nvidia";
-    # GBM_BACKEND = "nvidia-drm";
-    # __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    LIBVA_DRIVER_NAME = "nvidia";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     # VDPAU_DRIVER = "nvidia";
     # __NV_PRIME_RENDER_OFFLOAD = "1";
     # __VK_LAYER_NV_optimus = "NVIDIA_only";
     # PROTON_ENABLE_NGX_UPDATER = "1";
-    # NVD_BACKEND = "direct";
+    NVD_BACKEND = "direct";
     # WLR_USE_LIBINPUT = "1";
     # XWAYLAND_NO_GLAMOR = "1";
     # __GL_MaxFramesAllowed = "1";
