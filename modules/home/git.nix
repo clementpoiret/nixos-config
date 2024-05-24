@@ -13,6 +13,7 @@
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
       user.signingkey = "~/.ssh/id_ed25519_sk_blue.pub";
+      user.identityFile = "~/.ssh/id_ed25519_sk_blue";
     };
   };
 

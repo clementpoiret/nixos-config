@@ -40,8 +40,5 @@
     # XWAYLAND_NO_GLAMOR = "1";
     # __GL_MaxFramesAllowed = "1";
     # WLR_RENDERER_ALLOW_SOFTWARE = "1";
-
-    ## Customization
-    HYPRCURSOR_THEME = "rose-pine-hyprcursor";
   };
 }
