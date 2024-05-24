@@ -94,6 +94,7 @@
         r"*://*.duckduckgo.com/*",
         r"*://*.evanchen.cc/*",
         r"*://*.element.io/*",
+        r"*://*.gather.town/*",
         r"*://*.github.com/*",
         r"*://*.kagi.com/*",
         r"*://*.linear.app/*",
@@ -110,6 +111,7 @@
         r"*://*.slack.com/*",
         r"*://*.stackexchange.com/*",
         r"*://*.stripe.com/*",
+        r"*://*.supabase.com/*",
         r"*://*.usaco.org/*",
         r"*://*.wikipedia.org/*",
         r"*://*.wolframalpha.com/*",
@@ -152,6 +154,8 @@
         "https://easylist.to/easylist/easyprivacy.txt"
       ]
       c.content.blocking.adblock.lists = BLOCKING_FILTERS
+
+      config.set("content.canvas_reading", True, r"*://*.gather.town/*")
 
       config.set('content.cookies.accept', 'all', r"*://*.reddit.com/*")
       config.set('content.cookies.accept', 'all', r"*://*.redditinc.com/*")
@@ -203,4 +207,23 @@
   home.packages = (with pkgs; [
     inputs.qbpm.packages.${system}.qbpm
   ]);
+
+  xdg.mimeApps = {
+    enable = true;
+
+    associations.added = {
+      "text/html" = [ "org.qutebrowser.qutebrowser.desktop" ];
+      "x-scheme-handler/http" = [ "org.qutebrowser.qutebrowser.desktop" ];
+      "x-scheme-handler/https" = [ "org.qutebrowser.qutebrowser.desktop" ];
+      "x-scheme-handler/about" = [ "org.qutebrowser.qutebrowser.desktop" ];
+      "x-scheme-handler/unknown" = [ "org.qutebrowser.qutebrowser.desktop" ];
+    };
+    defaultApplications = {
+      "text/html" = [ "org.qutebrowser.qutebrowser.desktop" ];
+      "x-scheme-handler/http" = [ "org.qutebrowser.qutebrowser.desktop" ];
+      "x-scheme-handler/https" = [ "org.qutebrowser.qutebrowser.desktop" ];
+      "x-scheme-handler/about" = [ "org.qutebrowser.qutebrowser.desktop" ];
+      "x-scheme-handler/unknown" = [ "org.qutebrowser.qutebrowser.desktop" ];
+    };
+  };
 }

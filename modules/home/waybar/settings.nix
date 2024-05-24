@@ -31,7 +31,7 @@
         calendar = {
           format = { today = "<span color='#b4befe'><b><u>{}</u></b></span>"; };
         };
-        format = " {:%H:%M:%S}";
+        format = " {:%H:%M}";
         tooltip= "true";
         tooltip-format= "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
         format-alt= " {:%d/%m}";
