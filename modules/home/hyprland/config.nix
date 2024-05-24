@@ -13,7 +13,7 @@
         "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f) &"
         "hyprctl setcursor Nordzy-cursors 22 &"
         "poweralertd &"
-        "waybar &"
+        "sleep 1 && waybar &"
         "mako &"
       ];
 
@@ -161,7 +161,9 @@
 
         # screenshot
         "$mainMod, Print, exec, grimblast --notify --cursor save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod, Insert, exec, grimblast --notify --cursor save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
         ",Print, exec, grimblast --notify --cursor  copy area"
+        "ALT, Insert, exec, grimblast --notify --cursor  copy area"
 
         # switch focus
         "$mainMod, left, movefocus, l"

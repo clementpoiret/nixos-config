@@ -7,7 +7,6 @@
     bruno                             # for REST APIs tests
     bitwise                           # cli tool for bit / hex manipulation
     cinnamon.nemo-with-extensions     # file manager
-    # copyq
     drawio
     entr                              # perform action when file change
     fd                                # find replacement
@@ -29,11 +28,10 @@
     obsidian
     pciutils
     ripgrep                           # grep replacement
+    russ
     spotify-player
-    syncthing
     toipe                             # typing test in the terminal
     tldr                              # user-friendly help
-    # wl-clipboard
     zellij
 
     # C / C++

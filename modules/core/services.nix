@@ -10,4 +10,10 @@
     # don’t shutdown when power button is short-pressed
     HandlePowerKey=ignore
   '';
+
+  services.syncthing = {
+    enable = true;
+    user = "clementpoiret";
+    dataDir = "/mnt/hdd/Sync/";
+  };
 }

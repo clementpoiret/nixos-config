@@ -12,14 +12,30 @@
         "belak/zsh-utils path:prompt"
         "belak/zsh-utils path:utility"
         "romkatv/powerlevel10k"
-	"zdharma-continuum/fast-syntax-highlighting kind:defer"
-	"zsh-users/zsh-autosuggestions"
-	"zsh-users/zsh-completions"
+        "zdharma-continuum/fast-syntax-highlighting kind:defer"
+	      "zsh-users/zsh-autosuggestions"
+	      "zsh-users/zsh-completions"
       ];
     };
     initExtra = ''
       [[ ! -f ~/nixos-config/modules/home/files/.p10k.zsh ]] || source ~/nixos-config/modules/home/files/.p10k.zsh
+
+      bindkey '^p' history-search-backward
+      bindkey '^n' history-search-forward
+
+      zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
     '';
+
+    history = {
+      expireDuplicatesFirst = true;
+      ignoreDups = true;
+      ignoreAllDups = true;
+      ignoreSpace = true;
+      extended = true;
+      share = true;
+      size = 10000;
+      save = 10000;
+    };
 
     shellAliases = {
       # Utils
@@ -79,6 +95,11 @@
   };
 
   programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.atuin = {
     enable = true;
     enableZshIntegration = true;
   };
