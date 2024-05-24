@@ -5,6 +5,7 @@
     searchEngines = {
       "DEFAULT" = "https://kagi.com/search?q={}";
       "d" = "https://duckduckgo.com/?q={}&ia=web";
+      "p" = "https://perplexity.ai/search?q={}";
       "g" = "https://google.com/search?q={}";
       "n" = "https://mynixos.com/search?q={}";
       "nixo" = "https://search.nixos.org/options?channel=unstable&query={}";
@@ -18,66 +19,66 @@
           "https://kagi.com/";
         start_pages =
           [ "https://kagi.com/" ];
-	yank_ignored_parameters = [
+        yank_ignored_parameters = [
           "ref"
-	  "utm_source"
-	  "utm_medium"
-	  "utm_campaign"
-	  "utm_term"
-	  "utm_content"
-	  "utm_name"
+          "utm_source"
+          "utm_medium"
+          "utm_campaign"
+          "utm_term"
+          "utm_content"
+          "utm_name"
         ];
       };
 
       content = {
         autoplay = false;
-	blocking.enabled = true;
-	blocking.hosts.block_subdomains = true;
-	blocking.method = "both";
-	blocking.whitelist = [];
-	canvas_reading = false;
-	cookies.accept = "no-3rdparty";
-        dns_prefetch = true;
-	headers.accept_language = "en-US,en;q=0.9";
-	headers.do_not_track = true;
-	headers.referer = "same-domain";
-	headers.user_agent = "Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}";
-	javascript.clipboard = "none";
+        blocking.enabled = true;
+        blocking.hosts.block_subdomains = true;
+        blocking.method = "both";
+        blocking.whitelist = [];
+        canvas_reading = false;
+        cookies.accept = "no-3rdparty";
+              dns_prefetch = true;
+        headers.accept_language = "en-US,en;q=0.9";
+        headers.do_not_track = true;
+        headers.referer = "same-domain";
+        headers.user_agent = "Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}";
+        javascript.clipboard = "none";
         javascript.enabled = false;
         pdfjs = false;
       };
 
       downloads = {
         position = "bottom";
-	remove_finished = 5000;
+        remove_finished = 5000;
       };
 
       hints = {
         auto_follow = "unique-match";
-	auto_follow_timeout = 700;
+        auto_follow_timeout = 700;
       };
 
       input = {
         insert_mode.auto_enter = true;
-	insert_mode.auto_leave = true;
-	insert_mode.auto_load = true;
+        insert_mode.auto_leave = true;
+        insert_mode.auto_load = true;
       };
 
       tabs.background = true;
 
       auto_save = {
         session = false;
-	interval = 15000;
+        interval = 15000;
       };
     }; 
 
     keyBindings = {
       normal = {
         "sp" = "spawn --userscript qutepocket";
-	"E" = "spawn floorp '{url}'";
-	"M" = "hint links spawn mpv '{hint-url}'";
-	"P" = "open -w https://pass.proton.me/u/0/";
-	"\\\\" = "mode-enter passthrough";
+        "E" = "spawn floorp '{url}'";
+        "M" = "hint links spawn mpv '{hint-url}'";
+        "P" = "open -w https://pass.proton.me/u/0/";
+        "\\\\" = "mode-enter passthrough";
       };
     };
 
@@ -102,6 +103,7 @@
         r"*://*.myaccount.google.com/*",
         r"*://*.notion.so/*",
         r"*://*.notion.site/*",
+        r"*://*.perplexity.ai/*",
         r"*://*.proton.me/*",
         r"*://*.overleaf.com/*",  # their documentation is admittedly not bad
         r"*://*.readthedocs.io/*",
