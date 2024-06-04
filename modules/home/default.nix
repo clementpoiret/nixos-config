@@ -3,7 +3,7 @@
        [(import ./bat.nix)]                       # better cat command
     ++ [(import ./btop.nix)]                      # resouces monitor 
     ++ [(import ./floorp/floorp.nix)]             # firefox based browser
-    ++ [(import ./git.nix)]                       # vertion controle
+    ++ [(import ./git.nix)]                       # version controle
     ++ [(import ./gtk.nix)]                       # gtk theme
     ++ [(import ./hyprland)]                      # window manager
     ++ [(import ./kitty.nix)]                     # terminal

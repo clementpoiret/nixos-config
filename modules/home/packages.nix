@@ -32,6 +32,7 @@
     spotify-player
     toipe                             # typing test in the terminal
     tldr                              # user-friendly help
+    yarn
     zellij
 
     # C / C++
@@ -40,11 +41,14 @@
 
     # Python
     micromamba
+    pixi
     python3
 
     bleachbit                         # cache cleaner
+    chromium
     gparted                           # partition manager
     ffmpeg
+    firefox-devedition-bin
     imv                               # image viewer
     libnotify
     man-pages                         # extra man pages
@@ -59,6 +63,7 @@
     unzip
     wget
     wl-clipboard
+    cliphist
     xdg-utils
     xxd
     inputs.alejandra.defaultPackage.${system}

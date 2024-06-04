@@ -9,6 +9,7 @@
     extraConfig = { 
       init.defaultBranch = "main";
       credential.helper = "store";
+      core.sshCommand = "ssh -i /home/clementpoiret/.ssh/id_ed25519_sk_blue";
       commit.gpgsign = true;
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";

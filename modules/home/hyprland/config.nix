@@ -15,6 +15,7 @@
         "poweralertd &"
         "sleep 1 && waybar &"
         "mako &"
+        "wl-paste --watch cliphist store &"
       ];
 
       input = {
@@ -158,6 +159,7 @@
         "$mainMod ALT, B, exec, pkill -SIGUSR1 .waybar-wrapped"
         "$mainMod, C, exec, hyprpicker -a"
         "$mainMod, W, exec, pkill wofi || wallpaper-picker"
+        "$mainMod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
 
         # screenshot
         "$mainMod, Print, exec, grimblast --notify --cursor save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
