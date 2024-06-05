@@ -2,6 +2,7 @@
   imports =
        [(import ./bat.nix)]                       # better cat command
     ++ [(import ./btop.nix)]                      # resouces monitor 
+    ++ [(import ./easyeffect.nix)]                # audio profile 
     ++ [(import ./floorp/floorp.nix)]             # firefox based browser
     ++ [(import ./git.nix)]                       # version controle
     ++ [(import ./gtk.nix)]                       # gtk theme
