@@ -4,12 +4,17 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nur.url = "github:nix-community/NUR";
-  
+
     hypr-contrib.url = "github:hyprwm/contrib";
     hyprpicker.url = "github:hyprwm/hyprpicker";
   
     alejandra.url = "github:kamadorueda/alejandra/3.0.0";
   
+    classified = {
+      url = "github:GoldsteinE/classified";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     hyprland = {
       #url = "github:hyprwm/Hyprland";
       url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
@@ -35,7 +40,7 @@
     };
   };
 
-  outputs = { nixpkgs, self, ...} @ inputs:
+  outputs = { nixpkgs, self, classified, ...} @ inputs:
   let
     selfPkgs = import ./pkgs;
     username = "clementpoiret";
@@ -51,12 +56,18 @@
     nixosConfigurations = {
       desktop = nixpkgs.lib.nixosSystem {
         inherit system;
-        modules = [ (import ./hosts/desktop) ];
+        modules = [
+          (import ./hosts/desktop)
+          classified.nixosModules."${system}".default
+        ];
         specialArgs = { host="desktop"; inherit self inputs username ; };
       };
       laptop = nixpkgs.lib.nixosSystem {
         inherit system;
-        modules = [ (import ./hosts/laptop) ];
+        modules = [
+          (import ./hosts/laptop)
+          classified.nixosModules."${system}".default
+        ];
         specialArgs = { host="laptop"; inherit self inputs username ; };
       };
     };

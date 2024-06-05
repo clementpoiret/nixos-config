@@ -2,6 +2,7 @@
 {
   home.packages = (with pkgs; [
     aerc                              # for emails
+    age                               # for my secrets
     awscli2
     beeper
     bruno                             # for REST APIs tests

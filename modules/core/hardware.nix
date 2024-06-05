@@ -8,9 +8,9 @@
   ];
 
   # nvidia
-  services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.videoDrivers = lib.mkIf (host == "desktop") [ "nvidia" ];
 
-  hardware.nvidia = {
+  hardware.nvidia = lib.mkIf (host == "desktop") {
     package = config.boot.kernelPackages.nvidiaPackages.beta;
     modesetting.enable = true;
     powerManagement.enable = false;
@@ -27,7 +27,7 @@
   services.blueman.enable = true;
 
   # f2fs check
-  boot.initrd = lib.mkIf (host == "desktop") {
-    checkJournalingFS = false; 
-  };
+  #boot.initrd = lib.mkIf (host == "desktop") {
+  #  checkJournalingFS = false; 
+  #};
 }
