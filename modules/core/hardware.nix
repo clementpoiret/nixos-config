@@ -4,7 +4,13 @@
   hardware.opengl.driSupport = true;
   hardware.opengl.driSupport32Bit = true;
   hardware.enableRedistributableFirmware = true;
-  hardware.opengl.extraPackages = with pkgs; [
+  hardware.opengl.extraPackages = with pkgs; lib.mkIf (host == "laptop") [
+    amdvlk
+    rocm-opencl-icd
+    rocm-opencl-runtime 
+  ];
+  hardware.opengl.extraPackages32 = with pkgs; lib.mkIf (host == "laptop") [
+    driversi686Linux.amdvlk
   ];
 
   # nvidia
@@ -25,6 +31,9 @@
     powerOnBoot = true;
   };
   services.blueman.enable = true;
+
+  # Firmware updates
+  services.fwupd.enable = true;
 
   # f2fs check
   #boot.initrd = lib.mkIf (host == "desktop") {

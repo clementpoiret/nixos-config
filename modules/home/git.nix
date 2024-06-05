@@ -9,11 +9,11 @@
     extraConfig = { 
       init.defaultBranch = "main";
       credential.helper = "store";
-      core.sshCommand = "ssh -i /home/clementpoiret/.ssh/id_ed25519_sk_blue";
+      core.sshCommand = "ssh -i /home/clementpoiret/.ssh/id_ed25519_sk_main";
       commit.gpgsign = true;
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
-      user.signingkey = "~/.ssh/id_ed25519_sk_blue.pub";
+      user.signingkey = "~/.ssh/id_ed25519_sk_main.pub";
     };
   };
 
