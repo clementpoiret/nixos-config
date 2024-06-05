@@ -1,8 +1,17 @@
-{ pkgs, host, ... }:
+{ pkgs, host, inputs, ... }:
+let
+  secrets = import "${inputs.secrets}/variables.nix";
+in
 {
   networking = {
     hostName = "nixos";
     networkmanager.enable = true;
+    nameservers = [
+      "45.90.28.0#NixOS--${host}-${secrets.nextdnsId}.dns.nextdns.io"
+      "45.90.30.0#NixOS--${host}-${secrets.nextdnsId}.dns.nextdns.io"
+      "2a07:a8c0::#NixOS--${host}-${secrets.nextdnsId}.dns.nextdns.io"
+      "2a07:a8c1::#NixOS--${host}-${secrets.nextdnsId}.dns.nextdns.io"
+    ];
     firewall = {
       enable = true;
       allowedTCPPorts = [ 22 80 443 59010 59011 ];
@@ -18,27 +27,8 @@
     networkmanagerapplet
   ];
 
-  #services.resolved = {
-  #  enable = true;
-  #};
-
-  #classified = {
-  #  targetDir = "/etc/systemd/";
-  #  keys = {
-  #    primary = "/home/clementpoiret/.config/classified/primary.key";
-  #  };
-
-  #  files = {
-  #    "resolved.conf" = {
-  #      key = "primary";
-  #      encrypted = ../../secrets/desktop/resolved.conf;
-  #      # Default is `400`
-  #      mode = "777";
-  #      # Defaults are `root:root`
-  #      # user = "nginx";
-  #      # group = "nogroup";
-  #    };
-  #  };
-  #};
-
+  services.resolved = {
+    enable = true;
+    dnsovertls = "true";
+  };
 }

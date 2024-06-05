@@ -10,11 +10,6 @@
   
     alejandra.url = "github:kamadorueda/alejandra/3.0.0";
   
-    classified = {
-      url = "github:GoldsteinE/classified";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     hyprland = {
       #url = "github:hyprwm/Hyprland";
       url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
@@ -38,9 +33,14 @@
       url = "github:catppuccin/cava";
       flake = false;
     };
+
+    secrets = {
+      url = "git+ssh://git@github.com/clementpoiret/nix-secrets.git";
+      flake = false;
+    };
   };
 
-  outputs = { nixpkgs, self, classified, ...} @ inputs:
+  outputs = { nixpkgs, self, secrets, ...} @ inputs:
   let
     selfPkgs = import ./pkgs;
     username = "clementpoiret";
@@ -58,7 +58,6 @@
         inherit system;
         modules = [
           (import ./hosts/desktop)
-          classified.nixosModules."${system}".default
         ];
         specialArgs = { host="desktop"; inherit self inputs username ; };
       };
@@ -66,7 +65,6 @@
         inherit system;
         modules = [
           (import ./hosts/laptop)
-          classified.nixosModules."${system}".default
         ];
         specialArgs = { host="laptop"; inherit self inputs username ; };
       };
