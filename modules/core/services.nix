@@ -14,6 +14,6 @@
   services.syncthing = {
     enable = true;
     user = "clementpoiret";
-    dataDir = "/mnt/hdd/Sync/";
+    dataDir = "/home/clementpoiret/Sync/";
   };
 }
