@@ -8,6 +8,7 @@
     bruno                             # for REST APIs tests
     bitwise                           # cli tool for bit / hex manipulation
     cinnamon.nemo-with-extensions     # file manager
+    dmidecode
     drawio
     entr                              # perform action when file change
     fd                                # find replacement
@@ -23,6 +24,7 @@
     lazygit
     libreoffice
     lsd                               # ls replacement
+    lshw
     magic-wormhole                    # magic file transfer
     nitch                             # systhem fetch util
     nix-prefetch-github
@@ -47,6 +49,7 @@
 
     bleachbit                         # cache cleaner
     chromium
+    drawio
     gparted                           # partition manager
     ffmpeg
     firefox-devedition-bin

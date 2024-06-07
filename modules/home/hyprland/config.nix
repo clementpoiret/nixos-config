@@ -32,6 +32,7 @@
       };
 
       monitor = [
+        "eDP-2, 2560x1600@60, 0x0, 1.6"
         "DP-1, 1920x1080, 0x0, 1"
         "HDMI-A-1, 1920x1080, 1920x0, 1"
       ];
@@ -56,6 +57,7 @@
         animate_manual_resizes = false;
         enable_swallow = true;
         focus_on_activate = true;
+        vrr = 0;
       };
 
       gestures = {

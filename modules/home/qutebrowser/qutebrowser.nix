@@ -70,6 +70,8 @@
         session = false;
         interval = 15000;
       };
+
+      qt.highdpi = true;
     }; 
 
     keyBindings = {
