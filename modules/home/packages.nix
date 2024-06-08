@@ -11,6 +11,7 @@
     dmidecode
     drawio
     entr                              # perform action when file change
+    exfat
     fd                                # find replacement
     file                              # Show file information 
     fzf                               # fuzzy finder
@@ -25,6 +26,7 @@
     libreoffice
     lsd                               # ls replacement
     lshw
+    lxqt.lxqt-policykit
     magic-wormhole                    # magic file transfer
     nitch                             # systhem fetch util
     nix-prefetch-github
