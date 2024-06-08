@@ -7,6 +7,17 @@
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
-    # pinentryFlavor = "";
+    # pinentryFlavor = "qt";
+    pinentryPackage = pkgs.pinentry-qt;
+  };
+  services.pcscd.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    lxqt.lxqt-openssh-askpass
+  ];
+
+  programs.ssh = {
+    enableAskPassword = true;
+    askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
   };
 }

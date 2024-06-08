@@ -5,14 +5,15 @@
     
     userName = "clementpoiret";
     userEmail = "poiret.clement@outlook.fr";
-    
+
     extraConfig = { 
       init.defaultBranch = "main";
-      credential.helper = "store";
+      credential.helper = "cache";
       core.sshCommand = "ssh -i /home/clementpoiret/.ssh/id_ed25519_sk_main";
       commit.gpgsign = true;
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
+      status.showUntrackedFiles = "no";
       user.signingkey = "~/.ssh/id_ed25519_sk_main.pub";
     };
   };
