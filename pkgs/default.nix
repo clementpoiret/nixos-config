@@ -9,4 +9,4 @@ rec{
       names = builtins.attrNames dirContents;
     in
     builtins.listToAttrs (map genPackage names);
-}
+  }

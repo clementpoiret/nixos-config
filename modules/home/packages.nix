@@ -47,7 +47,7 @@
     # Python
     micromamba
     pixi
-    python3
+    (import ./python-packages.nix { pkgs = pkgs; })
 
     bleachbit                         # cache cleaner
     chromium
@@ -64,6 +64,8 @@
     pamixer                           # pulseaudio command line mixer
     pavucontrol                       # pulseaudio volume controle (GUI)
     playerctl                         # controller for media players
+    protonvpn-gui
+    protonvpn-cli
     poweralertd
     qalculate-gtk                     # calculator
     unzip
@@ -72,6 +74,7 @@
     cliphist
     xdg-utils
     xxd
+
     inputs.alejandra.defaultPackage.${system}
   ]);
 }
