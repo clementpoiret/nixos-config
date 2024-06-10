@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, host, lib, ... }:
 {
   home.sessionVariables = {
     SSH_ASKPASS = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
@@ -14,6 +14,7 @@
     DIRENV_LOG_FORMAT = "";
     WLR_DRM_NO_ATOMIC = "1";
     QT_AUTO_SCREEN_SCALE_FACTOR = "1";
+    QT_SCALE_FACTOR_ROUNDING_POLICY = "RoundPreferFloor";
     QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
     QT_QPA_PLATFORM = "wayland;xcb";
     QT_QPA_PLATFORMTHEME = "qt5ct";
@@ -29,18 +30,19 @@
     GTK_THEME = "Catppuccin-Mocha-Compact-Lavender-Dark";
     ELECTRON_OZONE_PLATFORM_HINT = "auto";
     # WLR_NO_HARDWARE_CURSORS = "0";
+  };
 
-    LIBVA_DRIVER_NAME = "nvidia";
-    GBM_BACKEND = "nvidia-drm";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+  home.sessionVariables.LIBVA_DRIVER_NAME = lib.mkIf (host == "desktop") "nvidia";
+  home.sessionVariables.GBM_BACKEND = lib.mkIf (host == "desktop") "nvidia-drm";
+  home.sessionVariables.__GLX_VENDOR_LIBRARY_NAME = lib.mkIf (host == "desktop") "nvidia";
+  home.sessionVariables.NVD_BACKEND = lib.mkIf (host == "desktop") "direct";
+
     # VDPAU_DRIVER = "nvidia";
     # __NV_PRIME_RENDER_OFFLOAD = "1";
     # __VK_LAYER_NV_optimus = "NVIDIA_only";
     # PROTON_ENABLE_NGX_UPDATER = "1";
-    NVD_BACKEND = "direct";
     # WLR_USE_LIBINPUT = "1";
     # XWAYLAND_NO_GLAMOR = "1";
     # __GL_MaxFramesAllowed = "1";
     # WLR_RENDERER_ALLOW_SOFTWARE = "1";
-  };
 }
