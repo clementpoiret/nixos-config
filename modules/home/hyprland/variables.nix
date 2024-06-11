@@ -20,7 +20,7 @@
     QT_QPA_PLATFORMTHEME = "qt5ct";
     QT_STYLE_OVERRIDE = "kvantum";
     MOZ_ENABLE_WAYLAND = "1";
-    WLR_BACKEND = "vulkan";
+    #WLR_BACKEND = "vulkan";
     #WLR_RENDERER = "vulkan";
     XDG_SESSION_TYPE = "wayland";
     XDG_SESSION_DESKTOP = "Hyprland";

@@ -13,7 +13,7 @@
       commit.gpgsign = true;
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
-      status.showUntrackedFiles = "no";
+      # status.showUntrackedFiles = "no";
       user.signingkey = "~/.ssh/id_ed25519_sk_main.pub";
     };
   };

@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nur.url = "github:nix-community/NUR";
 
     hypr-contrib.url = "github:hyprwm/contrib";
@@ -40,12 +41,16 @@
     };
   };
 
-  outputs = { nixpkgs, self, secrets, ...} @ inputs:
+  outputs = { nixpkgs, nixpkgs-master, self, secrets, ...} @ inputs:
   let
     selfPkgs = import ./pkgs;
     username = "clementpoiret";
     system = "x86_64-linux";
     pkgs = import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+    };
+    pkgs-master = import nixpkgs-master {
       inherit system;
       config.allowUnfree = true;
     };
@@ -57,6 +62,14 @@
       desktop = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
+          {
+            nixpkgs.overlays = [
+              (final: prev: {
+                # master = nixpkgs-master.legacyPackages.${prev.system};
+                master = pkgs-master;
+              })
+            ];
+          }
           (import ./hosts/desktop)
         ];
         specialArgs = { host="desktop"; inherit self inputs username ; };
@@ -64,6 +77,13 @@
       laptop = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
+          {
+            nixpkgs.overlays = [
+              (final: prev: {
+                master = pkgs-master;
+              })
+            ];
+          }
           (import ./hosts/laptop)
         ];
         specialArgs = { host="laptop"; inherit self inputs username ; };

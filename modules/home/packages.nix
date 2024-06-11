@@ -30,7 +30,6 @@
     magic-wormhole                    # magic file transfer
     nitch                             # systhem fetch util
     nix-prefetch-github
-    obsidian
     pciutils
     ripgrep                           # grep replacement
     russ
@@ -60,10 +59,12 @@
     man-pages                         # extra man pages
     mpv                               # video player
     ncdu                              # disk space
+    obsidian
     openssl
     pamixer                           # pulseaudio command line mixer
     pavucontrol                       # pulseaudio volume controle (GUI)
     playerctl                         # controller for media players
+    master.proton-pass
     protonvpn-gui
     protonvpn-cli
     poweralertd
@@ -74,6 +75,7 @@
     cliphist
     xdg-utils
     xxd
+    zotero-beta
 
     inputs.alejandra.defaultPackage.${system}
   ]);
