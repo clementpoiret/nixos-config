@@ -18,8 +18,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    qbpm.url = github:pvsr/qbpm;
-    qbpm.inputs.nixpkgs.follows = "nixpkgs";
+    qbpm = {
+      url = github:pvsr/qbpm;
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -54,6 +56,7 @@
       inherit system;
       config.allowUnfree = true;
     };
+
     lib = nixpkgs.lib;
   in
   {
