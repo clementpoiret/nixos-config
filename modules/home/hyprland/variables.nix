@@ -32,10 +32,10 @@
     # WLR_NO_HARDWARE_CURSORS = "0";
   };
 
-  home.sessionVariables.LIBVA_DRIVER_NAME = lib.mkIf (host == "desktop") "nvidia";
-  home.sessionVariables.GBM_BACKEND = lib.mkIf (host == "desktop") "nvidia-drm";
-  home.sessionVariables.__GLX_VENDOR_LIBRARY_NAME = lib.mkIf (host == "desktop") "nvidia";
-  home.sessionVariables.NVD_BACKEND = lib.mkIf (host == "desktop") "direct";
+  # home.sessionVariables.LIBVA_DRIVER_NAME = lib.mkIf (host == "desktop") "nvidia";
+  # home.sessionVariables.GBM_BACKEND = lib.mkIf (host == "desktop") "nvidia-drm";
+  # home.sessionVariables.__GLX_VENDOR_LIBRARY_NAME = lib.mkIf (host == "desktop") "nvidia";
+  # home.sessionVariables.NVD_BACKEND = lib.mkIf (host == "desktop") "direct";
 
     # VDPAU_DRIVER = "nvidia";
     # __NV_PRIME_RENDER_OFFLOAD = "1";
