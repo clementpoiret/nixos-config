@@ -164,6 +164,7 @@
         "$mainMod, W, exec, pkill wofi || wallpaper-picker"
         "$mainMod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
         "$mainMod, M, exec, proton-pass"
+        "$mainMod, O, exec, export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH; obsidian"
 
         # screenshot
         "$mainMod, Print, exec, grimblast --notify --cursor save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
