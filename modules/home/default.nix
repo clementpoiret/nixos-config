@@ -18,5 +18,5 @@
     ++ [(import ./waybar)]                        # status bar
     ++ [(import ./wofi.nix)]                      # launcher
     ++ [(import ./yazi.nix)]                      # terminal file manager
-    ++ [(import ./zsh.nix)];                      # shell
+    ++ [(import ./zsh/zsh.nix)];                  # shell
 }

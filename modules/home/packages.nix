@@ -21,6 +21,7 @@
     gtrash                            # rm replacement, put deleted files in system trash
     hexdump
     inxi                              # system info
+    jdk
     killall                           # to kill our little friends
     lazygit
     libreoffice

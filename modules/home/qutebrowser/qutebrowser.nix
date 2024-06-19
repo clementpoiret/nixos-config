@@ -103,6 +103,7 @@
         r"*://*.linear.app/*",
         r"*://*.mit.edu/*",
         r"*://*.myaccount.google.com/*",
+        r"*://*.nixos.org/*",
         r"*://*.notion.so/*",
         r"*://*.notion.site/*",
         r"*://*.perplexity.ai/*",
@@ -120,6 +121,7 @@
         r"*://*.wikipedia.org/*",
         r"*://*.wolframalpha.com/*",
         r"*://*.wikidata.org/*",
+        r"*://*.writefull.com/*",
         r"*://*.youtube.com/*",
         r"*://accounts.google.com/*",
         r"*://artofproblemsolving.com/*",
@@ -161,8 +163,10 @@
 
       config.set("content.canvas_reading", True, r"*://*.gather.town/*")
 
+      config.set('content.cookies.accept', 'all', r"*://*.overleaf.com/*")
       config.set('content.cookies.accept', 'all', r"*://*.reddit.com/*")
       config.set('content.cookies.accept', 'all', r"*://*.redditinc.com/*")
+      config.set('content.cookies.accept', 'all', r"*://*.writefull.com/*")
       config.set('content.cookies.accept', 'all', 'chrome-devtools://*')
       config.set('content.cookies.accept', 'all', 'devtools://*')
 
