@@ -70,6 +70,7 @@
     protonvpn-cli
     poweralertd
     qalculate-gtk                     # calculator
+    tdf                               # read pdfs in terminal
     unzip
     wget
     wl-clipboard

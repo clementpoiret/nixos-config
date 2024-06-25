@@ -75,6 +75,7 @@ in
     #custom-updates,
     #custom-nordvpn,
     #custom-notifications,
+    #custom-notification,
     #custom-power,
     #custom-weather {
         /* background: ${custom.background}; */
@@ -142,6 +143,11 @@ in
         font-weight: ${custom.font_weight};
         padding-left: 10px;
         padding-right: 15px;
+    }
+
+    custom-notification {
+        padding-left: 20px;
+        padding-right: 20px;
     }
   '';
 }

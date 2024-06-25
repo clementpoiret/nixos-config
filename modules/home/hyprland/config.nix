@@ -7,7 +7,7 @@
       exec-once = [
         "systemctl --user import-environment &"
         "hash dbus-update-activation-environment 2>/dev/null &"
-        "dbus-update-activation-environment --systemd &"
+        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &"
         "lxqt-policykit-agent &"
         "nm-applet &"
         "wl-clip-persist --clipboard both"
@@ -15,7 +15,7 @@
         "hyprctl setcursor Nordzy-cursors 22 &"
         "poweralertd &"
         "sleep 1 && waybar &"
-        "mako &"
+        "swaync &"
         "wl-paste --watch cliphist store &"
       ];
 
@@ -147,7 +147,7 @@
         # keybindings
         "$mainMod, Return, exec, kitty"
         "ALT, Return, exec, kitty --title float_kitty"
-        "$mainMod, D, exec, pkill wofi || wofi --show drun"
+        "$mainMod, D, exec, pkill fuzzel || fuzzel"
         "$mainMod, P, pseudo,"
         "$mainMod, Q, killactive,"
         "$mainMod, F, fullscreen, 1"
@@ -161,16 +161,16 @@
         "$mainMod, E, exec, kitty -e yazi"
         "$mainMod ALT, B, exec, pkill -SIGUSR1 .waybar-wrapped"
         "$mainMod, C, exec, hyprpicker -a"
-        "$mainMod, W, exec, pkill wofi || wallpaper-picker"
-        "$mainMod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
+        "$mainMod, W, exec, pkill fuzzel || wallpaper-picker"
+        "$mainMod, V, exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
         "$mainMod, M, exec, proton-pass"
         "$mainMod, O, exec, export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH; obsidian"
 
         # screenshot
-        "$mainMod, Print, exec, grimblast --notify --cursor save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        "$mainMod, Insert, exec, grimblast --notify --cursor save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        ",Print, exec, grimblast --notify --cursor  copy area"
-        "ALT, Insert, exec, grimblast --notify --cursor  copy area"
+        "$mainMod, Print, exec, grimblast --notify --cursor --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod, Insert, exec, grimblast --notify --cursor --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        ",Print, exec, grimblast --notify --cursor --freeze copy area"
+        "ALT, Insert, exec, grimblast --notify --cursor --freeze copy area"
 
         # switch focus
         "$mainMod, left, movefocus, l"
@@ -254,9 +254,6 @@
         "size 950 600,title:^(float_kitty)$"
         "float,audacious"
         "workspace 8 silent, audacious"
-        "pin,wofi"
-        "float,wofi"
-        "noborder,wofi"
         "idleinhibit focus,mpv"
         "float,udiskie"
         "float,^(pavucontrol)$"

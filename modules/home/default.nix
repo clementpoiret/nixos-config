@@ -4,11 +4,12 @@
     ++ [(import ./btop.nix)]                      # resouces monitor 
     ++ [(import ./easyeffect.nix)]                # audio profile 
     ++ [(import ./floorp/floorp.nix)]             # firefox based browser
+    ++ [(import ./fuzzel.nix)]                    # launcher
     ++ [(import ./git.nix)]                       # version controle
     ++ [(import ./gtk.nix)]                       # gtk theme
     ++ [(import ./hyprland)]                      # window manager
     ++ [(import ./kitty.nix)]                     # terminal
-    ++ [(import ./mako.nix)]                      # notification deamon
+    ++ [(import ./swaync/swaync.nix)]             # notification deamon
     ++ [(import ./micro.nix)]                     # nano replacement
     ++ [(import ./nvim/nvim.nix)]                 # neovim editor
     ++ [(import ./packages.nix)]                  # other packages
@@ -16,7 +17,6 @@
     ++ [(import ./scripts/scripts.nix)]           # personal scripts
     ++ [(import ./swaylock.nix)]                  # lock screen
     ++ [(import ./waybar)]                        # status bar
-    ++ [(import ./wofi.nix)]                      # launcher
     ++ [(import ./yazi.nix)]                      # terminal file manager
     ++ [(import ./zsh/zsh.nix)];                  # shell
 }
