@@ -1,15 +1,13 @@
 { config, host, lib, pkgs, ... }:
 {  
-  hardware.opengl.enable = true;
-  hardware.opengl.driSupport = true;
-  hardware.opengl.driSupport32Bit = true;
+  hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
-  hardware.opengl.extraPackages = with pkgs; lib.mkIf (host == "laptop") [
+  hardware.graphics.extraPackages = with pkgs; lib.mkIf (host == "laptop") [
     amdvlk
     rocm-opencl-icd
     rocm-opencl-runtime 
   ];
-  hardware.opengl.extraPackages32 = with pkgs; lib.mkIf (host == "laptop") [
+  hardware.graphics.extraPackages32 = with pkgs; lib.mkIf (host == "laptop") [
     driversi686Linux.amdvlk
   ];
 
