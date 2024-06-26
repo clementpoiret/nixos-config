@@ -16,9 +16,9 @@
     settings = {
       url = {
         default_page =
-          "https://kagi.com/";
+          "https://kagi.com/smallweb/";
         start_pages =
-          [ "https://kagi.com/" ];
+          [ "https://kagi.com/smallweb/" ];
         yank_ignored_parameters = [
           "ref"
           "utm_source"
