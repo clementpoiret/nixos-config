@@ -90,6 +90,9 @@
       piv = "python -m venv .venv";
       psv = "source .venv/bin/activate";
 
+      # custom tools
+      lakectl = "/home/clementpoiret/bin/lakectl";
+
       # to fix std lib issues
       obsidian = "export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH; obsidian";
     };
