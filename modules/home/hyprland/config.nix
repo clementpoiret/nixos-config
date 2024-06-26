@@ -164,6 +164,7 @@
         "$mainMod, W, exec, pkill fuzzel || wallpaper-picker"
         "$mainMod, V, exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
         "$mainMod, M, exec, proton-pass"
+        "$mainMod, N, exec, swaync-client -t"
         "$mainMod, O, exec, export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH; obsidian"
 
         # screenshot

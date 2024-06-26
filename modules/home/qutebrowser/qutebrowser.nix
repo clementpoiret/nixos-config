@@ -103,6 +103,7 @@
         r"*://*.linear.app/*",
         r"*://*.mit.edu/*",
         r"*://*.myaccount.google.com/*",
+        r"*://*.nextdns.io/*",
         r"*://*.nixos.org/*",
         r"*://*.notion.so/*",
         r"*://*.notion.site/*",
@@ -112,6 +113,7 @@
         r"*://*.readthedocs.io/*",
         r"*://*.reddit.com/*",
         r"*://*.redditinc.com/*",
+        r"*://*.scaleway.com/*",
         r"*://*.scholar-inbox.com/*",
         r"*://*.slack.com/*",
         r"*://*.stackexchange.com/*",
@@ -141,23 +143,9 @@
         config.set("content.javascript.enabled", True, site)
 
       BLOCKING_FILTERS = [
-        "https://small.oisd.nl",
-        # "https://malware-filter.gitlab.io/malware-filter/phishing-filter.txt",
-        # "https://malware-filter.gitlab.io/malware-filter/urlhaus-filter.txt",
-        # "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=1&mimetype=plaintext",
-        # "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt",
-        # "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt",
-        # "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt",
-        # "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt",
-        # "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/resource-abuse.txt",
-        "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
+        "https://big.oisd.nl",
         "https://raw.githubusercontent.com/easylist/listefr/master/liste_fr.txt",
-        "https://filters.adtidy.org/extension/ublock/filters/101_optimized.txt",
-        "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt",
-        "https://filters.adtidy.org/extension/ublock/filters/3_optimized.txt",
-        "https://filters.adtidy.org/extension/ublock/filters/118_optimized.txt",
-        "https://easylist.to/easylist/easylist.txt",
-        "https://easylist.to/easylist/easyprivacy.txt"
+        "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.plus.txt",
       ]
       c.content.blocking.adblock.lists = BLOCKING_FILTERS
 
