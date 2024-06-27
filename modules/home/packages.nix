@@ -48,6 +48,7 @@
     # Python
     micromamba
     pixi
+    poetry
     (import ./python-packages.nix { pkgs = pkgs; })
 
     bleachbit                         # cache cleaner
