@@ -17,6 +17,7 @@
     fzf                               # fuzzy finder
     gh                                # github cli
     gtt                               # google translate TUI
+    gifsicle                          # gif utility
     gnome.zenity
     gtrash                            # rm replacement, put deleted files in system trash
     hexdump
@@ -52,6 +53,7 @@
     bleachbit                         # cache cleaner
     chromium
     drawio
+    evince                            # gnome pdf viewer
     gparted                           # partition manager
     ffmpeg
     firefox-devedition-bin

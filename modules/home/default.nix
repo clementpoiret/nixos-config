@@ -15,7 +15,6 @@
     ++ [(import ./packages.nix)]                  # other packages
     ++ [(import ./qutebrowser/qutebrowser.nix)]   # qutebrowser
     ++ [(import ./scripts/scripts.nix)]           # personal scripts
-    ++ [(import ./swaylock.nix)]                  # lock screen
     ++ [(import ./waybar)]                        # status bar
     ++ [(import ./yazi.nix)]                      # terminal file manager
     ++ [(import ./zsh/zsh.nix)];                  # shell

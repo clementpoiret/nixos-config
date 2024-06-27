@@ -51,6 +51,8 @@
       icat = "kitten icat";
       dsize = "du -hs";
       findw = "grep -rl";
+      pdf = "tdf";
+      open = "xdg-open";
 
       ls = "lsd --group-directories-first";
       ll = "lsd -l --group-directories-first";
