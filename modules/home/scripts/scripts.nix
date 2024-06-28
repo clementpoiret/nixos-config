@@ -45,5 +45,7 @@ in {
     show-keybinds
 
     ascii
+
+    record
   ];
 }
