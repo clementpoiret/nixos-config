@@ -147,7 +147,7 @@
         # keybindings
         "$mainMod, Return, exec, kitty"
         "ALT, Return, exec, kitty --title float_kitty"
-        "$mainMod, D, exec, pkill fuzzel || fuzzel"
+        "$mainMod, D, exec, fuzzel"
         "$mainMod, P, pseudo,"
         "$mainMod, Q, killactive,"
         "$mainMod, F, fullscreen, 1"
@@ -161,7 +161,7 @@
         "$mainMod, E, exec, kitty -e yazi"
         "$mainMod ALT, B, exec, pkill -SIGUSR1 .waybar-wrapped"
         "$mainMod, C, exec, hyprpicker -a"
-        "$mainMod, W, exec, pkill fuzzel || wallpaper-picker"
+        "$mainMod, W, exec, wallpaper-picker"
         "$mainMod, V, exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
         "$mainMod, M, exec, proton-pass"
         "$mainMod, N, exec, swaync-client -t"
