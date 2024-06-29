@@ -151,6 +151,15 @@
               template = "{{ .FormattedMs }}";
               properties.threshold = 5000;
             }
+            {
+              type = "python";
+              style = "plain";
+              background = "transparent";
+              foreground = "p:grey";
+              fetch_virtual_env = true;
+              display_default = true;
+              fetch_version = true;
+            }
           ];
         }
 

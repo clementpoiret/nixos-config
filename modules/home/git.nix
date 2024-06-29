@@ -6,6 +6,10 @@
     userName = "clementpoiret";
     userEmail = "poiret.clement@outlook.fr";
 
+    delta = {
+      enable = true;
+    };
+
     extraConfig = { 
       init.defaultBranch = "main";
       credential.helper = "cache";
