@@ -55,10 +55,7 @@
     },
     "fenix": {
       "inputs": {
-        "nixpkgs": [
-          "alejandra",
-          "nixpkgs"
-        ],
+        "nixpkgs": ["alejandra", "nixpkgs"],
         "rust-analyzer-src": "rust-analyzer-src"
       },
       "locked": {
@@ -111,9 +108,7 @@
     },
     "home-manager": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": ["nixpkgs"]
       },
       "locked": {
         "lastModified": 1719588253,
@@ -149,18 +144,9 @@
     },
     "hyprcursor": {
       "inputs": {
-        "hyprlang": [
-          "hyprland",
-          "hyprlang"
-        ],
-        "nixpkgs": [
-          "hyprland",
-          "nixpkgs"
-        ],
-        "systems": [
-          "hyprland",
-          "systems"
-        ]
+        "hyprlang": ["hyprland", "hyprlang"],
+        "nixpkgs": ["hyprland", "nixpkgs"],
+        "systems": ["hyprland", "systems"]
       },
       "locked": {
         "lastModified": 1718450675,
@@ -182,9 +168,7 @@
         "hyprlang": "hyprlang",
         "hyprutils": "hyprutils",
         "hyprwayland-scanner": "hyprwayland-scanner",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
+        "nixpkgs": ["nixpkgs"],
         "systems": "systems",
         "xdph": "xdph"
       },
@@ -206,16 +190,8 @@
     },
     "hyprland-protocols": {
       "inputs": {
-        "nixpkgs": [
-          "hyprland",
-          "xdph",
-          "nixpkgs"
-        ],
-        "systems": [
-          "hyprland",
-          "xdph",
-          "systems"
-        ]
+        "nixpkgs": ["hyprland", "xdph", "nixpkgs"],
+        "systems": ["hyprland", "xdph", "systems"]
       },
       "locked": {
         "lastModified": 1714869498,
@@ -233,18 +209,9 @@
     },
     "hyprlang": {
       "inputs": {
-        "hyprutils": [
-          "hyprland",
-          "hyprutils"
-        ],
-        "nixpkgs": [
-          "hyprland",
-          "nixpkgs"
-        ],
-        "systems": [
-          "hyprland",
-          "systems"
-        ]
+        "hyprutils": ["hyprland", "hyprutils"],
+        "nixpkgs": ["hyprland", "nixpkgs"],
+        "systems": ["hyprland", "systems"]
       },
       "locked": {
         "lastModified": 1717881852,
@@ -280,14 +247,8 @@
     },
     "hyprutils": {
       "inputs": {
-        "nixpkgs": [
-          "hyprland",
-          "nixpkgs"
-        ],
-        "systems": [
-          "hyprland",
-          "systems"
-        ]
+        "nixpkgs": ["hyprland", "nixpkgs"],
+        "systems": ["hyprland", "systems"]
       },
       "locked": {
         "lastModified": 1719316102,
@@ -305,14 +266,8 @@
     },
     "hyprwayland-scanner": {
       "inputs": {
-        "nixpkgs": [
-          "hyprland",
-          "nixpkgs"
-        ],
-        "systems": [
-          "hyprland",
-          "systems"
-        ]
+        "nixpkgs": ["hyprland", "nixpkgs"],
+        "systems": ["hyprland", "systems"]
       },
       "locked": {
         "lastModified": 1719067853,
@@ -426,9 +381,7 @@
     "qbpm": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": ["nixpkgs"]
       },
       "locked": {
         "lastModified": 1716148639,
@@ -480,11 +433,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1717605321,
-        "narHash": "sha256-c0jEsXEZgLTHH8J023AFzKZEuTcnjBHMwYYmS0HddWY=",
+        "lastModified": 1719851152,
+        "narHash": "sha256-N1UvA+bfrPDEjwzp8h6SIZQvfGOKZUJsXIhiegzR2vQ=",
         "ref": "refs/heads/main",
-        "rev": "c34068092ea0e38426b4f31c1bfff1a587e2842d",
-        "revCount": 2,
+        "rev": "b42da975fc64a0dc3f56fa33e733e6c274b70f9b",
+        "revCount": 3,
         "type": "git",
         "url": "ssh://git@github.com/clementpoiret/nix-secrets.git"
       },
@@ -526,18 +479,9 @@
     "xdph": {
       "inputs": {
         "hyprland-protocols": "hyprland-protocols",
-        "hyprlang": [
-          "hyprland",
-          "hyprlang"
-        ],
-        "nixpkgs": [
-          "hyprland",
-          "nixpkgs"
-        ],
-        "systems": [
-          "hyprland",
-          "systems"
-        ]
+        "hyprlang": ["hyprland", "hyprlang"],
+        "nixpkgs": ["hyprland", "nixpkgs"],
+        "systems": ["hyprland", "systems"]
       },
       "locked": {
         "lastModified": 1718619174,

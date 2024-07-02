@@ -94,6 +94,7 @@
         r"*://localhost/*",
         r"*://*.amazon.com/*",
         r"*://*.archlinux.org/*",
+        r"*://*.controld.com/*",
         r"*://*.duckduckgo.com/*",
         r"*://*.evanchen.cc/*",
         r"*://*.element.io/*",
@@ -152,6 +153,7 @@
       config.set("content.canvas_reading", True, r"*://*.gather.town/*")
 
       config.set('content.cookies.accept', 'all', r"*://*.overleaf.com/*")
+      config.set('content.cookies.accept', 'all', r"*://*.perplexity.ai/*")
       config.set('content.cookies.accept', 'all', r"*://*.reddit.com/*")
       config.set('content.cookies.accept', 'all', r"*://*.redditinc.com/*")
       config.set('content.cookies.accept', 'all', r"*://*.writefull.com/*")
@@ -170,6 +172,10 @@
         'content.headers.user_agent',
         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         r"*://*.reddit.com/*")
+      config.set(
+        'content.headers.user_agent',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        r"*://*.perplexity.ai/*")
       config.set(
         'content.headers.user_agent',
         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',

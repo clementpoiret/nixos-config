@@ -7,10 +7,7 @@ in
     hostName = "nixos";
     networkmanager.enable = true;
     nameservers = [
-      "45.90.28.0#NixOS--${host}-${secrets.nextdnsId}.dns.nextdns.io"
-      "45.90.30.0#NixOS--${host}-${secrets.nextdnsId}.dns.nextdns.io"
-      "2a07:a8c0::#NixOS--${host}-${secrets.nextdnsId}.dns.nextdns.io"
-      "2a07:a8c1::#NixOS--${host}-${secrets.nextdnsId}.dns.nextdns.io"
+      secrets.dot."${host}"
     ];
     firewall = {
       enable = true;
