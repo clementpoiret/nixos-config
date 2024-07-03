@@ -4,7 +4,7 @@
     enable = true;
     enableZshIntegration = true;
 
-    settings = {
+    settings.manager = {
       sort_by = "modified";
       sort_dir_first = true;
       sort_reverse = true;
