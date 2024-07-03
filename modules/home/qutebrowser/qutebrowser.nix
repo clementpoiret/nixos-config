@@ -82,6 +82,23 @@
         "P" = "open -w https://pass.proton.me/u/0/";
         "\\\\" = "mode-enter passthrough";
       };
+      insert = {
+        "<Ctrl-h>" = "fake-key <Backspace>";
+        "<Ctrl-a>" = "fake-key <Home>";
+        "<Ctrl-e>" = "fake-key <End>";
+        "<Ctrl-b>" = "fake-key <Left>";
+        "<Mod1-b>" = "fake-key <Ctrl-Left>";
+        "<Ctrl-f>" = "fake-key <Right>";
+        "<Mod1-f>" = "fake-key <Ctrl-Right>";
+        "<Ctrl-p>" = "fake-key <Up>";
+        "<Ctrl-n>" = "fake-key <Down>";
+        "<Ctrl-d>" = "fake-key <Delete>";
+        "<Mod1-d>" = "fake-key <Ctrl-Delete>";
+        "<Ctrl-w>" = "fake-key <Ctrl-Backspace>";
+        "<Ctrl-u>" = "fake-key <Shift-Home><Delete>";
+        "<Ctrl-k>" = "fake-key <Shift-End><Delete>";
+        "<Ctrl-x><Ctrl-e>" = "open-editor";
+      };
     };
 
     extraConfig = ''
