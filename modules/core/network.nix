@@ -7,7 +7,7 @@ in
     hostName = "nixos";
     networkmanager.enable = true;
     nameservers = [
-      secrets.dot."${host}"
+      secrets.dns."${host}"
     ];
     firewall = {
       enable = true;
