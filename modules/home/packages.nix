@@ -67,12 +67,14 @@
     openssl
     pamixer                           # pulseaudio command line mixer
     pavucontrol                       # pulseaudio volume controle (GUI)
+    pdftk
     playerctl                         # controller for media players
     master.proton-pass
     protonvpn-gui
     protonvpn-cli
     poweralertd
     qalculate-gtk                     # calculator
+    rclone
     tdf                               # read pdfs in terminal
     unzip
     wget
