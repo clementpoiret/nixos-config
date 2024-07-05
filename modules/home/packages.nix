@@ -18,7 +18,7 @@
     gh                                # github cli
     gtt                               # google translate TUI
     gifsicle                          # gif utility
-    gnome.zenity
+    zenity
     gtrash                            # rm replacement, put deleted files in system trash
     hexdump
     inxi                              # system info
