@@ -76,6 +76,12 @@
                 # master = nixpkgs-master.legacyPackages.${prev.system};
                 master = pkgs-master;
               })
+              # HACK: Those are quickfixes caused by python3 updates. TO BE REMOVED
+              (self: super: {
+                qutebrowser = super.qutebrowser.override {
+                  python3 = self.python311;
+                };
+              })
             ];
           }
           (import ./hosts/desktop)
@@ -89,6 +95,11 @@
             nixpkgs.overlays = [
               (final: prev: {
                 master = pkgs-master;
+              })
+              (self: super: {
+                qutebrowser = super.qutebrowser.override {
+                  python3 = self.python311;
+                };
               })
             ];
           }
