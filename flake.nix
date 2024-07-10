@@ -37,6 +37,11 @@
       flake = false;
     };
 
+    spicetify-nix = {
+      url = "github:gerg-l/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     secrets = {
       url = "git+ssh://git@github.com/clementpoiret/nix-secrets.git";
       flake = false;
