@@ -29,7 +29,7 @@
     lsd                               # ls replacement
     lshw
     lxqt.lxqt-policykit
-    magic-wormhole                    # magic file transfer
+    python311Packages.magic-wormhole  # magic file transfer
     nitch                             # systhem fetch util
     nix-prefetch-github
     pciutils

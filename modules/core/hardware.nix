@@ -42,6 +42,12 @@
   # Firmware updates
   services.fwupd.enable = true;
 
+  # /tmp as tmpfs
+  boot.tmp = {
+    useTmpfs = true;
+    # tmpfsSize = "50%";
+  };
+
   # f2fs check
   #boot.initrd = lib.mkIf (host == "desktop") {
   #  checkJournalingFS = false; 
