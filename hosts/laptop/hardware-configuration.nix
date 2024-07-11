@@ -42,6 +42,19 @@
           "space_cache=v2"
         ];
       };
+    "/home/clementpoiret/datatraveler" =
+      { device = "/dev/disk/by-uuid/b12ea93c-293a-45d7-88ab-ba4c4c760d26";
+        fsType = "btrfs";
+        options = [
+          "noauto"
+          "user"
+          "compress=zstd:6"
+          "noatime"
+          "ssd"
+          "discard=async"
+          "space_cache=v2"
+        ];
+      };
   };
 
   boot.initrd.luks.devices = {
