@@ -53,6 +53,7 @@
 
     bleachbit                         # cache cleaner
     chromium
+    csvlens
     drawio
     evince                            # gnome pdf viewer
     gparted                           # partition manager

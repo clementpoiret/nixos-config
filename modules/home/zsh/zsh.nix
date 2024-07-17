@@ -27,6 +27,8 @@
       bindkey '^n' history-search-forward
 
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+      eval "$(micromamba shell hook --shell zsh)"
     '';
 
     history = {
