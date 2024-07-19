@@ -51,6 +51,12 @@
     poetry
     (import ./python-packages.nix { pkgs = pkgs; })
 
+    # Emac
+    emacs
+    mdl
+    pandoc
+    shellcheck
+
     bleachbit                         # cache cleaner
     chromium
     csvlens
