@@ -42,17 +42,23 @@
     zellij
 
     # C / C++
+    cmake
     gcc
     gnumake
 
     # Python
+    (import ./python-packages.nix { pkgs = pkgs; })
     micromamba
+    pipenv
     pixi
     poetry
-    (import ./python-packages.nix { pkgs = pkgs; })
+    python311Packages.nose
+    python311Packages.pytest
+    python311Packages.pyflakes
 
     # Emac
     emacs
+    libtool
     mdl
     pandoc
     shellcheck

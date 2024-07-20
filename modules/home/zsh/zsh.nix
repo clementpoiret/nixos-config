@@ -96,6 +96,7 @@
 
       # custom tools
       lakectl = "/home/clementpoiret/bin/lakectl";
+      emacs = "emacsclient -c -a 'emacs'";
 
       # to fix std lib issues
       obsidian = "export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH; obsidian";
