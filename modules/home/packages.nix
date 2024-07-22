@@ -52,9 +52,16 @@
     pipenv
     pixi
     poetry
+    python311Packages.epc
     python311Packages.nose
+    python311Packages.orjson
+    python311Packages.paramiko
     python311Packages.pytest
     python311Packages.pyflakes
+    python311Packages.rapidfuzz
+    python311Packages.setuptools
+    python311Packages.sexpdata
+    python311Packages.six
 
     # Emac
     emacs
@@ -63,6 +70,7 @@
     pandoc
     shellcheck
 
+    aria2
     bleachbit                         # cache cleaner
     chromium
     csvlens
