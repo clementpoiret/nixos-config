@@ -53,6 +53,7 @@
     selfPkgs = import ./pkgs;
     username = "clementpoiret";
     system = "x86_64-linux";
+
     pkgs = import nixpkgs {
       inherit system;
       config.allowUnfree = true;
@@ -61,6 +62,18 @@
       inherit system;
       config.allowUnfree = true;
     };
+
+    customOverlays = [
+      (final: prev: {
+        master = pkgs-master;
+      })
+      # HACK: Those are quickfixes caused by python3 updates. TO BE REMOVED
+      (self: super: {
+        qutebrowser = super.qutebrowser.override {
+          python3 = self.python311;
+        };
+      })
+    ];
 
     lib = nixpkgs.lib;
   in
@@ -71,18 +84,7 @@
         inherit system;
         modules = [
           {
-            nixpkgs.overlays = [
-              (final: prev: {
-                # master = nixpkgs-master.legacyPackages.${prev.system};
-                master = pkgs-master;
-              })
-              # HACK: Those are quickfixes caused by python3 updates. TO BE REMOVED
-              (self: super: {
-                qutebrowser = super.qutebrowser.override {
-                  python3 = self.python311;
-                };
-              })
-            ];
+            nixpkgs.overlays = customOverlays;
           }
           (import ./hosts/desktop)
         ];
@@ -92,16 +94,7 @@
         inherit system;
         modules = [
           {
-            nixpkgs.overlays = [
-              (final: prev: {
-                master = pkgs-master;
-              })
-              (self: super: {
-                qutebrowser = super.qutebrowser.override {
-                  python3 = self.python311;
-                };
-              })
-            ];
+            nixpkgs.overlays = customOverlays;
           }
           (import ./hosts/laptop)
         ];

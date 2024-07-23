@@ -2,7 +2,8 @@
   imports =
        [(import ./bat.nix)]                       # better cat command
     ++ [(import ./btop.nix)]                      # resouces monitor 
-    ++ [(import ./easyeffect.nix)]                # audio profile 
+    ++ [(import ./easyeffect.nix)]                # audio profile
+    ++ [(import ./emacs/emacs.nix)]                 # emacs editor
     ++ [(import ./floorp/floorp.nix)]             # firefox based browser
     ++ [(import ./fuzzel.nix)]                    # launcher
     ++ [(import ./git.nix)]                       # version controle
