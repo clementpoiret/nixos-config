@@ -32,8 +32,10 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'catppuccin)
-(setq catppuccin-flavor 'mocha)
+;; See towards the end of the file for my theme-changing strategy based on time.
+;;(setq doom-theme 'catppuccin)
+;;(setq catppuccin-flavor 'mocha)
+
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -80,3 +82,18 @@
 (rainbow-delimiters-mode -1)
 (setq-default global-whitespace-mode t)
 (setq whitespace-style '(face spaces space-mark tabs tab-mark newline newline-mark trailing))
+
+;; Change theme based on day/night
+(defun my/set-theme-based-on-time ()
+  "Set the theme based on the time of day."
+  (let* ((hour (string-to-number (format-time-string "%H")))
+         (daytime? (and (>= hour 9) (< hour 19))))
+    (setq doom-theme 'catppuccin)
+    (if daytime?
+        (setq catppuccin-flavor 'latte)  ; Light theme
+      (setq catppuccin-flavor 'mocha))   ; Dark theme
+    (load-theme doom-theme t)))
+
+;; Run now and check every hours
+(my/set-theme-based-on-time)
+(run-at-time "01:00" 3600 #'my/set-theme-based-on-time)

@@ -17,7 +17,6 @@
         "sleep 1 && waybar &"
         "swaync &"
         "wl-paste --watch cliphist store &"
-        "emacs --daemon &"
       ];
 
       input = {

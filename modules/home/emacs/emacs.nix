@@ -41,4 +41,8 @@ in
   home.sessionVariables = {
     LSP_USE_PLISTS="true";
   };
+
+  services.emacs = {
+    enable = true;
+  };
 }

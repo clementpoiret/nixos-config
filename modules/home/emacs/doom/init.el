@@ -221,7 +221,7 @@
       orig-result)))
 (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 
-;(with-eval-after-load 'lsp-mode
-;  (add-to-list 'lsp-disabled-clients 'pyls)
-;  (add-to-list 'lsp-enabled-clients 'pylsp)
-;  (add-to-list 'lsp-enabled-clients 'ruff-lsp))
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-disabled-clients 'pyls)
+  (add-to-list 'lsp-enabled-clients 'pylsp)
+  (add-to-list 'lsp-enabled-clients 'ruff-lsp))
