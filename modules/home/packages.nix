@@ -18,9 +18,9 @@
     gh                                # github cli
     gtt                               # google translate TUI
     gifsicle                          # gif utility
-    zenity
     gtrash                            # rm replacement, put deleted files in system trash
     hexdump
+    inkscape
     inxi                              # system info
     jdk
     killall                           # to kill our little friends
@@ -40,6 +40,7 @@
     tldr                              # user-friendly help
     yarn
     zellij
+    zenity
 
     # C / C++
     cmake

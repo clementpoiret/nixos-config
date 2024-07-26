@@ -97,3 +97,6 @@
 ;; Run now and check every hours
 (my/set-theme-based-on-time)
 (run-at-time "01:00" 3600 #'my/set-theme-based-on-time)
+
+;; Sets the default keybindings for multicursor
+(evil-multiedit-default-keybinds)
