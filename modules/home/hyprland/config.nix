@@ -1,4 +1,4 @@
-{ ... }: 
+{ lib, host, ... }: 
 {
   wayland.windowManager.hyprland = {
     settings = {
@@ -30,6 +30,11 @@
           disable_while_typing = true;
           tap-to-click = true;
         };
+      };
+
+      cursor = lib.mkIf (host == "desktop") {
+        no_hardware_cursors = true;
+        allow_dumb_copy = true;
       };
 
       monitor = [
