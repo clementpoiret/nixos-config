@@ -7,7 +7,6 @@
     beeper
     bruno                             # for REST APIs tests
     bitwise                           # cli tool for bit / hex manipulation
-    cinnamon.nemo-with-extensions     # file manager
     dmidecode
     drawio
     entr                              # perform action when file change
@@ -30,6 +29,7 @@
     lshw
     lxqt.lxqt-policykit
     python311Packages.magic-wormhole  # magic file transfer
+    nemo-with-extensions              # file manager
     nitch                             # systhem fetch util
     nix-prefetch-github
     pciutils
@@ -62,6 +62,7 @@
     chromium
     csvlens
     drawio
+    dust
     evince                            # gnome pdf viewer
     gparted                           # partition manager
     ffmpeg
