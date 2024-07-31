@@ -67,7 +67,6 @@
     gparted                           # partition manager
     ffmpeg
     firefox-devedition-bin
-    imv                               # image viewer
     libnotify
     man-pages                         # extra man pages
     mpv                               # video player
@@ -78,6 +77,7 @@
     pavucontrol                       # pulseaudio volume controle (GUI)
     pdftk
     playerctl                         # controller for media players
+    pqiv
     master.proton-pass
     protonvpn-gui
     protonvpn-cli

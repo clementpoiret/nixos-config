@@ -98,5 +98,10 @@
 (my/set-theme-based-on-time)
 (run-at-time "01:00" 3600 #'my/set-theme-based-on-time)
 
-;; Sets the default keybindings for multicursor
-(evil-multiedit-default-keybinds)
+;; Fix copy paste on wayland
+(use-package! xclip
+  :config
+  (setq xclip-program "wl-copy")
+  (setq xclip-select-enable-clipboard t)
+  (setq xclip-mode t)
+  (setq xclip-method (quote wl-copy)))
