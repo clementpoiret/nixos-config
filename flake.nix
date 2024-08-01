@@ -67,12 +67,6 @@
       (final: prev: {
         master = pkgs-master;
       })
-      # HACK: Those are quickfixes caused by python3 updates. TO BE REMOVED
-      (self: super: {
-        qutebrowser = super.qutebrowser.override {
-          python3 = self.python311;
-        };
-      })
     ];
 
     lib = nixpkgs.lib;

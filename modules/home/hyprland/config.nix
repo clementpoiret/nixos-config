@@ -33,7 +33,7 @@
       };
 
       cursor = lib.mkIf (host == "desktop") {
-        no_hardware_cursors = true;
+        #no_hardware_cursors = true;
         allow_dumb_copy = true;
       };
 
@@ -251,9 +251,9 @@
 
       # windowrule
       windowrule = [
-        "float,imv"
-        "center,imv"
-        "size 1200 725,imv"
+        "float,pqiv"
+        "center,pqiv"
+        "size 1200 725,pqiv"
         "float,mpv"
         "center,mpv"
         "size 1200 725,mpv"
@@ -261,7 +261,6 @@
         "center,title:^(float_kitty)$"
         "size 950 600,title:^(float_kitty)$"
         "float,audacious"
-        "workspace 8 silent, audacious"
         "idleinhibit focus,mpv"
         "float,udiskie"
         "float,^(pavucontrol)$"
@@ -281,7 +280,7 @@
         "float, title:^(Picture-in-Picture)$"
         "opacity 1.0 override 1.0 override, title:^(Picture-in-Picture)$"
         "pin, title:^(Picture-in-Picture)$"
-        "opacity 1.0 override 1.0 override, title:^(.*imv.*)$"
+        "opacity 1.0 override 1.0 override, title:^(.*pqiv.*)$"
         "opacity 1.0 override 1.0 override, title:^(.*mpv.*)$"
         "opacity 1.0 override 1.0 override, class:(Aseprite)"
         "opacity 1.0 override 1.0 override, class:(Unity)"
