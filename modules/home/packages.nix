@@ -28,6 +28,7 @@
     lsd                               # ls replacement
     lshw
     lxqt.lxqt-policykit
+    lz4
     python311Packages.magic-wormhole  # magic file transfer
     nemo-with-extensions              # file manager
     nitch                             # systhem fetch util
