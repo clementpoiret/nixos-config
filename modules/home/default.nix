@@ -10,6 +10,7 @@
     ++ [(import ./gtk.nix)]                       # gtk theme
     ++ [(import ./hyprland)]                      # window manager
     ++ [(import ./kitty.nix)]                     # terminal
+    ++ [(import ./nushell/nushell.nix)]           # shell
     ++ [(import ./spicetify.nix)]                 # spotify client
     ++ [(import ./swaync/swaync.nix)]             # notification deamon
     ++ [(import ./micro.nix)]                     # nano replacement
