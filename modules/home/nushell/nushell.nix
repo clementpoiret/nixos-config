@@ -32,7 +32,6 @@
       icat = "kitten icat";
       findw = "grep -rl";
       pdf = "tdf";
-      open = "xdg-open";
 
       ls = "lsd --group-directories-first";
       ll = "lsd -l --group-directories-first";
@@ -80,6 +79,11 @@
     };
   };
 
+  programs.carapace = {
+    enable = true;
+    enableNushellIntegration = true;
+  };
+  
   programs.zoxide = {
     enable = true;
     enableNushellIntegration = true;
