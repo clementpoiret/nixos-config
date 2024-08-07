@@ -42,6 +42,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nu_plugin_bash_env = {
+      url = "github:tesujimath/nu_plugin_bash_env/0.12.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     secrets = {
       url = "git+ssh://git@github.com/clementpoiret/nix-secrets.git";
       flake = false;

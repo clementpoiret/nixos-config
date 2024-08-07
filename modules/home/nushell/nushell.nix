@@ -1,4 +1,4 @@
-{ host, lib, pkgs, ... }:
+{ host, inputs, lib, pkgs, ... }:
 {
   programs.nushell = {
     enable = true;
@@ -33,10 +33,9 @@
       findw = "grep -rl";
       pdf = "tdf";
 
-      ls = "lsd --group-directories-first";
-      ll = "lsd -l --group-directories-first";
-      la = "lsd -la --group-directories-first";
-      tree = "lsd -l --group-directories-first --tree --depth=2";
+      ll = "ls -l";
+      la = "ls -a";
+      ldu = "ls -d";
 
       # Nixos
       cdnix = "cd ~/nixos-config";
@@ -77,6 +76,23 @@
       # to fix std lib issues
       obsidian = "with-env { LD_LIBRARY_PATH: $env.NIX_LD_LIBRARY_PATH } { obsidian }";
     };
+  };
+
+  home = {
+    packages = with pkgs; [
+      inputs.nu_plugin_bash_env.packages.${system}.default
+      jq
+    ];
+
+    activation =
+      let
+        nu-plugin = path: lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          run ${pkgs.nushell}/bin/nu --no-config-file --no-history --no-std-lib -c 'plugin add --plugin-config ~/.config/nushell/plugin.msgpackz ${path}'
+        '';
+      in
+      {
+        nu-plugin-bash-env = nu-plugin "${inputs.nu_plugin_bash_env}/nu_plugin_bash_env";
+      };
   };
 
   programs.carapace = {
