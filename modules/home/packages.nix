@@ -30,7 +30,7 @@
     lxqt.lxqt-policykit
     lz4
     python311Packages.magic-wormhole  # magic file transfer
-    nemo-with-extensions              # file manager
+    nautilus                          # file manager
     nitch                             # systhem fetch util
     nix-prefetch-github
     pciutils
