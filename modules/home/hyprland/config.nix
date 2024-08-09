@@ -37,6 +37,10 @@
         allow_dumb_copy = true;
       };
 
+      render = lib.mkIf (host == "desktop") {
+        explicit_sync = false;
+      };
+
       monitor = [
         "eDP-2, 2560x1600@60, 0x0, 1.6"
         "DP-1, 1920x1080, 0x0, 1"
