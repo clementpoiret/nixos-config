@@ -149,9 +149,9 @@ let zoxide_completer = {|spans|
 }
 let multiple_completers = {|spans|
   match $spans.0 {
-    z => $zoxide_completer
-    zi => $zoxide_completer
-    cd => $zoxide_completer
+    #z => $zoxide_completer
+    #zi => $zoxide_completer
+    #cd => $zoxide_completer
     _ => $carapace_completer
   } | do $in $spans
 }

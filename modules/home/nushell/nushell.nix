@@ -1,4 +1,8 @@
-{ host, inputs, lib, pkgs, ... }:
+{ config, host, inputs, lib, pkgs, ... }:
+let
+  home = config.home.homeDirectory;
+  profileDirectory = config.home.profileDirectory;
+in
 {
   programs.nushell = {
     enable = true;
@@ -19,6 +23,20 @@
         git add --all
         git commit -m $msg
       }
+
+      # Source the conda script to activate micromamba envs
+      use ~/.config/nushell/scripts/conda.nu [activate deactivate]
+    '';
+
+    extraEnv = ''
+      # Source /etc/set-environment to get environment variables
+      bash-env /etc/set-environment | load-env
+
+      # Same thing but for session variables set using home-manager
+      bash-env ${profileDirectory}/etc/profile.d/hm-session-vars.sh | load-env
+
+      # Fixes Micromamba and Aider
+      $env.GIT_PYTHON_GIT_EXECUTABLE = "${profileDirectory}/bin/git"
     '';
 
     shellAliases = {
@@ -93,6 +111,13 @@
       {
         nu-plugin-bash-env = nu-plugin "${inputs.nu_plugin_bash_env}/nu_plugin_bash_env";
       };
+
+    # Custom scripts
+    file = {
+      ".config/nushell/scripts/conda.nu" = {
+        source = ./scripts/conda.nu;
+      };
+    };
   };
 
   programs.carapace = {

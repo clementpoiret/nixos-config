@@ -99,14 +99,3 @@ $env.NU_PLUGIN_DIRS = [
 
 # To load from a custom file you can use:
 # source ($nu.default-config-dir | path join 'custom.nu')
-
-# Source /etc/set-environment
-#bash -c "source /etc/set-environment && env"
-#    | lines
-#    | parse "{n}={v}"
-#    | filter { |x| ($x.n not-in $env) or $x.v != ($env | get $x.n) }
-#    | where n not-in ["_", "LAST_EXIT_CODE", "DIRS_POSITION"]
-#    | transpose --header-row
-#    | into record
-#    | load-env
-bash-env /etc/set-environment | load-env
