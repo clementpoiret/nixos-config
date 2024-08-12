@@ -67,6 +67,7 @@
         layers_hog_keyboard_focus = true;
         animate_manual_resizes = false;
         enable_swallow = true;
+        swallow_regex = "^(kitty)$";
         focus_on_activate = true;
         vrr = 0;
       };

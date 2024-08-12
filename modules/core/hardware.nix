@@ -48,6 +48,23 @@
     # tmpfsSize = "50%";
   };
 
+  # Needed for desktop environments to detect/manage display brightness
+  hardware.sensor.iio.enable = lib.mkIf (host == "laptop") true;
+
+  hardware.keyboard.qmk.enable = true;
+
+  # Allow `services.libinput.touchpad.disableWhileTyping` to work correctly.
+  # Set unconditionally because libinput can also be configured dynamically via
+  # gsettings.
+  environment.etc = lib.mkIf (host == "laptop") {
+    "libinput/local-overrides.quirks".text = ''
+      [Serial Keyboards]
+      MatchUdevType=keyboard
+      MatchName=Framework Laptop 16 Keyboard Module - ANSI Keyboard
+      AttrKeyboardIntegration=internal
+    '';
+  };
+
   # f2fs check
   #boot.initrd = lib.mkIf (host == "desktop") {
   #  checkJournalingFS = false; 
