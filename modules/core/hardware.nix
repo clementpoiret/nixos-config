@@ -15,11 +15,12 @@
   services.xserver.videoDrivers = lib.mkIf (host == "desktop") [ "nvidia" ];
 
   hardware.nvidia = lib.mkIf (host == "desktop") {
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    # package = config.boot.kernelPackages.nvidiaPackages.beta;
     modesetting.enable = true;
     powerManagement.enable = false;
     powerManagement.finegrained = false;
-    open = true;
+    # open = true;
+    open = false;
     nvidiaSettings = true;
   };
 
