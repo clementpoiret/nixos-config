@@ -62,6 +62,8 @@
     bleachbit                         # cache cleaner
     chromium
     csvlens
+    devenv                            # reproducible dev env based on nix
+    direnv
     drawio
     dust
     evince                            # gnome pdf viewer
