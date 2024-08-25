@@ -77,7 +77,7 @@
     keyBindings = {
       normal = {
         "sp" = "spawn --userscript qutepocket";
-        "E" = "spawn floorp '{url}'";
+        "E" = "spawn zen '{url}'";
         # "E" = "spawn firefox-developer-edition '{url}'";
         "M" = "hint links spawn mpv '{hint-url}'";
         "P" = "open -w https://pass.proton.me/u/0/";

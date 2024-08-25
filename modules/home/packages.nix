@@ -96,6 +96,8 @@
     xxd
     zotero-beta
 
+    zed-editor
+    inputs.zen-browser.packages."${system}".specific
     inputs.alejandra.defaultPackage.${system}
   ]);
 }

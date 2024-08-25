@@ -47,6 +47,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    zen-browser.url = "github:MarceColl/zen-browser-flake";
+
     secrets = {
       url = "git+ssh://git@github.com/clementpoiret/nix-secrets.git";
       flake = false;

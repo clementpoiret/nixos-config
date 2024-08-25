@@ -1,5 +1,0 @@
-uBlock Origin                   # + filter for shorts
-Stylus                          # import file import.json
-Firefox Color                   # catppuccin
-Dark Reader                     # theme dracula
-I still don't care about cookies
