@@ -1,44 +1,43 @@
-{ inputs, pkgs, ... }: 
-{
+{ inputs, pkgs, ... }: {
   home.packages = (with pkgs; [
-    aerc                              # for emails
-    age                               # for my secrets
+    aerc # for emails
+    age # for my secrets
     awscli2
     beeper
-    bruno                             # for REST APIs tests
-    bitwise                           # cli tool for bit / hex manipulation
+    bruno # for REST APIs tests
+    bitwise # cli tool for bit / hex manipulation
     dmidecode
     drawio
-    entr                              # perform action when file change
+    entr # perform action when file change
     exfat
-    fd                                # find replacement
-    file                              # Show file information 
-    fzf                               # fuzzy finder
-    gh                                # github cli
-    gtt                               # google translate TUI
-    gifsicle                          # gif utility
-    gtrash                            # rm replacement, put deleted files in system trash
+    fd # find replacement
+    file # Show file information
+    fzf # fuzzy finder
+    gh # github cli
+    gtt # google translate TUI
+    gifsicle # gif utility
+    gtrash # rm replacement, put deleted files in system trash
     hexdump
     inkscape
-    inxi                              # system info
+    inxi # system info
     jdk
-    killall                           # to kill our little friends
+    killall # to kill our little friends
     lazygit
     libreoffice
-    lsd                               # ls replacement
+    lsd # ls replacement
     lshw
     lxqt.lxqt-policykit
     lz4
-    python311Packages.magic-wormhole  # magic file transfer
-    nautilus                          # file manager
-    nitch                             # systhem fetch util
+    python311Packages.magic-wormhole # magic file transfer
+    nautilus # file manager
+    nitch # systhem fetch util
     nix-prefetch-github
     pciutils
-    ripgrep                           # grep replacement
+    ripgrep # grep replacement
     russ
     spotify-player
-    toipe                             # typing test in the terminal
-    tldr                              # user-friendly help
+    toipe # typing test in the terminal
+    tldr # user-friendly help
     yarn
     zellij
     zenity
@@ -57,37 +56,38 @@
     python311Packages.nose
     python311Packages.pytest
     python311Packages.pyflakes
+    uv
 
+    aider-chat
     aria2
-    bleachbit                         # cache cleaner
+    bleachbit # cache cleaner
     chromium
-    csvlens
-    devenv                            # reproducible dev env based on nix
+    devenv # reproducible dev env based on nix
     direnv
     drawio
     dust
-    evince                            # gnome pdf viewer
-    gparted                           # partition manager
+    evince # gnome pdf viewer
     ffmpeg
     firefox-devedition-bin
+    gparted # partition manager
     libnotify
-    man-pages                         # extra man pages
-    mpv                               # video player
-    ncdu                              # disk space
+    man-pages # extra man pages
+    mpv # video player
+    ncdu # disk space
     obsidian
     openssl
-    pamixer                           # pulseaudio command line mixer
-    pavucontrol                       # pulseaudio volume controle (GUI)
+    pamixer # pulseaudio command line mixer
+    pavucontrol # pulseaudio volume controle (GUI)
     pdftk
-    playerctl                         # controller for media players
+    playerctl # controller for media players
     pqiv
     master.proton-pass
     protonvpn-gui
     protonvpn-cli
     poweralertd
-    qalculate-gtk                     # calculator
+    qalculate-gtk # calculator
     rclone
-    tdf                               # read pdfs in terminal
+    tdf # read pdfs in terminal
     unzip
     wget
     wl-clipboard
@@ -96,8 +96,7 @@
     xxd
     zotero-beta
 
-    zed-editor
-    inputs.zen-browser.packages."${system}".specific
-    inputs.alejandra.defaultPackage.${system}
+    flake.alejandra
+    flake.zen-browser
   ]);
 }

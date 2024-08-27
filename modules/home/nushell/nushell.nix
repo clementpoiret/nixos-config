@@ -98,7 +98,7 @@ in
 
   home = {
     packages = with pkgs; [
-      inputs.nu_plugin_bash_env.packages.${system}.default
+      flake.nu_plugin_bash_env
       jq
     ];
 
@@ -109,7 +109,7 @@ in
         '';
       in
       {
-        nu-plugin-bash-env = nu-plugin "${inputs.nu_plugin_bash_env}/nu_plugin_bash_env";
+        nu-plugin-bash-env = nu-plugin "${pkgs.flake.nu_plugin_bash_env}/bin/nu_plugin_bash_env";
       };
 
     # Custom scripts

@@ -98,9 +98,17 @@
 (run-at-time "01:00" 3600 #'my/set-theme-based-on-time)
 
 ;; Fix copy paste on wayland
-(use-package! xclip
+;; (use-package! xclip
+;;   :config
+;;   (setq xclip-program "wl-copy")
+;;   (setq xclip-select-enable-clipboard t)
+;;   (setq xclip-mode t)
+;;   (setq xclip-method (quote wl-copy)))
+
+;; gptel
+(use-package! gptel
   :config
-  (setq xclip-program "wl-copy")
-  (setq xclip-select-enable-clipboard t)
-  (setq xclip-mode t)
-  (setq xclip-method (quote wl-copy)))
+  (setq
+   gptel-model "claude-3-5-sonnet-20240620"
+   gptel-backend (gptel-make-anthropic "Claude"
+                   :stream t :key "$ANTHROPIC_API_KEY")))

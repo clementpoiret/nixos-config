@@ -1,11 +1,12 @@
-{ config, pkgs, ... }:
+{ config, inputs, pkgs, ... }:
 let
   home = config.home.homeDirectory;
-in
-{
+  secrets = import "${inputs.secrets}/variables.nix";
+in {
   home.packages = (with pkgs; [
-    emacs
+    emacs29-pgtk
     emacs-lsp-booster
+    ispell
     libtool
     mdl
     pandoc
@@ -19,6 +20,9 @@ in
     python311Packages.yapf
     ruff-lsp
 
+    # nix
+    nixfmt-classic
+
     # web stuff
     nodePackages_latest.prettier
     nodePackages_latest.eslint_d
@@ -28,21 +32,18 @@ in
 
   home.file = {
     ".config/doom/config.el" = {
-      source = ./doom/config.el;
+      # source = ./doom/config.el;
+      text = builtins.replaceStrings [ "$ANTHROPIC_API_KEY" ]
+        [ secrets.anthropicApiKey ] (builtins.readFile ./doom/config.el);
     };
-    ".config/doom/init.el" = {
-      source = ./doom/init.el;
-    };
-    ".config/doom/packages.el" = {
-      source = ./doom/packages.el;
-    };
+    ".config/doom/init.el" = { source = ./doom/init.el; };
+    ".config/doom/packages.el" = { source = ./doom/packages.el; };
   };
 
-  home.sessionVariables = {
-    LSP_USE_PLISTS="true";
-  };
+  home.sessionVariables = { LSP_USE_PLISTS = "true"; };
 
   services.emacs = {
     enable = true;
+    package = pkgs.emacs29-pgtk;
   };
 }

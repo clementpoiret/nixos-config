@@ -52,4 +52,4 @@
 (package! tldr)
 (package! catppuccin-theme)
 (package! fzf)
-(package! xclip)
+(package! gptel)
