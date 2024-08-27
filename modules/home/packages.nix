@@ -56,6 +56,7 @@
     python311Packages.nose
     python311Packages.pytest
     python311Packages.pyflakes
+    ruff
     uv
 
     aider-chat
