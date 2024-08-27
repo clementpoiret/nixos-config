@@ -3,6 +3,7 @@
     ++ [ (import ./btop.nix) ] # resouces monitor
     ++ [ (import ./easyeffect.nix) ] # audio profile
     ++ [ (import ./emacs/emacs.nix) ] # emacs editor
+    ++ [ (import ./files/files.nix) ] # custom files to add to the home folder
     ++ [ (import ./fuzzel.nix) ] # launcher
     ++ [ (import ./git.nix) ] # version controle
     ++ [ (import ./gtk.nix) ] # gtk theme

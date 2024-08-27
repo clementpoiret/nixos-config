@@ -441,11 +441,11 @@
     },
     "nixpkgs-master": {
       "locked": {
-        "lastModified": 1724744147,
-        "narHash": "sha256-+GG1jGb27iApu0n9zfO0VDrS93sk6ioCRsP49dmoYH0=",
+        "lastModified": 1724765497,
+        "narHash": "sha256-Wc+EeydCybd0lZ2mBuxOlqztNrADzTaId+kq0ZLvaVo=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "183a78cb566b1c1595fb42a4e18e6f95d12930d5",
+        "rev": "4c8deffe2f0a5b3b990e5a03eb0d0a0427f93b08",
         "type": "github"
       },
       "original": {
@@ -559,11 +559,11 @@
     },
     "nur": {
       "locked": {
-        "lastModified": 1724741288,
-        "narHash": "sha256-NqtRr6+eIrBc0ZVf0nXzJ7eEQGJXjQlHamdNxMijDZE=",
+        "lastModified": 1724766530,
+        "narHash": "sha256-8uiBXwCKBJz0QjGLf1giCFuWaHZG9csSEYZAf/jr0xc=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "872d4a49bb7cf7f9cd4c8144102de8b71327d3bc",
+        "rev": "367ed299decc7848abae79ec0c3ff188d07c476e",
         "type": "github"
       },
       "original": {
@@ -651,11 +651,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1724662462,
-        "narHash": "sha256-F29UVLU3KbZeA+4c3YgzebjmRoi2OInX2okeTjmpr4U=",
+        "lastModified": 1724766916,
+        "narHash": "sha256-vtcQgP+O9cd20g0PDIT6UtN+w08C0ZWBVyCz8czGVeA=",
         "ref": "refs/heads/main",
-        "rev": "260d5149ccce0af7983145acf887bfc8b1148b26",
-        "revCount": 5,
+        "rev": "10384285c3075b62e3574bd9819d210db6e37366",
+        "revCount": 6,
         "type": "git",
         "url": "ssh://git@github.com/clementpoiret/nix-secrets.git"
       },
