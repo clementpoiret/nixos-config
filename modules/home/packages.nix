@@ -68,6 +68,7 @@
     dust
     evince # gnome pdf viewer
     ffmpeg
+    file-roller
     firefox-devedition-bin
     gparted # partition manager
     libnotify

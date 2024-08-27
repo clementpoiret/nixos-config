@@ -1,5 +1,4 @@
-{ inputs, pkgs, ... }:
-{
+{ inputs, pkgs, ... }: {
   programs.qutebrowser = {
     enable = true;
     searchEngines = {
@@ -12,13 +11,11 @@
       "nixp" = "https://search.nixos.org/packages?channel=unstable&query={}";
       "gt" = "https://github.com/search?q={}&type=repositories";
     };
-    
+
     settings = {
       url = {
-        default_page =
-          "https://kagi.com/smallweb/";
-        start_pages =
-          [ "https://kagi.com/smallweb/" ];
+        default_page = "https://kagi.com/smallweb/";
+        start_pages = [ "https://kagi.com/smallweb/" ];
         yank_ignored_parameters = [
           "ref"
           "utm_source"
@@ -35,14 +32,15 @@
         blocking.enabled = true;
         blocking.hosts.block_subdomains = true;
         blocking.method = "both";
-        blocking.whitelist = [];
+        blocking.whitelist = [ ];
         canvas_reading = false;
         cookies.accept = "no-3rdparty";
-              dns_prefetch = true;
+        dns_prefetch = true;
         headers.accept_language = "en-US,en;q=0.9";
         headers.do_not_track = true;
         headers.referer = "same-domain";
-        headers.user_agent = "Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}";
+        headers.user_agent =
+          "Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}";
         javascript.clipboard = "none";
         javascript.enabled = false;
         pdfjs = false;
@@ -72,7 +70,7 @@
       };
 
       qt.highdpi = true;
-    }; 
+    };
 
     keyBindings = {
       normal = {
@@ -224,26 +222,5 @@
     '';
   };
 
-  home.packages = (with pkgs; [
-    inputs.qbpm.packages.${system}.qbpm
-  ]);
-
-  xdg.mimeApps = {
-    enable = true;
-
-    associations.added = {
-      "text/html" = [ "org.qutebrowser.qutebrowser.desktop" ];
-      "x-scheme-handler/http" = [ "org.qutebrowser.qutebrowser.desktop" ];
-      "x-scheme-handler/https" = [ "org.qutebrowser.qutebrowser.desktop" ];
-      "x-scheme-handler/about" = [ "org.qutebrowser.qutebrowser.desktop" ];
-      "x-scheme-handler/unknown" = [ "org.qutebrowser.qutebrowser.desktop" ];
-    };
-    defaultApplications = {
-      "text/html" = [ "org.qutebrowser.qutebrowser.desktop" ];
-      "x-scheme-handler/http" = [ "org.qutebrowser.qutebrowser.desktop" ];
-      "x-scheme-handler/https" = [ "org.qutebrowser.qutebrowser.desktop" ];
-      "x-scheme-handler/about" = [ "org.qutebrowser.qutebrowser.desktop" ];
-      "x-scheme-handler/unknown" = [ "org.qutebrowser.qutebrowser.desktop" ];
-    };
-  };
+  home.packages = (with pkgs; [ inputs.qbpm.packages.${system}.qbpm ]);
 }

@@ -1,5 +1,4 @@
-{ self, pkgs, lib, inputs, ...}: 
-{
+{ self, pkgs, lib, inputs, ... }: {
   # imports = [ inputs.nix-gaming.nixosModules.default ];
   nix = {
     settings = {
@@ -15,29 +14,14 @@
       ];
       trusted-users = [ "root" "clementpoiret" ];
     };
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
-    };
   };
-  nixpkgs = {
-    overlays = [
-      self.overlays.default
-      inputs.nur.overlay
-    ];
-  };
+  nixpkgs = { overlays = [ self.overlays.default inputs.nur.overlay ]; };
 
-  environment.systemPackages = with pkgs; [
-    wget
-    git
-  ];
+  environment.systemPackages = with pkgs; [ wget git ];
 
   programs.nix-ld = {
     enable = true;
-    libraries = with pkgs; [
-      stdenv.cc.cc
-    ];
+    libraries = with pkgs; [ stdenv.cc.cc ];
   };
 
   time.timeZone = "Europe/Paris";

@@ -1,8 +1,7 @@
-{ lib, host, ... }: 
-{
+{ lib, host, ... }: {
   wayland.windowManager.hyprland = {
     settings = {
-      
+
       # autostart
       exec-once = [
         "systemctl --user import-environment &"
@@ -37,14 +36,12 @@
         allow_dumb_copy = true;
       };
 
-      render = lib.mkIf (host == "desktop") {
-        explicit_sync = false;
-      };
+      render = lib.mkIf (host == "desktop") { explicit_sync = false; };
 
       monitor = [
         "eDP-2, 2560x1600@60, 0x0, 1.6"
         "DP-1, 1920x1080, 0x0, 1"
-        "DP-3, 1920x1080, 1600x0, 1, transform, 1"  # Vertical laptop screen
+        "DP-3, 1920x1080, 1600x0, 1, transform, 1" # Vertical laptop screen
         "HDMI-A-1, 1920x1080, 1920x0, 1"
       ];
 
@@ -97,7 +94,7 @@
       decoration = {
         rounding = 8;
         active_opacity = 1.0;
-        inactive_opacity = 0.80;
+        inactive_opacity = 0.8;
         # fullscreen_opacity = 1.0;
 
         blur = {
@@ -107,7 +104,7 @@
           # size = 4;
           # passes = 2;
           brightness = 1;
-          contrast = 1.400;
+          contrast = 1.4;
           ignore_opacity = true;
           noise = 0;
           new_optimizations = true;
@@ -170,7 +167,7 @@
         "$mainMod SHIFT, Escape, exec, shutdown-script"
         "$mainMod, J, togglesplit,"
         "$mainMod, E, exec, kitty -e yazi"
-        "$mainMod ALT, B, exec, pkill -SIGUSR1 .waybar-wrapped"
+        "$mainMod ALT, B, exec, toggle_waybar"
         "$mainMod, C, exec, hyprpicker -a"
         "$mainMod, W, exec, wallpaper-picker"
         "$mainMod, V, exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
@@ -312,11 +309,7 @@
 
     };
 
-    extraConfig = "
-      
-      xwayland {
-        force_zero_scaling = true
-      }
-    ";
+    extraConfig =
+      "\n      \n      xwayland {\n        force_zero_scaling = true\n      }\n    ";
   };
 }

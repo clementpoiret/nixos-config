@@ -2,8 +2,7 @@
 let
   home = config.home.homeDirectory;
   profileDirectory = config.home.profileDirectory;
-in
-{
+in {
   programs.nushell = {
     enable = true;
 
@@ -11,14 +10,6 @@ in
     envFile.source = ./env.nu;
 
     extraConfig = ''
-      def nix-clean [] {
-        sudo nix-collect-garbage
-        sudo nix-collect-garbage -d
-        sudo rm /nix/var/nix/gcroots/auto/*
-        nix-collect-garbage
-        nix-collect-garbage -d
-      }
-
       def gcma [msg] {
         git add --all
         git commit -m $msg
@@ -57,13 +48,17 @@ in
 
       # Nixos
       cdnix = "cd ~/nixos-config";
-      ns = "nix-shell --run nu";
-      nix-shell = "nix-shell --run nu";
-      nix-switch = "sudo nixos-rebuild switch --flake ~/nixos-config#${host}";
-      nix-switchu = "sudo nixos-rebuild switch --upgrade --flake ~/nixos-config#${host}";
+      ns = "nom-shell --run bash";
+      nix-shell = "nix-shell --run bash";
+      nix-switch = "nh os switch";
+      nix-update = "nh os switch --update";
+      nix-clean = "nh clean all --keep 5";
+      nix-search = "nh search";
+      nix-test = "nh os test";
       nix-flake-update = "sudo nix flake update ~/nixos-config#";
 
       # Git
+      g = "lazygit";
       ga = "git add";
       gaa = "git add --all";
       gs = "git status";
@@ -75,12 +70,20 @@ in
       gpst = "git push --follow-tags";
       gpso = "git push origin";
       gc = "git commit";
+      gcl = "git clone";
       gcm = "git commit -m";
       gtag = "git tag -ma";
       gch = "git checkout";
       gchb = "git checkout -b";
       gcoe = "git config user.email";
       gcon = "git config user.name";
+      glog = "git log --oneline --decorate --graph";
+      glol =
+        "git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'";
+      glola =
+        "git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --all";
+      glols =
+        "git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --stat";
 
       # python
       piv = "python -m venv .venv";
@@ -92,31 +95,27 @@ in
       doom = "~/.config/emacs/bin/doom";
 
       # to fix std lib issues
-      obsidian = "with-env { LD_LIBRARY_PATH: $env.NIX_LD_LIBRARY_PATH } { obsidian }";
+      obsidian =
+        "with-env { LD_LIBRARY_PATH: $env.NIX_LD_LIBRARY_PATH } { obsidian }";
     };
   };
 
   home = {
-    packages = with pkgs; [
-      flake.nu_plugin_bash_env
-      jq
-    ];
+    packages = with pkgs; [ flake.nu_plugin_bash_env jq ];
 
-    activation =
-      let
-        nu-plugin = path: lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    activation = let
+      nu-plugin = path:
+        lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           run ${pkgs.nushell}/bin/nu --no-config-file --no-history --no-std-lib -c 'plugin add --plugin-config ~/.config/nushell/plugin.msgpackz ${path}'
         '';
-      in
-      {
-        nu-plugin-bash-env = nu-plugin "${pkgs.flake.nu_plugin_bash_env}/bin/nu_plugin_bash_env";
-      };
+    in {
+      nu-plugin-bash-env =
+        nu-plugin "${pkgs.flake.nu_plugin_bash_env}/bin/nu_plugin_bash_env";
+    };
 
     # Custom scripts
     file = {
-      ".config/nushell/scripts/conda.nu" = {
-        source = ./scripts/conda.nu;
-      };
+      ".config/nushell/scripts/conda.nu" = { source = ./scripts/conda.nu; };
     };
   };
 
@@ -124,7 +123,7 @@ in
     enable = true;
     enableNushellIntegration = true;
   };
-  
+
   programs.zoxide = {
     enable = true;
     enableNushellIntegration = true;
@@ -161,7 +160,7 @@ in
 
       directory.style = "blue";
 
-      character = { 
+      character = {
         success_symbol = "[❯](purple)";
         error_symbol = "[❯](red)";
         vimcmd_symbol = "[❮](green)";
@@ -173,7 +172,8 @@ in
       };
 
       git_status = {
-        format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)";
+        format =
+          "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)";
         style = "cyan";
         conflicted = "";
         untracked = "";
