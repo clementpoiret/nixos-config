@@ -84,6 +84,7 @@ in {
         "git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --all";
       glols =
         "git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --stat";
+      gsw = "git switch";
 
       # python
       piv = "python -m venv .venv";
