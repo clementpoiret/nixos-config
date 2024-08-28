@@ -801,15 +801,15 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1724728467,
-        "narHash": "sha256-WhTJaCw0XDR9gAQ6uEIMkT7bKsHXBafj1GJnRsWXHpk=",
-        "owner": "eekrain",
+        "lastModified": 1724832737,
+        "narHash": "sha256-TpaYbL7HJjpVb2tY2UqnLdkmGI73KhrfR5gCfGGIzhc=",
+        "owner": "MarceColl",
         "repo": "zen-browser-flake",
-        "rev": "585a747bf24b4fc4ed96f63cb95ddad2135c0e5b",
+        "rev": "b3f060f132c209c1d486543e5cec51b710924f50",
         "type": "github"
       },
       "original": {
-        "owner": "eekrain",
+        "owner": "MarceColl",
         "repo": "zen-browser-flake",
         "type": "github"
       }

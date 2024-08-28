@@ -47,9 +47,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # For the latest update, to replace later w/:
-    # zen-browser.url = "github:MarceColl/zen-browser-flake";
-    zen-browser.url = "github:eekrain/zen-browser-flake";
+    zen-browser.url = "github:MarceColl/zen-browser-flake";
 
     secrets = {
       url = "git+ssh://git@github.com/clementpoiret/nix-secrets.git";
