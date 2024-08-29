@@ -41,7 +41,7 @@
       monitor = [
         "eDP-2, 2560x1600@60, 0x0, 1.6"
         "DP-1, 1920x1080, 0x0, 1"
-        "DP-3, 1920x1080, 1600x0, 1, transform, 1" # Vertical laptop screen
+        "DP-3, 2240x1400, 1600x0, 1.6, transform, 0"  # Vertical laptop screen
         "HDMI-A-1, 1920x1080, 1920x0, 1"
       ];
 
