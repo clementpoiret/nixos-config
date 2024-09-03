@@ -59,6 +59,12 @@
     ruff
     uv
 
+    # infra
+    docker
+    kubernetes-helm
+    kubectl
+    minikube
+
     aider-chat
     aria2
     bleachbit # cache cleaner
@@ -91,6 +97,7 @@
     rclone
     tdf # read pdfs in terminal
     unzip
+    via # keyboard config
     wget
     wl-clipboard
     cliphist

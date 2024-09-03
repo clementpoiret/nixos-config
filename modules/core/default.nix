@@ -5,5 +5,5 @@
     ++ [ (import ./program.nix) ] ++ [ (import ./security.nix) ]
     ++ [ (import ./services.nix) ] ++ [ (import ./system.nix) ]
     ++ [ (import ./user.nix) ] ++ [ (import ./wayland.nix) ]
-    ++ [ (import ./virtualization.nix) ] ++ [ (import ./kanata/kanata.nix) ];
+    ++ [ (import ./virtualization.nix) ]; # ++ [ (import ./kanata/kanata.nix) ];
 }
