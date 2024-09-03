@@ -140,6 +140,12 @@ in {
     enableNushellIntegration = true;
   };
 
+  programs.direnv = {
+    enable = true;
+    enableNushellIntegration = true;
+    nix-direnv.enable = true;
+  };
+
   programs.starship = {
     enable = true;
     enableNushellIntegration = true;
