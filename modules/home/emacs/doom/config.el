@@ -98,12 +98,26 @@
 (run-at-time "01:00" 3600 #'my/set-theme-based-on-time)
 
 ;; Fix copy paste on wayland
-;; (use-package! xclip
-;;   :config
-;;   (setq xclip-program "wl-copy")
-;;   (setq xclip-select-enable-clipboard t)
-;;   (setq xclip-mode t)
-;;   (setq xclip-method (quote wl-copy)))
+(when (getenv "WAYLAND_DISPLAY")
+  (setq wl-copy-p nil
+        interprogram-cut-function
+        (lambda (text)
+          (setq-local process-connection-type 'pipe)
+          (setq wl-copy-p (start-process "wl-copy" nil "wl-copy" "--foreground" "--trim-newline"))
+          (process-send-string wl-copy-p text)
+          (process-send-eof wl-copy-p)))
+  (when (getenv "WAYLAND_DISPLAY")
+    (setq interprogram-paste-function
+          (lambda ()
+            (shell-command-to-string "wl-paste -n | tr -d '\r'")))))
+
+
+(use-package! xclip
+  :config
+  (setq xclip-program "wl-copy")
+  (setq xclip-select-enable-clipboard t)
+  (setq xclip-mode t)
+  (setq xclip-method (quote wl-copy)))
 
 ;; gptel
 (use-package! gptel

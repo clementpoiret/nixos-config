@@ -4,7 +4,8 @@ let
   secrets = import "${inputs.secrets}/variables.nix";
 in {
   home.packages = (with pkgs; [
-    emacs29-pgtk
+    emacs
+    # emacs29-pgtk
     emacs-lsp-booster
     ispell
     libtool
@@ -44,6 +45,6 @@ in {
 
   services.emacs = {
     enable = true;
-    package = pkgs.emacs29-pgtk;
+    #package = pkgs.emacs29-pgtk;
   };
 }

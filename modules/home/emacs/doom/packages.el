@@ -53,3 +53,4 @@
 (package! catppuccin-theme)
 (package! fzf)
 (package! gptel)
+(package! xclip)
