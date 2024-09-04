@@ -126,3 +126,8 @@
    gptel-model "claude-3-5-sonnet-20240620"
    gptel-backend (gptel-make-anthropic "Claude"
                    :stream t :key "$ANTHROPIC_API_KEY")))
+
+;; (use-package! lsp-bridge
+;;   :config
+;;   (setq lsp-bridge-enable-log nil)
+;;   (global-lsp-bridge-mode))

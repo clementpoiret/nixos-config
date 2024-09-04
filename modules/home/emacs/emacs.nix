@@ -13,6 +13,15 @@ in {
     pandoc
     shellcheck
 
+    # lsp-bridge
+    #python311Packages.epc
+    #python311Packages.orjson
+    #python311Packages.sexpdata
+    #python311Packages.six
+    #python311Packages.setuptools
+    #python311Packages.paramiko
+    #python311Packages.rapidfuzz
+
     # python
     python311Packages.black
     python311Packages.flake8
