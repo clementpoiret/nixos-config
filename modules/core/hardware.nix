@@ -70,4 +70,6 @@
   #boot.initrd = lib.mkIf (host == "desktop") {
   #  checkJournalingFS = false; 
   #};
+
+  hardware.flipperzero.enable = true;
 }
