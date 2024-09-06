@@ -129,4 +129,14 @@
 (use-package! lsp-bridge
   :config
   (setq lsp-bridge-enable-log nil)
+  (setq lsp-bridge-python-lsp-server :pylsp)
+  (setq lsp-bridge-python-multi-lsp-server "pylsp_ruff")
+  (setq acm-backend-lsp-enable-auto-import t)
+
+  (map! :leader
+      (:prefix ("c" . "code")
+       :desc "LSP Code Action" "a" #'lsp-bridge-code-action
+       :desc "LSP Find Definition" "g" #'lsp-bridge-find-def
+       :desc "LSP Popup Documentation" "o" #'lsp-bridge-popup-documentation))
+
   (global-lsp-bridge-mode))
