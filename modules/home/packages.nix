@@ -57,7 +57,7 @@
     python311Packages.pytest
     python311Packages.pyflakes
     ruff
-    uv
+    master.uv
 
     # infra
     docker
@@ -94,6 +94,7 @@
     protonvpn-cli
     poweralertd
     qalculate-gtk # calculator
+    qFlipper
     rclone
     tdf # read pdfs in terminal
     unzip

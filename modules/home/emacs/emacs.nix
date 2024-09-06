@@ -4,9 +4,9 @@ let
   secrets = import "${inputs.secrets}/variables.nix";
 in {
   home.packages = (with pkgs; [
-    emacs
-    # emacs29-pgtk
-    emacs-lsp-booster
+    # emacs
+    emacs29-pgtk
+    #emacs-lsp-booster
     ispell
     libtool
     mdl
@@ -14,13 +14,13 @@ in {
     shellcheck
 
     # lsp-bridge
-    #python311Packages.epc
-    #python311Packages.orjson
-    #python311Packages.sexpdata
-    #python311Packages.six
-    #python311Packages.setuptools
-    #python311Packages.paramiko
-    #python311Packages.rapidfuzz
+    python311Packages.epc
+    python311Packages.orjson
+    python311Packages.sexpdata
+    python311Packages.six
+    python311Packages.setuptools
+    python311Packages.paramiko
+    python311Packages.rapidfuzz
 
     # python
     python311Packages.black
@@ -54,6 +54,6 @@ in {
 
   services.emacs = {
     enable = true;
-    #package = pkgs.emacs29-pgtk;
+    package = pkgs.emacs29-pgtk;
   };
 }

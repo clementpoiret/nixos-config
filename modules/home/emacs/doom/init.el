@@ -21,7 +21,7 @@
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       company           ; the ultimate code completion backend
+       ;;company           ; the ultimate code completion backend
        ;;(corfu +orderless)  ; complete with cap(f), cape and a flying feather!
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
@@ -95,7 +95,7 @@
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        lookup              ; navigate your code and its documentation
-       lsp               ; M-x vscode
+       ;;lsp               ; M-x vscode
        (magit +forge)             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
@@ -133,7 +133,7 @@
        ;;fsharp            ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
-       (go +lsp)         ; the hipster dialect
+       go         ; the hipster dialect
        ;;(graphql +lsp)    ; Give queries a REST
        ;;(haskell +lsp)    ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
@@ -155,7 +155,7 @@
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       (python +lsp +tree-sitter)           ; beautiful is better than ugly
+       (python +tree-sitter)           ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
@@ -190,38 +190,38 @@
        ;;literate
        (default +bindings +smartparens))
 
-(defun lsp-booster--advice-json-parse (old-fn &rest args)
-  "Try to parse bytecode instead of json."
-  (or
-   (when (equal (following-char) ?#)
-     (let ((bytecode (read (current-buffer))))
-       (when (byte-code-function-p bytecode)
-         (funcall bytecode))))
-   (apply old-fn args)))
-(advice-add (if (progn (require 'json)
-                       (fboundp 'json-parse-buffer))
-                'json-parse-buffer
-              'json-read)
-            :around
-            #'lsp-booster--advice-json-parse)
+;(defun lsp-booster--advice-json-parse (old-fn &rest args)
+;  "Try to parse bytecode instead of json."
+;  (or
+;   (when (equal (following-char) ?#)
+;     (let ((bytecode (read (current-buffer))))
+;       (when (byte-code-function-p bytecode)
+;         (funcall bytecode))))
+;   (apply old-fn args)))
+;(advice-add (if (progn (require 'json)
+;                       (fboundp 'json-parse-buffer))
+;                'json-parse-buffer
+;              'json-read)
+;            :around
+;            #'lsp-booster--advice-json-parse)
+;
+;(defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+;  "Prepend emacs-lsp-booster command to lsp CMD."
+;  (let ((orig-result (funcall old-fn cmd test?)))
+;    (if (and (not test?)                             ;; for check lsp-server-present?
+;             (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+;             lsp-use-plists
+;             (not (functionp 'json-rpc-connection))  ;; native json-rpc
+;             (executable-find "emacs-lsp-booster"))
+;        (progn
+;          (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+;            (setcar orig-result command-from-exec-path))
+;          (message "Using emacs-lsp-booster for %s!" orig-result)
+;          (cons "emacs-lsp-booster" orig-result))
+;      orig-result)))
+;(advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 
-(defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-  "Prepend emacs-lsp-booster command to lsp CMD."
-  (let ((orig-result (funcall old-fn cmd test?)))
-    (if (and (not test?)                             ;; for check lsp-server-present?
-             (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-             lsp-use-plists
-             (not (functionp 'json-rpc-connection))  ;; native json-rpc
-             (executable-find "emacs-lsp-booster"))
-        (progn
-          (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-            (setcar orig-result command-from-exec-path))
-          (message "Using emacs-lsp-booster for %s!" orig-result)
-          (cons "emacs-lsp-booster" orig-result))
-      orig-result)))
-(advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-
-(with-eval-after-load 'lsp-mode
-  (add-to-list 'lsp-disabled-clients 'pyls)
-  (add-to-list 'lsp-enabled-clients 'pylsp)
-  (add-to-list 'lsp-enabled-clients 'ruff-lsp))
+;(with-eval-after-load 'lsp-mode
+;  (add-to-list 'lsp-disabled-clients 'pyls)
+;  (add-to-list 'lsp-enabled-clients 'pylsp)
+;  (add-to-list 'lsp-enabled-clients 'ruff-lsp))

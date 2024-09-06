@@ -103,14 +103,13 @@
         interprogram-cut-function
         (lambda (text)
           (setq-local process-connection-type 'pipe)
-          (setq wl-copy-p (start-process "wl-copy" nil "wl-copy" "--foreground" "--trim-newline"))
+          (setq wl-copy-p (start-process "wl-copy" nil "wl-copy" "--foreground")) ;; "--trim-newline"))
           (process-send-string wl-copy-p text)
           (process-send-eof wl-copy-p)))
   (when (getenv "WAYLAND_DISPLAY")
     (setq interprogram-paste-function
           (lambda ()
-            (shell-command-to-string "wl-paste -n | tr -d '\r'")))))
-
+            (shell-command-to-string "wl-paste -n"))))) ;; | tr -d '\r'")))))
 
 (use-package! xclip
   :config
@@ -127,7 +126,7 @@
    gptel-backend (gptel-make-anthropic "Claude"
                    :stream t :key "$ANTHROPIC_API_KEY")))
 
-;; (use-package! lsp-bridge
-;;   :config
-;;   (setq lsp-bridge-enable-log nil)
-;;   (global-lsp-bridge-mode))
+(use-package! lsp-bridge
+  :config
+  (setq lsp-bridge-enable-log nil)
+  (global-lsp-bridge-mode))
