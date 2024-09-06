@@ -99,17 +99,20 @@
 
 ;; Fix copy paste on wayland
 (when (getenv "WAYLAND_DISPLAY")
-  (setq wl-copy-p nil
-        interprogram-cut-function
-        (lambda (text)
-          (setq-local process-connection-type 'pipe)
-          (setq wl-copy-p (start-process "wl-copy" nil "wl-copy" "--foreground")) ;; "--trim-newline"))
-          (process-send-string wl-copy-p text)
-          (process-send-eof wl-copy-p)))
-  (when (getenv "WAYLAND_DISPLAY")
-    (setq interprogram-paste-function
-          (lambda ()
-            (shell-command-to-string "wl-paste -n"))))) ;; | tr -d '\r'")))))
+  (setq wl-copy-process nil)
+  (defun wl-copy (text)
+    (setq wl-copy-process (make-process :name "wl-copy"
+                                        :buffer nil
+                                        :command '("wl-copy" "-f" "-n")
+                                        :connection-type 'pipe))
+    (process-send-string wl-copy-process text)
+    (process-send-eof wl-copy-process))
+  (defun wl-paste ()
+    (if (and wl-copy-process (process-live-p wl-copy-process))
+        nil ; should return nil if we're the current paste owner
+        (shell-command-to-string "wl-paste -n"))) ; | tr -d \r")))
+  (setq interprogram-cut-function 'wl-copy)
+  (setq interprogram-paste-function 'wl-paste))
 
 (use-package! xclip
   :config
