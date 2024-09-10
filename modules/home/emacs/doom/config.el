@@ -110,7 +110,7 @@
   (defun wl-paste ()
     (if (and wl-copy-process (process-live-p wl-copy-process))
         nil ; should return nil if we're the current paste owner
-        (shell-command-to-string "wl-paste -n"))) ; | tr -d \r")))
+      (shell-command-to-string "wl-paste -n"))) ; | tr -d \r")))
   (setq interprogram-cut-function 'wl-copy)
   (setq interprogram-paste-function 'wl-paste))
 
@@ -121,6 +121,13 @@
   (setq xclip-mode t)
   (setq xclip-method (quote wl-copy)))
 
+;; elysium
+(use-package elysium
+  :custom
+  ;; Below are the default values
+  (elysium-window-size 0.33) ; The elysium buffer will be 1/3 your screen
+  (elysium-window-style 'vertical)) ; Can be customized to horizontal
+
 ;; gptel
 (use-package! gptel
   :config
@@ -129,17 +136,23 @@
    gptel-backend (gptel-make-anthropic "Claude"
                    :stream t :key "$ANTHROPIC_API_KEY")))
 
+(use-package smerge-mode
+  :ensure nil
+  :hook
+  (prog-mode . smerge-mode))
+
 (use-package! lsp-bridge
   :config
   (setq lsp-bridge-enable-log nil)
+  (setq lsp-bridge-nix-lsp-server :nil)
   (setq lsp-bridge-python-lsp-server :pylsp)
   (setq lsp-bridge-python-multi-lsp-server "pylsp_ruff")
   (setq acm-backend-lsp-enable-auto-import t)
 
   (map! :leader
-      (:prefix ("c" . "code")
-       :desc "LSP Code Action" "a" #'lsp-bridge-code-action
-       :desc "LSP Find Definition" "g" #'lsp-bridge-find-def
-       :desc "LSP Popup Documentation" "o" #'lsp-bridge-popup-documentation))
+        (:prefix ("c" . "code")
+         :desc "LSP Code Action" "a" #'lsp-bridge-code-action
+         :desc "LSP Find Definition" "h" #'lsp-bridge-find-def
+         :desc "LSP Popup Documentation" "o" #'lsp-bridge-popup-documentation))
 
   (global-lsp-bridge-mode))

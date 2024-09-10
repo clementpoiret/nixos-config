@@ -47,6 +47,9 @@
     gcc
     gnumake
 
+    # Nix
+    nil
+
     # Python
     (import ./python-packages.nix { pkgs = pkgs; })
     micromamba
@@ -101,6 +104,7 @@
     via # keyboard config
     wget
     wl-clipboard
+    master.wush # transfer between computers
     cliphist
     xdg-utils
     xxd

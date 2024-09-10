@@ -64,3 +64,10 @@
                  :build (:not compile)))
   (package! markdown-mode)
   (package! yasnippet))
+
+(package! elysium
+  :recipe (:type git
+           :host github
+           :repo "lanceberge/elysium"
+           :branch "main"
+           :files ("*.el")))
