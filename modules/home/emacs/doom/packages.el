@@ -55,6 +55,8 @@
 (package! gptel)
 (package! xclip)
 
+(package! org-tree-slide)
+
 (when (package! lsp-bridge
         :recipe (:host github
                  :repo "manateelazycat/lsp-bridge"

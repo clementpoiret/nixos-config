@@ -68,7 +68,7 @@
     kubectl
     minikube
 
-    aider-chat
+    # aider-chat
     aria2
     bleachbit # cache cleaner
     chromium
