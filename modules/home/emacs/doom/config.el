@@ -47,7 +47,6 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Sync/Notes/org/")
 
-
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
@@ -193,3 +192,6 @@
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
+
+(setq org-roam-directory (file-truename "~/Sync/Notes/org-roam"))
+(org-roam-db-autosync-mode)
