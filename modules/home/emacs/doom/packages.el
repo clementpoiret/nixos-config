@@ -73,3 +73,6 @@
            :repo "lanceberge/elysium"
            :branch "main"
            :files ("*.el")))
+
+(unpin! org-roam)
+(package! org-roam-ui)
