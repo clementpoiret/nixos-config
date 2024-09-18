@@ -177,7 +177,7 @@
   (org-tree-slide-breadcrumbs " > ")
   (org-image-actual-width nil))
 
-;; Org-roam UI
+;; Org-roam, UI and Bibtex
 (use-package! websocket
   :after org-roam)
 
@@ -195,3 +195,7 @@
 
 (setq org-roam-directory (file-truename "~/Sync/Notes/org-roam"))
 (org-roam-db-autosync-mode)
+
+;; (use-package org-roam-bibtex
+;;   :after org-roam
+;;   :hook (org-roam-mode . org-roam-bibtex-mode))
