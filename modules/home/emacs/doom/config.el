@@ -178,6 +178,30 @@
   (org-image-actual-width nil))
 
 ;; Org-roam, UI and Bibtex
+(use-package! org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory (file-truename "~/Sync/Notes/org-roam/permanent/"))
+  (org-roam-completion-everywhere t)
+  (org-roam-capture-templates
+   '(("d" "default" plain
+      "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)
+     ("p" "permanent" plain
+      "* Main Idea\n\n* Additional Thoughts\n\n* References\n\n"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         :map org-mode-map
+         ("C-M-i" . completion-at-point))
+  :config
+  (org-roam-db-autosync-mode))
+
 (use-package! websocket
   :after org-roam)
 
@@ -192,10 +216,6 @@
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
-
-(setq org-roam-directory (file-truename "~/Sync/Notes/org-roam"))
-(org-roam-db-autosync-mode)
-
 ;; (use-package org-roam-bibtex
 ;;   :after org-roam
 ;;   :hook (org-roam-mode . org-roam-bibtex-mode))

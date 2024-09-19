@@ -553,6 +553,7 @@
       },
       "original": {
         "owner": "tesujimath",
+        "ref": "refs/tags/0.13.1",
         "repo": "nu_plugin_bash_env",
         "type": "github"
       }
