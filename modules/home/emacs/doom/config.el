@@ -219,3 +219,14 @@
 ;; (use-package org-roam-bibtex
 ;;   :after org-roam
 ;;   :hook (org-roam-mode . org-roam-bibtex-mode))
+
+(use-package! citar
+  :custom
+  (citar-bibliography '("~/Sync/Bibliography/library.bib"))
+  :hook
+  (LaTeX-mode . citar-capf-setup)
+  (org-mode . citar-capf-setup))
+
+(use-package! citar-org-roam
+  :after (citar org-roam)
+  :config (citar-org-roam-mode))

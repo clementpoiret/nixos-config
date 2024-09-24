@@ -14,9 +14,10 @@
     file # Show file information
     fzf # fuzzy finder
     gh # github cli
-    gtt # google translate TUI
     gifsicle # gif utility
+    gtt # google translate TUI
     gtrash # rm replacement, put deleted files in system trash
+    graphviz
     hexdump
     inkscape
     inxi # system info
@@ -64,6 +65,7 @@
 
     # infra
     docker
+    k9s
     kubernetes-helm
     kubectl
     minikube

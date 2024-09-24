@@ -76,4 +76,4 @@
 
 (unpin! org-roam)
 (package! org-roam-ui)
-;; (package! org-roam-bibtex)
+(package! citar-org-roam)
