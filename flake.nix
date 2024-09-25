@@ -43,7 +43,7 @@
     };
 
     nu_plugin_bash_env = {
-      url = "github:tesujimath/nu_plugin_bash_env/refs/tags/0.13.1";
+      url = "github:tesujimath/nu_plugin_bash_env/refs/tags/0.14.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
