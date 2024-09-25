@@ -122,6 +122,10 @@
   (setq xclip-mode t)
   (setq xclip-method (quote wl-copy)))
 
+;; Autoload forge
+(use-package! forge
+  :after magit)
+
 ;; elysium
 (use-package elysium
   :custom
