@@ -36,6 +36,7 @@
     pciutils
     ripgrep # grep replacement
     russ
+    sops
     spotify-player
     toipe # typing test in the terminal
     tldr # user-friendly help
