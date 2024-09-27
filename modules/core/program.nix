@@ -8,16 +8,17 @@
     enable = true;
     enableSSHSupport = true;
     # pinentryFlavor = "qt";
-    pinentryPackage = pkgs.pinentry-qt;
+    # pinentryPackage = pkgs.pinentry-qt;
   };
   services.pcscd.enable = true;
 
   environment.systemPackages = with pkgs; [
-    lxqt.lxqt-openssh-askpass
+    #lxqt.lxqt-openssh-askpass
+    seahorse
   ];
 
   programs.ssh = {
     enableAskPassword = true;
-    askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
+    # askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
   };
 }

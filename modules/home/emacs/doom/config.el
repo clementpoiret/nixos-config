@@ -141,10 +141,10 @@
    gptel-backend (gptel-make-anthropic "Claude"
                    :stream t :key "$ANTHROPIC_API_KEY")))
 
-(use-package smerge-mode
-  :ensure nil
-  :hook
-  (prog-mode . smerge-mode))
+;; (use-package smerge-mode
+;;   :ensure nil
+;;   :hook
+;;   (prog-mode . smerge-mode))
 
 (use-package! lsp-bridge
   :config

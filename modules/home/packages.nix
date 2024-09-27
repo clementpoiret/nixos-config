@@ -27,7 +27,7 @@
     libreoffice
     lsd # ls replacement
     lshw
-    lxqt.lxqt-policykit
+    #lxqt.lxqt-policykit
     lz4
     python311Packages.magic-wormhole # magic file transfer
     nautilus # file manager
