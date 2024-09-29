@@ -50,14 +50,14 @@
     # zen-browser.url = "github:MarceColl/zen-browser-flake";
     zen-browser.url = "github:ch4og/zen-browser-flake";
 
-    secrets = {
-      url = "git+ssh://git@github.com/clementpoiret/nix-secrets.git";
-      flake = false;
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = { alejandra, nixpkgs, nu_plugin_bash_env, nixpkgs-master, self
-    , secrets, zen-browser, ... }@inputs:
+    , home-manager, zen-browser, ... }@inputs:
     let
       selfPkgs = import ./pkgs;
       username = "clementpoiret";
@@ -87,6 +87,8 @@
       lib = nixpkgs.lib;
     in {
       overlays.default = selfPkgs.overlay;
+
+      # niz-switch
       nixosConfigurations = {
         desktop = nixpkgs.lib.nixosSystem {
           inherit system;
@@ -105,6 +107,32 @@
             host = "laptop";
             inherit self inputs username;
           };
+        };
+      };
+
+      # home-manager switch --flake .#clementpoiret@desktop --impure
+      homeConfigurations = {
+        "clementpoiret@desktop" = home-manager.lib.homeManagerConfiguration {
+          pkgs = pkgs;
+          #useUserPackages = true;
+          #useGlobalPkgs = true;
+          extraSpecialArgs = {
+            inherit self inputs username;
+            host = "desktop";
+          };
+          modules =
+            [ { nixpkgs.overlays = customOverlays; } (import ./home-manager) ];
+        };
+        "clementpoiret@laptop" = home-manager.lib.homeManagerConfiguration {
+          pkgs = pkgs;
+          #useUserPackages = true;
+          #useGlobalPkgs = true;
+          extraSpecialArgs = {
+            inherit self inputs username;
+            host = "laptop";
+          };
+          modules =
+            [ { nixpkgs.overlays = customOverlays; } (import ./home-manager) ];
         };
       };
     };

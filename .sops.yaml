@@ -1,0 +1,7 @@
+keys:
+  - &admin_clementpoiret age1tc9hx2sunf4ztpx8tfxata6rf20ag7ydfx3xd8h096ednw85hdmq0dy83l
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *admin_clementpoiret

@@ -225,4 +225,4 @@
                                         ;  (add-to-list 'lsp-disabled-clients 'pyls)
                                         ;  (add-to-list 'lsp-enabled-clients 'pylsp)
                                         ;  (add-to-list 'lsp-enabled-clients 'ruff-lsp))
-(setq auth-sources '("~/.authinfo"))
+(setq auth-sources '("~/.authinfo.gpg"))

@@ -1,9 +1,19 @@
 { inputs, nixpkgs, self, username, host, ... }: {
-  imports = [ (import ./bootloader.nix) ] ++ [ (import ./hardware.nix) ]
-    ++ [ (import ./xserver.nix) ] ++ [ (import ./network.nix) ]
-    ++ [ (import ./nh.nix) ] ++ [ (import ./pipewire.nix) ]
-    ++ [ (import ./program.nix) ] ++ [ (import ./security.nix) ]
-    ++ [ (import ./services.nix) ] ++ [ (import ./system.nix) ]
-    ++ [ (import ./user.nix) ] ++ [ (import ./wayland.nix) ]
-    ++ [ (import ./virtualization.nix) ]; # ++ [ (import ./kanata/kanata.nix) ];
+  imports = [
+    ./bootloader.nix
+    ./hardware.nix
+    #./kanata/kanata.nix
+    ./network.nix
+    ./nh.nix
+    ./pipewire.nix
+    ./program.nix
+    ./security.nix
+    ./services.nix
+    ./sops.nix
+    ./system.nix
+    ./user.nix
+    ./virtualization.nix
+    ./wayland.nix
+    ./xserver.nix
+  ];
 }

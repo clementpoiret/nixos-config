@@ -1,7 +1,5 @@
 { config, inputs, pkgs, ... }:
-let
-  home = config.home.homeDirectory;
-  secrets = import "${inputs.secrets}/variables.nix";
+let home = config.home.homeDirectory;
 in {
   home.packages = (with pkgs; [
     # emacs
@@ -32,11 +30,7 @@ in {
   ]);
 
   home.file = {
-    ".config/doom/config.el" = {
-      # source = ./doom/config.el;
-      text = builtins.replaceStrings [ "$ANTHROPIC_API_KEY" ]
-        [ secrets.anthropicApiKey ] (builtins.readFile ./doom/config.el);
-    };
+    ".config/doom/config.el" = { source = ./doom/config.el; };
     ".config/doom/init.el" = { source = ./doom/init.el; };
     ".config/doom/packages.el" = { source = ./doom/packages.el; };
   };

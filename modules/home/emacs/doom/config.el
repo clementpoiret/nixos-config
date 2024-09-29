@@ -139,7 +139,10 @@
   (setq
    gptel-model "claude-3-5-sonnet-20240620"
    gptel-backend (gptel-make-anthropic "Claude"
-                   :stream t :key "$ANTHROPIC_API_KEY")))
+                   :stream t
+                   :key (with-temp-buffer
+                          (insert-file-contents "/run/user/1000/secrets/api_keys/anthropic")
+                          (string-trim (buffer-string))))))
 
 ;; (use-package smerge-mode
 ;;   :ensure nil

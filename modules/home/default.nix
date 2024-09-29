@@ -1,24 +1,27 @@
 { inputs, username, host, ... }: {
-  imports = [ (import ./bat.nix) ] # better cat command
-    ++ [ (import ./btop.nix) ] # resouces monitor
-    ++ [ (import ./easyeffect.nix) ] # audio profile
-    ++ [ (import ./emacs/emacs.nix) ] # emacs editor
-    ++ [ (import ./files/files.nix) ] # custom files to add to the home folder
-    ++ [ (import ./fuzzel.nix) ] # launcher
-    ++ [ (import ./git.nix) ] # version controle
-    ++ [ (import ./gtk.nix) ] # gtk theme
-    ++ [ (import ./hyprland) ] # window manager
-    ++ [ (import ./kitty.nix) ] # terminal
-    ++ [ (import ./nushell/nushell.nix) ] # shell
-    ++ [ (import ./spicetify.nix) ] # spotify client
-    ++ [ (import ./swaync/swaync.nix) ] # notification deamon
-    ++ [ (import ./micro.nix) ] # nano replacement
-    ++ [ (import ./nvim/nvim.nix) ] # neovim editor
-    ++ [ (import ./packages.nix) ] # other packages
-    ++ [ (import ./qutebrowser/qutebrowser.nix) ] # qutebrowser
-    ++ [ (import ./scripts/scripts.nix) ] # personal scripts
-    ++ [ (import ./waybar) ] # status bar
-    ++ [ (import ./xdg-mimes.nix) ] # default apps
-    ++ [ (import ./yazi.nix) ] # terminal file manager
-    ++ [ (import ./zsh/zsh.nix) ]; # shell
+  imports = [
+    ./bat.nix # better cat command
+    ./btop.nix # resouces monitor
+    ./easyeffect.nix # audio profile
+    ./emacs/emacs.nix # emacs editor
+    ./files/files.nix # custom files
+    ./fuzzel.nix # launcher
+    ./git.nix # version controle
+    ./gtk.nix # gtk theme
+    ./hyprland # window manager
+    ./kitty.nix # terminal
+    ./nushell/nushell.nix # shell
+    ./spicetify.nix # spotify client
+    ./swaync/swaync.nix # notification deamon
+    ./micro.nix # nano replacement
+    ./nvim/nvim.nix # neovim editor
+    ./packages.nix # other packages
+    ./qutebrowser/qutebrowser.nix # qutebrowser
+    ./sops.nix # secrets mgmt
+    ./scripts/scripts.nix # personal scripts
+    ./waybar # status bar
+    ./xdg-mimes.nix # default apps
+    ./yazi.nix # terminal file manager
+    ./zsh/zsh.nix # shell
+  ];
 }
