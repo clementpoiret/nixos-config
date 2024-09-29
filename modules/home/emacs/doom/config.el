@@ -126,6 +126,9 @@
 (use-package! forge
   :after magit)
 
+(after! magit
+  (magit-todos-mode +1))
+
 ;; elysium
 (use-package elysium
   :custom

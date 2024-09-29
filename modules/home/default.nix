@@ -18,6 +18,7 @@
     ./packages.nix # other packages
     ./qutebrowser/qutebrowser.nix # qutebrowser
     ./sops.nix # secrets mgmt
+    ./swayosd.nix # volume and brightness feedbacks
     ./scripts/scripts.nix # personal scripts
     ./waybar # status bar
     ./xdg-mimes.nix # default apps

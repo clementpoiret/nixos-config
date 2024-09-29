@@ -41,7 +41,7 @@
       monitor = [
         "eDP-2, 2560x1600@60, 0x0, 1.6"
         "DP-1, 1920x1080, 0x0, 1"
-        "DP-3, 2240x1400, 1600x0, 1.6, transform, 0"  # Vertical laptop screen
+        "DP-3, 2240x1400, 1600x0, 1.6, transform, 0" # Vertical laptop screen
         "HDMI-A-1, 1920x1080, 1920x0, 1"
       ];
 
@@ -161,7 +161,7 @@
         "$mainMod, F, fullscreen, 1"
         "$mainMod SHIFT, F, fullscreen, 0"
         "$mainMod, B, exec, zen"
-        "$mainMod, Space, togglefloating,"
+        "$mainMod, Space, exec, toggle_float"
         "$mainMod, Escape, exec, hyprlock"
         "$mainMod SHIFT, Escape, exec, shutdown-script"
         "$mainMod, J, togglesplit,"
@@ -227,21 +227,21 @@
         "$mainMod ALT, down, moveactive, 0 80"
 
         # media and volume controls
-        ",XF86AudioRaiseVolume, exec, pamixer -i 2"
-        ",XF86AudioLowerVolume, exec, pamixer -d 2"
-        ",XF86AudioMute,exec, pamixer -t"
-        ",XF86AudioPlay,exec, playerctl play-pause"
-        ",XF86AudioNext,exec, playerctl next"
-        ",XF86AudioPrev,exec, playerctl previous"
+        #",XF86AudioRaiseVolume, exec, pamixer -i 2"
+        #",XF86AudioLowerVolume, exec, pamixer -d 2"
+        #",XF86AudioMute, exec, pamixer -t"
+        ",XF86AudioPlay, exec, playerctl play-pause"
+        ",XF86AudioNext, exec, playerctl next"
+        ",XF86AudioPrev, exec, playerctl previous"
         ",XF86AudioStop, exec, playerctl stop"
         "$mainMod, mouse_down, workspace, e-1"
         "$mainMod, mouse_up, workspace, e+1"
 
         # laptop brigthness
-        ",XF86MonBrightnessUp, exec, brightnessctl set 5%+"
-        ",XF86MonBrightnessDown, exec, brightnessctl set 5%-"
-        "$mainMod, XF86MonBrightnessUp, exec, brightnessctl set 100%+"
-        "$mainMod, XF86MonBrightnessDown, exec, brightnessctl set 100%-"
+        #",XF86MonBrightnessUp, exec, brightnessctl set 5%+"
+        #",XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+        #"$mainMod, XF86MonBrightnessUp, exec, brightnessctl set 100%+"
+        #"$mainMod, XF86MonBrightnessDown, exec, brightnessctl set 100%-"
       ];
 
       # mouse binding
