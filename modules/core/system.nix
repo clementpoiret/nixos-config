@@ -4,6 +4,8 @@
     settings = {
       auto-optimise-store = true;
       experimental-features = [ "nix-command" "flakes" ];
+      plugin-files = "${pkgs.nix-plugins}/lib/nix/plugins";
+      extra-builtins-file = [ ../../libs/extra-builtins.nix ];
       substituters = [
         "https://nix-community.cachix.org"
         "https://nix-gaming.cachix.org"

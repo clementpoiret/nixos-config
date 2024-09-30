@@ -4,7 +4,7 @@
     ./btop.nix # resouces monitor
     ./easyeffect.nix # audio profile
     ./emacs/emacs.nix # emacs editor
-    ./files/files.nix # custom files
+    # ./files/files.nix # custom files
     ./fuzzel.nix # launcher
     ./git.nix # version controle
     ./gtk.nix # gtk theme

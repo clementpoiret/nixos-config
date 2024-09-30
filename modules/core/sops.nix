@@ -1,5 +1,5 @@
-{ config, inputs, host, ... }:
-{
+{ pkgs, ... }: {
+  environment.systemPackages = with pkgs; [ sops ];
   # imports = [ inputs.sops-nix.nixosModules.sops ];
   # sops = {
   #   age.keyFile = "/home/clementpoiret/.config/sops/age/keys.txt";
