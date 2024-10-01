@@ -1,5 +1,9 @@
 { config, inputs, pkgs, ... }:
-let home = config.home.homeDirectory;
+let
+  home = config.home.homeDirectory;
+  doomBin = pkgs.writeScriptBin "doom" ''
+    $HOME/.config/emacs/bin/doom $@
+  '';
 in {
   home.packages = (with pkgs; [
     # emacs
@@ -27,6 +31,8 @@ in {
     nodePackages_latest.eslint_d
     nodePackages_latest.vscode-langservers-extracted
     nodePackages_latest.typescript-language-server
+
+    doomBin
   ]);
 
   home.file = {

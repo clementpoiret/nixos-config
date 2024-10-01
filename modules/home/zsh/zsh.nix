@@ -1,11 +1,4 @@
-{
-  hostname,
-  config,
-  pkgs,
-  host,
-  ...
-}:
-{
+{ hostname, config, pkgs, host, ... }: {
   programs.zsh = {
     enable = true;
     dotDir = ".config/zsh";
@@ -66,9 +59,11 @@
       ns = "nix-shell --run zsh";
       nix-shell = "nix-shell --run zsh";
       nix-switch = "sudo nixos-rebuild switch --flake ~/nixos-config#${host}";
-      nix-switchu = "sudo nixos-rebuild switch --upgrade --flake ~/nixos-config#${host}";
+      nix-switchu =
+        "sudo nixos-rebuild switch --upgrade --flake ~/nixos-config#${host}";
       nix-flake-update = "sudo nix flake update ~/nixos-config#";
-      nix-clean = "sudo nix-collect-garbage && sudo nix-collect-garbage -d && sudo rm /nix/var/nix/gcroots/auto/* && nix-collect-garbage && nix-collect-garbage -d";
+      nix-clean =
+        "sudo nix-collect-garbage && sudo nix-collect-garbage -d && sudo rm /nix/var/nix/gcroots/auto/* && nix-collect-garbage && nix-collect-garbage -d";
 
       # Git
       ga = "git add";
@@ -97,7 +92,6 @@
       # custom tools
       lakectl = "/home/clementpoiret/bin/lakectl";
       emacs = "emacsclient -c -a 'emacs'";
-      doom = "~/.config/emacs/bin/doom";
 
       # to fix std lib issues
       obsidian = "export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH; obsidian";
@@ -109,7 +103,8 @@
     enableZshIntegration = true;
     enableNushellIntegration = false;
     settings = {
-      "$schema" = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json";
+      "$schema" =
+        "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json";
       version = 2;
       final_space = true;
       console_title_template = "{{ .Shell }} in {{ .Folder }}";
@@ -133,7 +128,8 @@
               style = "plain";
               background = "transparent";
               foreground = "p:grey";
-              template = " {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>";
+              template =
+                " {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>";
               properties = {
                 branch_icon = "";
                 commit_icon = "@";
@@ -173,27 +169,23 @@
           alignment = "left";
           newline = true;
 
-          segments = [
-            {
-              type = "text";
-              style = "plain";
-              background = "transparent";
-              foreground_templates = [
-                "{{if gt .Code 0}}red{{end}}"
-                "{{if eq .Code 0}}magenta{{end}}"
-              ];
-              template = "❯";
-            }
-          ];
+          segments = [{
+            type = "text";
+            style = "plain";
+            background = "transparent";
+            foreground_templates = [
+              "{{if gt .Code 0}}red{{end}}"
+              "{{if eq .Code 0}}magenta{{end}}"
+            ];
+            template = "❯";
+          }];
         }
       ];
 
       transient_prompt = {
         background = "transparent";
-        foreground_templates = [
-          "{{if gt .Code 0}}red{{end}}"
-          "{{if eq .Code 0}}magenta{{end}}"
-        ];
+        foreground_templates =
+          [ "{{if gt .Code 0}}red{{end}}" "{{if eq .Code 0}}magenta{{end}}" ];
         template = "❯ ";
       };
 
