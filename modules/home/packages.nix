@@ -29,7 +29,7 @@
     lshw
     #lxqt.lxqt-policykit
     lz4
-    python311Packages.magic-wormhole # magic file transfer
+    python312Packages.magic-wormhole # magic file transfer
     nautilus # file manager
     nitch # systhem fetch util
     nix-prefetch-github
@@ -58,9 +58,9 @@
     pipenv
     pixi
     poetry
-    python311Packages.nose
-    python311Packages.pytest
-    python311Packages.pyflakes
+    python312Packages.nose
+    python312Packages.pytest
+    python312Packages.pyflakes
     ruff
     master.uv
 
@@ -84,6 +84,7 @@
     file-roller
     firefox-devedition-bin
     gparted # partition manager
+    hugo
     libnotify
     man-pages # extra man pages
     mpv # video player

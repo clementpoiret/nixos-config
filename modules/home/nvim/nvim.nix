@@ -16,11 +16,11 @@ in
     stylua
 
     # python
-    python311Packages.black
-    python311Packages.flake8
-    python311Packages.isort
-    python311Packages.python-lsp-server
-    python311Packages.yapf
+    python312Packages.black
+    python312Packages.flake8
+    python312Packages.isort
+    python312Packages.python-lsp-server
+    python312Packages.yapf
 
     # web stuff
     nodePackages_latest.prettier

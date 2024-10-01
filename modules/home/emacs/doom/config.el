@@ -240,3 +240,7 @@
 (use-package! citar-org-roam
   :after (citar org-roam)
   :config (citar-org-roam-mode))
+
+;; Blog publishing
+(use-package! ox-hugo
+  :after ox)
