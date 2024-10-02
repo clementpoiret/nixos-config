@@ -1,4 +1,6 @@
-{ inputs, host, ... }: {
+{ inputs, host, ... }:
+let secretFile = ../../secrets/user-secrets.yaml;
+in {
   imports = [ inputs.sops-nix.homeManagerModules.sops ];
 
   sops = {
@@ -7,9 +9,8 @@
     defaultSymlinkPath = "/run/user/1000/secrets";
     defaultSecretsMountPoint = "/run/user/1000/secrets.d";
 
-    secrets."api_keys/anthropic" = {
-      sopsFile = ../../secrets/user-secrets.yaml;
-    };
-    secrets."api_keys/pypi" = { sopsFile = ../../secrets/user-secrets.yaml; };
+    secrets."dns/${host}" = { sopsFile = secretFile; };
+    secrets."api_keys/anthropic" = { sopsFile = secretFile; };
+    secrets."api_keys/pypi" = { sopsFile = secretFile; };
   };
 }

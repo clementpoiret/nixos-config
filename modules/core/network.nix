@@ -1,10 +1,10 @@
 { config, pkgs, host, inputs, ... }:
-let secrets = builtins.extraBuiltins.readSops ../../secrets/eval-secrets.nix;
+let nameserver = builtins.readFile "/run/user/1000/secrets/dns/${host}";
 in {
   networking = {
     hostName = "${host}";
     networkmanager.enable = true;
-    nameservers = [ secrets.dns.${host} ];
+    nameservers = [ nameserver ];
     firewall = {
       enable = true;
       allowedTCPPorts = [ 22 80 443 59010 59011 ];
