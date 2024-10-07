@@ -82,6 +82,8 @@
 (rainbow-delimiters-mode -1)
 (setq-default global-whitespace-mode t)
 (setq whitespace-style '(face spaces space-mark tabs tab-mark newline newline-mark trailing))
+(setopt display-fill-column-indicator-column 80)
+(global-display-fill-column-indicator-mode t)
 
 ;; Change theme based on day/night
 (defun my/set-theme-based-on-time ()
