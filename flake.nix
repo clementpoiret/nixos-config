@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     nur.url = "github:nix-community/NUR";
 
     hypr-contrib.url = "github:hyprwm/contrib";
@@ -56,8 +57,8 @@
     };
   };
 
-  outputs = { alejandra, nixpkgs, nu_plugin_bash_env, nixpkgs-master, self
-    , home-manager, zen-browser, ... }@inputs:
+  outputs = { alejandra, chaotic, nixpkgs, nu_plugin_bash_env, nixpkgs-master
+    , self, home-manager, zen-browser, ... }@inputs:
     let
       selfPkgs = import ./pkgs;
       username = "clementpoiret";
@@ -92,8 +93,11 @@
       nixosConfigurations = {
         desktop = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules =
-            [ { nixpkgs.overlays = customOverlays; } (import ./hosts/desktop) ];
+          modules = [
+            { nixpkgs.overlays = customOverlays; }
+            ./hosts/desktop
+            chaotic.nixosModules.default
+          ];
           specialArgs = {
             host = "desktop";
             inherit self inputs username;
@@ -101,8 +105,11 @@
         };
         laptop = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules =
-            [ { nixpkgs.overlays = customOverlays; } (import ./hosts/laptop) ];
+          modules = [
+            { nixpkgs.overlays = customOverlays; }
+            ./hosts/laptop
+            chaotic.nixosModules.default
+          ];
           specialArgs = {
             host = "laptop";
             inherit self inputs username;
