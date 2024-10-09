@@ -79,9 +79,26 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+;; Increase GC threshold during startup
+(setq gc-cons-threshold most-positive-fixnum)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold 800000)))
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            ;; Reset GC threshold after startup
+            (setq gc-cons-threshold (* 20 1024 1024))  ; 20 MB
+            (setq gc-cons-percentage 0.1)))
+
+;; Make emacs use a posix-compliant shell
+(setq-default explicit-shell-file-name "/run/current-system/sw/bin/bash")
+(setq-default shell-file-name "/run/current-system/sw/bin/bash")
+(setq-default sh-shell "/run/current-system/sw/bin/bash")
+
 (rainbow-delimiters-mode -1)
-(setq-default global-whitespace-mode t)
-(setq whitespace-style '(face spaces space-mark tabs tab-mark newline newline-mark trailing))
+;; (setq-default global-whitespace-mode t)
+;; (setq whitespace-style '(face spaces space-mark tabs tab-mark newline newline-mark trailing))
 (setopt display-fill-column-indicator-column 80)
 (global-display-fill-column-indicator-mode t)
 
@@ -97,7 +114,7 @@
     (load-theme doom-theme t)))
 
 ;; Run now and check every hours
-(my/set-theme-based-on-time)
+(add-hook 'emacs-startup-hook #'my/set-theme-based-on-time)
 (run-at-time "01:00" 3600 #'my/set-theme-based-on-time)
 
 ;; Fix copy paste on wayland
@@ -156,6 +173,9 @@
 
 (use-package! lsp-bridge
   :config
+  ;; because of direnv, emacs sometimes tries to launch lsp-bridge w/ a local
+  ;; python venv.
+  (setq lsp-bridge-python-command "/etc/profiles/per-user/clementpoiret/bin/python")
   (setq lsp-bridge-enable-log nil)
   (setq lsp-bridge-nix-lsp-server :nil)
   (setq lsp-bridge-python-lsp-server :pylsp)

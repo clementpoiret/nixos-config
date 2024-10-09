@@ -24,7 +24,6 @@
     jdk
     killall # to kill our little friends
     lazygit
-    libreoffice
     lsd # ls replacement
     lshw
     #lxqt.lxqt-policykit
@@ -90,6 +89,7 @@
     mpv # video player
     ncdu # disk space
     obsidian
+    onlyoffice-desktopeditors
     openssl
     pamixer # pulseaudio command line mixer
     pavucontrol # pulseaudio volume controle (GUI)
