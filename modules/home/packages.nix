@@ -6,6 +6,7 @@
     beeper
     bruno # for REST APIs tests
     bitwise # cli tool for bit / hex manipulation
+    dconf-editor
     dmidecode
     drawio
     entr # perform action when file change
@@ -29,7 +30,6 @@
     #lxqt.lxqt-policykit
     lz4
     python312Packages.magic-wormhole # magic file transfer
-    nautilus # file manager
     nitch # systhem fetch util
     nix-prefetch-github
     pciutils

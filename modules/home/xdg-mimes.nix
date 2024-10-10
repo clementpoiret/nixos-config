@@ -8,7 +8,7 @@ let
     image = [ "pqiv.desktop" ];
     audio = [ "mpv.desktop" ];
     video = [ "mpv.desktop" ];
-    directory = [ "nautilus.desktop" "org.gnome.Nautilus.desktop" ];
+    directory = [ "nemo.desktop" ];
     office = [ "libreoffice.desktop" ];
     pdf = [ "org.gnome.Evince.desktop" ];
     terminal = [ "kitty.desktop" ];
