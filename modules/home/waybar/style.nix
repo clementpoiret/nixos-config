@@ -8,7 +8,7 @@ let custom = {
     tertiary_accent = "#f5f5f5";
     background = "#11111b";
     active_background = "#27273f";
-    hover_background = "#373758";
+    hover_background = "#1e1e2e";
     opacity = "0.98";
 };
 in 
@@ -43,6 +43,7 @@ in
         background: ${custom.background};
         color: ${custom.text_color};
         border-radius: 1rem;
+        border: none;
         margin: 0px 5px;
         padding: 0px 10px;
         transition: all 0.5s cubic-bezier(0.33, 1.0, 0.68, 1.0); /* easeInOutCubic */
@@ -52,9 +53,15 @@ in
         border-radius: 1rem;
         padding: 0rem 1rem;
     }
-    #workspaces button.active {
+    #workspaces button.empty {
         color: #b4befe;
         border-radius: 1rem;
+    }
+    #workspaces button:hover {
+        box-shadow: none; /* Remove predefined box-shadow */
+        text-shadow: none; /* Remove predefined text-shadow */
+        background: ${custom.hover_background};
+        padding: 0rem 1rem;
     }
 
     #window,
@@ -69,6 +76,7 @@ in
     #temperature,
     #idle_inhibitor,
     #clock,
+    #power-profiles-daemon,
     #battery,
     #custom-music,
     #custom-launcher,

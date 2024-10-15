@@ -18,7 +18,14 @@
     ];
     modules-center = [ "clock" ];
     modules-right =
-      [ "tray" "pulseaudio" "battery" "network" "custom/notification" ];
+      [
+        "tray"
+        "pulseaudio"
+        "power-profiles-daemon"
+        "battery"
+        "network"
+        "custom/notification"
+      ];
     clock = {
       timezone = "Europe/Paris";
       calendar = {
@@ -81,6 +88,17 @@
       format-icons = { default = [ " " ]; };
       scroll-step = 5;
       on-click = "pamixer -t";
+    };
+    power-profiles-daemon = {
+      format = "{icon}";
+      tooltip-format = "Power profile: {profile}\nDriver: {driver}";
+      tooltip = true;
+      format-icons = {
+        default = "";
+        performance = "";
+        balanced = "";
+        power-saver = "";
+      };
     };
     battery = {
       format = "{icon} {capacity}%";
