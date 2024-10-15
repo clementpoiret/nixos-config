@@ -16,6 +16,7 @@
     fzf # fuzzy finder
     gh # github cli
     gifsicle # gif utility
+    gnuplot
     gtt # google translate TUI
     gtrash # rm replacement, put deleted files in system trash
     graphviz

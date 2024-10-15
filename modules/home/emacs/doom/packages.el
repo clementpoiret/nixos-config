@@ -78,4 +78,4 @@
 (package! org-roam-ui)
 (package! citar-org-roam)
 
-(package! ox-hugo)
+;; (package! ox-hugo)

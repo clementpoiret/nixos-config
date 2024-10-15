@@ -264,5 +264,5 @@
   :config (citar-org-roam-mode))
 
 ;; Blog publishing
-(use-package! ox-hugo
-  :after ox)
+;; (use-package! ox-hugo
+;;   :after ox)
