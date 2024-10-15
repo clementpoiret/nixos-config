@@ -16,7 +16,8 @@ in {
       }
 
       # Source the conda script to activate micromamba envs
-      use ~/.config/nushell/scripts/conda.nu [activate deactivate]
+      use ($nu.default-config-dir | path join 'scripts/conda.nu') [activate deactivate]
+      source ($nu.default-config-dir | path join 'completions/jj.nu')
     '';
 
     extraEnv = ''
@@ -116,6 +117,7 @@ in {
     # Custom scripts
     file = {
       ".config/nushell/scripts/conda.nu" = { source = ./scripts/conda.nu; };
+      ".config/nushell/completions/jj.nu" = { source = ./completions/jj.nu; };
     };
   };
 

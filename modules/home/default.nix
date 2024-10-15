@@ -9,6 +9,7 @@
     ./git.nix # version controle
     ./gtk.nix # gtk theme
     ./hyprland # window manager
+    ./jj.nix # just another version control tool
     ./kitty.nix # terminal
     ./nushell/nushell.nix # shell
     ./spicetify.nix # spotify client
