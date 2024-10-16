@@ -18,7 +18,7 @@
     ./nemo.nix # file manager
     ./nvim/nvim.nix # neovim editor
     ./packages.nix # other packages
-    ./qutebrowser/qutebrowser.nix # qutebrowser
+    # ./qutebrowser/qutebrowser.nix # qutebrowser
     ./sops.nix # secrets mgmt
     ./swayosd.nix # volume and brightness feedbacks
     ./scripts/scripts.nix # personal scripts
