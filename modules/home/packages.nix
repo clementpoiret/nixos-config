@@ -110,7 +110,7 @@
     wget
     wl-clipboard
     master.wush # transfer between computers
-    cliphist
+    master.cliphist
     xdg-utils
     xxd
     zotero-beta
