@@ -19,10 +19,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    qbpm = {
-      url = "github:pvsr/qbpm";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # qbpm = {
+    #   url = "github:pvsr/qbpm";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -44,7 +44,7 @@
     };
 
     nu_plugin_bash_env = {
-      url = "github:tesujimath/nu_plugin_bash_env/refs/tags/0.14.2";
+      url = "github:tesujimath/nu_plugin_bash_env/refs/tags/0.16.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

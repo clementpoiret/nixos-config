@@ -1,18 +1,18 @@
 { ... }:
-let custom = {
+let
+  custom = {
     font = "JetBrainsMono Nerd Font";
     font_size = "12px";
     font_weight = "bold";
     text_color = "#cdd6f4";
-    secondary_accent= "#89b4fa";
+    secondary_accent = "#89b4fa";
     tertiary_accent = "#f5f5f5";
     background = "#11111b";
     active_background = "#27273f";
     hover_background = "#1e1e2e";
     opacity = "0.98";
-};
-in 
-{
+  };
+in {
   programs.waybar.style = ''
 
     * {
@@ -35,14 +35,14 @@ in
     }
 
     #workspaces {
-        border-radius: 1rem;
+        border-radius: 32px;
         margin: 5px;
         margin-left: 1rem;
     }
     #workspaces button {
         background: ${custom.background};
         color: ${custom.text_color};
-        border-radius: 1rem;
+        border-radius: 32px;
         border: none;
         margin: 0px 5px;
         padding: 0px 10px;
@@ -50,12 +50,12 @@ in
     }
     #workspaces button.active {
         color: #b4befe;
-        border-radius: 1rem;
+        border-radius: 32px;
         padding: 0rem 1rem;
     }
     #workspaces button.empty {
         color: #b4befe;
-        border-radius: 1rem;
+        border-radius: 32px;
     }
     #workspaces button:hover {
         box-shadow: none; /* Remove predefined box-shadow */
@@ -139,7 +139,7 @@ in
         padding-left: 9px;
         padding-right: 15px;
     }
-    
+
     #clock {
         padding-left: 9px;
         padding-right: 15px;

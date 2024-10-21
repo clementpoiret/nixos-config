@@ -58,7 +58,6 @@
     pipenv
     pixi
     poetry
-    python312Packages.nose
     python312Packages.pytest
     python312Packages.pyflakes
     ruff
