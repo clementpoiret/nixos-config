@@ -96,7 +96,7 @@
     pdftk
     playerctl # controller for media players
     pqiv
-    master.proton-pass
+    proton-pass
     protonvpn-gui
     protonvpn-cli
     poweralertd
