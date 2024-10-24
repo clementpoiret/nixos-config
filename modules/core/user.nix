@@ -24,4 +24,5 @@
     packages = [ inputs.home-manager.packages.${pkgs.system}.default ];
   };
   nix.settings.allowed-users = [ "${username}" ];
+  environment.localBinInPath = true;
 }
