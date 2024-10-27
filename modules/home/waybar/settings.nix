@@ -17,15 +17,14 @@
       "disk"
     ];
     modules-center = [ "clock" ];
-    modules-right =
-      [
-        "tray"
-        "pulseaudio"
-        "power-profiles-daemon"
-        "battery"
-        "network"
-        "custom/notification"
-      ];
+    modules-right = [
+      "tray"
+      "pulseaudio"
+      "power-profiles-daemon"
+      "battery"
+      "network"
+      "custom/notification"
+    ];
     clock = {
       timezone = "Europe/Paris";
       calendar = {
@@ -57,19 +56,19 @@
       format = "󰟜 {}%";
       format-alt = "󰟜 {used} GiB"; # 
       interval = 2;
-      on-click-right = "kitty --override font_size=14 --title float_kitty btop";
+      on-click-right = "kitty --title float_kitty btop";
     };
     cpu = {
       format = "  {usage}%";
       format-alt = "  {avg_frequency} GHz";
       interval = 2;
-      on-click-right = "kitty --override font_size=14 --title float_kitty btop";
+      on-click-right = "kitty --title float_kitty btop";
     };
     disk = {
       # path = "/";
       format = "󰋊 {percentage_used}%";
       interval = 60;
-      on-click-right = "kitty --override font_size=14 --title float_kitty btop";
+      on-click-right = "kitty --title float_kitty btop";
     };
     network = {
       format-wifi = "  {signalStrength}%";
@@ -91,7 +90,9 @@
     };
     power-profiles-daemon = {
       format = "{icon}";
-      tooltip-format = "Power profile: {profile}\nDriver: {driver}";
+      tooltip-format = ''
+        Power profile: {profile}
+        Driver: {driver}'';
       tooltip = true;
       format-icons = {
         default = "";

@@ -84,6 +84,7 @@
     firefox-devedition-bin
     gparted # partition manager
     hugo
+    #lens
     libnotify
     man-pages # extra man pages
     mpv # video player

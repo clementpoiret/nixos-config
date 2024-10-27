@@ -10,14 +10,16 @@ in {
     envFile.source = ./env.nu;
 
     extraConfig = ''
-      def gcma [msg] {
-        git add --all
-        git commit -m $msg
-      }
-
       # Source the conda script to activate micromamba envs
       use ($nu.default-config-dir | path join 'scripts/conda.nu') [activate deactivate]
+
+      # Jujutsu
       source ($nu.default-config-dir | path join 'completions/jj.nu')
+
+      # Program aliases
+      use ($nu.default-config-dir | path join 'aliases/bat.nu') *
+      use ($nu.default-config-dir | path join 'aliases/git.nu') *
+      use ($nu.default-config-dir | path join 'aliases/k8s.nu') *
     '';
 
     extraEnv = ''
@@ -58,35 +60,6 @@ in {
       nix-test = "nh os test";
       nix-flake-update = "sudo nix flake update ~/nixos-config#";
 
-      # Git
-      g = "lazygit";
-      ga = "git add";
-      gaa = "git add --all";
-      gs = "git status";
-      gb = "git branch";
-      gm = "git merge";
-      gpl = "git pull";
-      gplo = "git pull origin";
-      gps = "git push";
-      gpst = "git push --follow-tags";
-      gpso = "git push origin";
-      gc = "git commit";
-      gcl = "git clone";
-      gcm = "git commit -m";
-      gtag = "git tag -ma";
-      gch = "git checkout";
-      gchb = "git checkout -b";
-      gcoe = "git config user.email";
-      gcon = "git config user.name";
-      glog = "git log --oneline --decorate --graph";
-      glol =
-        "git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'";
-      glola =
-        "git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --all";
-      glols =
-        "git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --stat";
-      gsw = "git switch";
-
       # python
       piv = "python -m venv .venv";
       # psv = "source .venv/bin/activate";
@@ -118,6 +91,9 @@ in {
     file = {
       ".config/nushell/scripts/conda.nu" = { source = ./scripts/conda.nu; };
       ".config/nushell/completions/jj.nu" = { source = ./completions/jj.nu; };
+      ".config/nushell/aliases/bat.nu" = { source = ./aliases/bat.nu; };
+      ".config/nushell/aliases/git.nu" = { source = ./aliases/git.nu; };
+      ".config/nushell/aliases/k8s.nu" = { source = ./aliases/k8s.nu; };
     };
   };
 
