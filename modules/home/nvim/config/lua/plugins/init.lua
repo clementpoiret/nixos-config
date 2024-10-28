@@ -98,7 +98,7 @@ return {
   -- Programming
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "lua", "python", "bash", "rust", "nix" } },
+    opts = { ensure_installed = { "lua", "python", "bash", "rust", "nix" }, ignore_install = { "org" } },
   },
 
   -- -- REPLs
@@ -163,45 +163,39 @@ return {
   },
 
   -- Org Mode & Org Roam
-  -- {
-  --   'nvim-orgmode/orgmode',
-  --   event = 'VeryLazy',
-  --   ft = { 'org' },
-  --   config = function()
-  --     -- Setup orgmode
-  --     require('orgmode').setup({
-  --       org_agenda_files = '~/orgfiles/**/*',
-  --       org_default_notes_file = '~/orgfiles/refile.org',
-  --     })
-  --
-  --     -- NOTE: If you are using nvim-treesitter with ~ensure_installed = "all"~ option
-  --     -- add ~org~ to ignore_install
-  --     -- require('nvim-treesitter.configs').setup({
-  --     --   ensure_installed = 'all',
-  --     --   ignore_install = { 'org' },
-  --     -- })
-  --   end,
-  -- },
-  --
-  -- {
-  --   "chipsenkbeil/org-roam.nvim",
-  --   tag = "0.1.0",
-  --   dependencies = {
-  --     {
-  --       "nvim-orgmode/orgmode",
-  --       tag = "0.3.7",
-  --     },
-  --   },
-  --   config = function()
-  --     require("org-roam").setup({
-  --       directory = "~/org_roam_files",
-  --       -- optional
-  --       org_files = {
-  --         "~/another_org_dir",
-  --         "~/some/folder/*.org",
-  --         "~/a/single/org_file.org",
-  --       }
-  --     })
-  --   end
-  -- }
+  {
+    "nvim-orgmode/orgmode",
+    event = "VeryLazy",
+    ft = { "org" },
+    config = function()
+      -- Setup orgmode
+      require("orgmode").setup {
+        org_agenda_files = "~/Sync/Notes/org/**/*",
+        org_default_notes_file = "~/Sync/Notes/org/todo.org",
+      }
+    end,
+  },
+
+  -- TODO: Citation plugin
+  {
+    "chipsenkbeil/org-roam.nvim",
+    tag = "0.1.0",
+    dependencies = {
+      {
+        "nvim-orgmode/orgmode",
+        tag = "0.3.7",
+      },
+    },
+    config = function()
+      require("org-roam").setup {
+        directory = "~/Sync/Notes/org-roam/permanent/",
+        -- -- optional
+        -- org_files = {
+        --   "~/another_org_dir",
+        --   "~/some/folder/*.org",
+        --   "~/a/single/org_file.org",
+        -- }
+      }
+    end,
+  },
 }
