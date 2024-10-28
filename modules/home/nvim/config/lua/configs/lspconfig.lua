@@ -16,6 +16,15 @@ for _, lsp in ipairs(servers) do
   }
 end
 
+-- Python
+require("lspconfig").ruff.setup {
+  trace = "messages",
+  init_options = {
+    settings = {
+      logLevel = "debug",
+    },
+  },
+}
 -- configuring single server, example: typescript
 -- lspconfig.ts_ls.setup {
 --   on_attach = nvlsp.on_attach,

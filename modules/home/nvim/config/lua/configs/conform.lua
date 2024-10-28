@@ -10,7 +10,7 @@ local options = {
     json = { "prettier" },
     sh = { "shfmt" },
     elm = { "elm-format" },
-    python = { "ruff" },
+    python = { "ruff_format", "ruff_fix", "ruff_organize_imports" },
     dart = { "dart_format" },
   },
 
