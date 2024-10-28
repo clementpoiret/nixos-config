@@ -18,7 +18,7 @@ export def git_main_branch [] {
 # (sorted alphabetically)
 #
 
-export alias g = gitui
+#export alias g = gitui  # currently broken with ssh key w/ passwords
 export alias ga = git add
 export alias gaa = git add --all
 export alias gapa = git add --patch
