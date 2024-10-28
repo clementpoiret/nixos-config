@@ -55,6 +55,8 @@ return {
   -- -- Third Party
   { "actionshrimp/direnv.nvim", config = true, lazy = false, opts = {} },
 
+  { "mg979/vim-visual-multi", event = "VeryLazy", branch = "master" },
+
   {
     "folke/todo-comments.nvim",
     -- PERF: test perf?
