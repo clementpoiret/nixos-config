@@ -171,7 +171,8 @@
         "$mainMod, M, exec, proton-pass"
         "$mainMod, N, exec, swaync-client -t"
         "$mainMod, O, exec, export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH; obsidian"
-        "$mainMod, SEMICOLON, exec, emacsclient -c -a 'emacs'"
+        #"$mainMod, SEMICOLON, exec, emacsclient -c -a 'emacs'"
+        "$mainMod, SEMICOLON, exec, kitty -e nvim"
 
         # screenshot
         "$mainMod, Print, exec, grimblast --notify --cursor --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"

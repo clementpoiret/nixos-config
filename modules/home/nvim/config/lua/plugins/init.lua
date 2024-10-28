@@ -1,188 +1,205 @@
 return {
-	{
-		"stevearc/conform.nvim",
-		-- event = "BufWritePre", -- uncomment for format on save
-		config = function()
-			require("configs.conform")
-		end,
-	},
 
-	-- General
-	-- {
-	--   "Exafunction/codeium.vim",
-	--   event = "BufEnter",
-	--   config = function()
-	--     vim.g.codeium_disable_bindings = 1
-	--     vim.keymap.set("i", "<C-a>", function()
-	--       return vim.fn["codeium#Accept"]()
-	--     end, { expr = true, silent = true })
-	--     vim.keymap.set("i", "<c-;>", function()
-	--       return vim.fn["codeium#CycleCompletions"](1)
-	--     end, { expr = true, silent = true })
-	--     vim.keymap.set("i", "<c-,>", function()
-	--       return vim.fn["codeium#CycleCompletions"](-1)
-	--     end, { expr = true, silent = true })
-	--     vim.keymap.set("i", "<c-x>", function()
-	--       return vim.fn["codeium#Clear"]()
-	--     end, { expr = true, silent = true })
-	--     vim.keymap.set("i", "<C-ESC>", function()
-	--       return vim.fn["codeium#Chat"]()
-	--     end, { expr = true, silent = true })
-	--   end,
-	-- },
-	{
-		"NvChad/nvcommunity",
-		{ import = "nvcommunity.git.lazygit" },
-	},
-	{ "rafamadriz/friendly-snippets" },
-	{
-		"L3MON4D3/LuaSnip",
-		dependencies = { "rafamadriz/friendly-snippets" },
-	},
-	{
-		"pwntester/octo.nvim",
-		lazy = false,
-		requires = {
-			"nvim-lua/plenary.nvim",
-			"nvim-telescope/telescope.nvim",
-			-- OR 'ibhagwan/fzf-lua',
-			"nvim-tree/nvim-web-devicons",
-		},
-		config = function()
-			require("octo").setup()
-		end,
-	},
+  -- General
+  -- -- NvChad
+  {
+    "stevearc/conform.nvim",
+    event = "BufWritePre", -- uncomment for format on save
+    opts = require "configs.conform",
+  },
 
-	-- Python
-	{
-		"Vigemus/iron.nvim",
-		ft = "python",
-		config = function()
-			require("configs.iron")
-		end,
-	},
-	{
-		"AckslD/swenv.nvim",
-	},
-	{
-		"stevearc/dressing.nvim",
-	},
-	{
-		"heavenshell/vim-pydocstring",
-	},
+  {
+    "nvim-tree/nvim-tree.lua",
+    config = function()
+      require("nvim-tree").setup {
+        sync_root_with_cwd = true,
+        respect_buf_cwd = true,
+        update_focused_file = {
+          enable = true,
+          update_root = true,
+        },
+      }
+    end,
+  },
 
-	-- Elm
-	{
-		"elmcast/elm-vim",
-	},
+  {
+    "neovim/nvim-lspconfig",
+    config = function()
+      require "configs.lspconfig"
+    end,
+  },
 
-	-- LaTeX
-	{
-		"lervag/vimtex",
-		config = function()
-			vim.g.vimtex_view_method = "zathura"
-		end,
-	},
+  "nvim-lua/plenary.nvim",
 
-	-- Flutter
-	{
-		"akinsho/flutter-tools.nvim",
-		lazy = false,
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"stevearc/dressing.nvim", -- optional for vim.ui.select
-		},
-		config = true,
-	},
+  {
+    "nvchad/ui",
+    config = function()
+      require "nvchad"
+    end,
+  },
 
-	-- Obsidian
-	{
-		"epwalsh/obsidian.nvim",
-		lazy = true,
-		ft = "markdown",
-		opts = {
-			workspaces = {
-				{
-					name = "default",
-					path = "~/Sync/Notes/Obsidian/Default/",
-				},
-			},
-		},
-	},
+  {
+    "nvchad/base46",
+    lazy = true,
+    build = function()
+      require("base46").load_all_highlights()
+    end,
+  },
 
-	-- Misc
-	{
-		"mfussenegger/nvim-jdtls",
-	},
-	{
-		"folke/todo-comments.nvim",
-		-- PERF: test perf?
-		-- HACK: bruh
-		-- TODO: wew
-		-- NOTE:  sdkfj dkfjskdfj
-		-- FIX: fixed
-		-- WARNING: test done
-		lazy = false,
-		dependencies = { "nvim-lua/plenary.nvim" },
-		config = function()
-			require("todo-comments").setup()
-		end,
-	},
-	{
-		"kelwin/vim-smali",
-	},
+  "nvchad/volt",
 
-	-- Overrides
-	{
-		"hrsh7th/nvim-cmp",
-		dependencies = { "kdheepak/cmp-latex-symbols" },
-		opts = function()
-			local opts = require("nvchad.configs.cmp")
-			local cmp = require("cmp")
+  "NvChad/nvcommunity",
+  { import = "nvcommunity.git.diffview" },
+  { import = "nvcommunity.git.neogit" },
 
-			local symbols = {
-				name = "latex_symbols",
-				option = {
-					strategy = 0,
-				},
-			}
+  -- -- Third Party
+  { "actionshrimp/direnv.nvim", config = true, lazy = false, opts = {} },
 
-			opts.mapping["<CR>"] = cmp.mapping.confirm({ select = false })
-			table.insert(opts.sources, symbols)
+  {
+    "folke/todo-comments.nvim",
+    -- PERF: test perf?
+    -- HACK: bruh
+    -- TODO: wew
+    -- NOTE:  sdkfj dkfjskdfj
+    -- FIX: fixed
+    -- WARNING: test done
+    lazy = false,
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("todo-comments").setup()
+    end,
+  },
 
-			return opts
-		end,
-	},
+  "nvim-lua/popup.nvim",
+  "jvgrootveld/telescope-zoxide",
+  "nvim-telescope/telescope-file-browser.nvim",
+  "nvim-telescope/telescope-project.nvim",
 
-	{
-		"neovim/nvim-lspconfig",
-		config = function()
-			require("nvchad.configs.lspconfig").defaults()
-			require("configs.lspconfig")
-		end,
-	},
+  {
+    "nvim-telescope/telescope.nvim",
+    opts = {
+      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide" },
+    },
+  },
 
-	-- These are some examples, uncomment them if you want to see them work!
-	{
-		"williamboman/mason.nvim",
-		opts = {
-			ensure_installed = {
-				"lua-language-server",
-				"stylua",
-				"html-lsp",
-				"css-lsp",
-				"prettier",
-			},
-		},
-	},
-	--
-	-- {
-	-- 	"nvim-treesitter/nvim-treesitter",
-	-- 	opts = {
-	-- 		ensure_installed = {
-	-- 			"vim", "lua", "vimdoc
-	--      "html", "css"
-	-- 		},
-	-- 	},
-	-- },
+  -- {
+  --   "ahmedkhalf/project.nvim",
+  --   lazy = false,
+  --   dependencies = {
+  --     "nvim-telescope/telescope-file-browser.nvim"
+  --   },
+  --   config = function()
+  --     require("project_nvim").setup {}
+  --   end
+  -- },
+
+  -- Programming
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = { ensure_installed = { "lua", "python", "bash", "rust", "nix" } },
+  },
+
+  -- -- REPLs
+  {
+    "jalvesaq/vimcmdline",
+    lazy = true,
+    ft = { "python", "lua" },
+    config = function(_)
+      vim.g.cmdline_term_height = 15
+      vim.g.cmdline_term_width = 80
+      vim.g.cmdline_tmp_dir = "/tmp"
+      vim.g.cmdline_outhl = 1
+      -- we override this mapping below, so map here to something we'll probably not use.
+      vim.g.cmdline_map_start = "<leader>z"
+    end,
+  },
+
+  -- Sometimes useful
+  {
+    "yetone/avante.nvim",
+    event = "VeryLazy",
+    lazy = true,
+    version = false, -- set this if you want to always pull the latest change
+    opts = {
+      -- add any opts here
+    },
+    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+    build = "make",
+    -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "stevearc/dressing.nvim",
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+      {
+        -- support for image pasting
+        "HakonHarnes/img-clip.nvim",
+        event = "VeryLazy",
+        opts = {
+          -- recommended settings
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            -- required for Windows users
+            use_absolute_path = true,
+          },
+        },
+      },
+      {
+        -- Make sure to set this up properly if you have lazy=true
+        "MeanderingProgrammer/render-markdown.nvim",
+        opts = {
+          file_types = { "markdown", "Avante" },
+        },
+        ft = { "markdown", "Avante" },
+      },
+    },
+  },
+
+  -- Org Mode & Org Roam
+  -- {
+  --   'nvim-orgmode/orgmode',
+  --   event = 'VeryLazy',
+  --   ft = { 'org' },
+  --   config = function()
+  --     -- Setup orgmode
+  --     require('orgmode').setup({
+  --       org_agenda_files = '~/orgfiles/**/*',
+  --       org_default_notes_file = '~/orgfiles/refile.org',
+  --     })
+  --
+  --     -- NOTE: If you are using nvim-treesitter with ~ensure_installed = "all"~ option
+  --     -- add ~org~ to ignore_install
+  --     -- require('nvim-treesitter.configs').setup({
+  --     --   ensure_installed = 'all',
+  --     --   ignore_install = { 'org' },
+  --     -- })
+  --   end,
+  -- },
+  --
+  -- {
+  --   "chipsenkbeil/org-roam.nvim",
+  --   tag = "0.1.0",
+  --   dependencies = {
+  --     {
+  --       "nvim-orgmode/orgmode",
+  --       tag = "0.3.7",
+  --     },
+  --   },
+  --   config = function()
+  --     require("org-roam").setup({
+  --       directory = "~/org_roam_files",
+  --       -- optional
+  --       org_files = {
+  --         "~/another_org_dir",
+  --         "~/some/folder/*.org",
+  --         "~/a/single/org_file.org",
+  --       }
+  --     })
+  --   end
+  -- }
 }

@@ -7,6 +7,7 @@
     # ./files/files.nix # custom files
     ./fuzzel.nix # launcher
     ./git.nix # version controle
+    ./gitui/gitui.nix # lazygit replacement
     ./gtk.nix # gtk theme
     ./hyprland # window manager
     ./jj.nix # just another version control tool

@@ -29,10 +29,7 @@
     };
   };
 
-  # home.packages = [ pkgs.gh pkgs.git-lfs ];
-  programs.gpg = {
-    enable = true;
-  };
+  programs.gpg = { enable = true; };
 
   services.gpg-agent = {
     enable = true;

@@ -1,9 +1,4 @@
 local options = {
-  formatters = {
-    yapf = {
-      args = { "--style", "{based_on_style: google}" },
-    },
-  },
   formatters_by_ft = {
     lua = { "stylua" },
     javascript = { "prettier" },
@@ -15,9 +10,15 @@ local options = {
     json = { "prettier" },
     sh = { "shfmt" },
     elm = { "elm-format" },
-    python = { "isort", "yapf" },
+    python = { "ruff" },
     dart = { "dart_format" },
   },
+
+  -- format_on_save = {
+  --   -- These options will be passed to conform.format()
+  --   timeout_ms = 500,
+  --   lsp_fallback = true,
+  -- },
 }
 
-require("conform").setup(options)
+return options

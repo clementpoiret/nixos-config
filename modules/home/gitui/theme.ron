@@ -1,0 +1,4 @@
+(
+    selection_fg: Some("#ffffff"),
+    command_fg: Some("#ffffff"),
+)

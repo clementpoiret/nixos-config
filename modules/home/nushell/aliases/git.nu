@@ -18,7 +18,7 @@ export def git_main_branch [] {
 # (sorted alphabetically)
 #
 
-export alias g = lazygit
+export alias g = gitui
 export alias ga = git add
 export alias gaa = git add --all
 export alias gapa = git add --patch

@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
-let
-  home = config.home.homeDirectory;
-in
-{
+let home = config.home.homeDirectory;
+in {
   programs.neovim = {
     enable = true;
     viAlias = true;
@@ -20,33 +18,16 @@ in
     python312Packages.flake8
     python312Packages.isort
     python312Packages.python-lsp-server
-    python312Packages.yapf
-
-    # web stuff
-    nodePackages_latest.prettier
-    nodePackages_latest.eslint_d
-    nodePackages_latest.vscode-langservers-extracted
-    nodePackages_latest.typescript-language-server
+    ruff
   ];
 
   home.file = {
-    ".config/nvim/init.lua" = {
-      source = ./config/init.lua;
-    };
-    ".config/nvim/lua/options.lua" = {
-      source = ./config/lua/options.lua;
-    };
-    ".config/nvim/lua/mappings.lua" = {
-      source = ./config/lua/mappings.lua;
-    };
-    ".config/nvim/lua/chadrc.lua" = {
-      source = ./config/lua/chadrc.lua;
-    };
+    ".config/nvim/init.lua" = { source = ./config/init.lua; };
+    ".config/nvim/lua/options.lua" = { source = ./config/lua/options.lua; };
+    ".config/nvim/lua/mappings.lua" = { source = ./config/lua/mappings.lua; };
+    ".config/nvim/lua/chadrc.lua" = { source = ./config/lua/chadrc.lua; };
     ".config/nvim/lua/configs/conform.lua" = {
       source = ./config/lua/configs/conform.lua;
-    };
-    ".config/nvim/lua/configs/iron.lua" = {
-      source = ./config/lua/configs/iron.lua;
     };
     ".config/nvim/lua/configs/lazy.lua" = {
       source = ./config/lua/configs/lazy.lua;
