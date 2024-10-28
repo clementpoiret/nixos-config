@@ -41,12 +41,12 @@ end)
 -- General
 vim.opt.relativenumber = true
 vim.opt.colorcolumn = "80"
--- vim.api.nvim_create_autocmd("BufWritePre", {
---   pattern = "*",
---   callback = function(args)
---     require("conform").format { bufnr = args.buf }
---   end,
--- })
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  callback = function(args)
+    require("conform").format { bufnr = args.buf }
+  end,
+})
 
 -- Python
 --vim.g.pydocstring_formatter = "google"
