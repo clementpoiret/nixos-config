@@ -76,11 +76,12 @@ return {
   "jvgrootveld/telescope-zoxide",
   "nvim-telescope/telescope-file-browser.nvim",
   "nvim-telescope/telescope-project.nvim",
+  "joaomsa/telescope-orgmode.nvim",
 
   {
     "nvim-telescope/telescope.nvim",
     opts = {
-      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide" },
+      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "orgmode" },
     },
   },
 
@@ -188,6 +189,9 @@ return {
     },
     config = function()
       require("org-roam").setup {
+        bindings = {
+          prefix = "<LocalLeader>n",
+        },
         directory = "~/Sync/Notes/org-roam/permanent/",
         -- -- optional
         -- org_files = {
