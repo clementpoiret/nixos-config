@@ -4,7 +4,8 @@ let
 in 
 {
   home.packages = [ pkgs.zk ];
-  #home.file.".config/zk/config.toml" = { source = ./config.toml; };
+  home.file.".config/zk/config.toml" = { source = ./config.toml; };
+
   # TODO: Wait for PR in zk to be merged to fix symlinks.
   # then, I'll be able to remove this if to use
   # "${config.home.homeDirectory}Sync/Notes/zk/";
