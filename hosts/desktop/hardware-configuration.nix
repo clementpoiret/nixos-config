@@ -17,7 +17,7 @@
     "/" = {
       device = "/dev/disk/by-uuid/c56b3988-3ac8-4277-9223-d79b3dec2cee";
       fsType = "f2fs";
-      options = [ "atgc" "gc_merge" "lazytime" ];
+      options = [ "atgc" "gc_merge" "lazytime" "discard" ];
     };
     "/boot" = {
       device = "/dev/disk/by-uuid/30E4-9849";
@@ -27,7 +27,7 @@
     "/home" = {
       device = "/dev/disk/by-uuid/15426f33-9399-4ac0-b276-baff0229010c";
       fsType = "f2fs";
-      options = [ "compress_algorithm=zstd:6" "compress_chksum" "atgc" "gc_merge" "lazytime" ];
+      options = [ "compress_algorithm=zstd:6" "compress_chksum" "atgc" "gc_merge" "lazytime" "discard" ];
     };
     "/mnt/hdd" = {
       device = "/dev/disk/by-uuid/4ca96338-156a-4cfe-9113-220ceb2fcf73";
