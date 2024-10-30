@@ -113,6 +113,7 @@
     master.cliphist
     xdg-utils
     xxd
+    zk # Zettelkasten
     zotero-beta
 
     flake.alejandra
