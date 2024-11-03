@@ -1,18 +1,23 @@
 { config, host, lib, pkgs, ... }:
+let
+  xserverDrivers = {
+    "desktop" = "nvidia";
+    "laptop" = "amdgpu";
+  };
+in
 {  
   hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
   hardware.graphics.extraPackages = with pkgs; lib.mkIf (host == "laptop") [
     amdvlk
-    rocm-opencl-icd
-    rocm-opencl-runtime 
+    rocmPackages.clr
   ];
   hardware.graphics.extraPackages32 = with pkgs; lib.mkIf (host == "laptop") [
     driversi686Linux.amdvlk
   ];
 
-  # nvidia
-  services.xserver.videoDrivers = lib.mkIf (host == "desktop") [ "nvidia" ];
+  # nvidia and amdgpu
+  services.xserver.videoDrivers = [ xserverDrivers."${host}" ];
 
   hardware.nvidia = lib.mkIf (host == "desktop") {
     # package = config.boot.kernelPackages.nvidiaPackages.beta;
