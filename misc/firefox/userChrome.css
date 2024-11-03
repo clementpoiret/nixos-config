@@ -1,0 +1,16 @@
+menupopup {
+  -moz-appearance: none !important;
+  color: #cdd6f4 !important;
+}
+
+/* For specific menu items */
+menuitem,
+menu {
+  color: #cdd6f4 !important;
+}
+
+/* For disabled menu items */
+menuitem[disabled="true"],
+menu[disabled="true"] {
+  color: #6c7086 !important;
+}
