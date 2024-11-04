@@ -3,7 +3,10 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
-  chaotic.scx.enable = true;
+  chaotic.scx = {
+    enable = true;
+    package = pkgs.scx.full;
+  };
 
   boot.extraModulePackages = with config.boot.kernelPackages;
     lib.mkIf (host == "laptop") [ framework-laptop-kmod ];
