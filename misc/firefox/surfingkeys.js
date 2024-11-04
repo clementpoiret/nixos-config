@@ -58,6 +58,18 @@ mapkey("p", "Open the clipboard's URL in the current tab", () => {
   });
 });
 
+// Ctrl+Click on link
+// WARNING: this is currently bugged
+mapkey("<Alt-c>", "Ctrl+click on link", () => {
+  Hints.create("*[href]", (element) => {
+    const event = new MouseEvent("click", {
+      ctrlKey: true,
+      bubbles: true,
+    });
+    element.dispatchEvent(event);
+  });
+});
+
 // Open Clipboard URL in new tab
 map("P", "cc");
 
@@ -182,6 +194,13 @@ Visual.style("marks", "background-color: #b4bef299;");
 Visual.style("cursor", "background-color: #89b4fa;");
 
 settings.theme = `
+  #sk_editor {
+    color: #cdd6f4;
+    background: #1e1e2e !important;
+    height: 50% !important;
+    font-family: monospace !important;
+    font-size: x-large !important
+  }
   .sk_theme {
     background: #1e1e2e;
     color: #b4befe;
