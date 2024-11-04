@@ -62,8 +62,7 @@ mapkey("p", "Open the clipboard's URL in the current tab", () => {
 });
 
 // Ctrl+Click on link
-// WARNING: this is currently bugged
-mapkey("<Alt-c>", "Ctrl+click on link", () => {
+mapkey("<Alt-c>", "Ctrl+click on links (simulates Zen's Glance)", () => {
   Hints.create("*[href]", (element) => {
     const event = new MouseEvent("click", {
       ctrlKey: true,
