@@ -29,9 +29,12 @@ const {
 // ---- Settings ----
 Hints.setCharacters("asdfgyuiopqwertnmzxcvb");
 
+settings.showModeStatus = true;
 settings.defaultSearchEngine = "k";
+settings.enableEmojiInsertion = false;
 settings.hintAlign = "left";
 settings.omnibarPosition = "bottom";
+settings.omnibarSuggestion = true;
 settings.focusFirstCandidate = false;
 settings.focusAfterClosed = "last";
 settings.scrollStepSize = 200;
@@ -65,6 +68,8 @@ mapkey("<Alt-c>", "Ctrl+click on link", () => {
     const event = new MouseEvent("click", {
       ctrlKey: true,
       bubbles: true,
+      cancelable: true,
+      view: window,
     });
     element.dispatchEvent(event);
   });
@@ -74,13 +79,18 @@ mapkey("<Alt-c>", "Ctrl+click on link", () => {
 map("P", "cc");
 
 // Open a URL in current tab
-map("o", "go");
+mapkey("o", "#8Open a URL in current tab", function () {
+  Front.openOmnibar({ type: "URLs", tabbed: false });
+});
+mapkey("O", "#8Open a URL in a new tab", function () {
+  Front.openOmnibar({ type: "URLs", tabbed: true });
+});
 
 // Choose a buffer/tab
 map("b", "T");
 
 // Edit current URL, and open in same tab
-map("O", ";U");
+map("go", ";U");
 
 // Edit current URL, and open in new tab
 map("T", ";u");
@@ -98,10 +108,6 @@ mapkey("<Ctrl-u>", "Scroll up", () => {
 });
 map("<Ctrl-b>", "U"); // scroll full page up
 //map('<Ctrl-f>', 'P');  // scroll full page down -- looks like we can't overwrite browser-native binding
-
-// Next/Prev Page
-map("K", "[[");
-map("J", "]]");
 
 // Open Chrome Flags
 //mapkey("gF", "#12Open Chrome Flags", () => {
@@ -122,7 +128,9 @@ mapkey("u", "#3Restore closed tab", () => {
 map(">", ">>");
 map("<", "<<");
 
-// Tab Next/Prev
+// Next/Prev Tab
+map("K", "E");
+map("J", "R");
 map("<Alt-j>", "R");
 map("<Alt-k>", "E");
 
@@ -198,8 +206,7 @@ settings.theme = `
     color: #cdd6f4;
     background: #1e1e2e !important;
     height: 50% !important;
-    font-family: monospace !important;
-    font-size: x-large !important
+    font-family: 'JetBrainsMono Nerd Font', monospace !important;
   }
   .sk_theme {
     background: #1e1e2e;
