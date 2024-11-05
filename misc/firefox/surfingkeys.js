@@ -35,7 +35,7 @@ settings.enableEmojiInsertion = false;
 settings.hintAlign = "left";
 settings.omnibarPosition = "bottom";
 settings.omnibarSuggestion = true;
-settings.focusFirstCandidate = false;
+settings.focusFirstCandidate = true;
 settings.focusAfterClosed = "last";
 settings.scrollStepSize = 200;
 settings.tabsThreshold = 0;
@@ -55,14 +55,14 @@ map("F", "C");
 
 // --- Nav ---
 // Open Clipboard URL in current tab
-mapkey("p", "Open the clipboard's URL in the current tab", () => {
+mapkey("p", "#4Open the clipboard's URL in the current tab", () => {
   Clipboard.read(function (response) {
     window.location.href = response.data;
   });
 });
 
 // Ctrl+Click on link
-mapkey("<Alt-c>", "Ctrl+click on links (simulates Zen's Glance)", () => {
+mapkey("<Alt-c>", "#4Ctrl+click on links (simulates Zen's Glance)", () => {
   Hints.create("*[href]", (element) => {
     const event = new MouseEvent("click", {
       ctrlKey: true,
@@ -72,6 +72,17 @@ mapkey("<Alt-c>", "Ctrl+click on links (simulates Zen's Glance)", () => {
     });
     element.dispatchEvent(event);
   });
+});
+
+map("gs", ";fs");
+
+mapkey("g.", "#4Go to parent domain", () => {
+  const subdomains = window.location.host.split(".");
+  const parentDomain = (
+    subdomains.length > 2 ? subdomains.slice(1) : subdomains
+  ).join(".");
+  const target = `${window.location.protocol}//${parentDomain}`;
+  window.location.href = target;
 });
 
 // Open Clipboard URL in new tab
@@ -99,10 +110,10 @@ map("H", "S");
 map("L", "D");
 
 // Scroll Page Down/Up
-mapkey("<Ctrl-d>", "Scroll down", () => {
+mapkey("<Ctrl-d>", "#2Scroll down", () => {
   Normal.scroll("pageDown");
 });
-mapkey("<Ctrl-u>", "Scroll up", () => {
+mapkey("<Ctrl-u>", "#2Scroll up", () => {
   Normal.scroll("pageUp");
 });
 map("<Ctrl-b>", "U"); // scroll full page up
