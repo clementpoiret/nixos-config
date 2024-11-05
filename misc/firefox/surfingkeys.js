@@ -119,6 +119,15 @@ mapkey("<Ctrl-u>", "#2Scroll up", () => {
 map("<Ctrl-b>", "U"); // scroll full page up
 //map('<Ctrl-f>', 'P');  // scroll full page down -- looks like we can't overwrite browser-native binding
 
+// View source code
+mapkey("gc", "View page source", function () {
+  RUNTIME("viewSource", { tab: { tabbed: true } });
+});
+
+mapkey("gS", "Open Firefox Config", () => {
+  tabOpenLink("about:config");
+});
+
 // Open Chrome Flags
 //mapkey("gF", "#12Open Chrome Flags", () => {
 //  tabOpenLink("chrome://flags/");
@@ -197,7 +206,7 @@ addSearchAlias("gh", "github", "https://github.com/search?q=", "s");
 
 // theme
 const hintsCss =
-  "font-size: 12pt; font-family: 'JetBrainsMono Nerd Font', 'Cascadia Code', 'Helvetica Neue', Helvetica, Arial, sans-serif; border: 0px; color: #b4befe !important; background: #1e1e2e; background-color: #1e1e2e";
+  "font-size: 12pt; font-family: 'JetBrainsMono Nerd Font', 'Cascadia Code', 'Helvetica Neue', Helvetica, Arial, sans-serif; border: 0px; color: #b4befe !important; background: #1e1e2e !important; background-color: #1e1e2e !important";
 
 //Hints.style(
 //  "border: solid 2px #313244; color:#b4befe; background: initial; background-color: #1e1e2e;",
@@ -492,6 +501,7 @@ settings.theme = `
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    color: #cdd6f4 !important;
   }
   #sk_tabs {
     position: fixed;
