@@ -47,7 +47,3 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     require("conform").format { bufnr = args.buf }
   end,
 })
-
--- Python
---vim.g.pydocstring_formatter = "google"
---vim.g.vim_isort_map = "C-i"

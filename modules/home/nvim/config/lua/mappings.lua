@@ -18,6 +18,11 @@ map("n", "N", "Nzzzv", { desc = "Find previous and center cursor" })
 map("n", "<leader>op", ":NvimTreeToggle<cr>", { desc = "Open NvimTree" })
 map("n", "<leader>fp", ":NvimTreeFocus<cr>", { desc = "Focus NvimTree" })
 
+-- Buffer navigation
+map("n", "<Tab>", ":bnext<CR>", { desc = "Next buffer" })
+map("n", "<S-Tab>", ":bprev<CR>", { desc = "Previous buffer" })
+map("n", "<leader>x", ":bd<CR>", { desc = "Close buffer" })
+
 -- projects
 map(
   "n",

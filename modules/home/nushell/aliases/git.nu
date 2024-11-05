@@ -123,16 +123,19 @@ export def gmom [] {
 }
 
 export alias gp = git push
+export alias gpo = git push origin
 export alias gpd = git push --dry-run
 export alias gpf = git push --force-with-lease
 export alias gpf! = git push --force
 export alias gpl = git pull
+export alias gplo = git pull origin
 export def gpoat [] {
     git push origin --all; git push origin --tags
 }
 export alias gpod = git push origin --delete
 export alias gpodc = git push origin --delete (git_current_branch)
 export alias gpr = git pull --rebase
+export alias gpro = git pull --rebase origin
 export alias gpu = git push upstream
 export alias gpv = git push --verbose
 

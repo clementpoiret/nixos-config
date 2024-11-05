@@ -72,6 +72,15 @@ return {
     end,
   },
 
+  {
+    "tiagovla/scope.nvim",
+    lazy = true,
+    event = "VeryLazy",
+    config = function()
+      require("scope").setup {}
+    end,
+  },
+
   "nvim-lua/popup.nvim",
   "jvgrootveld/telescope-zoxide",
   "nvim-telescope/telescope-file-browser.nvim",
@@ -81,7 +90,7 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     opts = {
-      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "orgmode" },
+      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "orgmode", "scope" },
     },
   },
 

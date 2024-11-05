@@ -138,7 +138,7 @@ map("<Alt-k>", "E");
 map("y", "yy");
 
 // Change focused frame
-map("gf", "w");
+//map("gf", "w");
 
 // ---- Unmap -----
 // Proxy Stuff
