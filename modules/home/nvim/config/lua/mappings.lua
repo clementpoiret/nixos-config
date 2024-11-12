@@ -15,7 +15,7 @@ map("n", "n", "nzzzv", { desc = "Find next and center cursor" })
 map("n", "N", "Nzzzv", { desc = "Find previous and center cursor" })
 
 -- Selection trick, useful for vimcmdline
-map("n", "<leader>v", "v$", { desc = "Select from cursor to the end of line" })
+map("n", "<leader>v", "^v$", { desc = "Select from cursor to the end of line" })
 
 -- Remap nvimtree
 map("n", "<leader>op", ":NvimTreeToggle<cr>", { desc = "Open NvimTree" })
