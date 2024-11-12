@@ -11,7 +11,7 @@ in {
 
     extraConfig = ''
       # Source the conda script to activate micromamba envs
-      use ($nu.default-config-dir | path join 'scripts/conda.nu') [activate deactivate]
+      use conda.nu [activate deactivate]
 
       # Jujutsu
       source ($nu.default-config-dir | path join 'completions/jj.nu')
@@ -107,7 +107,13 @@ in {
   };
 
   home = {
-    packages = with pkgs; [ flake.nu_plugin_bash_env jq ];
+    packages = with pkgs; [
+      flake.nu_plugin_bash_env
+      jq
+      nufmt
+      nushellPlugins.query
+      nushellPlugins.polars
+    ];
 
     activation = let
       nu-plugin = path:
@@ -117,6 +123,8 @@ in {
     in {
       nu-plugin-bash-env =
         nu-plugin "${pkgs.flake.nu_plugin_bash_env}/bin/nu_plugin_bash_env";
+      nu-plugin-query = nu-plugin "${pkgs.nushellPlugins.query}/bin/nu_plugin_query";
+      nu-plugin-polars = nu-plugin "${pkgs.nushellPlugins.polars}/bin/nu_plugin_polars";
     };
 
     # Custom scripts

@@ -75,7 +75,6 @@
     bleachbit # cache cleaner
     chromium
     devenv # reproducible dev env based on nix
-    direnv
     drawio
     dust
     evince # gnome pdf viewer
@@ -101,6 +100,7 @@
     protonvpn-gui
     protonvpn-cli
     poweralertd
+    pueue # manage long running tasks
     qalculate-gtk # calculator
     qFlipper
     rclone

@@ -108,13 +108,14 @@
           xray = true;
         };
 
-        drop_shadow = true;
-
-        shadow_ignore_window = true;
-        shadow_offset = "0 2";
-        shadow_range = 15;
-        shadow_render_power = 2;
-        "col.shadow" = "rgba(00000055)";
+        shadow = {
+          enabled = true;
+          color = "rgba(00000055)";
+          ignore_window = true;
+          offset = "0 2";
+          range = 15;
+          render_power = 2;
+        };
       };
 
       animations = {

@@ -7,15 +7,26 @@
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     nur.url = "github:nix-community/NUR";
 
-    hypr-contrib.url = "github:hyprwm/contrib";
-    hyprpicker.url = "github:hyprwm/hyprpicker";
-
     alejandra.url = "github:kamadorueda/alejandra/3.0.0";
 
     hyprland = {
       #url = "github:hyprwm/Hyprland";
       url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
       # url = "github:hyprwm/Hyprland/fe7b748";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    hypr-contrib.url = "github:hyprwm/contrib";
+    hyprcursor = { 
+      url = "github:hyprwm/hyprcursor";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hyprpicker = { 
+      url = "github:hyprwm/hyprpicker";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hyprsunset = { 
+      url = "github:hyprwm/hyprsunset";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -48,7 +59,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # zen-browser.url = "github:MarceColl/zen-browser-flake";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     sops-nix = {
@@ -75,7 +85,7 @@
       pkgs-flake = {
         alejandra = alejandra.defaultPackage.${system};
         nu_plugin_bash_env = nu_plugin_bash_env.packages.${system}.default;
-        zen-browser = zen-browser.packages."${system}".specific;
+        zen-browser = zen-browser.packages.${system}.specific;
       };
 
       customOverlays = [

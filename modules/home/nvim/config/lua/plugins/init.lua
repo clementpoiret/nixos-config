@@ -109,6 +109,11 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "lua", "python", "bash", "rust", "nix" }, ignore_install = { "org" } },
+    dependencies = {
+      -- NOTE: additional parser for nu
+      { "nushell/tree-sitter-nu", build = ":TSInstall nu" },
+    },
+    build = ":TSUpdate",
   },
 
   -- -- REPLs

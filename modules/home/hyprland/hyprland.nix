@@ -4,27 +4,26 @@ let
 in
 {
   home.packages = with pkgs; [
-    # swww
-    swaybg
     inputs.hypr-contrib.packages.${pkgs.system}.grimblast
-    hyprpicker
+    inputs.hyprcursor.packages.${pkgs.system}.hyprcursor
+    inputs.hyprpicker.packages.${pkgs.system}.hyprpicker
+    inputs.hyprsunset.packages.${pkgs.system}.hyprsunset
+
+    glib
     grim
     slurp
+    swaybg
+    wayland
     wl-clip-persist
     wf-recorder
-    glib
-    wayland
-    direnv
-    hyprcursor
   ];
   systemd.user.targets.hyprland-session.Unit.Wants = [ "xdg-desktop-autostart.target" ];
   wayland.windowManager.hyprland = {
     enable = true;
+    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
     xwayland = {
       enable = true;
-      # hidpi = true;
     };
-    #enableNvidiaPatches = true;
     systemd.enable = true;
   };
 
