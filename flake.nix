@@ -7,6 +7,8 @@
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     nur.url = "github:nix-community/NUR";
 
+    ucodenix.url = "github:e-tho/ucodenix";
+
     alejandra.url = "github:kamadorueda/alejandra/3.0.0";
 
     hyprland = {

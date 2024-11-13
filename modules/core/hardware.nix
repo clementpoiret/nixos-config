@@ -1,11 +1,18 @@
-{ config, host, lib, pkgs, ... }:
+{ inputs, config, host, lib, pkgs, ... }:
 let
   xserverDrivers = {
     "desktop" = "nvidia";
     "laptop" = "amdgpu";
   };
+
+  # from `cpuid -1 -l 1 -r | sed -n 's/.*eax=0x\([0-9a-f]*\).*/\U\1/p'`
+  cpuModelId = {
+    "desktop" = "00870F10";
+  };
 in
-{  
+{
+  imports = [ inputs.ucodenix.nixosModules.default ];
+
   hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
   hardware.graphics.extraPackages = with pkgs; lib.mkIf (host == "laptop") [
@@ -47,6 +54,12 @@ in
 
   # Firmware updates
   services.fwupd.enable = true;
+
+  # ucode updates
+  services.ucodenix = {
+    enable = true;
+    cpuModelId = cpuModelId.${host};
+  };
 
   # /tmp as tmpfs
   boot.tmp = {
