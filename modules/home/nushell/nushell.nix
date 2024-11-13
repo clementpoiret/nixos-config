@@ -63,9 +63,6 @@ in {
 
       # Fixes Micromamba and Aider
       $env.GIT_PYTHON_GIT_EXECUTABLE = "${profileDirectory}/bin/git"
-
-      # Misc API Keys from SOPS
-      $env.ANTHROPIC_API_KEY = ^cat /run/user/1000/secrets/api_keys/anthropic
     '';
 
     shellAliases = {
