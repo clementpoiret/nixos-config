@@ -47,3 +47,27 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     require("conform").format { bufnr = args.buf }
   end,
 })
+
+-- Settings for Neovide
+if vim.g.neovide then
+  -- Font configuration
+  vim.o.guifont = "MonaspiceNe Nerd Font:h11" -- Set font and size
+
+  -- Visual settings
+  -- vim.g.neovide_floating_blur_amount_x = 2.0 -- Blur for floating windows
+  -- vim.g.neovide_floating_blur_amount_y = 2.0
+
+  -- Animation settings
+  -- vim.g.neovide_cursor_animation_length = 0.05 -- Cursor animation speed
+  -- vim.g.neovide_cursor_trail_length = 0.8 -- Cursor trail size
+  -- vim.g.neovide_cursor_antialiasing = true -- Smooth cursor movement
+
+  -- Performance settings
+  vim.g.neovide_refresh_rate = 60 -- Display refresh rate
+  vim.g.neovide_refresh_rate_idle = 5 -- Refresh rate when idle
+  vim.g.neovide_no_idle = false -- Continue animations when idle
+
+  -- Window settings
+  -- vim.g.neovide_remember_window_size = true -- Remember window size
+  -- vim.g.neovide_fullscreen = false -- Start in fullscreen mode
+end

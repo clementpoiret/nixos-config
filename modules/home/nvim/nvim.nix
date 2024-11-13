@@ -5,9 +5,11 @@ in {
     enable = true;
     viAlias = true;
     vimAlias = true;
-    defaultEditor = true;
+    defaultEditor = false;
     extraLuaPackages = ps: [ ps.magick ];
   };
+
+  home.sessionVariables.EDITOR = "neovide";
 
   home.packages = with pkgs; [
     lua-language-server
@@ -19,6 +21,9 @@ in {
     python312Packages.isort
     python312Packages.python-lsp-server
     ruff
+
+    # gui if needed
+    neovide
   ];
 
   home.file = {

@@ -71,7 +71,6 @@ in {
       cd = "z";
       tt = "gtrash put";
       cat = "bat";
-      nano = "micro";
       py = "python";
       icat = "kitten icat";
       findw = "grep -rl";

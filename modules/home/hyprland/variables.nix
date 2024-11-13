@@ -1,6 +1,7 @@
 { pkgs, host, lib, ... }:
 {
   home.sessionVariables = {
+    EDITOR = "neovide";
     #SSH_ASKPASS = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
 
     NIXOS_OZONE_WL = "1";

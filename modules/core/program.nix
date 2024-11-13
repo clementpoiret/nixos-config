@@ -21,4 +21,6 @@
     enableAskPassword = true;
     # askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
   };
+
+  environment.variables.EDITOR = "neovide";
 }

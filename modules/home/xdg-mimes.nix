@@ -4,7 +4,7 @@ let
   defaultApps = {
     archive = [ "org.gnome.FileRoller.desktop" ];
     browser = [ "zen.desktop" ];
-    text = [ "nvim.desktop" ];
+    text = [ "neovide.desktop" ];
     image = [ "pqiv.desktop" ];
     audio = [ "mpv.desktop" ];
     video = [ "mpv.desktop" ];

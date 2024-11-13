@@ -15,7 +15,6 @@
     ./nushell/nushell.nix # shell
     ./spicetify.nix # spotify client
     ./swaync/swaync.nix # notification deamon
-    ./micro.nix # nano replacement
     ./nemo.nix # file manager
     ./nvim/nvim.nix # neovim editor
     ./packages.nix # other packages
