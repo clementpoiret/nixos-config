@@ -8,6 +8,7 @@ let
   # from `cpuid -1 -l 1 -r | sed -n 's/.*eax=0x\([0-9a-f]*\).*/\U\1/p'`
   cpuModelId = {
     "desktop" = "00870F10";
+    "laptop" = "00A70F41";
   };
 in
 {
