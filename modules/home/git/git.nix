@@ -20,14 +20,22 @@
       init.defaultBranch = "main";
       credential.helper = "cache";
       #core.sshCommand = "ssh -i /home/clementpoiret/.ssh/id_ed25519_pwd";
+      core.attributesfile = "~/.gitattributes";
       commit.gpgsign = true;
       diff.colorMoved = "default";
       gpg.format = "openpgp";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
       # status.showUntrackedFiles = "no";
       merge.conflictstyle = "diff3";
+      "merge \"mergiraf\"" = {
+        name = "mergiraf";
+        driver = "mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P";
+      };
     };
   };
+
+  home.packages = [ pkgs.mergiraf ];
+  home.file.".gitattributes".source = ./gitattributes;
 
   programs.gpg = { enable = true; };
 

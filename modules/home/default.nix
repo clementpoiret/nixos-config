@@ -6,7 +6,7 @@
     ./emacs/emacs.nix # emacs editor
     # ./files/files.nix # custom files
     ./fuzzel.nix # launcher
-    ./git.nix # version controle
+    ./git/git.nix # version controle
     ./gitui/gitui.nix # lazygit replacement
     ./gtk.nix # gtk theme
     ./hyprland # window manager

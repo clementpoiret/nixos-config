@@ -123,27 +123,27 @@ export def gmom [] {
 }
 
 export alias gp = git push
-export alias gpo = git push origin
-export alias gpd = git push --dry-run
-export alias gpf = git push --force-with-lease
-export alias gpf! = git push --force
+export alias gpso = git push origin
+export alias gpsd = git push --dry-run
+export alias gpsf = git push --force-with-lease
+export alias gpsf! = git push --force
 export alias gpl = git pull
 export alias gplo = git pull origin
-export def gpoat [] {
+export def gpsoat [] {
     git push origin --all; git push origin --tags
 }
-export alias gpod = git push origin --delete
-export alias gpodc = git push origin --delete (git_current_branch)
-export alias gpr = git pull --rebase
-export alias gpro = git pull --rebase origin
-export alias gpu = git push upstream
-export alias gpv = git push --verbose
+export alias gpsod = git push origin --delete
+export alias gpsodc = git push origin --delete (git_current_branch)
+export alias gplr = git pull --rebase
+export alias gplro = git pull --rebase origin
+export alias gpsu = git push upstream
+export alias gpsv = git push --verbose
 
 export alias gr = git remote
-export alias gpra = git pull --rebase --autostash
-export alias gprav = git pull --rebase --autostash --verbose
-export alias gprv = git pull --rebase --verbose
-export alias gpsup = git push --set-upstream origin (git_current_branch)
+export alias gplra = git pull --rebase --autostash
+export alias gplrav = git pull --rebase --autostash --verbose
+export alias gplrv = git pull --rebase --verbose
+export alias gpssup = git push --set-upstream origin (git_current_branch)
 export alias gra = git remote add
 export alias grb = git rebase
 export alias grba = git rebase --abort
@@ -197,7 +197,7 @@ export alias gts = git tag --sign
 export def gtv [] {
     git tag | lines | sort
 }
-export alias glum = git pull upstream (git_main_branch)
+export alias gplum = git pull upstream (git_main_branch)
 
 export alias gunignore = git update-index --no-assume-unchanged
 export alias gup = git pull --rebase
