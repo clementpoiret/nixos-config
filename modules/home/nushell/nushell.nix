@@ -55,11 +55,15 @@ in {
     '';
 
     extraEnv = ''
+      # To source env variables
+      # from https://github.com/tesujimath/bash-env-nushell/blob/main/bash-env.nu
+      use parse-env.nu [parseenv]
+
       # Source /etc/set-environment to get environment variables
-      bash-env /etc/set-environment | load-env
+      parseenv /etc/set-environment | load-env
 
       # Same thing but for session variables set using home-manager
-      bash-env ${profileDirectory}/etc/profile.d/hm-session-vars.sh | load-env
+      parseenv ${profileDirectory}/etc/profile.d/hm-session-vars.sh | load-env
 
       # Fixes Micromamba and Aider
       $env.GIT_PYTHON_GIT_EXECUTABLE = "${profileDirectory}/bin/git"
@@ -107,7 +111,7 @@ in {
 
   home = {
     packages = with pkgs; [
-      flake.nu_plugin_bash_env
+      flake.bash-env-json
       jq
       nufmt
       nushellPlugins.query
@@ -120,8 +124,6 @@ in {
           run ${pkgs.nushell}/bin/nu --no-config-file --no-history --no-std-lib -c 'plugin add --plugin-config ~/.config/nushell/plugin.msgpackz ${path}'
         '';
     in {
-      nu-plugin-bash-env =
-        nu-plugin "${pkgs.flake.nu_plugin_bash_env}/bin/nu_plugin_bash_env";
       nu-plugin-query = nu-plugin "${pkgs.nushellPlugins.query}/bin/nu_plugin_query";
       nu-plugin-polars = nu-plugin "${pkgs.nushellPlugins.polars}/bin/nu_plugin_polars";
     };
@@ -129,6 +131,7 @@ in {
     # Custom scripts
     file = {
       ".config/nushell/scripts/conda.nu" = { source = ./scripts/conda.nu; };
+      ".config/nushell/scripts/parse-env.nu" = { source = ./scripts/parse-env.nu; };
       ".config/nushell/completions/jj.nu" = { source = ./completions/jj.nu; };
       ".config/nushell/aliases/bat.nu" = { source = ./aliases/bat.nu; };
       ".config/nushell/aliases/git.nu" = { source = ./aliases/git.nu; };

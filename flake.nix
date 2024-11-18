@@ -32,11 +32,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # qbpm = {
-    #   url = "github:pvsr/qbpm";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -56,8 +51,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nu_plugin_bash_env = {
-      url = "github:tesujimath/nu_plugin_bash_env/refs/tags/0.16.1";
+    bash-env-json = {
+      url = "github:tesujimath/bash-env-json/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -69,7 +64,7 @@
     };
   };
 
-  outputs = { alejandra, chaotic, nixpkgs, nu_plugin_bash_env, nixpkgs-master
+  outputs = { alejandra, chaotic, nixpkgs, bash-env-json, nixpkgs-master
     , self, home-manager, zen-browser, ... }@inputs:
     let
       selfPkgs = import ./pkgs;
@@ -86,7 +81,7 @@
       };
       pkgs-flake = {
         alejandra = alejandra.defaultPackage.${system};
-        nu_plugin_bash_env = nu_plugin_bash_env.packages.${system}.default;
+        bash-env-json = bash-env-json.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.specific;
       };
 

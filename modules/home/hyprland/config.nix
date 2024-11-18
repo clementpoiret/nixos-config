@@ -32,7 +32,7 @@
 
       cursor = lib.mkIf (host == "desktop") {
         #no_hardware_cursors = true;
-        allow_dumb_copy = true;
+        #allow_dumb_copy = true;
       };
 
       render = lib.mkIf (host == "desktop") { explicit_sync = false; };
