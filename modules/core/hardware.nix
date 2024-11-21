@@ -28,7 +28,7 @@ in
   services.xserver.videoDrivers = [ xserverDrivers."${host}" ];
 
   hardware.nvidia = lib.mkIf (host == "desktop") {
-    # package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
     modesetting.enable = true;
     powerManagement.enable = false;
     powerManagement.finegrained = false;
