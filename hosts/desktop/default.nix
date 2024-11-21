@@ -6,4 +6,6 @@
   ];
 
   powerManagement.cpuFreqGovernor = "performance";
+
+  boot.kernelParams = [ "nvidia_drm.modeset=1" "fbdev=1" ];
 }
