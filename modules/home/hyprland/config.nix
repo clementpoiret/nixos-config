@@ -1,4 +1,5 @@
-{ lib, host, ... }: {
+{ lib, host, ... }:
+{
   wayland.windowManager.hyprland = {
     settings = {
 
@@ -15,6 +16,7 @@
         "sleep 1 && waybar &"
         "swaync &"
         "wl-paste --watch cliphist store &"
+        "hyprsunset -t 6000"
       ];
 
       input = {

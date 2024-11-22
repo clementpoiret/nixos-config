@@ -1,9 +1,19 @@
-{ self, pkgs, lib, inputs, ... }: {
+{
+  self,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
+{
   # imports = [ inputs.nix-gaming.nixosModules.default ];
   nix = {
     settings = {
       auto-optimise-store = true;
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       substituters = [
         "https://nix-community.cachix.org"
         "https://nixpkgs-python.cachix.org"
@@ -18,12 +28,23 @@
         "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
         "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
       ];
-      trusted-users = [ "root" "clementpoiret" ];
+      trusted-users = [
+        "root"
+        "clementpoiret"
+      ];
     };
   };
-  nixpkgs = { overlays = [ self.overlays.default inputs.nur.overlay ]; };
+  nixpkgs = {
+    overlays = [
+      self.overlays.default
+      inputs.nur.overlay
+    ];
+  };
 
-  environment.systemPackages = with pkgs; [ wget git ];
+  environment.systemPackages = with pkgs; [
+    wget
+    git
+  ];
 
   programs.nix-ld = {
     enable = true;
@@ -33,5 +54,5 @@
   time.timeZone = "Europe/Paris";
   i18n.defaultLocale = "en_US.UTF-8";
   nixpkgs.config.allowUnfree = true;
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
 }

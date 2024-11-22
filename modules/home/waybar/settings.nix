@@ -1,4 +1,5 @@
-{ ... }: {
+{ ... }:
+{
   programs.waybar.settings.mainBar = {
     position = "top";
     layer = "top";
@@ -28,7 +29,9 @@
     clock = {
       timezone = "Europe/Paris";
       calendar = {
-        format = { today = "<span color='#b4befe'><b><u>{}</u></b></span>"; };
+        format = {
+          today = "<span color='#b4befe'><b><u>{}</u></b></span>";
+        };
       };
       format = " {:%H:%M}";
       tooltip = "true";
@@ -84,7 +87,9 @@
     pulseaudio = {
       format = "{icon} {volume}%";
       format-muted = "  {volume}%";
-      format-icons = { default = [ " " ]; };
+      format-icons = {
+        default = [ " " ];
+      };
       scroll-step = 5;
       on-click = "pamixer -t";
     };
@@ -103,12 +108,20 @@
     };
     battery = {
       format = "{icon} {capacity}%";
-      format-icons = [ " " " " " " " " " " ];
+      format-icons = [
+        " "
+        " "
+        " "
+        " "
+        " "
+      ];
       format-charging = " {capacity}%";
       format-full = " {capacity}%";
       format-warning = " {capacity}%";
       interval = 5;
-      states = { warning = 20; };
+      states = {
+        warning = 20;
+      };
       format-time = "{H}h{M}m";
       tooltip = true;
       tooltip-format = "{time}";
@@ -116,7 +129,10 @@
     backlight = {
       # "device": "acpi_video1",
       format = "{percent}% {icon}";
-      format-icons = [ "" "" ];
+      format-icons = [
+        ""
+        ""
+      ];
       # on-scroll-up = "/home/cp264607/.config/hypr/scripts/tools/brightness_ctl.sh up";
       # on-scroll-down = "/home/cp264607/.config/hypr/scripts/tools/brightness_ctl.sh down";
       interval = 1;
@@ -135,11 +151,9 @@
         none = "   ";
         dnd-notification = "<span foreground='red'><sup></sup></span>   ";
         dnd-none = "   ";
-        inhibited-notification =
-          "<span foreground='red'><sup></sup></span>   ";
+        inhibited-notification = "<span foreground='red'><sup></sup></span>   ";
         inhibited-none = "   ";
-        dnd-inhibited-notification =
-          "<span foreground='red'><sup></sup></span>   ";
+        dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>   ";
         dnd-inhibited-none = "   ";
       };
       return-type = "json";
