@@ -23,9 +23,6 @@ in {
     python312Packages.yapf
     ruff-lsp
 
-    # nix
-    nixfmt-classic
-
     # web stuff
     nodePackages_latest.prettier
     nodePackages_latest.eslint_d

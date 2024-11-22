@@ -12,6 +12,7 @@ local options = {
     elm = { "elm-format" },
     python = { "ruff_format", "ruff_organize_imports" },
     dart = { "dart_format" },
+    nix = { "nixfmt" },
   },
 
   -- format_on_save = {

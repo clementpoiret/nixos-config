@@ -50,7 +50,8 @@
     gnumake
 
     # Nix
-    nil
+    nixd
+    nixfmt-rfc-style
 
     # Python
     (import ./python-packages.nix { pkgs = pkgs; })

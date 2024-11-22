@@ -29,6 +29,9 @@ require("lspconfig").ruff.setup {
 -- nushell
 require("lspconfig").nushell.setup {}
 
+-- nix
+require("lspconfig").nixd.setup {}
+
 -- configuring single server, example: typescript
 -- lspconfig.ts_ls.setup {
 --   on_attach = nvlsp.on_attach,
