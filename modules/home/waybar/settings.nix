@@ -24,6 +24,7 @@
       "power-profiles-daemon"
       "battery"
       "network"
+      "custom/hyprsunset"
       "custom/notification"
     ];
     clock = {
@@ -142,6 +143,10 @@
       on-click = "fuzzel";
       on-click-right = "wallpaper-picker";
       tooltip = "false";
+    };
+    "custom/hyprsunset" = {
+      format = " ";
+      on-click = "toggle_light";
     };
     "custom/notification" = {
       tooltip = false;

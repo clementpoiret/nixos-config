@@ -15,6 +15,7 @@ let
   );
   toggle_waybar = pkgs.writeScriptBin "toggle_waybar" (builtins.readFile ./scripts/toggle_waybar.sh);
   toggle_float = pkgs.writeScriptBin "toggle_float" (builtins.readFile ./scripts/toggle_float.sh);
+  toggle_light = pkgs.writeScriptBin "toggle_light" (builtins.readFile ./scripts/toggle_light.sh);
 
   maxfetch = pkgs.writeScriptBin "maxfetch" (builtins.readFile ./scripts/maxfetch.sh);
 
@@ -44,6 +45,7 @@ in
     toggle_oppacity
     toggle_waybar
     toggle_float
+    toggle_light
 
     maxfetch
 
