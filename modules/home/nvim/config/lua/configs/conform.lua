@@ -13,6 +13,9 @@ local options = {
     python = { "ruff_format", "ruff_organize_imports" },
     dart = { "dart_format" },
     nix = { "nixfmt" },
+    tf = { "terraform_fmt" },
+    terraform = { "terraform_fmt" },
+    hcl = { "terraform_fmt" },
   },
 
   -- format_on_save = {

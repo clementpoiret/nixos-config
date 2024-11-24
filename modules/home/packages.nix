@@ -26,12 +26,10 @@
       hexdump
       inkscape
       inxi # system info
-      jdk
       killall # to kill our little friends
       lazygit
       lsd # ls replacement
       lshw
-      #lxqt.lxqt-policykit
       lz4
       python312Packages.magic-wormhole # magic file transfer
       nitch # systhem fetch util
@@ -76,6 +74,8 @@
       kubernetes-helm
       kubectl
       minikube
+      terraform
+      terraform-ls
 
       # aider-chat
       aria2
