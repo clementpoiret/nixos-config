@@ -17,6 +17,47 @@ map("n", "N", "Nzzzv", { desc = "Find previous and center cursor" })
 -- Selection trick, useful for vimcmdline
 map("n", "vl", "^v$", { desc = "Select from cursor to the end of line" })
 
+vim.cmd [[
+function! SendLineNoWhitespace()
+    " First check if we're in a valid cmdline buffer
+    if !exists('b:cmdline_filetype') || cmdline#QuartoLng() == 'none'
+        return
+    endif
+
+    " Check if global variables are initialized
+    if !exists('g:cmdline_job') || !exists('g:cmdline_tmuxsname')
+        call cmdline#Init()
+    endif
+
+    " Check for active session
+    let has_active_job = exists('g:cmdline_job') && has_key(g:cmdline_job, b:cmdline_filetype) && g:cmdline_job[b:cmdline_filetype]
+    let has_active_tmux = exists('g:cmdline_tmuxsname') && has_key(g:cmdline_tmuxsname, b:cmdline_filetype) && g:cmdline_tmuxsname[b:cmdline_filetype] != ""
+    let has_active_pane = exists('s:cmdline_app_pane') && s:cmdline_app_pane != ''
+
+    if !has_active_job && !has_active_tmux && !has_active_pane
+        return
+    endif
+
+    " Store cursor position
+    let save_pos = getpos('.')
+
+    " Get current line and trim leading whitespace
+    let line = getline('.')
+    let trimmed_line = substitute(line, '^\s*', '', '')
+
+    " Send the trimmed line
+    call cmdline#SendCmd(trimmed_line)
+    call cmdline#Down()
+endfunction
+]]
+
+map(
+  "n",
+  "<C-Space>",
+  ":call SendLineNoWhitespace()<CR>",
+  { desc = "Send current line (trimmed) to REPL and move to next line", silent = true }
+)
+
 -- Remap nvimtree
 map("n", "<leader>op", ":NvimTreeToggle<cr>", { desc = "Open NvimTree" })
 map("n", "<leader>fp", ":NvimTreeFocus<cr>", { desc = "Focus NvimTree" })
