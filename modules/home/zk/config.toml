@@ -83,11 +83,10 @@ shell = "/run/current-system/sw/bin/bash"
 recents = "--sort created- --created-after 'last two weeks'"
 
 # COMMAND ALIASES
-# TODO: Fix for nushell
 [alias]
 
 # Edit the last modified note.
-edlast = "zk edit --limit 1 --sort modified- $argv"
+edlast = "zk edit --limit 1 --sort modified- $@"
 
 # Edit the notes selected interactively among the notes created the last two weeks.
 recent = "zk edit --sort created- --created-after 'last two weeks' --interactive"
@@ -99,11 +98,11 @@ lucky = "zk list --quiet --format full --sort random --limit 1"
 ls = "zk edit --interactive"
 
 # sear notes by tags
-t = "zk edit --interactive --tag $argv"
+t = "zk edit --interactive --tag $@"
 
 # new fleeting entry
-nef = 'zk new --no-input "$ZK_NOTEBOOK_DIR/fleeting" --title $argv'
-nep = 'zk new --no-input "$ZK_NOTEBOOK_DIR/permanent" --title $argv'
+nef = 'zk new --no-input "$ZK_NOTEBOOK_DIR/fleeting" --title $@'
+nep = 'zk new --no-input "$ZK_NOTEBOOK_DIR/permanent" --title $@'
 
 fleetings = "zk edit --sort created- $ZK_NOTEBOOK_DIR/fleeting --interactive"
 permanents = "zk edit --sort created- $ZK_NOTEBOOK_DIR/permanent --interactive"
@@ -112,13 +111,13 @@ permanents = "zk edit --sort created- $ZK_NOTEBOOK_DIR/permanent --interactive"
 #update = "cd $ZK_NOTEBOOK_DIR; git add -A; git commit -am 'updating'; git push; cd -"
 
 # remove a files
-rm = "zk list --interactive --quiet --format path --delimiter0 $argv | xargs -0 rm -vf --"
+rm = "zk list --interactive --quiet --format path --delimiter0 $@ | xargs -0 rm -vf --"
 
 # print the backlinks of a note
 bl = "zk list --link-to $@"
 
 # open last zk in slides
-slides = "zk list --interactive --quiet --format path --delimiter0 $argv | xargs -0 slides"
+slides = "zk list --interactive --quiet --format path --delimiter0 $@ | xargs -0 slides"
 
 # LSP (EDITOR INTEGRATION)
 [lsp]

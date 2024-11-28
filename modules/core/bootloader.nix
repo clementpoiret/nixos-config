@@ -10,7 +10,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
-  chaotic.scx = {
+  services.scx = {
     enable = true;
     package = pkgs.scx.full;
     scheduler = "scx_bpfland";

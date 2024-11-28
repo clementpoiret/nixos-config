@@ -85,12 +85,11 @@ return {
   "jvgrootveld/telescope-zoxide",
   "nvim-telescope/telescope-file-browser.nvim",
   "nvim-telescope/telescope-project.nvim",
-  "joaomsa/telescope-orgmode.nvim",
 
   {
     "nvim-telescope/telescope.nvim",
     opts = {
-      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "orgmode", "scope" },
+      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "scope" },
     },
   },
 
@@ -108,7 +107,7 @@ return {
   -- Programming
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "lua", "python", "bash", "rust", "nix", "hcl" }, ignore_install = { "org" } },
+    opts = { ensure_installed = { "lua", "python", "bash", "rust", "nix", "hcl" } },
     dependencies = {
       -- NOTE: additional parser for nu
       { "nushell/tree-sitter-nu", build = ":TSInstall nu" },
@@ -128,6 +127,31 @@ return {
       vim.g.cmdline_outhl = 1
       -- we override this mapping below, so map here to something we'll probably not use.
       vim.g.cmdline_map_start = "<leader>z"
+    end,
+  },
+
+  -- -- Notes and TODOs
+  {
+    "clementpoiret/dooing",
+    event = "VeryLazy",
+    lazy = true,
+    branch = "feature/priority",
+    -- tag = "v1.6.0-alpha",
+    config = function()
+      require("dooing").setup {
+        save_path = vim.fn.expand "$HOME/Sync/Notes/dooing_todos.json",
+
+        prioritization = true,
+      }
+    end,
+  },
+
+  {
+    "zk-org/zk-nvim",
+    config = function()
+      require("zk").setup {
+        picker = "telescope",
+      }
     end,
   },
 
@@ -175,45 +199,5 @@ return {
         ft = { "markdown", "Avante" },
       },
     },
-  },
-
-  -- Org Mode & Org Roam
-  {
-    "nvim-orgmode/orgmode",
-    event = "VeryLazy",
-    ft = { "org" },
-    config = function()
-      -- Setup orgmode
-      require("orgmode").setup {
-        org_agenda_files = "~/Sync/Notes/org/**/*",
-        org_default_notes_file = "~/Sync/Notes/org/todo.org",
-      }
-    end,
-  },
-
-  -- TODO: Citation plugin
-  {
-    "chipsenkbeil/org-roam.nvim",
-    tag = "0.1.0",
-    dependencies = {
-      {
-        "nvim-orgmode/orgmode",
-        tag = "0.3.7",
-      },
-    },
-    config = function()
-      require("org-roam").setup {
-        bindings = {
-          prefix = "<LocalLeader>n",
-        },
-        directory = "~/Sync/Notes/org-roam/permanent/",
-        -- -- optional
-        -- org_files = {
-        --   "~/another_org_dir",
-        --   "~/some/folder/*.org",
-        --   "~/a/single/org_file.org",
-        -- }
-      }
-    end,
   },
 }
