@@ -132,16 +132,12 @@ return {
 
   -- -- Notes and TODOs
   {
-    "clementpoiret/dooing",
+    "atiladefreitas/dooing",
     event = "VeryLazy",
     lazy = true,
-    branch = "feature/priority",
-    -- tag = "v1.6.0-alpha",
     config = function()
       require("dooing").setup {
         save_path = vim.fn.expand "$HOME/Sync/Notes/dooing_todos.json",
-
-        prioritization = true,
       }
     end,
   },

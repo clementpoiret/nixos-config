@@ -74,6 +74,7 @@
       kubernetes-helm
       kubectl
       minikube
+      opentofu
       terraform
       terraform-ls
 
