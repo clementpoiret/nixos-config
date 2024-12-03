@@ -50,6 +50,11 @@
       gcc
       gnumake
 
+      # Rust
+      cargo
+      rust-analyzer
+      rustfmt
+
       # bash
       shfmt
 

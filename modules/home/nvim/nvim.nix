@@ -1,6 +1,5 @@
-{ config, pkgs, ... }:
-let home = config.home.homeDirectory;
-in {
+{ pkgs, ... }:
+{
   programs.neovim = {
     enable = true;
     viAlias = true;
@@ -24,13 +23,28 @@ in {
 
     # gui if needed
     neovide
+
+    # lldb
+    vscode-extensions.vadimcn.vscode-lldb
   ];
 
+  home.sessionVariables = {
+    LSP_CODELLDB = "${pkgs.vscode-extensions.vadimcn.vscode-lldb}";
+  };
+
   home.file = {
-    ".config/nvim/init.lua" = { source = ./config/init.lua; };
-    ".config/nvim/lua/options.lua" = { source = ./config/lua/options.lua; };
-    ".config/nvim/lua/mappings.lua" = { source = ./config/lua/mappings.lua; };
-    ".config/nvim/lua/chadrc.lua" = { source = ./config/lua/chadrc.lua; };
+    ".config/nvim/init.lua" = {
+      source = ./config/init.lua;
+    };
+    ".config/nvim/lua/options.lua" = {
+      source = ./config/lua/options.lua;
+    };
+    ".config/nvim/lua/mappings.lua" = {
+      source = ./config/lua/mappings.lua;
+    };
+    ".config/nvim/lua/chadrc.lua" = {
+      source = ./config/lua/chadrc.lua;
+    };
     ".config/nvim/lua/configs/conform.lua" = {
       source = ./config/lua/configs/conform.lua;
     };
