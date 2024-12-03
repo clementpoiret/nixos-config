@@ -2,6 +2,8 @@
 {
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
+    julia-mono
+    nerd-fonts.fira-code
     nerd-fonts.jetbrains-mono
     nerd-fonts.monaspace
     nerd-fonts.noto

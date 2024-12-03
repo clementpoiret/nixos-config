@@ -1,12 +1,12 @@
-{ pkgs, ... }: 
+{ ... }:
 {
   programs.kitty = {
     enable = true;
 
     themeFile = "Catppuccin-Mocha";
-    
+
     font = {
-      name = "MonaspiceNe Nerd Font";
+      name = "FiraCode Nerd Font";
       size = 11;
     };
 
@@ -49,7 +49,7 @@
       window_margin_width = 0;
       scrollback_lines = 10000;
       enable_audio_bell = false;
-      
+
       ## Style
       tab_title_template = "{title}{' :{}:'.format(num_windows) if num_windows > 1 else ''}";
       tab_bar_min_tabs = 1;

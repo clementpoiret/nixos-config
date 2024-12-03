@@ -13,21 +13,20 @@
 
     hyprland = {
       #url = "github:hyprwm/Hyprland";
-      url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
-      # url = "github:hyprwm/Hyprland/fe7b748";
+      url = "github:hyprwm/Hyprland/v0.45.2?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     hypr-contrib.url = "github:hyprwm/contrib";
-    hyprcursor = { 
+    hyprcursor = {
       url = "github:hyprwm/hyprcursor";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hyprpicker = { 
+    hyprpicker = {
       url = "github:hyprwm/hyprpicker";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hyprsunset = { 
+    hyprsunset = {
       url = "github:hyprwm/hyprsunset";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -64,8 +63,18 @@
     };
   };
 
-  outputs = { alejandra, chaotic, nixpkgs, bash-env-json, nixpkgs-master
-    , self, home-manager, zen-browser, ... }@inputs:
+  outputs =
+    {
+      alejandra,
+      chaotic,
+      nixpkgs,
+      bash-env-json,
+      nixpkgs-master,
+      self,
+      home-manager,
+      zen-browser,
+      ...
+    }@inputs:
     let
       selfPkgs = import ./pkgs;
       username = "clementpoiret";
@@ -93,7 +102,8 @@
       ];
 
       lib = nixpkgs.lib;
-    in {
+    in
+    {
       overlays.default = selfPkgs.overlay;
 
       # niz-switch
@@ -134,8 +144,10 @@
             inherit self inputs username;
             host = "desktop";
           };
-          modules =
-            [ { nixpkgs.overlays = customOverlays; } (import ./home-manager) ];
+          modules = [
+            { nixpkgs.overlays = customOverlays; }
+            (import ./home-manager)
+          ];
         };
         "clementpoiret@laptop" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgs;
@@ -145,8 +157,10 @@
             inherit self inputs username;
             host = "laptop";
           };
-          modules =
-            [ { nixpkgs.overlays = customOverlays; } (import ./home-manager) ];
+          modules = [
+            { nixpkgs.overlays = customOverlays; }
+            (import ./home-manager)
+          ];
         };
       };
     };
