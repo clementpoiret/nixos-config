@@ -7,6 +7,11 @@
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     nur.url = "github:nix-community/NUR";
 
+    fw-fanctrl = {
+      url = "github:TamtamHero/fw-fanctrl/packaging/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ucodenix.url = "github:e-tho/ucodenix";
 
     alejandra.url = "github:kamadorueda/alejandra/3.0.0";
@@ -65,6 +70,7 @@
 
   outputs =
     {
+      fw-fanctrl,
       alejandra,
       chaotic,
       nixpkgs,
@@ -125,6 +131,7 @@
           modules = [
             { nixpkgs.overlays = customOverlays; }
             ./hosts/laptop
+            fw-fanctrl.nixosModules.default
             chaotic.nixosModules.default
           ];
           specialArgs = {
