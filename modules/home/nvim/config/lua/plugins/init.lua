@@ -93,16 +93,7 @@ return {
     },
   },
 
-  -- {
-  --   "ahmedkhalf/project.nvim",
-  --   lazy = false,
-  --   dependencies = {
-  --     "nvim-telescope/telescope-file-browser.nvim"
-  --   },
-  --   config = function()
-  --     require("project_nvim").setup {}
-  --   end
-  -- },
+  { "mcauley-penney/visual-whitespace.nvim" },
 
   -- Programming
   {
@@ -248,5 +239,10 @@ return {
         ft = { "markdown", "Avante" },
       },
     },
+  },
+  {
+    "nvzone/typr",
+    event = "VeryLazy",
+    lazy = true,
   },
 }
