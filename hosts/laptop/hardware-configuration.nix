@@ -101,7 +101,6 @@
   # Fan Control
   programs.fw-fanctrl.enable = true;
   programs.fw-fanctrl.config = {
-    defaultStrategy = "medium";
-    strategyOnDischarging = "lazy"; # or lazyiest
+    defaultStrategy = "lazy";
   };
 }

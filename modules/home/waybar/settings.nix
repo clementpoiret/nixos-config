@@ -21,6 +21,7 @@
     modules-right = [
       "tray"
       "pulseaudio"
+      "custom/fancontrol"
       "power-profiles-daemon"
       "battery"
       "network"
@@ -93,6 +94,15 @@
       };
       scroll-step = 5;
       on-click = "pamixer -t";
+    };
+    "custom/fancontrol" = {
+      format = "󰈐 {}";
+      exec-if = "which fw-fanctrl";
+      exec = "fw-fanctrl print current";
+      interval = 5;
+      on-click = "sh -c 'current=$(fw-fanctrl print current); case $current in laziest) next=lazy;; lazy) next=medium;; medium) next=agile;; agile) next=very-agile;; very-agile) next=deaf;; deaf) next=aeolus;; aeolus) next=laziest;; *) next=medium;; esac; fw-fanctrl use $next'";
+      tooltip = true;
+      tooltip-format = "Current fan mode: {}";
     };
     power-profiles-daemon = {
       format = "{icon}";
