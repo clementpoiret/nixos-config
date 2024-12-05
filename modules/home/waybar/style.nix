@@ -12,7 +12,8 @@ let
     hover_background = "#1e1e2e";
     opacity = "0.98";
   };
-in {
+in
+{
   programs.waybar.style = ''
 
     * {
@@ -78,6 +79,7 @@ in {
     #clock,
     #power-profiles-daemon,
     #battery,
+    #custom-fancontrol,
     #custom-music,
     #custom-launcher,
     #custom-updates,
