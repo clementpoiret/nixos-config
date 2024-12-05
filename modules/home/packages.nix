@@ -75,6 +75,7 @@
 
       # infra
       docker
+      fluxcd
       k9s
       kubernetes-helm
       kubectl
