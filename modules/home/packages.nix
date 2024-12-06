@@ -18,6 +18,7 @@
       file # Show file information
       fzf # fuzzy finder
       gh # github cli
+      glab
       gifsicle # gif utility
       gnuplot
       gtt # google translate TUI
@@ -79,6 +80,7 @@
       k9s
       kubernetes-helm
       kubectl
+      lens
       minikube
       opentofu
       terraform
