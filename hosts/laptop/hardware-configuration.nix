@@ -4,7 +4,6 @@
 {
   config,
   lib,
-  pkgs,
   modulesPath,
   ...
 }:
@@ -81,10 +80,17 @@
     "luks-5ee5fadf-22f0-4a53-a33d-63e22931255f".device = "/dev/disk/by-uuid/5ee5fadf-22f0-4a53-a33d-63e22931255f";
   };
 
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+    priority = 100;
+  };
   swapDevices = [
     {
       device = "/var/lib/swapfile";
       size = 64 * 1024;
+      priority = 0;
     }
   ];
 
