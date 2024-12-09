@@ -95,6 +95,39 @@ return {
 
   { "mcauley-penney/visual-whitespace.nvim" },
 
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    keys = {
+      {
+        "<leader>.",
+        function()
+          Snacks.scratch()
+        end,
+        desc = "Toggle Scratch Buffer",
+      },
+      {
+        "<leader>S",
+        function()
+          Snacks.scratch.select()
+        end,
+        desc = "Select Scratch Buffer",
+      },
+    },
+    opts = {
+      bigfile = { enabled = true },
+      bufdelete = { enabled = true },
+      gitbrowse = { enabled = true },
+      notifier = { enabled = true },
+      notify = { enabled = true },
+      quickfile = { enabled = true },
+      scratch = { enabled = true },
+      toggle = { enabled = true },
+      words = { enabled = true },
+    },
+  },
+
   -- Programming
   {
     "nvim-treesitter/nvim-treesitter",
