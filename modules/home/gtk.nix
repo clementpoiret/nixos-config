@@ -7,6 +7,7 @@
     nerd-fonts.jetbrains-mono
     nerd-fonts.monaspace
     nerd-fonts.noto
+    nerd-fonts.symbols-only
     noto-fonts-emoji
     twemoji-color-font
   ];

@@ -1,7 +1,6 @@
 {
   self,
   pkgs,
-  lib,
   inputs,
   ...
 }:
@@ -37,7 +36,7 @@
   nixpkgs = {
     overlays = [
       self.overlays.default
-      inputs.nur.overlay
+      inputs.nur.overlays.default
     ];
   };
 
