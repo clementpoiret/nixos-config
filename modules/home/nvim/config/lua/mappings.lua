@@ -2,7 +2,6 @@ require "nvchad.mappings"
 
 local map = vim.keymap.set
 
-map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "jk", "<ESC>")
 
 -- swenv
@@ -100,3 +99,11 @@ map("n", "<Leader>dr", "<cmd>lua require'dap'.run_last()<CR>", { desc = "Debugge
 
 -- rustaceanvim
 map("n", "<Leader>dt", "<cmd>lua vim.cmd('RustLsp testables')<CR>", { desc = "Debugger testables" })
+
+-- Arrow
+map("n", "<C-S-P>", function()
+  require("arrow.persist").previous()
+end, { desc = "Arrow prev file" })
+map("n", "<C-S-N>", function()
+  require("arrow.persist").next()
+end, { desc = "Arrow next file" })

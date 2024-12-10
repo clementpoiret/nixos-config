@@ -53,6 +53,62 @@ return {
   { import = "nvcommunity.git.neogit" },
 
   -- -- Third Party
+  {
+    "otavioschwanck/arrow.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      { "nvim-tree/nvim-web-devicons" },
+    },
+    opts = {
+      show_icons = true,
+      leader_key = ";", -- Recommended to be a single key
+      buffer_leader_key = "m", -- Per Buffer Mappings
+      window = {
+        border = "rounded",
+      },
+    },
+  },
+
+  {
+    "rmagatti/auto-session",
+    lazy = false,
+
+    ---enables autocomplete for opts
+    ---@module "auto-session"
+    ---@type AutoSession.Config
+    opts = {
+      suppressed_dirs = { "~/", "~/Downloads", "/" },
+    },
+  },
+
+  {
+    "hiphish/rainbow-delimiters.nvim",
+    event = "BufReadPost",
+    config = function()
+      local rainbow_delimiters = require "rainbow-delimiters"
+
+      vim.g.rainbow_delimiters = {
+        strategy = {
+          [""] = rainbow_delimiters.strategy["global"],
+          vim = rainbow_delimiters.strategy["local"],
+        },
+        query = {
+          [""] = "rainbow-delimiters",
+          lua = "rainbow-blocks",
+        },
+        highlight = {
+          "RainbowDelimiterRed",
+          "RainbowDelimiterYellow",
+          "RainbowDelimiterBlue",
+          "RainbowDelimiterOrange",
+          "RainbowDelimiterGreen",
+          "RainbowDelimiterViolet",
+          "RainbowDelimiterCyan",
+        },
+      }
+    end,
+  },
+
   { "actionshrimp/direnv.nvim", config = true, lazy = false, opts = {} },
 
   { "mg979/vim-visual-multi", event = "VeryLazy", branch = "master" },
@@ -77,7 +133,13 @@ return {
     lazy = true,
     event = "VeryLazy",
     config = function()
-      require("scope").setup {}
+      require("scope").setup {
+        hooks = {
+          post_tab_enter = function()
+            require("arrow.persist").load_cache_file()
+          end,
+        },
+      }
     end,
   },
 
@@ -90,6 +152,16 @@ return {
     "nvim-telescope/telescope.nvim",
     opts = {
       extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "scope" },
+      extensions = {
+        project = {
+          on_project_selected = function(prompt_bufnr)
+            local project_actions = require "telescope._extensions.project.actions"
+            project_actions.change_working_directory(prompt_bufnr, false)
+            require("arrow.persist").load_cache_file()
+            vim.cmd "Telescope find_files"
+          end,
+        },
+      },
     },
   },
 
@@ -123,12 +195,13 @@ return {
       notify = { enabled = true },
       quickfile = { enabled = true },
       scratch = { enabled = true },
-      toggle = { enabled = true },
       words = { enabled = true },
     },
   },
 
   -- Programming
+  { "akinsho/git-conflict.nvim", version = "*", config = true },
+
   {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "lua", "python", "bash", "rust", "nix", "hcl" } },
