@@ -14,3 +14,17 @@ menuitem[disabled="true"],
 menu[disabled="true"] {
   color: #6c7086 !important;
 }
+
+/* TODO: REMOVE LATER */
+/* Temporary fixes gradient selector width */
+#PanelUI-zen-gradient-generator .panel-viewcontainer,
+#PanelUI-zen-gradient-generator .panel-viewstack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Removes the annoying badge above the `list all tabs` button */
+#alltabs-button .toolbarbutton-badge-stack .toolbarbutton-badge {
+  display: none !important;
+}
