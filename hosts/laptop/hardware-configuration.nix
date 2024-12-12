@@ -76,8 +76,10 @@
   };
 
   boot.initrd.luks.devices = {
-    "luks-4b1c13e3-af35-4286-b534-674ca54de75a".device = "/dev/disk/by-uuid/4b1c13e3-af35-4286-b534-674ca54de75a";
-    "luks-5ee5fadf-22f0-4a53-a33d-63e22931255f".device = "/dev/disk/by-uuid/5ee5fadf-22f0-4a53-a33d-63e22931255f";
+    "luks-4b1c13e3-af35-4286-b534-674ca54de75a".device =
+      "/dev/disk/by-uuid/4b1c13e3-af35-4286-b534-674ca54de75a";
+    "luks-5ee5fadf-22f0-4a53-a33d-63e22931255f".device =
+      "/dev/disk/by-uuid/5ee5fadf-22f0-4a53-a33d-63e22931255f";
   };
 
   zramSwap = {
