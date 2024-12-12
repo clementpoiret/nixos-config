@@ -103,7 +103,7 @@ map("b", "T");
 map("go", ";U");
 
 // Edit current URL, and open in new tab
-map("T", ";u");
+map("gO", ";u");
 
 // History Back/Forward
 map("H", "S");
