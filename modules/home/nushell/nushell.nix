@@ -1,8 +1,16 @@
-{ config, host, inputs, lib, pkgs, ... }:
+{
+  config,
+  host,
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
   home = config.home.homeDirectory;
   profileDirectory = config.home.profileDirectory;
-in {
+in
+{
   programs.nushell = {
     enable = true;
 
@@ -70,6 +78,10 @@ in {
     '';
 
     shellAliases = {
+      # Because of muscle memory
+      ":q" = "exit";
+      ":wq" = "exit";
+
       # Utils
       c = "clear";
       cd = "z";
@@ -104,8 +116,7 @@ in {
       emacs = "emacsclient -c -a 'emacs'";
 
       # to fix std lib issues
-      obsidian =
-        "with-env { LD_LIBRARY_PATH: $env.NIX_LD_LIBRARY_PATH } { obsidian }";
+      obsidian = "with-env { LD_LIBRARY_PATH: $env.NIX_LD_LIBRARY_PATH } { obsidian }";
     };
   };
 
@@ -118,24 +129,39 @@ in {
       nushellPlugins.polars
     ];
 
-    activation = let
-      nu-plugin = path:
-        lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          run ${pkgs.nushell}/bin/nu --no-config-file --no-history --no-std-lib -c 'plugin add --plugin-config ~/.config/nushell/plugin.msgpackz ${path}'
-        '';
-    in {
-      nu-plugin-query = nu-plugin "${pkgs.nushellPlugins.query}/bin/nu_plugin_query";
-      nu-plugin-polars = nu-plugin "${pkgs.nushellPlugins.polars}/bin/nu_plugin_polars";
-    };
+    activation =
+      let
+        nu-plugin =
+          path:
+          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            run ${pkgs.nushell}/bin/nu --no-config-file --no-history --no-std-lib -c 'plugin add --plugin-config ~/.config/nushell/plugin.msgpackz ${path}'
+          '';
+      in
+      {
+        nu-plugin-query = nu-plugin "${pkgs.nushellPlugins.query}/bin/nu_plugin_query";
+        nu-plugin-polars = nu-plugin "${pkgs.nushellPlugins.polars}/bin/nu_plugin_polars";
+      };
 
     # Custom scripts
     file = {
-      ".config/nushell/scripts/conda.nu" = { source = ./scripts/conda.nu; };
-      ".config/nushell/scripts/parse-env.nu" = { source = ./scripts/parse-env.nu; };
-      ".config/nushell/completions/jj.nu" = { source = ./completions/jj.nu; };
-      ".config/nushell/aliases/bat.nu" = { source = ./aliases/bat.nu; };
-      ".config/nushell/aliases/git.nu" = { source = ./aliases/git.nu; };
-      ".config/nushell/aliases/k8s.nu" = { source = ./aliases/k8s.nu; };
+      ".config/nushell/scripts/conda.nu" = {
+        source = ./scripts/conda.nu;
+      };
+      ".config/nushell/scripts/parse-env.nu" = {
+        source = ./scripts/parse-env.nu;
+      };
+      ".config/nushell/completions/jj.nu" = {
+        source = ./completions/jj.nu;
+      };
+      ".config/nushell/aliases/bat.nu" = {
+        source = ./aliases/bat.nu;
+      };
+      ".config/nushell/aliases/git.nu" = {
+        source = ./aliases/git.nu;
+      };
+      ".config/nushell/aliases/k8s.nu" = {
+        source = ./aliases/k8s.nu;
+      };
     };
   };
 
@@ -198,8 +224,7 @@ in {
       };
 
       git_status = {
-        format =
-          "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)";
+        format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)";
         style = "cyan";
         conflicted = "";
         untracked = "";
