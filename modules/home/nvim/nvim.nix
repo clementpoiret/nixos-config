@@ -26,6 +26,9 @@
 
     # lldb
     vscode-extensions.vadimcn.vscode-lldb
+
+    # bibtex lsp
+    flake.bibli-ls
   ];
 
   home.sessionVariables = {

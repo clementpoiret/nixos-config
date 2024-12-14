@@ -66,6 +66,11 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    bibli-ls = {
+      url = "github:clementpoiret/bibli-ls";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -79,6 +84,7 @@
       self,
       home-manager,
       zen-browser,
+      bibli-ls,
       ...
     }@inputs:
     let
@@ -98,6 +104,7 @@
         alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.specific;
+        bibli-ls = bibli-ls.packages.${system}.default;
       };
 
       customOverlays = [
