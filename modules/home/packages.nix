@@ -109,6 +109,7 @@
       openssl
       pamixer # pulseaudio command line mixer
       pavucontrol # pulseaudio volume controle (GUI)
+      poppler # pdf preview
       pdftk
       playerctl # controller for media players
       pqiv
