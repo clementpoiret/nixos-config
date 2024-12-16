@@ -32,22 +32,3 @@ lspconfig.nushell.setup {}
 
 -- nix
 lspconfig.nixd.setup {}
-
--- bibli-ls
-if not configs.bibli_ls then
-  configs.bibli_ls = {
-    default_config = {
-      cmd = { "bibli_ls" },
-      filetypes = { "markdown" },
-      root_dir = lspconfig.util.root_pattern ".bibli.toml",
-      -- Optional: visit the URL of the citation with LSP DocumentImplementation
-      on_attach = function(client, bufnr)
-        vim.keymap.set({ "n" }, "<cr>", function()
-          vim.lsp.buf.implementation()
-        end)
-      end,
-    },
-  }
-end
-
-lspconfig.bibli_ls.setup {}

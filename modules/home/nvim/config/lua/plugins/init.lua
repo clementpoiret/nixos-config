@@ -147,11 +147,12 @@ return {
   "jvgrootveld/telescope-zoxide",
   "nvim-telescope/telescope-file-browser.nvim",
   "nvim-telescope/telescope-project.nvim",
+  "nvim-telescope/telescope-bibtex.nvim",
 
   {
     "nvim-telescope/telescope.nvim",
     opts = {
-      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "scope" },
+      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "scope", "bibtex" },
       extensions = {
         project = {
           on_project_selected = function(prompt_bufnr)
@@ -160,6 +161,9 @@ return {
             require("arrow.persist").load_cache_file()
             vim.cmd "Telescope find_files"
           end,
+        },
+        bibtex = {
+          global_files = { "/home/clementpoiret/Sync/Bibliography/library.bib" },
         },
       },
     },

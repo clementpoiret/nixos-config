@@ -76,29 +76,6 @@
         "type": "github"
       }
     },
-    "bibli-ls": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "pyproject-build-systems": "pyproject-build-systems",
-        "pyproject-nix": "pyproject-nix",
-        "uv2nix": "uv2nix"
-      },
-      "locked": {
-        "lastModified": 1734357808,
-        "narHash": "sha256-GIiRRc0wqHn8NTeEMXnc53a25fySFy0xA0BGdnsQRTM=",
-        "owner": "kha-dinh",
-        "repo": "bibli-ls",
-        "rev": "7513a482e6bfdd76f7299d31da2748128f1528e7",
-        "type": "github"
-      },
-      "original": {
-        "owner": "kha-dinh",
-        "repo": "bibli-ls",
-        "type": "github"
-      }
-    },
     "catppuccin-bat": {
       "flake": false,
       "locked": {
@@ -1039,61 +1016,10 @@
         "type": "github"
       }
     },
-    "pyproject-build-systems": {
-      "inputs": {
-        "nixpkgs": [
-          "bibli-ls",
-          "nixpkgs"
-        ],
-        "pyproject-nix": [
-          "bibli-ls",
-          "pyproject-nix"
-        ],
-        "uv2nix": [
-          "bibli-ls",
-          "uv2nix"
-        ]
-      },
-      "locked": {
-        "lastModified": 1734141183,
-        "narHash": "sha256-bZQhcuk0C1OoVWQm0pH4rXXiUD6S6cB4GEWxFLKDa/I=",
-        "owner": "pyproject-nix",
-        "repo": "build-system-pkgs",
-        "rev": "8d629a268902659d5640a2c062ad2ad75615e6f8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "pyproject-nix",
-        "repo": "build-system-pkgs",
-        "type": "github"
-      }
-    },
-    "pyproject-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "bibli-ls",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1733540292,
-        "narHash": "sha256-UAW/Rs8hx6ai+lAv2c0fP21NXi3SWuJO9p0DNiEYS90=",
-        "owner": "pyproject-nix",
-        "repo": "pyproject.nix",
-        "rev": "e2393999b79ea26c1d399f8fcc34db4a01665e9b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "pyproject-nix",
-        "repo": "pyproject.nix",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "alejandra": "alejandra",
         "bash-env-json": "bash-env-json",
-        "bibli-ls": "bibli-ls",
         "catppuccin-bat": "catppuccin-bat",
         "catppuccin-cava": "catppuccin-cava",
         "chaotic": "chaotic",
@@ -1282,31 +1208,6 @@
       "original": {
         "owner": "e-tho",
         "repo": "ucodenix",
-        "type": "github"
-      }
-    },
-    "uv2nix": {
-      "inputs": {
-        "nixpkgs": [
-          "bibli-ls",
-          "nixpkgs"
-        ],
-        "pyproject-nix": [
-          "bibli-ls",
-          "pyproject-nix"
-        ]
-      },
-      "locked": {
-        "lastModified": 1734141123,
-        "narHash": "sha256-noOnK9DaeqknFpq0HDmY+BHVdsesPnUu3PxZGhW9AxE=",
-        "owner": "pyproject-nix",
-        "repo": "uv2nix",
-        "rev": "4da329bbefd8947c3fbc8f9eba540ab3c625331c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "pyproject-nix",
-        "repo": "uv2nix",
         "type": "github"
       }
     },
