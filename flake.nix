@@ -68,7 +68,7 @@
     };
 
     bibli-ls = {
-      url = "github:clementpoiret/bibli-ls";
+      url = "github:kha-dinh/bibli-ls";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -113,8 +113,6 @@
           flake = pkgs-flake;
         })
       ];
-
-      lib = nixpkgs.lib;
     in
     {
       overlays.default = selfPkgs.overlay;
