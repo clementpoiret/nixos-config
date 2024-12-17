@@ -21,7 +21,7 @@ let
   arch = {
     "desktop" = "x86-64-v3";
     "laptop" = "x86-64-v4";
-  }
+  };
 in
 {
   imports = [ inputs.ucodenix.nixosModules.default ];
