@@ -18,7 +18,8 @@
 
     hyprland = {
       #url = "github:hyprwm/Hyprland";
-      url = "github:hyprwm/Hyprland/v0.45.2?submodules=1";
+      # url = "github:hyprwm/Hyprland/v0.46.0?submodules=1";
+      url = "github:hyprwm/Hyprland/?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
