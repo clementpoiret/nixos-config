@@ -17,6 +17,11 @@ let
     "desktop" = "00870F10";
     "laptop" = "00A70F41";
   };
+
+  arch = {
+    "desktop" = "x86-64-v3";
+    "laptop" = "x86-64-v4";
+  }
 in
 {
   imports = [ inputs.ucodenix.nixosModules.default ];
@@ -128,8 +133,8 @@ in
   nixpkgs.config = {
     localSystem = {
       system = "x86_64-linux";
-      gcc.arch = "x86-64-v3";
-      gcc.tune = "x86-64-v3";
+      gcc.arch = arch.${host};
+      gcc.tune = arch.${host};
     };
   };
 }
