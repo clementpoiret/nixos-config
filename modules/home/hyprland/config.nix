@@ -17,6 +17,7 @@
         "swaync &"
         "wl-paste --watch cliphist store &"
         "toggle_light &"
+        "suspend &"
       ];
 
       input = {

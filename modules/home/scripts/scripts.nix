@@ -26,6 +26,8 @@ let
     builtins.readFile ./scripts/shutdown-script.sh
   );
 
+  suspend = pkgs.writeScriptBin "suspend" (builtins.readFile ./scripts/suspend.sh);
+
   show-keybinds = pkgs.writeScriptBin "show-keybinds" (builtins.readFile ./scripts/keybinds.sh);
 
   ascii = pkgs.writeScriptBin "ascii" (builtins.readFile ./scripts/ascii.sh);
@@ -53,6 +55,8 @@ in
     extract
 
     shutdown-script
+
+    suspend
 
     show-keybinds
 

@@ -121,6 +121,7 @@
       qalculate-gtk # calculator
       qFlipper
       rclone
+      swayidle
       tdf # read pdfs in terminal
       unzip
       via # keyboard config
