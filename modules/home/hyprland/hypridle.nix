@@ -22,7 +22,10 @@
               timeout = 300; # 5min
               on-timeout = "pidof hyprlock || hyprlock";
             }
-            # TODO: Fix systemd suspend on desktop
+            {
+              timeout = 900; # 15min
+              on-timeout = "systemctl suspend";
+            }
           ];
           laptopListeners = [
             {
@@ -34,10 +37,6 @@
               timeout = 330; # 5.5min
               on-timeout = "hyprctl dispatch dpms off";
               on-resume = "hyprctl dispatch dpms on";
-            }
-            {
-              timeout = 900; # 15min
-              on-timeout = "systemctl suspend";
             }
           ];
         in

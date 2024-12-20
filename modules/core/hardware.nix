@@ -74,8 +74,8 @@ in
   hardware.nvidia = lib.mkIf (host == "desktop") {
     package = config.boot.kernelPackages.nvidiaPackages.beta;
     modesetting.enable = true;
-    powerManagement.enable = false;
-    powerManagement.finegrained = false;
+    powerManagement.enable = true;
+    # powerManagement.finegrained = false;
     open = true;
     nvidiaSettings = true;
   };
