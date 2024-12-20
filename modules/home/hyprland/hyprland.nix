@@ -1,7 +1,11 @@
-{ inputs, lib, host, pkgs, config, ...}: 
-let
-  home = config.home.homeDirectory;
-in
+{
+  inputs,
+  lib,
+  host,
+  pkgs,
+  config,
+  ...
+}:
 {
   home.packages = with pkgs; [
     inputs.hypr-contrib.packages.${pkgs.system}.grimblast

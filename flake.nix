@@ -21,13 +21,17 @@
 
     hyprland = {
       url = "github:hyprwm/Hyprland/?submodules=1";
-      # url = "github:hyprwm/Hyprland/v0.46.1?submodules=1";
+      # url = "github:hyprwm/Hyprland/v0.46.2?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     hypr-contrib.url = "github:hyprwm/contrib";
     hyprcursor = {
       url = "github:hyprwm/hyprcursor";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hypridle = {
+      url = "github:hyprwm/hypridle";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprpicker = {
