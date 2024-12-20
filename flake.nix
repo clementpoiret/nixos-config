@@ -14,11 +14,14 @@
 
     ucodenix.url = "github:e-tho/ucodenix";
 
-    alejandra.url = "github:kamadorueda/alejandra/3.0.0";
+    alejandra = {
+      url = "github:kamadorueda/alejandra/3.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     hyprland = {
-      # url = "github:hyprwm/Hyprland/?submodules=1";
-      url = "github:hyprwm/Hyprland/v0.46.0?submodules=1";
+      url = "github:hyprwm/Hyprland/?submodules=1";
+      # url = "github:hyprwm/Hyprland/v0.46.1?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
