@@ -73,10 +73,14 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # TODO: Remove once fixed
+    espanso-fix.url = "github:pitkling/nixpkgs/espanso-fix-capabilities-export";
   };
 
   outputs =
     {
+      espanso-fix,
       fw-fanctrl,
       alejandra,
       chaotic,
@@ -125,6 +129,7 @@
             { nixpkgs.overlays = customOverlays; }
             ./hosts/desktop
             chaotic.nixosModules.default
+            espanso-fix.nixosModules.espanso-capdacoverride
           ];
           specialArgs = {
             host = "desktop";
@@ -138,6 +143,7 @@
             ./hosts/laptop
             fw-fanctrl.nixosModules.default
             chaotic.nixosModules.default
+            espanso-fix.nixosModules.espanso-capdacoverride
           ];
           specialArgs = {
             host = "laptop";

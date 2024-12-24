@@ -149,6 +149,22 @@
         "type": "github"
       }
     },
+    "espanso-fix": {
+      "locked": {
+        "lastModified": 1733174540,
+        "narHash": "sha256-Yv72ufzlbccsUgjnDtLfybPS4HJ7v3lN+pjmcH3/l+I=",
+        "owner": "pitkling",
+        "repo": "nixpkgs",
+        "rev": "2c39301457f9b5cb18a042a1f5643b15de551c79",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pitkling",
+        "ref": "espanso-fix-capabilities-export",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "fenix": {
       "inputs": {
         "nixpkgs": [
@@ -1145,6 +1161,7 @@
         "catppuccin-bat": "catppuccin-bat",
         "catppuccin-cava": "catppuccin-cava",
         "chaotic": "chaotic",
+        "espanso-fix": "espanso-fix",
         "fw-fanctrl": "fw-fanctrl",
         "home-manager": "home-manager_2",
         "hypr-contrib": "hypr-contrib",
