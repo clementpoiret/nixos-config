@@ -152,7 +152,7 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     opts = {
-      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "scope", "bibtex" },
+      extensions_list = { "themes", "terms", "file_browser", "project", "zoxide", "scope", "bibtex", "zk" },
       extensions = {
         project = {
           on_project_selected = function(prompt_bufnr)

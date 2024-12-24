@@ -17,6 +17,7 @@ local options = {
     terraform = { "terraform_fmt" },
     hcl = { "terraform_fmt" },
     rust = { "rustfmt" },
+    markdown = { "mdformat" },
   },
 
   -- format_on_save = {
