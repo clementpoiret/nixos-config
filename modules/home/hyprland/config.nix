@@ -65,7 +65,7 @@
         layers_hog_keyboard_focus = true;
         animate_manual_resizes = false;
         enable_swallow = true;
-        swallow_regex = "^(kitty)$";
+        swallow_regex = "^(ghostty)$";
         focus_on_activate = true;
         vrr = 0;
       };
@@ -154,8 +154,8 @@
         "$mainMod, F1, exec, show-keybinds"
 
         # keybindings
-        "$mainMod, Return, exec, kitty"
-        "ALT, Return, exec, kitty --title float_kitty"
+        "$mainMod, Return, exec, ghostty"
+        "ALT, Return, exec, ghostty --title=float_ghostty"
         "$mainMod, D, exec, fuzzel"
         "$mainMod, P, pseudo,"
         "$mainMod, Q, killactive,"
@@ -166,7 +166,7 @@
         "$mainMod, Escape, exec, hyprlock"
         "$mainMod SHIFT, Escape, exec, shutdown-script"
         "$mainMod, X, togglesplit,"
-        "$mainMod, E, exec, kitty -e yazi"
+        "$mainMod, E, exec, ghostty -e yazi"
         "$mainMod ALT, B, exec, toggle_waybar"
         "$mainMod, C, exec, hyprpicker -a"
         "$mainMod, W, exec, wallpaper-picker"
@@ -278,9 +278,9 @@
         "float,mpv"
         "center,mpv"
         "size 1200 725,mpv"
-        "float,title:^(float_kitty)$"
-        "center,title:^(float_kitty)$"
-        "size 950 600,title:^(float_kitty)$"
+        "float,title:^(float_ghostty)$"
+        "center,title:^(float_ghostty)$"
+        "size 950 600,title:^(float_ghostty)$"
         "float,audacious"
         "idleinhibit focus,mpv"
         "float,udiskie"

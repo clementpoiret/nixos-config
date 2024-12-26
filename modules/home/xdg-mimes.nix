@@ -11,7 +11,7 @@ let
     directory = [ "nemo.desktop" ];
     office = [ "libreoffice.desktop" ];
     pdf = [ "org.gnome.Evince.desktop" ];
-    terminal = [ "kitty.desktop" ];
+    terminal = [ "ghostty.desktop" ];
   };
 
   mimeMap = {
@@ -77,11 +77,13 @@ let
     terminal = [ "terminal" ];
   };
 
-  associations = with lists;
-    listToAttrs (flatten (mapAttrsToList
-      (key: map (type: attrsets.nameValuePair type defaultApps."${key}"))
-      mimeMap));
-in {
+  associations =
+    with lists;
+    listToAttrs (
+      flatten (mapAttrsToList (key: map (type: attrsets.nameValuePair type defaultApps."${key}")) mimeMap)
+    );
+in
+{
   xdg.configFile."mimeapps.list".force = true;
   xdg.mimeApps.enable = true;
   xdg.mimeApps.associations.added = associations;

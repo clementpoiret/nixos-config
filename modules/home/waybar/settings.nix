@@ -61,19 +61,19 @@
       format = "󰟜 {}%";
       format-alt = "󰟜 {used} GiB"; # 
       interval = 2;
-      on-click-right = "kitty --title float_kitty btop";
+      on-click-right = "ghostty --title=float_ghostty -e btop";
     };
     cpu = {
       format = "  {usage}%";
       format-alt = "  {avg_frequency} GHz";
       interval = 2;
-      on-click-right = "kitty --title float_kitty btop";
+      on-click-right = "ghostty --title=float_ghostty -e btop";
     };
     disk = {
       # path = "/";
       format = "󰋊 {percentage_used}%";
       interval = 60;
-      on-click-right = "kitty --title float_kitty btop";
+      on-click-right = "ghostty --title=float_ghostty -e btop";
     };
     network = {
       format-wifi = "  {signalStrength}%";
