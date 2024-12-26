@@ -5,7 +5,7 @@
     [
       aerc # for emails
       age # for my secrets
-      awscli2
+      stable.awscli2
       beeper
       bruno # for REST APIs tests
       bitwise # cli tool for bit / hex manipulation
@@ -32,7 +32,7 @@
       lsd # ls replacement
       lshw
       lz4
-      python312Packages.magic-wormhole # magic file transfer
+      # magic-wormhole # magic file transfer
       nitch # systhem fetch util
       nix-prefetch-github
       pciutils
@@ -42,6 +42,7 @@
       spotify-player
       toipe # typing test in the terminal
       tldr # user-friendly help
+      wormhole-william # magic wormhole in Go
       yarn
       zellij
       zenity
