@@ -44,7 +44,6 @@
       tldr # user-friendly help
       wormhole-william # magic wormhole in Go
       yarn
-      zellij
       zenity
 
       # C / C++

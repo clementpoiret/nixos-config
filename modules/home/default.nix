@@ -29,6 +29,7 @@
     ./waybar # status bar
     ./xdg-mimes.nix # default apps
     ./yazi.nix # terminal file manager
+    ./zellij/zellij.nix # terminal multiplexer
     ./zk/zk.nix # zettelkasten
     ./zsh/zsh.nix # shell
   ];
