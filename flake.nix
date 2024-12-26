@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-24.11";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     nur.url = "github:nix-community/NUR";
@@ -80,15 +81,16 @@
 
   outputs =
     {
+      self,
+      alejandra,
+      bash-env-json,
+      chaotic,
       espanso-fix,
       fw-fanctrl,
-      alejandra,
-      chaotic,
-      nixpkgs,
-      bash-env-json,
-      nixpkgs-master,
-      self,
       home-manager,
+      nixpkgs,
+      nixpkgs-master,
+      nixpkgs-stable,
       zen-browser,
       ...
     }@inputs:
@@ -105,15 +107,20 @@
         inherit system;
         config.allowUnfree = true;
       };
+      pkgs-stable = import nixpkgs-stable {
+        inherit system;
+        config.allowUnfree = true;
+      };
       pkgs-flake = {
         alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
-        zen-browser = zen-browser.packages.${system}.specific;
+        zen-browser = zen-browser.packages.${system}.default;
       };
 
       customOverlays = [
         (final: prev: {
           master = pkgs-master;
+          stable = pkgs-stable;
           flake = pkgs-flake;
         })
       ];
