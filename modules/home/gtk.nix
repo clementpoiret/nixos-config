@@ -26,7 +26,7 @@
       };
     };
     theme = {
-      name = "Catppuccin-Mocha-Compact-Lavender-Dark";
+      name = "catppuccin-mocha-lavender-compact";
       package = pkgs.catppuccin-gtk.override {
         accents = [ "lavender" ];
         size = "compact";
