@@ -5,6 +5,7 @@
   xdg.configFile."ghostty/config".text = ''
     theme = catppuccin-mocha 
     gtk-titlebar = false
-    # window-decoration = false
+    font-family = "FiraCode Nerd Font"
+    font-size = 10
   '';
 }
