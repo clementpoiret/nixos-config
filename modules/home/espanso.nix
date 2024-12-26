@@ -7,7 +7,7 @@
 
   # WARNING: You'll need to run the following commands to have the complete
   # setup:
-  # espanso install all-emojis
+  # espanso install basic-emojis
   # espanso install lorem
   # espanso install greek-letters-improved
   # espanso install math-symbols
