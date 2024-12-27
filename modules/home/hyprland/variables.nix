@@ -1,4 +1,6 @@
-{ pkgs, host, lib, ... }:
+{
+  ...
+}:
 {
   home.sessionVariables = {
     EDITOR = "neovide";
@@ -18,8 +20,8 @@
     QT_SCALE_FACTOR_ROUNDING_POLICY = "RoundPreferFloor";
     QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
     QT_QPA_PLATFORM = "wayland;xcb";
-    QT_QPA_PLATFORMTHEME = "qt5ct";
-    QT_STYLE_OVERRIDE = "kvantum";
+    # QT_QPA_PLATFORMTHEME = "qt5ct";
+    # QT_STYLE_OVERRIDE = "kvantum";
     MOZ_ENABLE_WAYLAND = "1";
     #WLR_BACKEND = "vulkan";
     #WLR_RENDERER = "vulkan";
@@ -28,7 +30,7 @@
     XDG_CURRENT_DESKTOP = "Hyprland";
     SDL_VIDEODRIVER = "wayland";
     CLUTTER_BACKEND = "wayland";
-    GTK_THEME = "Catppuccin-Mocha-Compact-Lavender-Dark";
+    # GTK_THEME = "Catppuccin-Mocha-Compact-Lavender-Dark";
     ELECTRON_OZONE_PLATFORM_HINT = "auto";
     # WLR_NO_HARDWARE_CURSORS = "0";
   };
@@ -38,12 +40,12 @@
   # home.sessionVariables.__GLX_VENDOR_LIBRARY_NAME = lib.mkIf (host == "desktop") "nvidia";
   # home.sessionVariables.NVD_BACKEND = lib.mkIf (host == "desktop") "direct";
 
-    # VDPAU_DRIVER = "nvidia";
-    # __NV_PRIME_RENDER_OFFLOAD = "1";
-    # __VK_LAYER_NV_optimus = "NVIDIA_only";
-    # PROTON_ENABLE_NGX_UPDATER = "1";
-    # WLR_USE_LIBINPUT = "1";
-    # XWAYLAND_NO_GLAMOR = "1";
-    # __GL_MaxFramesAllowed = "1";
-    # WLR_RENDERER_ALLOW_SOFTWARE = "1";
+  # VDPAU_DRIVER = "nvidia";
+  # __NV_PRIME_RENDER_OFFLOAD = "1";
+  # __VK_LAYER_NV_optimus = "NVIDIA_only";
+  # PROTON_ENABLE_NGX_UPDATER = "1";
+  # WLR_USE_LIBINPUT = "1";
+  # XWAYLAND_NO_GLAMOR = "1";
+  # __GL_MaxFramesAllowed = "1";
+  # WLR_RENDERER_ALLOW_SOFTWARE = "1";
 }

@@ -35,15 +35,35 @@
       };
     };
     cursorTheme = {
-      name = "Nordzy-cursors";
-      package = pkgs.nordzy-cursor-theme;
+      name = "Bibata-Modern-Ice";
+      package = pkgs.bibata-cursors;
       size = 22;
     };
   };
 
   home.pointerCursor = {
-    name = "Nordzy-cursors";
-    package = pkgs.nordzy-cursor-theme;
+    name = "Bibata-Modern-Ice";
+    package = pkgs.bibata-cursors;
     size = 22;
+    gtk.enable = true;
+    x11.enable = true;
+    hyprcursor = {
+      enable = true;
+      size = 22;
+    };
+  };
+
+  home.sessionVariables = {
+    XCURSOR_SIZE = 22;
+  };
+
+  # QT Theming
+  qt = {
+    enable = true;
+    platformTheme.name = "kvantum";
+    style = {
+      package = pkgs.catppuccin-kvantum;
+      name = "Catppuccin-Mocha-Lavender";
+    };
   };
 }

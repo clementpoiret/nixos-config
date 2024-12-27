@@ -11,7 +11,6 @@
         "nm-applet &"
         "wl-clip-persist --clipboard both"
         "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f) &"
-        "hyprctl setcursor Nordzy-cursors 22 &"
         "poweralertd &"
         "sleep 1 && waybar &"
         "swaync &"
@@ -40,9 +39,9 @@
       render = lib.mkIf (host == "desktop") { explicit_sync = false; };
 
       monitor = [
-        "eDP-2, 2560x1600@60, 0x0, 1.6"
+        "eDP-2, highres, 0x0, 1.6"
         "DP-1, 1920x1080, 0x0, 1"
-        "DP-3, 2240x1400, 1600x0, 1.6, transform, 0" # Vertical laptop screen
+        "DP-3, highres, 1600x0, 1.6, transform, 0" # Vertical laptop screen
         "HDMI-A-1, 1920x1080, 1920x0, 1"
       ];
 
