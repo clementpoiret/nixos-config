@@ -144,3 +144,9 @@ if require("zk.util").notebook_root(vim.fn.expand "%:p") ~= nil then
   -- Open the code actions for a visual selection.
   map("v", "<leader>za", ":'<,'>lua vim.lsp.buf.range_code_action()<CR>", opts)
 end
+
+-- Zellij
+map("n", "<leader>jf", "<cmd>ZellijNewPane<CR>", { desc = "Zellij new pane" })
+map("n", "<leader>jt", "<cmd>ZellijNewTab<CR>", { desc = "Zellij new tab" })
+map("n", "<leader>jo", "<cmd>ZellijNewPaneSplit<CR>", { desc = "Zellij new pane split" })
+map("n", "<leader>jv", "<cmd>ZellijNewPaneVSplit<CR>", { desc = "Zellij new pane vsplit" })

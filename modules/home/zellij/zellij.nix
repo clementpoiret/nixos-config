@@ -8,5 +8,8 @@
         [ "$ZELLIJ_THEMES" ]
         [ "${config.home.homeDirectory}/.config/zellij/themes/" ]
         (builtins.readFile ./config.kdl);
+
+    # Current version: 0.2.2rc1
+    ".config/zellij/plugins/zellij-autolock.wasm".source = ./plugins/zellij-autolock.wasm;
   };
 }

@@ -54,6 +54,19 @@ return {
 
   -- -- Third Party
   {
+    "https://github.com/fresh2dev/zellij.vim",
+    -- Pin version to avoid breaking changes.
+    -- tag = '0.3.*',
+    -- lazy = false,
+    event = "VeryLazy",
+    init = function()
+      -- Options:
+      -- vim.g.zelli_navigator_move_focus_or_tab = 1
+      -- vim.g.zellij_navigator_no_default_mappings = 1
+    end,
+  },
+
+  {
     "otavioschwanck/arrow.nvim",
     event = "VeryLazy",
     dependencies = {

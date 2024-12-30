@@ -1,4 +1,4 @@
-{ pkgs, ... }: 
+{ pkgs, ... }:
 {
   programs.dconf.enable = true;
   programs.zsh.enable = true;
@@ -22,5 +22,5 @@
     # askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
   };
 
-  environment.variables.EDITOR = "neovide";
+  environment.variables.EDITOR = "nvim";
 }

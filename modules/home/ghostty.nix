@@ -11,5 +11,6 @@
     # font-family = "TX-02"
     font-size = 10
     copy-on-select = true
+    confirm-close-surface = false
   '';
 }

@@ -8,7 +8,7 @@
     extraLuaPackages = ps: [ ps.magick ];
   };
 
-  home.sessionVariables.EDITOR = "neovide";
+  home.sessionVariables.EDITOR = "nvim";
 
   home.packages = with pkgs; [
     lua-language-server
