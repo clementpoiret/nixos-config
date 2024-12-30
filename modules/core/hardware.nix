@@ -54,7 +54,10 @@ in
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
   '';
 
-  hardware.graphics.enable = true;
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
   hardware.enableRedistributableFirmware = true;
   hardware.graphics.extraPackages =
     with pkgs;

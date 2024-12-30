@@ -7,7 +7,7 @@
       age # for my secrets
       stable.awscli2
       beeper
-      bruno # for REST APIs tests
+      stable.bruno # for REST APIs tests
       bitwise # cli tool for bit / hex manipulation
       dconf-editor
       dmidecode
