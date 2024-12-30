@@ -8,8 +8,8 @@
   color: @text;
 
   all: unset;
-  font-size: 14px;
-  font-family: "JetBrains Mono Nerd Font 10";
+  font-size: 12px;
+  font-family: "TX02 Nerd Font Mono";
   transition: 200ms;
 }
 

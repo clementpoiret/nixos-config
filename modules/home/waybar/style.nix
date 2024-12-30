@@ -1,9 +1,9 @@
 { ... }:
 let
   custom = {
-    font = "JetBrainsMono Nerd Font";
-    font_size = "12px";
-    font_weight = "bold";
+    font = "TX02 Nerd Font Mono";
+    font_size = "11px";
+    font_weight = "600";
     text_color = "#cdd6f4";
     secondary_accent = "#89b4fa";
     tertiary_accent = "#f5f5f5";

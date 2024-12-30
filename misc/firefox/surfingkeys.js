@@ -206,7 +206,7 @@ addSearchAlias("gh", "github", "https://github.com/search?q=", "s");
 
 // theme
 const hintsCss =
-  "font-size: 12pt; font-family: 'JetBrainsMono Nerd Font', 'Cascadia Code', 'Helvetica Neue', Helvetica, Arial, sans-serif; border: 0px; color: #b4befe !important; background: #1e1e2e !important; background-color: #1e1e2e !important";
+  "font-size: 12pt; font-family: 'TX02 Nerd Font Mono' 'JetBrainsMono Nerd Font', 'Cascadia Code', 'Helvetica Neue', Helvetica, Arial, sans-serif; border: 0px; color: #b4befe !important; background: #1e1e2e !important; background-color: #1e1e2e !important";
 
 //Hints.style(
 //  "border: solid 2px #313244; color:#b4befe; background: initial; background-color: #1e1e2e;",
@@ -225,7 +225,7 @@ settings.theme = `
     color: #cdd6f4;
     background: #1e1e2e !important;
     height: 50% !important;
-    font-family: 'JetBrainsMono Nerd Font', monospace !important;
+    font-family: 'TX02 Nerd Font Mono', monospace !important;
   }
   .sk_theme {
     background: #1e1e2e;
@@ -271,7 +271,7 @@ settings.theme = `
   body {
     margin: 0;
 
-    font-family: "JetBrainsMono Nerd Font", "Cascadia Code", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "TX02 Nerd Font Mono" "JetBrainsMono Nerd Font", "Cascadia Code", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 12px;
   }
   #sk_omnibar {
@@ -478,7 +478,7 @@ settings.theme = `
     white-space: nowrap;
     display: inline-block;
     padding: 3px 5px;
-    font: 11px "JetBrains Mono NL", "Cascadia Code", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font: 11px "TX02 Nerd Font Mono" "JetBrains Mono NL", "Cascadia Code", "Helvetica Neue", Helvetica, Arial, sans-serif;
     line-height: 10px;
     vertical-align: middle;
     border: solid 1px #585b70;

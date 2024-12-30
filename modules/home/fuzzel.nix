@@ -4,7 +4,8 @@
     enable = true;
     settings = {
       main = {
-        font = "JetBrainsMono Nerd Font:weight=bold:size=14";
+        # font = "JetBrainsMono Nerd Font:weight=bold:size=14";
+        font = "TX02 Nerd Font Mono:weight=bold:size=12";
         line-height = 25;
         fields = "name,generic,comment,categories,filename,keywords";
         terminal = "ghostty";
