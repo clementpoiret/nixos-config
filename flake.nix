@@ -49,8 +49,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    ghostty.url = "github:ghostty-org/ghostty";
-
     catppuccin-bat = {
       url = "github:catppuccin/bat";
       flake = false;
@@ -90,7 +88,6 @@
       chaotic,
       espanso-fix,
       fw-fanctrl,
-      ghostty,
       home-manager,
       nixpkgs,
       nixpkgs-master,
@@ -118,7 +115,6 @@
       pkgs-flake = {
         alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
-        ghostty = ghostty.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
       };
 
