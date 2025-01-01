@@ -1,9 +1,12 @@
-{ ... }: 
+{ ... }:
 {
   services = {
     gvfs.enable = true;
     gnome.gnome-keyring.enable = true;
-    dbus.enable = true;
+    dbus = {
+      enable = true;
+      implementation = "broker";
+    };
     #fstrim.enable = true;
   };
   services.logind.extraConfig = ''
