@@ -911,9 +911,14 @@ $env.config = {
     ]
 }
 
+# Start hyprland
+if (^uwsm check may-start | complete).exit_code == 0 {
+    ^uwsm start hyprland-uwsm.desktop
+}
+
 # zellij
 def start_zellij [] {
-  if 'ZELLIJ' not-in ($env | columns) {
+  if (not ($env.TERM == "linux")) and ('ZELLIJ' not-in ($env | columns)) {
     if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
       zellij attach -c
     } else {

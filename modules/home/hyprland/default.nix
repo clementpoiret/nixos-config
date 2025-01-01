@@ -5,6 +5,5 @@
     ./config.nix
     ./hypridle.nix
     ./hyprlock.nix
-    ./variables.nix
   ];
 }

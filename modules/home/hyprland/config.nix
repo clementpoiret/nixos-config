@@ -5,17 +5,15 @@
 
       # autostart
       exec-once = [
-        "systemctl --user import-environment &"
-        "hash dbus-update-activation-environment 2>/dev/null &"
-        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &"
-        "nm-applet &"
+        "systemctl --user import-environment"
+        "nm-applet"
         "wl-clip-persist --clipboard both"
-        "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f) &"
-        "poweralertd &"
-        "sleep 1 && waybar &"
-        "swaync &"
-        "wl-paste --watch cliphist store &"
-        "toggle_light &"
+        "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f)"
+        "poweralertd"
+        "sleep 1 && waybar"
+        "swaync"
+        "wl-paste --watch cliphist store"
+        "toggle_light"
       ];
 
       input = {
