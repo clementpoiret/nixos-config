@@ -146,7 +146,7 @@ if require("zk.util").notebook_root(vim.fn.expand "%:p") ~= nil then
 end
 
 -- Zellij
-map("n", "<leader>jf", "<cmd>ZellijNewPane<CR>", { desc = "Zellij new pane" })
-map("n", "<leader>jt", "<cmd>ZellijNewTab<CR>", { desc = "Zellij new tab" })
-map("n", "<leader>jo", "<cmd>ZellijNewPaneSplit<CR>", { desc = "Zellij new pane split" })
-map("n", "<leader>jv", "<cmd>ZellijNewPaneVSplit<CR>", { desc = "Zellij new pane vsplit" })
+map("n", "<M-z>jf", "<cmd>ZellijNewPane<CR>", { desc = "Zellij new pane" })
+map("n", "<M-z>jt", "<cmd>ZellijNewTab<CR>", { desc = "Zellij new tab" })
+map("n", "<M-z>jo", "<cmd>ZellijNewPaneSplit<CR>", { desc = "Zellij new pane split" })
+map("n", "<M-z>jv", "<cmd>ZellijNewPaneVSplit<CR>", { desc = "Zellij new pane vsplit" })

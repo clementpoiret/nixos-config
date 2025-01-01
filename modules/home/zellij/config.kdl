@@ -27,9 +27,7 @@ keybinds clear-defaults=true {
     }
   }
   locked {
-    bind "Ctrl g" { SwitchToMode "Normal"; }
-
-    bind "Alt z" {
+    bind "Ctrl g" {
       // Disable the autolock plugin.
       MessagePlugin "autolock" {payload "disable";};
       // Unlock Zellij.
@@ -174,7 +172,6 @@ keybinds clear-defaults=true {
   shared_except "locked" {
     // Put keybindings here if they conflict with Vim or others.
 
-    bind "Ctrl g" { SwitchToMode "Locked"; }
     bind "Alt n" { NewPane; }
     bind "Alt h" "Alt Left" { MoveFocusOrTab "Left"; }
     bind "Alt l" "Alt Right" { MoveFocusOrTab "Right"; }
@@ -185,7 +182,7 @@ keybinds clear-defaults=true {
     bind "Alt [" { PreviousSwapLayout; }
     bind "Alt ]" { NextSwapLayout; }
 
-    bind "Alt z" {
+    bind "Ctrl g" {
       // Disable the autolock plugin.
       MessagePlugin "autolock" {payload "disable";};
       // Lock Zellij.
@@ -193,12 +190,10 @@ keybinds clear-defaults=true {
     }
 
     bind "Ctrl h" {
-      // MoveFocusOrTab "Left";
-      MoveFocus "Left";
+      MoveFocusOrTab "Left";
     }
     bind "Ctrl l" {
-      // MoveFocusOrTab "Right";
-      MoveFocus "Right";
+      MoveFocusOrTab "Right";
     }
     bind "Ctrl j" {
       MoveFocus "Down";

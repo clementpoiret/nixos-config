@@ -12,4 +12,5 @@
     # Current version: 0.2.2rc1
     ".config/zellij/plugins/zellij-autolock.wasm".source = ./plugins/zellij-autolock.wasm;
   };
+  home.sessionVariables.ZELLIJ_AUTO_ATTACH = "true";
 }
