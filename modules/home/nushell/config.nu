@@ -917,18 +917,18 @@ if (^uwsm check may-start | complete).exit_code == 0 {
 }
 
 # zellij
-def start_zellij [] {
-  if (not ($env.TERM == "linux")) and ('ZELLIJ' not-in ($env | columns)) {
-    if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
-      zellij attach -c
-    } else {
-      zellij
-    }
-
-    if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
-      exit
-    }
-  }
-}
-
-start_zellij
+# def start_zellij [] {
+#   if (not ($env.TERM == "linux")) and ('ZELLIJ' not-in ($env | columns)) {
+#     if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
+#       zellij attach -c
+#     } else {
+#       zellij
+#     }
+#
+#     if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
+#       exit
+#     }
+#   }
+# }
+#
+# start_zellij

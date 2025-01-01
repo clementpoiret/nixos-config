@@ -151,8 +151,9 @@
         "$mainMod, F1, exec, show-keybinds"
 
         # keybindings
-        "$mainMod, Return, exec, ghostty"
-        "ALT, Return, exec, ghostty --title=float_ghostty"
+        "$mainMod, Return, exec, ghostty -e zellij a -c --index 0"
+        "$mainMod SHIFT, Return, exec, ghostty -e zellij"
+        "ALT, Return, exec, ghostty"
         "$mainMod, D, exec, fuzzel"
         "$mainMod, P, pseudo,"
         "$mainMod, Q, killactive,"
@@ -172,7 +173,7 @@
         "$mainMod, N, exec, swaync-client -t"
         "$mainMod, O, exec, export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH; obsidian"
         #"$mainMod, SEMICOLON, exec, emacsclient -c -a 'emacs'"
-        "$mainMod, SEMICOLON, exec, ghostty -e nvim"
+        "$mainMod, SEMICOLON, exec, ghostty -e zellij --layout nvim"
 
         # screenshot
         "$mainMod, Print, exec, grimblast --notify --cursor --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"

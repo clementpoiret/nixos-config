@@ -2,6 +2,7 @@
 {
   programs.zellij.enable = true;
   home.file = {
+    ".config/zellij/layouts/nvim.kdl".source = ./layouts/nvim.kdl;
     ".config/zellij/themes/catppuccin.yaml".source = ./themes/catppuccin.yaml;
     ".config/zellij/config.kdl".text =
       builtins.replaceStrings

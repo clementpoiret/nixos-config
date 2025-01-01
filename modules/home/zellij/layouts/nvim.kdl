@@ -1,0 +1,11 @@
+// Very simple convenient layout to run w/ `ghostty -e`
+
+layout {
+  pane size=1 borderless=true {
+    plugin location="zellij:tab-bar"
+  }
+  pane command="nvim" close_on_exit=true
+  pane size=1 borderless=true {
+    plugin location="zellij:status-bar"
+  }
+}

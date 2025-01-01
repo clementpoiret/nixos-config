@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  home.packages = with pkgs; [ ghostty ];
+  home.packages = with pkgs; [ master.ghostty ];
 
   xdg.configFile."ghostty/config".text = ''
     theme = catppuccin-mocha 
