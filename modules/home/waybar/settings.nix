@@ -106,6 +106,7 @@
     };
     power-profiles-daemon = {
       format = "{icon}";
+      exec-if = "which powerprofilesctl";
       tooltip-format = ''
         Power profile: {profile}
         Driver: {driver}'';

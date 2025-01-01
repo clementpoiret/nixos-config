@@ -2,8 +2,8 @@
 let
   custom = {
     font = "TX02 Nerd Font Mono";
-    font_size = "11px";
-    font_weight = "600";
+    font_size = "12px";
+    font_weight = "500";
     text_color = "#cdd6f4";
     secondary_accent = "#89b4fa";
     tertiary_accent = "#f5f5f5";

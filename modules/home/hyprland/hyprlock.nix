@@ -71,6 +71,9 @@
       outer_color = $accent
       inner_color = $surface0
       font_color = $text
+      font_family = $font
+      font_weight = 400
+      font_size = 14
       fade_on_empty = false
       placeholder_text = <span foreground="##$textAlpha"><i>󰌾  Logged in as </i><span foreground="##$accentAlpha">$USER</span></span>
       hide_input = false
