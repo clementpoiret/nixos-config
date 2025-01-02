@@ -6,10 +6,12 @@
       # autostart
       exec-once = [
         "systemctl --user import-environment"
+        "uwsm finalize"
         "nm-applet"
         "wl-clip-persist --clipboard both"
         "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f)"
         "poweralertd"
+        "systemctl --user enable --now hypridle.service"
         "sleep 1 && waybar"
         "swaync"
         "wl-paste --watch cliphist store"
