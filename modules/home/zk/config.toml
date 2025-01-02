@@ -46,6 +46,18 @@ paths = ["permanent"]
 [group.permanent.note]
 template = "permanent.md"
 
+[group.project]
+paths = ["project"]
+
+[group.project.note]
+template = "project.md"
+
+[group.structure]
+paths = ["structure"]
+
+[group.structure.note]
+template = "structure.md"
+
 [group.fleeting]
 paths = ["fleeting"]
 
@@ -103,9 +115,13 @@ t = "zk edit --interactive --tag $@"
 # new fleeting entry
 nef = 'zk new --no-input "$ZK_NOTEBOOK_DIR/fleeting" --title $@'
 nep = 'zk new --no-input "$ZK_NOTEBOOK_DIR/permanent" --title $@'
+neproj = 'zk new --no-input "$ZK_NOTEBOOK_DIR/project" --title $@'
+nes = 'zk new --no-input "$ZK_NOTEBOOK_DIR/structure" --title $@'
 
 fleetings = "zk edit --sort created- $ZK_NOTEBOOK_DIR/fleeting --interactive"
 permanents = "zk edit --sort created- $ZK_NOTEBOOK_DIR/permanent --interactive"
+projects = "zk edit --sort created- $ZK_NOTEBOOK_DIR/project --interactive"
+structures = "zk edit --sort created- $ZK_NOTEBOOK_DIR/structure --interactive"
 
 # update zk notes
 #update = "cd $ZK_NOTEBOOK_DIR; git add -A; git commit -am 'updating'; git push; cd -"

@@ -21,11 +21,4 @@ in
   home.sessionVariables = {
     ZK_NOTEBOOK_DIR = dir;
   };
-
-  home.file."Sync/Notes/zk/permanent/.bibli.toml".text = ''
-    [backends]
-    [backends.library]
-    backend_type = "bibfile"
-    bibfiles = ["${config.home.homeDirectory}/Sync/Bibliography/library.bib"]
-  '';
 }
