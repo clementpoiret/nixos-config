@@ -63,7 +63,9 @@ in
     with pkgs;
     lib.mkIf (host == "laptop") [
       amdvlk
-      rocmPackages.clr
+      # TODO: Switch back to unstable after the following issue is fixed:
+      # https://github.com/NixOS/nixpkgs/issues/369433
+      stable.rocmPackages.clr
     ];
   hardware.graphics.extraPackages32 =
     with pkgs;
