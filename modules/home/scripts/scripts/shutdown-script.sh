@@ -1,17 +1,20 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
-respond="$(echo " Shutdown\n Restart\n Logout\n Cancel" | fuzzel --dmenu --lines=4 --width=10 --prompt='')"
+respond="$(echo -e " Shutdown\n Restart\n Suspend\n Logout\n Cancel" | fuzzel --dmenu --lines=5 --width=11 --prompt='')"
 
-if [ $respond = " Shutdown" ]
-then
+if [ "$respond" = " Shutdown" ]; then
     echo "shutdown"
-	shutdown now
-elif [ $respond = " Restart" ]
-then
+    shutdown now
+elif [ "$respond" = " Restart" ]; then
     echo "restart"
     reboot
-elif [ $respond = " Logout" ]
-then
+elif [ "$respond" = " Suspend" ]; then
+    echo "suspend"
+    systemctl suspend
+elif [ "$respond" = " Logout" ]; then
     echo "logout"
-    loginctl terminate-user ""
+    loginctl terminate-user "$USER"
+elif [ "$respond" = " Cancel" ]; then
+    echo "cancel"
+    exit 0
 fi
