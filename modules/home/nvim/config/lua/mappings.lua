@@ -10,8 +10,14 @@ map("i", "jk", "<ESC>")
 -- cursor
 map("n", "j", "jzz", { desc = "Next line and center cursor" })
 map("n", "k", "kzz", { desc = "Previous line and center cursor" })
+map("n", "<C-u>", "<C-u>zz", { desc = "Half page up and center cursor" })
+map("n", "<C-d>", "<C-d>zz", { desc = "Half page down and center cursor" })
 map("n", "n", "nzzzv", { desc = "Find next and center cursor" })
 map("n", "N", "Nzzzv", { desc = "Find previous and center cursor" })
+
+-- Moving lines
+map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selected lines down" })
+map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selected lines up" })
 
 -- Selection trick, useful for vimcmdline
 map("n", "vl", "^v$", { desc = "Select from cursor to the end of line" })
