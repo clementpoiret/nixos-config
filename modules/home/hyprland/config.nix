@@ -256,6 +256,7 @@
         ",XF86AudioStop, exec, playerctl stop"
         "$mainMod, mouse_down, workspace, e-1"
         "$mainMod, mouse_up, workspace, e+1"
+        "$mainMod, S, exec, select-sink"
 
         # laptop brigthness
         #",XF86MonBrightnessUp, exec, brightnessctl set 5%+"

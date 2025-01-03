@@ -22,6 +22,8 @@ let
   compress = pkgs.writeScriptBin "compress" (builtins.readFile ./scripts/compress.sh);
   extract = pkgs.writeScriptBin "extract" (builtins.readFile ./scripts/extract.sh);
 
+  select-sink = pkgs.writeScriptBin "select-sink" (builtins.readFile ./scripts/select-sink.sh);
+
   shutdown-script = pkgs.writeScriptBin "shutdown-script" (
     builtins.readFile ./scripts/shutdown-script.sh
   );
@@ -51,6 +53,8 @@ in
 
     compress
     extract
+
+    select-sink
 
     shutdown-script
 
