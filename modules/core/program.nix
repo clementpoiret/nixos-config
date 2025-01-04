@@ -3,7 +3,10 @@
   programs.dconf.enable = true;
   programs.zsh.enable = true;
 
-  services.udev.packages = [ pkgs.yubikey-personalization ];
+  services.udev.packages = with pkgs; [
+    qmk-udev-rules
+    yubikey-personalization
+  ];
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;

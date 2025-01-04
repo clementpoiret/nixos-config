@@ -120,6 +120,7 @@
       pueue # manage long running tasks
       qalculate-gtk # calculator
       qFlipper
+      qmk
       rclone
       tdf # read pdfs in terminal
       unzip
