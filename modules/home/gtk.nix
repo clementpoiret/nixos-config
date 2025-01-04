@@ -15,7 +15,7 @@
   gtk = {
     enable = true;
     font = {
-      name = "TX02 Nerd Font Mono";
+      name = "TX02 Nerd Font Mono Ret";
       size = 11;
     };
     iconTheme = {
