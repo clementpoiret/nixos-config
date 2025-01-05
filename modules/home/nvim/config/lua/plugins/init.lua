@@ -3,6 +3,11 @@ return {
   -- General
   -- -- NvChad
   {
+    "hrsh7th/nvim-cmp",
+    enabled = false, -- replaced by blink.cmp
+  },
+
+  {
     "stevearc/conform.nvim",
     event = "BufWritePre", -- uncomment for format on save
     opts = require "configs.conform",
@@ -53,6 +58,30 @@ return {
   { import = "nvcommunity.git.neogit" },
 
   -- -- Third Party
+  {
+    "saghen/blink.cmp",
+    event = "VeryLazy",
+    dependencies = "rafamadriz/friendly-snippets",
+    version = "*",
+
+    opts = {
+      keymap = { preset = "default" },
+
+      appearance = {
+        -- Will be removed in a future release
+        use_nvim_cmp_as_default = true,
+        nerd_font_variant = "normal",
+      },
+
+      sources = {
+        default = { "lsp", "path", "snippets", "buffer" },
+      },
+
+      signature = { enabled = true },
+    },
+    opts_extend = { "sources.default" },
+  },
+
   {
     "https://github.com/fresh2dev/zellij.vim",
     -- Pin version to avoid breaking changes.
@@ -324,13 +353,12 @@ return {
     "yetone/avante.nvim",
     event = "VeryLazy",
     lazy = true,
-    version = false, -- set this if you want to always pull the latest change
+    version = "*", -- set this if you want to always pull the latest change
     opts = {
       -- add any opts here
     },
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-    build = "make",
-    -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
+    -- build = "make",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "stevearc/dressing.nvim",

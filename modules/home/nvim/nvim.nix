@@ -15,10 +15,7 @@
     stylua
 
     # python
-    python312Packages.black
-    python312Packages.flake8
-    python312Packages.isort
-    python312Packages.python-lsp-server
+    pylyzer
     ruff
 
     # gui if needed
