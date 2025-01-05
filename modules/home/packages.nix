@@ -89,6 +89,7 @@
       # aider-chat
       aria2
       bleachbit # cache cleaner
+      bluetuith
       chromium
       devenv # reproducible dev env based on nix
       drawio
