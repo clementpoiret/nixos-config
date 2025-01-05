@@ -1,7 +1,7 @@
 { ... }:
 let
   custom = {
-    font = "TX02 Nerd Font Mono";
+    font = "TX02 Nerd Font";
     font_size = "12px";
     font_weight = "500";
     text_color = "#cdd6f4";

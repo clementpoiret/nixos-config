@@ -6,7 +6,7 @@
     themeFile = "Catppuccin-Mocha";
 
     font = {
-      name = "TX02 Nerd Font Mono Ret";
+      name = "TX02 Nerd Font Ret";
       size = 11;
     };
 

@@ -51,7 +51,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- Settings for Neovide
 if vim.g.neovide then
   -- Font configuration
-  vim.o.guifont = "TX02 Nerd Font Mono Ret:h11" -- Set font and size
+  vim.o.guifont = "TX02 Nerd Font Ret:h11" -- Set font and size
 
   -- Visual settings
   -- vim.g.neovide_floating_blur_amount_x = 2.0 -- Blur for floating windows

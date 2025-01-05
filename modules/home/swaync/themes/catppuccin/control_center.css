@@ -9,7 +9,7 @@
 
   all: unset;
   font-size: 12px;
-  font-family: "TX02 Nerd Font Mono";
+  font-family: "TX02 Nerd Font";
   transition: 200ms;
 }
 

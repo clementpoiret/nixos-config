@@ -13,7 +13,7 @@
     $textAlpha = cdd6f4
     $accent = $lavender
     $accentAlpha = $mauveAlpha
-    $font = TX02 Nerd Font Mono
+    $font = TX02 Nerd Font
     # GENERAL
     general {
       disable_loading_bar = true
