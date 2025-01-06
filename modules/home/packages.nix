@@ -128,7 +128,7 @@
       via # keyboard config
       wget
       wl-clipboard
-      master.wush # transfer between computers
+      stable.wush # transfer between computers, stable to have v0.3.0
       master.cliphist
       xdg-utils
       xxd
