@@ -16,6 +16,7 @@
         width = 35;
         horizontal-pad = 25;
         inner-pad = 5;
+        launch-prefix = "uwsm-app --";
       };
       colors = {
         background = "1e1e2ecc";

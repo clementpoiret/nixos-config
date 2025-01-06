@@ -9,6 +9,7 @@
   };
 
   programs.uwsm.enable = true;
+  environment.variables.UWSM_USE_SESSION_SLICE = "true";
 
   xdg.portal = {
     enable = true;
