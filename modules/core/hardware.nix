@@ -65,7 +65,7 @@ in
       amdvlk
       # TODO: Switch back to unstable after the following issue is fixed:
       # https://github.com/NixOS/nixpkgs/issues/369433
-      stable.rocmPackages.clr
+      rocmPackages.clr
     ];
   hardware.graphics.extraPackages32 =
     with pkgs;

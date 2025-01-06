@@ -5,9 +5,9 @@
     [
       aerc # for emails
       age # for my secrets
-      stable.awscli2
+      awscli2
       beeper
-      stable.bruno # for REST APIs tests
+      bruno # for REST APIs tests
       bitwise # cli tool for bit / hex manipulation
       dconf-editor
       dmidecode
