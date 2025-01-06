@@ -237,6 +237,7 @@ return {
       bigfile = { enabled = true },
       bufdelete = { enabled = true },
       gitbrowse = { enabled = true },
+      lazygit = { enabled = true },
       notifier = { enabled = true },
       notify = { enabled = true },
       quickfile = { enabled = true },

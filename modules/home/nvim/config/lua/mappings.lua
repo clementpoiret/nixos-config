@@ -86,7 +86,8 @@ map(
   ":lua require'telescope'.extensions.project.project{}<CR>",
   { desc = "Manage Projects", noremap = true, silent = true }
 )
-map("n", "<C-x>g", ":Neogit<CR>")
+-- map("n", "<C-x>g", ":Neogit<CR>")
+map("n", "<C-x>g", "<cmd>lua require'snacks'.lazygit()<CR>")
 
 -- Nvim DAP
 map("n", "<Leader>dl", "<cmd>lua require'dap'.step_into()<CR>", { desc = "Debugger step into" })
@@ -152,7 +153,7 @@ if require("zk.util").notebook_root(vim.fn.expand "%:p") ~= nil then
 end
 
 -- Zellij
-map("n", "<M-z>jf", "<cmd>ZellijNewPane<CR>", { desc = "Zellij new pane" })
-map("n", "<M-z>jt", "<cmd>ZellijNewTab<CR>", { desc = "Zellij new tab" })
-map("n", "<M-z>jo", "<cmd>ZellijNewPaneSplit<CR>", { desc = "Zellij new pane split" })
-map("n", "<M-z>jv", "<cmd>ZellijNewPaneVSplit<CR>", { desc = "Zellij new pane vsplit" })
+map("n", "<C-a><C-a>", "<cmd>ZellijNewPane<CR>", { desc = "Zellij new pane" })
+map("n", "<C-a>t", "<cmd>ZellijNewTab<CR>", { desc = "Zellij new tab" })
+map("n", "<C-a>h", "<cmd>ZellijNewPaneSplit<CR>", { desc = "Zellij new pane split" })
+map("n", "<C-a>n", "<cmd>ZellijNewPaneVSplit<CR>", { desc = "Zellij new pane vsplit" })
