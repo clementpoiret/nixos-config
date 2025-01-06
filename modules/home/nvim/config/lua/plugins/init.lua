@@ -59,6 +59,16 @@ return {
 
   -- -- Third Party
   {
+    "m4xshen/autoclose.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("autoclose").setup {
+        options = { pair_spaces = true },
+      }
+    end,
+  },
+
+  {
     "saghen/blink.cmp",
     event = "VeryLazy",
     dependencies = "rafamadriz/friendly-snippets",
