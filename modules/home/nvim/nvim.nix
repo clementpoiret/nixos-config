@@ -15,6 +15,7 @@
     stylua
 
     # python
+    basedpyright
     pylyzer
     ruff
 
