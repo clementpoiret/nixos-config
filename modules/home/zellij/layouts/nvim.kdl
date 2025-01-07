@@ -5,9 +5,10 @@ layout {
     plugin location="zellij:tab-bar"
   }
   pane {
-      command "nu"
-      args "-e nvim"
-      close_on_exit true 
+    name "nvim"
+    command "nu"
+    args "-e nvim"
+    close_on_exit true 
   }
   pane size=1 borderless=true {
     plugin location="zellij:status-bar"
