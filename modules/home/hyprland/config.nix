@@ -1,4 +1,18 @@
 { lib, host, ... }:
+let
+  monitors =
+    if (host == "desktop") then
+      [
+        "HDMI-A-1, 1920x1080, auto, 1"
+        "DP-1, 1920x1080, auto-left, 1"
+        "DP-2, 1920x1080, auto-right, 1, transform, 1"
+      ]
+    else
+      [
+        "eDP-2, highres, auto, 1.6"
+        "DP-3, highres, auto-right, 1.6, transform, 0"
+      ];
+in
 {
   wayland.windowManager.hyprland = {
     settings = {
@@ -39,11 +53,9 @@
       render = lib.mkIf (host == "desktop") { explicit_sync = false; };
 
       monitor = [
-        "eDP-2, highres, 0x0, 1.6"
-        "DP-1, 1920x1080, 0x0, 1"
-        "DP-3, highres, 1600x0, 1.6, transform, 0" # Vertical laptop screen
-        "HDMI-A-1, 1920x1080, 1920x0, 1"
-      ];
+        # General rule
+        ", preferred, auto, 1"
+      ] ++ monitors;
 
       general = {
         "$mainMod" = "SUPER";
