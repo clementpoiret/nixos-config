@@ -7,7 +7,7 @@ layout {
   pane {
     name "nvim"
     command "nu"
-    args "-e nvim"
+    args "-c nvim"
     close_on_exit true 
   }
   pane size=1 borderless=true {
