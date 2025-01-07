@@ -331,7 +331,7 @@ return {
 
   -- -- Notes and TODOs
   {
-    "clementpoiret/dooing",
+    "atiladefreitas/dooing",
     event = "VeryLazy",
     lazy = true,
     config = function()
