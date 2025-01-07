@@ -1,13 +1,10 @@
 {
   config,
-  host,
-  inputs,
   lib,
   pkgs,
   ...
 }:
 let
-  home = config.home.homeDirectory;
   profileDirectory = config.home.profileDirectory;
 in
 {
