@@ -64,6 +64,10 @@ return {
     config = function()
       require("autoclose").setup {
         options = { pair_spaces = true },
+        keys = {
+          -- Because this breaks zk's LSP suggestions
+          ["["] = { escape = false, close = true, pair = "[]", disabled_filetypes = { "markdown" } },
+        },
       }
     end,
   },
@@ -118,18 +122,6 @@ return {
       window = {
         border = "rounded",
       },
-    },
-  },
-
-  {
-    "rmagatti/auto-session",
-    lazy = false,
-
-    ---enables autocomplete for opts
-    ---@module "auto-session"
-    ---@type AutoSession.Config
-    opts = {
-      suppressed_dirs = { "~/", "~/Downloads", "/" },
     },
   },
 
