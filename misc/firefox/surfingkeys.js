@@ -196,6 +196,7 @@ removeSearchAlias("y", "s");
 removeSearchAlias("s", "s");
 
 addSearchAlias("k", "kagi", "https://kagi.com/search?q=", "s");
+addSearchAlias("g", "github", "https://github.com/search?q=", "s");
 addSearchAlias(
   "n",
   "nixp",
