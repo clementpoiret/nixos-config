@@ -19,22 +19,22 @@
         let
           commonListeners = [
             {
-              timeout = 300; # 5min
+              timeout = 600; # 10min
               on-timeout = "pidof hyprlock || hyprlock";
             }
             {
-              timeout = 900; # 15min
+              timeout = 1200; # 20min
               on-timeout = "systemctl suspend";
             }
           ];
           laptopListeners = [
             {
-              timeout = 150; # 2.5min.
+              timeout = 180; # 3min.
               on-timeout = "brightnessctl -s set 10";
               on-resume = "brightnessctl -r";
             }
             {
-              timeout = 330; # 5.5min
+              timeout = 360; # 6min
               on-timeout = "hyprctl dispatch dpms off";
               on-resume = "hyprctl dispatch dpms on";
             }
