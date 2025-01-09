@@ -34,7 +34,6 @@
   xdg.configFile = {
     "uwsm/env".text = # sh
       ''
-        export WLR_NO_HARDWARE_CURSORS=1
         export NIXOS_OZONE_WL=1
         export ELECTRON_OZONE_PLATFORM_HINT="auto"
       '';

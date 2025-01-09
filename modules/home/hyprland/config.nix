@@ -46,7 +46,8 @@ in
       };
 
       cursor = lib.mkIf (host == "desktop") {
-        #no_hardware_cursors = true;
+        # TODO: Disable when vertical monitor bug fixed
+        no_hardware_cursors = true;
         #allow_dumb_copy = true;
       };
 
