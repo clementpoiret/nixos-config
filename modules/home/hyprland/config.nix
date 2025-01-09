@@ -3,9 +3,9 @@ let
   monitors =
     if (host == "desktop") then
       [
-        "HDMI-A-1, 1920x1080, auto, 1"
-        "DP-1, 1920x1080, auto-left, 1"
-        "DP-2, 1920x1080, auto-right, 1, transform, 1"
+        "HDMI-A-1, preferred, auto, 1"
+        "DP-1, preferred, auto-left, 1"
+        "DP-2, preferred, auto-right, 1, transform, 1"
       ]
     else
       [
@@ -290,11 +290,8 @@ in
         "float,mpv"
         "center,mpv"
         "size 1200 725,mpv"
-        "float,title:^(float_ghostty)$"
-        "center,title:^(float_ghostty)$"
-        "size 950 600,title:^(float_ghostty)$"
         "float,audacious"
-        "idleinhibit focus,mpv"
+        "idleinhibit focus, mpv"
         "float,udiskie"
         "float,^(pavucontrol)$"
         "float,^(blueman-manager)$"
@@ -310,6 +307,7 @@ in
 
       # windowrulev2
       windowrulev2 = [
+        "idleinhibit fullscreen, fullscreen:1"
         "float, title:^(Picture-in-Picture)$"
         "opacity 1.0 override 1.0 override, title:^(Picture-in-Picture)$"
         "pin, title:^(Picture-in-Picture)$"
@@ -318,11 +316,14 @@ in
         "opacity 1.0 override 1.0 override, class:(Aseprite)"
         "opacity 1.0 override 1.0 override, class:(Unity)"
         "idleinhibit focus, class:^(mpv)$"
-        "idleinhibit fullscreen, class:^(firefox)$"
+        "idleinhibit fullscreen, title:^(.*Zen Browser.*)$"
         "float,class:^(zenity)$"
         "center,class:^(zenity)$"
         "size 850 500,class:^(zenity)$"
-        "float,class:^(pavucontrol)$"
+        "size 950 600,title:^(float_ghostty)$"
+        "float,class:^(float_ghostty)$"
+        "float,class:^(.*pavucontrol)$"
+        "float,class:^(qalculate-gtk)$"
         "float,class:^(SoundWireServer)$"
         "float,class:^(.sameboy-wrapped)$"
         "float,class:^(file_progress)$"

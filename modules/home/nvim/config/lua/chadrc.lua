@@ -21,6 +21,7 @@ M.nvdash = {
   load_on_startup = true,
 
   buttons = {
+    { txt = "  Todo List", keys = "td", cmd = "Dooing" },
     { txt = "  Projects", keys = "fp", cmd = "Telescope project" },
     { txt = "  Find File", keys = "ff", cmd = "Telescope find_files" },
     { txt = "  Recent Files", keys = "fo", cmd = "Telescope oldfiles" },
