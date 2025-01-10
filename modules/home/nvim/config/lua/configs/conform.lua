@@ -9,15 +9,16 @@ local options = {
     html = { "prettier" },
     json = { "prettier" },
     sh = { "shfmt" },
-    elm = { "elm-format" },
+    -- elm = { "elm-format" },
     python = { "ruff_format", "ruff_organize_imports" },
-    dart = { "dart_format" },
+    -- dart = { "dart_format" },
     nix = { "nixfmt" },
     tf = { "terraform_fmt" },
     terraform = { "terraform_fmt" },
     hcl = { "terraform_fmt" },
     rust = { "rustfmt" },
     markdown = { "mdformat" },
+    -- zig = { "zigfmt" },
   },
 
   -- format_on_save = {

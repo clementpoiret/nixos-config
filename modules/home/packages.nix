@@ -74,6 +74,10 @@
       ruff
       master.uv
 
+      # Zig
+      zig
+      zls
+
       # infra
       docker
       fluxcd

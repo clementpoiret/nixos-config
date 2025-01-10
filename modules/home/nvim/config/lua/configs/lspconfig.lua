@@ -3,7 +3,7 @@ require("nvchad.configs.lspconfig").defaults()
 
 local lspconfig = require "lspconfig"
 
-local servers = { "html", "cssls", "ruff", "nushell", "nixd" }
+local servers = { "html", "cssls", "ruff", "nushell", "nixd", "zls" }
 
 local nvlsp = require "nvchad.configs.lspconfig"
 local cmp = require "blink.cmp"
