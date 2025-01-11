@@ -308,7 +308,7 @@ in
 
       # windowrulev2
       windowrulev2 = [
-        "idleinhibit fullscreen, fullscreen:1"
+        "idleinhibit fullscreen, fullscreen:2"
         "float, title:^(Picture-in-Picture)$"
         "opacity 1.0 override 1.0 override, title:^(Picture-in-Picture)$"
         "pin, title:^(Picture-in-Picture)$"
