@@ -310,6 +310,7 @@
             "v" = ":sh zellij ac new-pane -d right";
             "h" = ":sh zellij ac new-pane -d down";
           };
+          "C-t".n = ":sh zellij ac new-tab";
 
           "C-h" = ":sh zellij ac move-focus-or-tab left";
           "C-j" = ":sh zellij ac move-focus-or-tab down";
@@ -334,6 +335,17 @@
           esc = [
             "collapse_selection"
             "normal_mode"
+          ];
+
+          # REPL
+          "C-space" = [
+            "select_mode"
+            "extend_to_line_bounds"
+            ":sh zellij ac move-focus-or-tab right"
+            ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
+            ":sh zellij ac move-focus-or-tab left"
+            "collapse_selection"
+            "insert_mode"
           ];
         };
 
