@@ -94,6 +94,7 @@
           "C-x".g = ":sh zellij run -ci -- lazygit";
 
           "=" = ":format";
+
           # "{" = [
           #   "goto_prev_paragraph"
           #   "collapse_selection"
@@ -319,9 +320,9 @@
           "C-space" = [
             "select_mode"
             "extend_to_line_bounds"
-            ":sh zellij ac focus-next-pane"
-            ":pipe-to xargs -I {} zellij ac write-chars '{}\n'"
-            ":sh zellij ac focus-previous-pane"
+            ":sh zellij ac move-focus-or-tab right"
+            ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
+            ":sh zellij ac move-focus-or-tab left"
             "collapse_selection"
             "move_visual_line_down"
             "goto_first_nonwhitespace"
@@ -419,9 +420,9 @@
 
           # REPL
           "C-space" = [
-            ":sh zellij ac focus-next-pane"
-            ":pipe-to xargs -I {} zellij ac write-chars '{}\n'"
-            ":sh zellij ac focus-previous-pane"
+            ":sh zellij ac move-focus-or-tab right"
+            ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
+            ":sh zellij ac move-focus-or-tab left"
             "collapse_selection"
             "move_visual_line_down"
             "goto_first_nonwhitespace"
