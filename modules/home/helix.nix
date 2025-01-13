@@ -433,7 +433,7 @@
           # REPL
           "C-space" = [
             ":sh zellij ac move-focus-or-tab right"
-            ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
+            ":pipe-to sh -c 'rg -v \"^[[:space:]]*$\" | zellij ac write-chars \"$(cat)\n\"'"
             ":sh zellij ac move-focus-or-tab left"
             "collapse_selection"
             "move_visual_line_down"
