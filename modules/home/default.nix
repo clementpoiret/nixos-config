@@ -14,9 +14,11 @@
     ./git/git.nix # version controle
     ./gitui/gitui.nix # lazygit replacement
     ./gtk.nix # gtk theme
+    ./helix.nix
     ./hyprland # window manager
     ./jj.nix # just another version control tool
     ./kitty.nix # terminal
+    ./lazygit.nix
     ./nushell/nushell.nix # shell
     ./spicetify.nix # spotify client
     ./swaync/swaync.nix # notification deamon

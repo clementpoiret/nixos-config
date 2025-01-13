@@ -28,7 +28,6 @@
       inkscape
       inxi # system info
       killall # to kill our little friends
-      lazygit
       lsd # ls replacement
       lshw
       lz4
