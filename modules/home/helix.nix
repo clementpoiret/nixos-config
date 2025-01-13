@@ -4,6 +4,22 @@
     enable = true;
 
     languages = {
+      language-server = {
+        basedpyright.config = {
+          basedpyright.analysis.typeCheckingMode = "basic";
+        };
+      };
+      ruff = {
+        config.settings = {
+          lineLength = 120;
+          indent-width = 4;
+          lint = {
+            select = [ "ALL" ];
+            ignore = [ ];
+          };
+        };
+      };
+
       language = [
         {
           name = "python";
