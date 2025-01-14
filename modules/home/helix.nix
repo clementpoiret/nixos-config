@@ -142,9 +142,21 @@
             ":sh zellij ac move-focus-or-tab right"
             ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
             ":sh zellij ac move-focus-or-tab left"
-            "collapse_selection"
             "move_visual_line_down"
             "goto_first_nonwhitespace"
+            "collapse_selection"
+            "normal_mode"
+          ];
+          "A-space" = [
+            "goto_first_nonwhitespace"
+            "select_mode"
+            "extend_to_line_end"
+            ":sh zellij ac move-focus-or-tab right"
+            ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
+            ":sh zellij ac move-focus-or-tab left"
+            "move_visual_line_down"
+            "goto_first_nonwhitespace"
+            "collapse_selection"
             "normal_mode"
           ];
         };
@@ -159,6 +171,16 @@
           "C-space" = [
             "select_mode"
             "extend_to_line_bounds"
+            ":sh zellij ac move-focus-or-tab right"
+            ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
+            ":sh zellij ac move-focus-or-tab left"
+            "collapse_selection"
+            "insert_mode"
+          ];
+          "A-space" = [
+            "goto_first_nonwhitespace"
+            "select_mode"
+            "extend_to_line_end"
             ":sh zellij ac move-focus-or-tab right"
             ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
             ":sh zellij ac move-focus-or-tab left"
@@ -187,6 +209,7 @@
             "collapse_selection"
             "move_visual_line_down"
             "goto_first_nonwhitespace"
+            "collapse_selection"
             "normal_mode"
           ];
         };
