@@ -65,8 +65,8 @@ keybinds clear-defaults=true {
     bind "d" { NewPane "Down"; SwitchToMode "Normal"; }
     //bind "r" { NewPane "Right"; SwitchToMode "Normal"; }
     bind "x" { CloseFocus; SwitchToMode "Normal"; }
-    bind "z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
-    bind "f" { TogglePaneFrames; SwitchToMode "Normal"; }
+    bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+    //bind "f" { TogglePaneFrames; SwitchToMode "Normal"; }
     bind "w" { ToggleFloatingPanes; SwitchToMode "Normal"; }
     bind "Ctrl a" { ToggleFloatingPanes; SwitchToMode "Normal"; }
     bind "e" { TogglePaneEmbedOrFloating; SwitchToMode "Normal"; }
