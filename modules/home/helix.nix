@@ -128,6 +128,10 @@
             "n" = ":sh zellij ac new-pane";
             "v" = ":sh zellij ac new-pane -d right";
             "h" = ":sh zellij ac new-pane -d down";
+            "r" = [
+              ":sh zellij ac new-pane -d right -- devenv shell repl"
+              ":sh zellij ac move-focus left"
+            ];
           };
           "C-t".n = ":sh zellij ac new-tab";
 
@@ -148,7 +152,7 @@
             "collapse_selection"
             "normal_mode"
           ];
-          "A-space" = [
+          "C-esc" = [
             "goto_first_nonwhitespace"
             "select_mode"
             "extend_to_line_end"
@@ -178,7 +182,7 @@
             "collapse_selection"
             "insert_mode"
           ];
-          "A-space" = [
+          "C-esc" = [
             "goto_first_nonwhitespace"
             "select_mode"
             "extend_to_line_end"
