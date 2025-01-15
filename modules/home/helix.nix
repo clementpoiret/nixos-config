@@ -222,7 +222,7 @@
           ret = [
             # "move_line_down"
             # "goto_first_nonwhitespace"
-            "goto_word"
+            "extend_to_word"
           ];
 
           # REPL
