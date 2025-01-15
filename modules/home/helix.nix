@@ -32,12 +32,13 @@
     };
 
     settings = {
-      theme = "catppuccin_mocha";
+      theme = "catppuccin_mocha_mod";
 
       editor = {
         cursorline = true;
         line-number = "relative";
         rulers = [ 120 ];
+        color-modes = true;
         true-color = true;
 
         auto-format = true;
@@ -120,7 +121,7 @@
           ];
 
           # Zellij stuff
-          "C-x".g = ":sh zellij run -ci -- lazygit";
+          space.ret = ":sh zellij run -ci -- lazygit";
           "C-a" = {
             "C-a" = ":sh zellij ac toggle-floating-panes";
             "z" = ":sh zellij ac toggle-fullscreen";
@@ -213,6 +214,15 @@
             "normal_mode"
           ];
         };
+      };
+    };
+
+    themes.catppuccin_mocha_mod = {
+      inherits = "catppuccin_mocha";
+      "ui.virtual.jump-label" = {
+        fg = "rosewater";
+        modifiers = [ "bold" ];
+        underline.style = "line";
       };
     };
   };
