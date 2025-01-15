@@ -94,13 +94,31 @@
 
           "=" = ":format";
 
+          j = [
+            "move_visual_line_down"
+            "align_view_center"
+          ];
+          k = [
+            "move_visual_line_up"
+            "align_view_center"
+          ];
+          n = [
+            "search_next"
+            "align_view_center"
+          ];
+          N = [
+            "search_prev"
+            "align_view_center"
+          ];
+
           esc = [
             "collapse_selection"
             "keep_primary_selection"
           ];
           ret = [
-            "move_line_down"
-            "goto_first_nonwhitespace"
+            # "move_line_down"
+            # "goto_first_nonwhitespace"
+            "goto_word"
           ];
           "0" = "goto_line_start";
           "*" = [
@@ -202,8 +220,9 @@
           ];
           "0" = "goto_line_start";
           ret = [
-            "move_line_down"
-            "goto_first_nonwhitespace"
+            # "move_line_down"
+            # "goto_first_nonwhitespace"
+            "goto_word"
           ];
 
           # REPL
