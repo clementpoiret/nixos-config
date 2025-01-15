@@ -6,7 +6,6 @@
       aerc # for emails
       age # for my secrets
       awscli2
-      beeper
       bruno # for REST APIs tests
       bitwise # cli tool for bit / hex manipulation
       dconf-editor
@@ -18,6 +17,7 @@
       file # Show file information
       fzf # fuzzy finder
       gh # github cli
+      gh-dash
       glab
       gifsicle # gif utility
       gnuplot
@@ -36,7 +36,6 @@
       nix-prefetch-github
       pciutils
       ripgrep # grep replacement
-      russ
       sops
       spotify-player
       toipe # typing test in the terminal
@@ -108,7 +107,6 @@
       man-pages # extra man pages
       mpv # video player
       ncdu # disk space
-      obsidian
       onlyoffice-desktopeditors
       openssl
       pamixer # pulseaudio command line mixer
@@ -133,6 +131,7 @@
       wl-clipboard
       stable.wush # transfer between computers, stable to have v0.3.0
       master.cliphist
+      wiper
       xdg-utils
       xxd
       zotero-beta
