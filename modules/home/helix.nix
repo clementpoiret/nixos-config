@@ -56,12 +56,6 @@
         {
           name = "markdown";
           auto-format = true;
-          scope = "source.md";
-          injection-regex = "md|markdown";
-          file-types = [
-            "md"
-            "markdown"
-          ];
           roots = [
             ".zk"
             ".marksman.toml"
