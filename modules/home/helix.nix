@@ -4,6 +4,8 @@
     enable = true;
     defaultEditor = true;
 
+    # TODO: Ltex-ls-plus
+    # TODO: simple-completion-language-server
     languages = {
       language-server = {
         basedpyright.config = {
@@ -60,7 +62,10 @@
             "md"
             "markdown"
           ];
-          roots = [ ".zk" ];
+          roots = [
+            ".zk"
+            ".marksman.toml"
+          ];
           language-servers = [
             "zk"
             "marksman"
