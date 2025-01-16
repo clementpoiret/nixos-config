@@ -44,6 +44,9 @@
       yarn
       zenity
 
+      # Markdown
+      marksman
+
       # C / C++
       cmake
       gcc

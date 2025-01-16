@@ -25,5 +25,5 @@
     # askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
   };
 
-  environment.variables.EDITOR = "nvim";
+  environment.variables.EDITOR = "hx";
 }

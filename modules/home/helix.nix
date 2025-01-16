@@ -2,11 +2,17 @@
 {
   programs.helix = {
     enable = true;
+    defaultEditor = true;
 
     languages = {
       language-server = {
         basedpyright.config = {
           basedpyright.analysis.typeCheckingMode = "basic";
+        };
+
+        zk = {
+          command = "zk";
+          args = [ "lsp" ];
         };
       };
       ruff = {
@@ -22,11 +28,47 @@
 
       language = [
         {
+          name = "nix";
+          auto-format = true;
+        }
+        {
+          name = "lua";
+          auto-format = true;
+        }
+        {
+          name = "rust";
+          auto-format = true;
+        }
+        {
+          name = "zig";
+          auto-format = true;
+        }
+        {
           name = "python";
+          auto-format = true;
           language-servers = [
             "ruff"
             "basedpyright"
           ];
+        }
+        {
+          name = "markdown";
+          auto-format = true;
+          scope = "source.md";
+          injection-regex = "md|markdown";
+          file-types = [
+            "md"
+            "markdown"
+          ];
+          roots = [ ".zk" ];
+          language-servers = [
+            "zk"
+            "marksman"
+          ];
+          formatter = {
+            command = "mdformat";
+            args = [ "-" ];
+          };
         }
       ];
     };
@@ -40,8 +82,11 @@
         rulers = [ 120 ];
         color-modes = true;
         true-color = true;
+        mouse = false;
 
         auto-format = true;
+
+        file-picker.hidden = false;
 
         statusline = {
           left = [
