@@ -57,12 +57,13 @@
           name = "markdown";
           auto-format = true;
           roots = [
-            ".zk"
             ".marksman.toml"
+            ".zk"
           ];
           language-servers = [
-            "zk"
+            "ltex-ls-plus"
             "marksman"
+            "zk"
           ];
           formatter = {
             command = "mdformat";

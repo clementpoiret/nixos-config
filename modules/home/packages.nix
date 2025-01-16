@@ -45,6 +45,7 @@
       zenity
 
       # Markdown
+      ltex-ls-plus
       marksman
 
       # C / C++
