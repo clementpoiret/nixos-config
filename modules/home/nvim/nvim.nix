@@ -24,9 +24,6 @@
 
     # lldb
     vscode-extensions.vadimcn.vscode-lldb
-
-    # misc
-    mdformat
   ];
 
   home.sessionVariables = {

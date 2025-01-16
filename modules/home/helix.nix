@@ -66,8 +66,20 @@
             "zk"
           ];
           formatter = {
-            command = "mdformat";
-            args = [ "-" ];
+            # TODO: use mdformat.withPlugins once fixed
+            command = "uvx";
+            args = [
+              "--with"
+              "mdformat-gfm"
+              "--with"
+              "mdformat-frontmatter"
+              "--with"
+              "mdformat-footnote"
+              "--from"
+              "mdformat"
+              "mdformat"
+              "-"
+            ];
           };
         }
       ];

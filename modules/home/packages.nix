@@ -47,6 +47,13 @@
       # Markdown
       ltex-ls-plus
       marksman
+      # WARNING: This is broken, it only installs the first plugin in the list...
+      # I'll use uvx instead.
+      # (mdformat.withPlugins (p: [
+      #   p.mdformat-gfm
+      #   p.mdformat-frontmatter
+      #   p.mdformat-footnote
+      # ]))
 
       # C / C++
       cmake
