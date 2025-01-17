@@ -2,10 +2,12 @@
 {
   home.packages = with pkgs; [ aichat ];
 
-  xdg.configFile."aichat.yaml".text = # yaml
+  xdg.configFile."aichat/config.yaml".text = # yaml
     ''
       # llm
       model: claude
+      clients:
+        - type: claude
 
       # behavior
       keybindings: vi

@@ -27,5 +27,6 @@ in
 
   home.sessionVariables = {
     ANTHROPIC_API_KEY = builtins.readFile /run/user/1000/secrets/api_keys/anthropic;
+    CLAUDE_API_KEY = builtins.readFile /run/user/1000/secrets/api_keys/anthropic;
   };
 }
