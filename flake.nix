@@ -77,6 +77,8 @@
 
     # TODO: Remove once fixed
     espanso-fix.url = "github:pitkling/nixpkgs/espanso-fix-capabilities-export";
+
+    bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
   };
 
   outputs =
@@ -85,6 +87,7 @@
 
       alejandra,
       bash-env-json,
+      bibli-ls,
       chaotic,
       espanso-fix,
       fw-fanctrl,
@@ -115,6 +118,7 @@
       pkgs-flake = {
         alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
+        bibli-ls = bibli-ls.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
       };
 

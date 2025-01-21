@@ -12,6 +12,9 @@
           basedpyright.analysis.typeCheckingMode = "basic";
         };
 
+        bibli-ls = {
+          command = "bibli_ls";
+        };
         zk = {
           command = "zk";
           args = [ "lsp" ];
@@ -61,6 +64,7 @@
             ".zk"
           ];
           language-servers = [
+            "bibli-ls"
             "ltex-ls-plus"
             "marksman"
             "zk"
@@ -167,6 +171,14 @@
             "search_prev"
             "align_view_center"
           ];
+          "+" = [
+            "move_line_down"
+            "align_view_center"
+          ];
+          "-" = [
+            "move_line_up"
+            "align_view_center"
+          ];
 
           esc = [
             "collapse_selection"
@@ -270,6 +282,15 @@
         };
 
         select = {
+          "+" = [
+            "extend_line_down"
+            "align_view_center"
+          ];
+          "-" = [
+            "extend_line_up"
+            "align_view_center"
+          ];
+
           esc = [
             "collapse_selection"
             "keep_primary_selection"

@@ -12,7 +12,17 @@ let
       "${config.home.homeDirectory}/Sync/Notes/zk/";
 in
 {
-  home.packages = [ pkgs.zk ];
+  home.packages = with pkgs; [
+    flake.bibli-ls
+    zk
+  ];
+
+  home.file."Sync/Notes/zk/permanent/.bibli.toml".text = ''
+    [backends]
+    [backends.library]
+    backend_type = "bibfile"
+    bibfiles = ["${config.home.homeDirectory}/Sync/Bibliography/library.bib"]
+  '';
   home.file.".config/zk/config.toml".source = ./config.toml;
 
   # TODO: Wait for PR in zk to be merged to fix symlinks.
