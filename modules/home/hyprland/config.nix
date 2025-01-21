@@ -33,8 +33,8 @@ in
       ];
 
       input = {
-        kb_layout = "us";
-        kb_options = "compose:ralt";
+        kb_layout = "fr(ergol)";
+        # kb_options = if (host == "desktop") then null else "compose:ralt";
         numlock_by_default = true;
         follow_mouse = 1;
         sensitivity = 0;
@@ -200,10 +200,14 @@ in
         "$mainMod, right, movefocus, r"
         "$mainMod, up, movefocus, u"
         "$mainMod, down, movefocus, d"
-        "$mainMod, h, movefocus, l"
-        "$mainMod, j, movefocus, d"
-        "$mainMod, k, movefocus, u"
-        "$mainMod, l, movefocus, r"
+        "$mainMod, bracketleft, movefocus, l"
+        "$mainMod, bracketright, movefocus, r"
+        "$mainMod, minus, movefocus, u"
+        "$mainMod, plus, movefocus, d"
+        # "$mainMod, h, movefocus, l"
+        # "$mainMod, j, movefocus, d"
+        # "$mainMod, k, movefocus, u"
+        # "$mainMod, l, movefocus, r"
 
         # switch workspace
         "$mainMod, 1, workspace, 1"
@@ -235,19 +239,27 @@ in
         "$mainMod SHIFT, right, movewindow, r"
         "$mainMod SHIFT, up, movewindow, u"
         "$mainMod SHIFT, down, movewindow, d"
-        "$mainMod SHIFT, h, movewindow, l"
-        "$mainMod SHIFT, j, movewindow, d"
-        "$mainMod SHIFT, k, movewindow, u"
-        "$mainMod SHIFT, l, movewindow, r"
+        "$mainMod SHIFT, bracketleft, movewindow, l"
+        "$mainMod SHIFT, bracketright, movewindow, r"
+        "$mainMod SHIFT, minus, movewindow, u"
+        "$mainMod SHIFT, plus, movewindow, d"
+        # "$mainMod SHIFT, h, movewindow, l"
+        # "$mainMod SHIFT, j, movewindow, d"
+        # "$mainMod SHIFT, k, movewindow, u"
+        # "$mainMod SHIFT, l, movewindow, r"
 
         "$mainMod CTRL, left, resizeactive, -80 0"
         "$mainMod CTRL, right, resizeactive, 80 0"
         "$mainMod CTRL, up, resizeactive, 0 -80"
         "$mainMod CTRL, down, resizeactive, 0 80"
-        "$mainMod CTRL, h, resizeactive, -80 0"
-        "$mainMod CTRL, j, resizeactive, 0 80"
-        "$mainMod CTRL, k, resizeactive, 0 -80"
-        "$mainMod CTRL, l, resizeactive, 80 0"
+        "$mainMod CTRL, bracketleft, resizeactive, -80 0"
+        "$mainMod CTRL, bracketright, resizeactive, 80 0"
+        "$mainMod CTRL, minus, resizeactive, 0 -80"
+        "$mainMod CTRL, plus, resizeactive, 0 80"
+        # "$mainMod CTRL, h, resizeactive, -80 0"
+        # "$mainMod CTRL, j, resizeactive, 0 80"
+        # "$mainMod CTRL, k, resizeactive, 0 -80"
+        # "$mainMod CTRL, l, resizeactive, 80 0"
 
         "$mainMod ALT, left, moveactive,  -80 0"
         "$mainMod ALT, right, moveactive, 80 0"

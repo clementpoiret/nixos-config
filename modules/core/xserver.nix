@@ -1,16 +1,16 @@
-{ pkgs, username, ... }: 
+{ ... }:
 {
   services = {
     xserver = {
       enable = true;
       autorun = false;
-      xkb.layout = "us";
+      xkb.layout = "fr(ergol)";
       displayManager.startx.enable = true;
     };
 
     # displayManager.autoLogin = {
-      # enable = false;
-      # user = "${username}";
+    # enable = false;
+    # user = "${username}";
     # };
 
     libinput = {
@@ -19,6 +19,11 @@
       #  accelProfile = "flat";
       # };
     };
+  };
+
+  console = {
+    useXkbConfig = true;
+    # keyMap = "fr(ergol)";
   };
 
   # To prevent getting stuck at shutdown
