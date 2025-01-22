@@ -156,8 +156,14 @@
       tooltip = "false";
     };
     "custom/hyprsunset" = {
-      format = " ";
-      on-click = "toggle_light";
+      # format = " ";
+      # on-click = "toggle_light";
+      format = " {} ";
+      exec = "bluelightinfo";
+      tooltip = true;
+      interval = 1;
+      return-type = "json";
+      on-click = "bluelighttoggle";
     };
     "custom/notification" = {
       tooltip = false;

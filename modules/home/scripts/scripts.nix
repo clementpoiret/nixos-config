@@ -15,7 +15,6 @@ let
   );
   toggle_waybar = pkgs.writeScriptBin "toggle_waybar" (builtins.readFile ./scripts/toggle_waybar.sh);
   toggle_float = pkgs.writeScriptBin "toggle_float" (builtins.readFile ./scripts/toggle_float.sh);
-  toggle_light = pkgs.writeScriptBin "toggle_light" (builtins.readFile ./scripts/toggle_light.sh);
 
   maxfetch = pkgs.writeScriptBin "maxfetch" (builtins.readFile ./scripts/maxfetch.sh);
 
@@ -35,6 +34,11 @@ let
   record = pkgs.writeScriptBin "record" (builtins.readFile ./scripts/record.sh);
 
   run_nvim = pkgs.writeScriptBin "run_nvim" (builtins.readFile ./scripts/run_nvim.sh);
+
+  bluelightinfo = pkgs.writeScriptBin "bluelightinfo" (builtins.readFile ./scripts/bluelightinfo.sh);
+  bluelighttoggle = pkgs.writeScriptBin "bluelighttoggle" (
+    builtins.readFile ./scripts/bluelighttoggle.sh
+  );
 in
 {
   home.packages = [
@@ -49,7 +53,6 @@ in
     toggle_oppacity
     toggle_waybar
     toggle_float
-    toggle_light
 
     maxfetch
 
@@ -67,5 +70,8 @@ in
     record
 
     run_nvim
+
+    bluelightinfo
+    bluelighttoggle
   ];
 }
