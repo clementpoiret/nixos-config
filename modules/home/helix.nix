@@ -14,10 +14,16 @@
 
         bibli-ls = {
           command = "bibli_ls";
+          required-root-patterns = [
+            ".bibli.toml"
+          ];
         };
         zk = {
           command = "zk";
           args = [ "lsp" ];
+          required-root-patterns = [
+            ".zk"
+          ];
         };
       };
       ruff = {
@@ -62,6 +68,7 @@
           roots = [
             ".marksman.toml"
             ".zk"
+            ".bibli.toml"
           ];
           language-servers = [
             "bibli-ls"

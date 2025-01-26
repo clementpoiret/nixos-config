@@ -1,4 +1,8 @@
-{ lib, host, ... }:
+{
+  lib,
+  host,
+  ...
+}:
 let
   monitors =
     if (host == "desktop") then
@@ -14,8 +18,10 @@ let
       ];
 in
 {
+
   wayland.windowManager.hyprland = {
     settings = {
+      xwayland.force_zero_scaling = true;
 
       # autostart
       exec-once = [
@@ -363,11 +369,5 @@ in
       ];
 
     };
-
-    extraConfig = ''
-      xwayland {
-        force_zero_scaling = true
-      }
-    '';
   };
 }

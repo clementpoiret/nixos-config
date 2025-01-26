@@ -1,8 +1,8 @@
 { ... }:
 {
   imports = [
-    ./hyprland.nix
     ./config.nix
+    ./hyprland.nix
     ./hypridle.nix
     ./hyprlock.nix
   ];

@@ -22,6 +22,9 @@ in
     [backends.library]
     backend_type = "bibfile"
     bibfiles = ["${config.home.homeDirectory}/Sync/Bibliography/library.bib"]
+
+    [cite]
+    trigger = "@"
   '';
   home.file.".config/zk/config.toml".source = ./config.toml;
 
