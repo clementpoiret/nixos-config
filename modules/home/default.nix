@@ -8,7 +8,7 @@
     ./btop.nix # resouces monitor
     ./easyeffect.nix # audio profile
     ./emacs/emacs.nix # emacs editor
-    ./espanso.nix # expand keywords
+    # ./espanso.nix # expand keywords
     # ./files/files.nix # custom files
     ./fuzzel.nix # launcher
     ./ghostty.nix # the best terminal emulator
@@ -32,6 +32,7 @@
     ./swayosd.nix # volume and brightness feedbacks
     ./scripts/scripts.nix # personal scripts
     ./waybar # status bar
+    ./wl-kbptr.nix
     ./xdg-mimes.nix # default apps
     ./yazi.nix # terminal file manager
     ./zellij/zellij.nix # terminal multiplexer
