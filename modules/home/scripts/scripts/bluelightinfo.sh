@@ -9,7 +9,7 @@ if [ -z "$pid" ]; then
   temperature=6500
 else
   # If hyprsunset is running, temperature is 5700K
-  temperature=5700
+  temperature=3500
 fi
 
 # Format the output for Waybar with line breaks

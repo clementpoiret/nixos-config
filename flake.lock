@@ -953,15 +953,16 @@
         "systems": "systems_7"
       },
       "locked": {
-        "lastModified": 1737635828,
-        "narHash": "sha256-e3vsaQSB9F6p8KMRzrK4l+wCgMytw7ocUvxjgmJfjp8=",
+        "lastModified": 1728415425,
+        "narHash": "sha256-SVkcePzX9PAlWsPSGBaxiNFCouiQmGOezhMo0+zhDIQ=",
         "owner": "hyprwm",
         "repo": "hyprsunset",
-        "rev": "cdcf145eec3e4bbb5e07ae16012c825b59efd44e",
+        "rev": "f535c1894d71d7639d19b52f5b72e1ac840c2512",
         "type": "github"
       },
       "original": {
         "owner": "hyprwm",
+        "ref": "v0.1.0",
         "repo": "hyprsunset",
         "type": "github"
       }

@@ -44,7 +44,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprsunset = {
-      url = "github:hyprwm/hyprsunset";
+      url = "github:hyprwm/hyprsunset/v0.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

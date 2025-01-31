@@ -5,8 +5,8 @@ pid=$(pgrep -x hyprsunset)
 
 if [ -z "$pid" ]; then
   # If not running, start hyprsunset with the specified temperature
-  hyprsunset -t 5700 &
-  echo "hyprsunset started with temperature 5700"
+  hyprsunset -t 3500 &
+  echo "hyprsunset started with temperature 3500"
 else
   # If running, kill hyprsunset
   kill "$pid"
