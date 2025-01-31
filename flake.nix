@@ -22,13 +22,17 @@
 
     hyprland = {
       # url = "github:hyprwm/Hyprland/?submodules=1";
-      url = "github:hyprwm/Hyprland/v0.47.0?submodules=1";
+      url = "github:hyprwm/Hyprland/v0.47.1?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     hypr-contrib.url = "github:hyprwm/contrib";
     hyprcursor = {
       url = "github:hyprwm/hyprcursor";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hyprlock = {
+      url = "github:hyprwm/hyprlock";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hypridle = {
@@ -92,6 +96,7 @@
       espanso-fix,
       fw-fanctrl,
       home-manager,
+      hyprlock,
       nixpkgs,
       nixpkgs-master,
       nixpkgs-stable,
@@ -119,6 +124,7 @@
         alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
+        hyprlock = hyprlock.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
       };
 
