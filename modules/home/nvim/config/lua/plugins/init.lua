@@ -117,7 +117,7 @@ return {
     },
     opts = {
       show_icons = true,
-      leader_key = ";", -- Recommended to be a single key
+      leader_key = ";",        -- Recommended to be a single key
       buffer_leader_key = "m", -- Per Buffer Mappings
       window = {
         border = "rounded",
@@ -153,9 +153,9 @@ return {
     end,
   },
 
-  { "actionshrimp/direnv.nvim", config = true, lazy = false, opts = {} },
+  { "actionshrimp/direnv.nvim", config = true,      lazy = false,     opts = {} },
 
-  { "mg979/vim-visual-multi", event = "VeryLazy", branch = "master" },
+  { "mg979/vim-visual-multi",   event = "VeryLazy", branch = "master" },
 
   {
     "folke/todo-comments.nvim",
@@ -249,7 +249,7 @@ return {
   },
 
   -- Programming
-  { "akinsho/git-conflict.nvim", version = "*", config = true },
+  { "akinsho/git-conflict.nvim",            version = "*", config = true },
 
   {
     "nvim-treesitter/nvim-treesitter",
@@ -276,17 +276,17 @@ return {
     version = "^5",
     lazy = false,
     config = function()
-      local codelldb = vim.fn.expand "$LSP_CODELLDB"
-      local extension_path = codelldb .. "share/vscode/extensions/vadimcn.vscode-lldb"
-      local codelldb_path = extension_path .. "adapter/codelldb"
-      local liblldb_path = extension_path .. "lldb/lib/liblldb.so"
-      local cfg = require "rustaceanvim.config"
+      -- local codelldb = vim.fn.expand "$LSP_CODELLDB"
+      -- local extension_path = codelldb .. "share/vscode/extensions/vadimcn.vscode-lldb"
+      -- local codelldb_path = extension_path .. "adapter/codelldb"
+      -- local liblldb_path = extension_path .. "lldb/lib/liblldb.so"
+      -- local cfg = require "rustaceanvim.config"
 
-      vim.g.rustaceanvim = {
-        dap = {
-          adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
-        },
-      }
+      -- vim.g.rustaceanvim = {
+      --   dap = {
+      --     adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
+      --   },
+      -- }
     end,
   },
   {

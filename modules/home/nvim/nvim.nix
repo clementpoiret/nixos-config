@@ -15,7 +15,7 @@
     stylua
 
     # python
-    basedpyright
+    master.basedpyright
     pylyzer
     ruff
 
@@ -23,11 +23,11 @@
     neovide
 
     # lldb
-    vscode-extensions.vadimcn.vscode-lldb
+    # vscode-extensions.vadimcn.vscode-lldb
   ];
 
   home.sessionVariables = {
-    LSP_CODELLDB = "${pkgs.vscode-extensions.vadimcn.vscode-lldb}";
+    # LSP_CODELLDB = "${pkgs.vscode-extensions.vadimcn.vscode-lldb}";
   };
 
   home.file = {
