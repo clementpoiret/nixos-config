@@ -14,16 +14,8 @@
     lua-language-server
     stylua
 
-    # python
-    master.basedpyright
-    pylyzer
-    ruff
-
     # gui if needed
     neovide
-
-    # lldb
-    # vscode-extensions.vadimcn.vscode-lldb
   ];
 
   home.sessionVariables = {

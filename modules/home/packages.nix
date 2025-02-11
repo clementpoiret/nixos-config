@@ -55,6 +55,9 @@
       #   p.mdformat-footnote
       # ]))
 
+      # lldb
+      master.vscode-extensions.vadimcn.vscode-lldb
+
       # C / C++
       cmake
       gcc
@@ -75,13 +78,10 @@
       # Python
       (import ./python-packages.nix { pkgs = pkgs; })
       micromamba
-      pipenv
-      pixi
-      poetry
-      python312Packages.pytest
-      python312Packages.pyflakes
       ruff
-      master.uv
+      uv
+      master.basedpyright
+      ruff
 
       # Zig
       zig
@@ -141,7 +141,7 @@
       wget
       wl-clipboard
       stable.wush # transfer between computers, stable to have v0.3.0
-      master.cliphist
+      cliphist
       wiper
       xdg-utils
       xxd
