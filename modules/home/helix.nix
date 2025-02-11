@@ -109,7 +109,7 @@
 
         auto-format = true;
 
-        file-picker.hidden = false;
+        file-picker.hidden = true;
 
         statusline = {
           left = [
