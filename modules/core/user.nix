@@ -30,7 +30,7 @@
       "networkmanager"
       "wheel"
     ];
-    shell = pkgs.stable.nushell;
+    shell = pkgs.nushell;
     packages = [ inputs.home-manager.packages.${pkgs.system}.default ];
   };
   nix.settings.allowed-users = [ "${username}" ];

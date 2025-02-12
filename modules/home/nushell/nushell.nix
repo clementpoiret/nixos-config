@@ -10,7 +10,7 @@ in
 {
   programs.nushell = {
     enable = true;
-    package = pkgs.stable.nushell;
+    package = pkgs.nushell;
 
     configFile.source = ./config.nu;
     envFile.source = ./env.nu;
