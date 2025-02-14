@@ -1,5 +1,7 @@
 { pkgs, ... }:
 {
+  home.file.lesskey.text = "Q toggle-option -!^Predraw-on-quit\nq";
+
   programs.jujutsu = {
     enable = true;
     settings = {
@@ -15,6 +17,9 @@
       git.sign-on-push = true;
       ui = {
         show-cryptographic-signatures = true;
+
+        pager = "delta";
+        diff.format = "git";
       };
     };
   };
