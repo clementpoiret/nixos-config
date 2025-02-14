@@ -1,5 +1,35 @@
 { ... }:
 {
+  xdg.configFile."helix/yazi-picker.sh".text = # sh
+    ''
+      #!/usr/bin/env bash
+
+      paths=$(yazi --chooser-file=/dev/stdout | while read -r; do printf "%q " "$REPLY"; done)
+
+      if [[ -n "$paths" ]]; then
+          zellij action toggle-floating-panes
+          zellij action write 27 # send <Escape> key
+          zellij action write-chars ":$1 $paths"
+          zellij action write 13 # send <Enter> key
+      else
+          zellij action toggle-floating-panes
+      fi
+    '';
+
+  xdg.configFile."helix/serpl-replace.sh".text = # sh
+    ''
+      #!/usr/bin/env bash
+
+      serpl
+      exit_code=$?
+
+      if [[ $exit_code -eq 0 ]]; then
+          zellij action toggle-floating-panes
+          zellij action write-chars ":reload-all"
+          zellij action write 13 # send <Enter> key
+      fi
+    '';
+
   programs.helix = {
     enable = true;
     defaultEditor = true;
@@ -160,22 +190,13 @@
         normal = {
           space.space = "file_picker";
 
-          "=" = ":format";
-
+          # Movements
           j = [
             "move_visual_line_down"
             "align_view_center"
           ];
           k = [
             "move_visual_line_up"
-            "align_view_center"
-          ];
-          n = [
-            "search_next"
-            "align_view_center"
-          ];
-          N = [
-            "search_prev"
             "align_view_center"
           ];
           "+" = [
@@ -186,17 +207,25 @@
             "move_line_up"
             "align_view_center"
           ];
+          ret = [
+            "goto_word"
+          ];
+          "0" = "goto_line_start";
 
           esc = [
             "collapse_selection"
             "keep_primary_selection"
           ];
-          ret = [
-            # "move_line_down"
-            # "goto_first_nonwhitespace"
-            "goto_word"
+
+          # Search
+          n = [
+            "search_next"
+            "align_view_center"
           ];
-          "0" = "goto_line_start";
+          N = [
+            "search_prev"
+            "align_view_center"
+          ];
           "*" = [
             "move_char_right"
             "move_prev_word_start"
@@ -226,13 +255,12 @@
               ":sh zellij ac new-pane -d right -- devenv shell repl"
               ":sh zellij ac move-focus left"
             ];
+            "left" = ":sh zellij ac move-focus-or-tab left";
+            "down" = ":sh zellij ac move-focus-or-tab down";
+            "up" = ":sh zellij ac move-focus-or-tab up";
+            "right" = ":sh zellij ac move-focus-or-tab right";
           };
           "C-t".n = ":sh zellij ac new-tab";
-
-          "C-h" = ":sh zellij ac move-focus-or-tab left";
-          "C-j" = ":sh zellij ac move-focus-or-tab down";
-          "C-k" = ":sh zellij ac move-focus-or-tab up";
-          "C-l" = ":sh zellij ac move-focus-or-tab right";
 
           # REPL
           "C-space" = [
@@ -258,6 +286,33 @@
             "collapse_selection"
             "normal_mode"
           ];
+
+          # Yazi
+          space.q = {
+            q = ":sh zellij run -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh open";
+            v = ":sh zellij run -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh vsplit";
+            s = ":sh zellij run -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh hsplit";
+          };
+
+          # Search and Replace
+          space.H = ":sh zellij run -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/serpl-replace.sh";
+
+          # Misc
+          "=" = ":format";
+          g = {
+            v = [
+              "vsplit"
+              "jump_view_down"
+              "goto_definition"
+              "collapse_selection"
+            ];
+            V = [
+              "hsplit"
+              "jump_view_down"
+              "goto_definition"
+              "collapse_selection"
+            ];
+          };
         };
 
         insert = {
@@ -305,8 +360,6 @@
           ];
           "0" = "goto_line_start";
           ret = [
-            # "move_line_down"
-            # "goto_first_nonwhitespace"
             "extend_to_word"
           ];
 

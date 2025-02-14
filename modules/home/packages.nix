@@ -135,6 +135,7 @@
       qFlipper
       qmk
       rclone
+      serpl
       tdf # read pdfs in terminal
       unzip
       via # keyboard config
