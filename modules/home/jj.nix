@@ -18,7 +18,11 @@
       ui = {
         show-cryptographic-signatures = true;
 
-        pager = "delta";
+        pager = [
+          "delta"
+          "--diff-so-fancy"
+          "--side-by-side"
+        ];
         diff.format = "git";
       };
     };

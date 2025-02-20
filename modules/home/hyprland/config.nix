@@ -32,10 +32,9 @@ in
         "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f)"
         "poweralertd"
         "systemctl --user enable --now hypridle.service"
-        "uwsm-app waybar"
         "uwsm-app swaync"
         "wl-paste --watch cliphist store"
-        "toggle_light"
+        "uwsm-app waybar"
       ];
 
       input = {
