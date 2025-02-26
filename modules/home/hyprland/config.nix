@@ -195,8 +195,10 @@ in
         "$mainMod, SEMICOLON, exec, uwsm-app -- ghostty -e zellij --layout nvim"
 
         # screenshot
-        "$mainMod, Print, exec, grimblast --notify --cursor --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        "$mainMod, Insert, exec, grimblast --notify --cursor --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod, Print, exec, uwsm-app -- grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod, Insert, exec, uwsm-app -- grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod SHIFT, S, exec, uwsm-app -- grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod SHIFT, C, exec, uwsm-app -- grimblast --notify --freeze copy area"
         ",Print, exec, uwsm-app -- grimblast --notify --cursor --freeze copy area"
         "ALT, Insert, exec, uwsm-app -- grimblast --notify --cursor --freeze copy area"
 
