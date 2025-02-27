@@ -38,8 +38,12 @@
     # TODO: simple-completion-language-server
     languages = {
       language-server = {
-        basedpyright.config = {
-          basedpyright.analysis.typeCheckingMode = "basic";
+        # basedpyright.config = {
+        #   basedpyright.analysis.typeCheckingMode = "basic";
+        # };
+        pylyzer = {
+          command = "pylyzer";
+          args = [ "--server" ];
         };
 
         bibli-ls = {
@@ -89,7 +93,8 @@
           auto-format = true;
           language-servers = [
             "ruff"
-            "basedpyright"
+            # "basedpyright"
+            "pylyzer"
           ];
         }
         {

@@ -81,6 +81,7 @@
       ruff
       uv
       master.basedpyright
+      pylyzer
       ruff
 
       # Zig
