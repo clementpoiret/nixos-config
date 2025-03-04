@@ -3,7 +3,7 @@
   home.packages = (
     with pkgs;
     [
-      aerc # for emails
+      # aerc # for emails
       age # for my secrets
       awscli2
       bruno # for REST APIs tests

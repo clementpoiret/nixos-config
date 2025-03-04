@@ -79,8 +79,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # TODO: Remove once fixed
-    espanso-fix.url = "github:pitkling/nixpkgs/espanso-fix-capabilities-export";
+    # espanso-fix.url = "github:pitkling/nixpkgs/espanso-fix-capabilities-export";
 
     bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
   };
@@ -93,7 +92,7 @@
       bash-env-json,
       bibli-ls,
       chaotic,
-      espanso-fix,
+      # espanso-fix,
       fw-fanctrl,
       home-manager,
       hyprlock,
@@ -147,7 +146,7 @@
             { nixpkgs.overlays = customOverlays; }
             ./hosts/desktop
             chaotic.nixosModules.default
-            espanso-fix.nixosModules.espanso-capdacoverride
+            # espanso-fix.nixosModules.espanso-capdacoverride
           ];
           specialArgs = {
             host = "desktop";
@@ -161,7 +160,7 @@
             ./hosts/laptop
             fw-fanctrl.nixosModules.default
             chaotic.nixosModules.default
-            espanso-fix.nixosModules.espanso-capdacoverride
+            # espanso-fix.nixosModules.espanso-capdacoverride
           ];
           specialArgs = {
             host = "laptop";

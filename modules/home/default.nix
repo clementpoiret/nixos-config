@@ -7,7 +7,7 @@
     ./bat.nix # better cat command
     ./btop.nix # resouces monitor
     ./easyeffect.nix # audio profile
-    ./emacs/emacs.nix # emacs editor
+    # ./emacs/emacs.nix # emacs editor
     # ./espanso.nix # expand keywords
     # ./files/files.nix # custom files
     ./fuzzel.nix # launcher
