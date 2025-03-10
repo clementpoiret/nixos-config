@@ -8,8 +8,8 @@ let
     if (host == "desktop") then
       [
         "HDMI-A-1, preferred, auto, 1"
-        "DP-1, preferred, auto-left, 1"
-        "DP-2, preferred, auto-right, 1, transform, 1"
+        "DP-1, preferred, auto-right, 1, transform, 1"
+        "DP-2, preferred, auto-left, 1"
       ]
     else
       [
