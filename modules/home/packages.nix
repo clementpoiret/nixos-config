@@ -102,6 +102,7 @@
 
       # aider-chat
       aria2
+      bibiman
       bleachbit # cache cleaner
       bluetuith
       chromium
