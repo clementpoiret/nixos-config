@@ -134,12 +134,4 @@ in
   };
 
   hardware.flipperzero.enable = true;
-
-  nixpkgs.config = {
-    localSystem = {
-      system = "x86_64-linux";
-      gcc.arch = arch.${host};
-      gcc.tune = arch.${host};
-    };
-  };
 }

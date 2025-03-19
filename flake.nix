@@ -20,34 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hyprland = {
-      # url = "github:hyprwm/Hyprland/?submodules=1";
-      url = "github:hyprwm/Hyprland/v0.47.1?submodules=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    hypr-contrib.url = "github:hyprwm/contrib";
-    hyprcursor = {
-      url = "github:hyprwm/hyprcursor";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    hyprlock = {
-      url = "github:hyprwm/hyprlock";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    hypridle = {
-      url = "github:hyprwm/hypridle";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    hyprpicker = {
-      url = "github:hyprwm/hyprpicker";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    hyprsunset = {
-      url = "github:hyprwm/hyprsunset/v0.1.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -79,8 +51,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # espanso-fix.url = "github:pitkling/nixpkgs/espanso-fix-capabilities-export";
-
     bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
   };
 
@@ -92,10 +62,8 @@
       bash-env-json,
       bibli-ls,
       chaotic,
-      # espanso-fix,
       fw-fanctrl,
       home-manager,
-      hyprlock,
       nixpkgs,
       nixpkgs-master,
       nixpkgs-stable,
@@ -123,8 +91,32 @@
         alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
-        hyprlock = hyprlock.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
+      };
+
+      optimizedPackagesOverlay = final: prev: {
+        # DE-related
+        hyprland = prev.hyprland.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
+        xdg-desktop-portal-hyprland = prev.xdg-desktop-portal-hyprland.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
+        hyprcursor = prev.hyprcursor.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
+        hyprpicker = prev.hyprpicker.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
+        hyprlock = prev.hyprlock.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
+        hypridle = prev.hypridle.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
+        hyprsunset = prev.hyprsunset.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
       };
 
       customOverlays = [
@@ -133,6 +125,7 @@
           stable = pkgs-stable;
           flake = pkgs-flake;
         })
+        optimizedPackagesOverlay
       ];
     in
     {
@@ -146,7 +139,6 @@
             { nixpkgs.overlays = customOverlays; }
             ./hosts/desktop
             chaotic.nixosModules.default
-            # espanso-fix.nixosModules.espanso-capdacoverride
           ];
           specialArgs = {
             host = "desktop";
@@ -160,7 +152,6 @@
             ./hosts/laptop
             fw-fanctrl.nixosModules.default
             chaotic.nixosModules.default
-            # espanso-fix.nixosModules.espanso-capdacoverride
           ];
           specialArgs = {
             host = "laptop";
