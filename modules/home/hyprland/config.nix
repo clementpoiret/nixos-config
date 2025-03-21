@@ -65,7 +65,7 @@ in
 
       general = {
         "$mainMod" = "SUPER";
-        layout = "dwindle";
+        layout = "master";
         gaps_in = 8;
         gaps_out = 8;
         border_size = 3;
@@ -84,7 +84,7 @@ in
         enable_swallow = true;
         swallow_regex = "^(ghostty)$";
         focus_on_activate = true;
-        vrr = 0;
+        vrr = 1;
       };
 
       gestures = {
@@ -103,7 +103,7 @@ in
       };
 
       master = {
-        new_status = "master";
+        new_status = "slave";
         special_scale_factor = 1;
       };
 
@@ -111,7 +111,6 @@ in
         rounding = 8;
         active_opacity = 1.0;
         inactive_opacity = 0.8;
-        # fullscreen_opacity = 1.0;
 
         blur = {
           enabled = true;
@@ -170,12 +169,11 @@ in
         # show keybinds list
         "$mainMod, F1, exec, show-keybinds"
 
-        # keybindings
+        # app and scrips bindings
         "$mainMod, Return, exec, uwsm-app -- ghostty -e zellij a -c --index 0"
         "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e zellij"
         "ALT, Return, exec, uwsm-app -- ghostty"
         "$mainMod, D, exec, fuzzel"
-        "$mainMod, P, pseudo,"
         "$mainMod, Q, killactive,"
         "$mainMod, F, fullscreen, 1"
         "$mainMod SHIFT, F, fullscreen, 0"
@@ -183,16 +181,21 @@ in
         "$mainMod, Space, exec, toggle_float"
         "$mainMod, Escape, exec, uwsm-app -- hyprlock"
         "$mainMod SHIFT, Escape, exec, shutdown-script"
-        "$mainMod, X, togglesplit,"
         "$mainMod, E, exec, uwsm-app -- ghostty -e yazi"
         "$mainMod ALT, B, exec, toggle_waybar"
         "$mainMod, C, exec, uwsm-app -- hyprpicker -a"
         "$mainMod, W, exec, wallpaper-picker"
         "$mainMod, V, exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
-        "$mainMod, M, exec, uwsm-app -- proton-pass"
         "$mainMod, N, exec, swaync-client -t"
-        #"$mainMod, SEMICOLON, exec, emacsclient -c -a 'emacs'"
         "$mainMod, SEMICOLON, exec, uwsm-app -- ghostty -e zellij --layout nvim"
+
+        # master layout bindings
+        "$mainMod, M, layoutmsg, focusmaster"
+        "$mainMod SHIFT, M, layoutmsg, swapwithmaster"
+        "$mainMod ALT, M, layoutmsg, addmaster"
+        "$mainMod ALT SHIFT, M, layoutmsg, removemaster"
+        "$mainMod, TAB, layoutmsg, cyclenext"
+        "$mainMod SHIFT, TAB, layoutmsg, cycleprev"
 
         # screenshot
         "$mainMod, Print, exec, uwsm-app -- grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
@@ -211,10 +214,6 @@ in
         "$mainMod, bracketright, movefocus, r"
         "$mainMod, minus, movefocus, u"
         "$mainMod, plus, movefocus, d"
-        # "$mainMod, h, movefocus, l"
-        # "$mainMod, j, movefocus, d"
-        # "$mainMod, k, movefocus, u"
-        # "$mainMod, l, movefocus, r"
 
         # switch workspace
         "$mainMod, 1, workspace, 1"
@@ -229,7 +228,7 @@ in
         "$mainMod, 0, workspace, 10"
 
         # same as above, but switch to the workspace
-        "$mainMod SHIFT, 1, movetoworkspacesilent, 1" # movetoworkspacesilent
+        "$mainMod SHIFT, 1, movetoworkspacesilent, 1"
         "$mainMod SHIFT, 2, movetoworkspacesilent, 2"
         "$mainMod SHIFT, 3, movetoworkspacesilent, 3"
         "$mainMod SHIFT, 4, movetoworkspacesilent, 4"
@@ -250,10 +249,6 @@ in
         "$mainMod SHIFT, bracketright, movewindow, r"
         "$mainMod SHIFT, minus, movewindow, u"
         "$mainMod SHIFT, plus, movewindow, d"
-        # "$mainMod SHIFT, h, movewindow, l"
-        # "$mainMod SHIFT, j, movewindow, d"
-        # "$mainMod SHIFT, k, movewindow, u"
-        # "$mainMod SHIFT, l, movewindow, r"
 
         "$mainMod CTRL, left, resizeactive, -80 0"
         "$mainMod CTRL, right, resizeactive, 80 0"
@@ -263,10 +258,6 @@ in
         "$mainMod CTRL, bracketright, resizeactive, 80 0"
         "$mainMod CTRL, minus, resizeactive, 0 -80"
         "$mainMod CTRL, plus, resizeactive, 0 80"
-        # "$mainMod CTRL, h, resizeactive, -80 0"
-        # "$mainMod CTRL, j, resizeactive, 0 80"
-        # "$mainMod CTRL, k, resizeactive, 0 -80"
-        # "$mainMod CTRL, l, resizeactive, 80 0"
 
         "$mainMod ALT, left, moveactive,  -80 0"
         "$mainMod ALT, right, moveactive, 80 0"
