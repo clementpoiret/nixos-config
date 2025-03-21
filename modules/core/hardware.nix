@@ -17,11 +17,6 @@ let
     "desktop" = "00870F10";
     "laptop" = "00A70F41";
   };
-
-  arch = {
-    "desktop" = "x86-64-v3";
-    "laptop" = "x86-64-v4";
-  };
 in
 {
   imports = [ inputs.ucodenix.nixosModules.default ];
@@ -91,7 +86,7 @@ in
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     NVD_BACKEND = "direct";
     __GL_GSYNC_ALLOWED = "1";
-    __GL_VRR_ALLOWED = "0";
+    __GL_VRR_ALLOWED = "1";
   };
 
   # bluetooth
