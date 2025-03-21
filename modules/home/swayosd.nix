@@ -1,10 +1,10 @@
-{ lib, pkgs, ... }: {
+{ pkgs, ... }:
+{
   home.packages = with pkgs; [ swayosd ];
   wayland.windowManager.hyprland = {
     settings = {
       exec-once = [ "swayosd-server" ];
-      bind =
-        [ ",XF86AudioMute, exec, swayosd-client --output-volume mute-toggle" ];
+      bind = [ ",XF86AudioMute, exec, swayosd-client --output-volume mute-toggle" ];
       # binds active in lockscreen
       bindl = [
         ",XF86MonBrightnessUp, exec, swayosd-client --brightness raise 5%+"
@@ -23,40 +23,41 @@
       ];
     };
   };
-  xdg.configFile."swayosd/style.css".text = ''
-    window {
-        padding: 0px 10px;
-        border-radius: 30px;
-        border: 10px;
-        background: alpha(#1e1e2e, 0.99);
-    }
-    #container {
-        margin: 15px;
-    }
-    image, label {
-        color: #b4befe;
-    }
-    progressbar:disabled,
-    image:disabled {
-        opacity: 0.95;
-    }
-    progressbar {
-        min-height: 6px;
-        border-radius: 999px;
-        background: transparent;
-        border: none;
-    }
-    trough {
-        min-height: inherit;
-        border-radius: inherit;
-        border: none;
-        background: alpha(#cdd6f4, 0.1);
-    }
-    progress {
-        min-height: inherit;
-        border-radius: inherit;
-        border: none;
-        background: #b4befe;
+  xdg.configFile."swayosd/style.scss".text = ''
+    window#osd {
+      padding: 0px 10px;
+      border-radius: 30px;
+      border: 10px;
+      background: alpha(#1e1e2e, 0.99);
+
+      #container {
+          margin: 15px;
+      }
+      image, label {
+          color: #b4befe;
+      }
+      progressbar:disabled,
+      image:disabled {
+          opacity: 0.95;
+      }
+      progressbar {
+          min-height: 6px;
+          border-radius: 999px;
+          background: transparent;
+          border: none;
+      }
+      trough {
+          min-height: inherit;
+          border-radius: inherit;
+          border: none;
+          background: alpha(#cdd6f4, 0.1);
+      }
+      progress {
+          min-height: inherit;
+          border-radius: inherit;
+          border: none;
+          background: #b4befe;
+      }
     }
   '';
 }
