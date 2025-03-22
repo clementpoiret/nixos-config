@@ -15,6 +15,8 @@ let
   );
   toggle_waybar = pkgs.writeScriptBin "toggle_waybar" (builtins.readFile ./scripts/toggle_waybar.sh);
   toggle_float = pkgs.writeScriptBin "toggle_float" (builtins.readFile ./scripts/toggle_float.sh);
+  toggle_suspend = pkgs.writeScriptBin "toggle_suspend" (builtins.readFile ./scripts/toggle_suspend.sh);
+  suspend_state = pkgs.writeScriptBin "suspend_state" (builtins.readFile ./scripts/suspend_state.sh);
 
   maxfetch = pkgs.writeScriptBin "maxfetch" (builtins.readFile ./scripts/maxfetch.sh);
 
@@ -53,6 +55,8 @@ in
     toggle_oppacity
     toggle_waybar
     toggle_float
+    toggle_suspend
+    suspend_state
 
     maxfetch
 

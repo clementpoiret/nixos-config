@@ -26,6 +26,7 @@
       "battery"
       "network"
       "custom/hyprsunset"
+      "custom/suspend"
       "custom/notification"
     ];
     clock = {
@@ -164,6 +165,12 @@
       interval = 1;
       return-type = "json";
       on-click = "bluelighttoggle";
+    };
+    "custom/suspend" = {
+      exec = "suspend_state";
+      on-click = "toggle_suspend";
+      return-type = "json";
+      interval = 1;
     };
     "custom/notification" = {
       tooltip = false;
