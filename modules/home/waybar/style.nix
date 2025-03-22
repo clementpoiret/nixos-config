@@ -1,15 +1,18 @@
 { ... }:
 let
+  theme = import ../theme.nix;
+  colors = theme.mocha.colors;
+
   custom = {
-    font = "TX02 Nerd Font";
+    font = theme.font;
     font_size = "12px";
     font_weight = "500";
-    text_color = "#cdd6f4";
-    secondary_accent = "#89b4fa";
-    tertiary_accent = "#f5f5f5";
-    background = "#11111b";
-    active_background = "#27273f";
-    hover_background = "#1e1e2e";
+    text_color = colors.text.hex;
+    secondary_accent = colors.blue.hex;
+    tertiary_accent = colors.subtext1.hex;
+    background = colors.crust.hex;
+    active_background = colors.mantle.hex;
+    hover_background = colors.base.hex;
     opacity = "0.98";
   };
 in
@@ -83,7 +86,8 @@ in
     #custom-music,
     #custom-launcher,
     #custom-updates,
-    #custom-nordvpn,
+    #custom-hyprsunset,
+    #custom-suspend,
     #custom-notifications,
     #custom-notification,
     #custom-power,

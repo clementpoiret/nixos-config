@@ -16,9 +16,10 @@ let
         "eDP-2, highres, auto, 1.6"
         "DP-3, highres, auto-right, 1.6, transform, 0"
       ];
+  theme = import ../theme.nix;
+  colors = theme.mocha.colors;
 in
 {
-
   wayland.windowManager.hyprland = {
     settings = {
       xwayland.force_zero_scaling = true;
@@ -69,7 +70,7 @@ in
         gaps_in = 8;
         gaps_out = 8;
         border_size = 3;
-        "col.active_border" = "rgb(7287fd) rgb(b4befe) 45deg";
+        "col.active_border" = "rgb(${colors.blue.texthex}) rgb(${colors.lavender.texthex}) 45deg";
         "col.inactive_border" = "0x00000000";
         border_part_of_window = false;
         no_border_on_floating = false;
@@ -116,8 +117,6 @@ in
           enabled = true;
           size = 2;
           passes = 4;
-          # size = 4;
-          # passes = 2;
           brightness = 1;
           contrast = 1.4;
           ignore_opacity = true;
@@ -319,7 +318,7 @@ in
       # windowrulev2
       windowrulev2 = [
         "idleinhibit fullscreen, fullscreenstate:* 2"
-        "bordercolor rgb(dc8a78) rgb(e64553) 45deg, fullscreen:1"
+        "bordercolor rgb(${colors.red.texthex}) rgb(${colors.peach.texthex}) 45deg, fullscreen:1"
         "float, title:^(Picture-in-Picture)$"
         "opacity 1.0 override 1.0 override, title:^(Picture-in-Picture)$"
         "pin, title:^(Picture-in-Picture)$"
