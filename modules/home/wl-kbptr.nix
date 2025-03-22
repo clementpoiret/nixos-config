@@ -1,6 +1,9 @@
 { pkgs, ... }:
 {
-  home.packages = [ pkgs.wl-kbptr ];
+  home.packages = with pkgs; [
+    wl-kbptr
+    wlrctl
+  ];
 
   # TODO: refine with upcoming qmk mod
   wayland.windowManager.hyprland.extraConfig = ''
@@ -11,10 +14,10 @@
     bind=,a,exec,hyprctl dispatch submap reset && wl-kbptr && hyprctl dispatch submap cursor
 
     # Cursor movement
-    # binde=,j,exec,wlrctl pointer move 0 10
-    # binde=,k,exec,wlrctl pointer move 0 -10
-    # binde=,l,exec,wlrctl pointer move 10 0
-    # binde=,h,exec,wlrctl pointer move -10 0
+    binde=,r,exec,wlrctl pointer move 0 10
+    binde=,t,exec,wlrctl pointer move 0 -10
+    binde=,i,exec,wlrctl pointer move 10 0
+    binde=,l,exec,wlrctl pointer move -10 0
 
     # Left button
     bind=,s,sendshortcut,,mouse:272,
