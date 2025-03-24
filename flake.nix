@@ -117,6 +117,9 @@
         hyprsunset = prev.hyprsunset.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
+        waybar = prev.waybar.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
       };
 
       customOverlays = [
