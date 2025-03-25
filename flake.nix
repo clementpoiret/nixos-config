@@ -105,7 +105,7 @@
         hyprcursor = prev.hyprcursor.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
-        hyprpicker = prev.hyprpicker.overrideAttrs (old: {
+        hyprpicker = prev.master.hyprpicker.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
         hyprlock = prev.hyprlock.overrideAttrs (old: {
@@ -114,7 +114,7 @@
         hypridle = prev.hypridle.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
-        hyprsunset = prev.hyprsunset.overrideAttrs (old: {
+        hyprsunset = prev.master.hyprsunset.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
         waybar = prev.waybar.overrideAttrs (old: {

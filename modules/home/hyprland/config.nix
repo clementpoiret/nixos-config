@@ -25,6 +25,8 @@ in
       xwayland.force_zero_scaling = true;
 
       # autostart
+      # for the first install, run "systemctl --user enable --now <service>.service"
+      # for hypridle, hyprsunset, and waybar
       exec-once = [
         "systemctl --user import-environment"
         "uwsm finalize"
@@ -32,10 +34,8 @@ in
         "wl-clip-persist --clipboard both"
         "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f)"
         "poweralertd"
-        "systemctl --user enable --now hypridle.service"
         "uwsm-app swaync"
         "wl-paste --watch cliphist store"
-        "uwsm-app waybar"
       ];
 
       input = {
@@ -72,8 +72,8 @@ in
         border_size = 3;
         "col.active_border" = "rgb(${colors.blue.texthex}) rgb(${colors.lavender.texthex}) 45deg";
         "col.inactive_border" = "0x00000000";
-        border_part_of_window = false;
         no_border_on_floating = false;
+        # border_part_of_window = false;
       };
 
       misc = {
@@ -85,6 +85,7 @@ in
         enable_swallow = true;
         swallow_regex = "^(ghostty)$";
         focus_on_activate = true;
+        vfr = true;
         vrr = 1;
       };
 
@@ -293,45 +294,51 @@ in
       ];
 
       # windowrule
-      windowrule = [
-        "float,pqiv"
-        "center,pqiv"
-        "size 1200 725,pqiv"
-        "float,mpv"
-        "center,mpv"
-        "size 1200 725,mpv"
-        "float,audacious"
-        "idleinhibit focus, mpv"
-        "float,udiskie"
-        # "float,^(pavucontrol)$"
-        # "float,^(blueman-manager)$"
-        # "float,^(nm-connection-editor)$"
-        # "float,title:^(Transmission)$"
-        # "float,title:^(Volume Control)$"
-        # "float,title:^(Firefox — Sharing Indicator)$"
-        # "float,title:^(OpenSSH Authentication Passphrase request)$"
-        # "move 0 0,title:^(Firefox — Sharing Indicator)$"
-        # "size 700 450,title:^(Volume Control)$"
-        # "move 40 55%,title:^(Volume Control)$"
-      ];
+      # windowrule = [
+      # "float,pqiv"
+      # "center,pqiv"
+      # "size 1200 725,pqiv"
+      # "float,mpv"
+      # "center,mpv"
+      # "size 1200 725,mpv"
+      # "float,audacious"
+      # "idleinhibit focus, mpv"
+      # "float,udiskie"
+      # "float,^(pavucontrol)$"
+      # "float,^(blueman-manager)$"
+      # "float,^(nm-connection-editor)$"
+      # "float,title:^(Transmission)$"
+      # "float,title:^(Volume Control)$"
+      # "float,title:^(Firefox — Sharing Indicator)$"
+      # "float,title:^(OpenSSH Authentication Passphrase request)$"
+      # "move 0 0,title:^(Firefox — Sharing Indicator)$"
+      # "size 700 450,title:^(Volume Control)$"
+      # "move 40 55%,title:^(Volume Control)$"
+      # ];
 
       # windowrulev2
-      windowrulev2 = [
+      windowrule = [
         "idleinhibit fullscreen, fullscreenstate:* 2"
+        "idleinhibit focus, class:^(mpv)$"
+        "idleinhibit fullscreen, title:^(.*Zen Browser.*)$"
+
         "bordercolor rgb(${colors.red.texthex}) rgb(${colors.peach.texthex}) 45deg, fullscreen:1"
-        "float, title:^(Picture-in-Picture)$"
+
         "opacity 1.0 override 1.0 override, title:^(Picture-in-Picture)$"
-        "pin, title:^(Picture-in-Picture)$"
         "opacity 1.0 override 1.0 override, title:^(.*pqiv.*)$"
         "opacity 1.0 override 1.0 override, title:^(.*mpv.*)$"
         "opacity 1.0 override 1.0 override, class:(Aseprite)"
         "opacity 1.0 override 1.0 override, class:(Unity)"
-        "idleinhibit focus, class:^(mpv)$"
-        "idleinhibit fullscreen, title:^(.*Zen Browser.*)$"
-        "float,class:^(zenity)$"
+
+        "pin, title:^(Picture-in-Picture)$"
+
         "center,class:^(zenity)$"
+
         "size 850 500,class:^(zenity)$"
         "size 950 600,title:^(float_ghostty)$"
+
+        "float,class:^(zenity)$"
+        "float, title:^(Picture-in-Picture)$"
         "float,class:^(float_ghostty)$"
         "float,class:^(.*pavucontrol)$"
         "float,class:^(qalculate-gtk)$"
