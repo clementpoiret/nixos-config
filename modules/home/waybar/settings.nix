@@ -157,14 +157,16 @@
       tooltip = "false";
     };
     "custom/hyprsunset" = {
-      # format = " ";
-      # on-click = "toggle_light";
-      format = " {} ";
-      exec = "bluelightinfo";
-      tooltip = true;
-      interval = 1;
-      return-type = "json";
-      on-click = "bluelighttoggle";
+      format = "󱣖";
+      on-click = "hyprctl hyprsunset temperature 3500";
+      on-click-right = "hyprctl hyprsunset temperature identity";
+      on-scroll-up = "hyprctl hyprsunset temperature +500";
+      on-scroll-down = "hyprctl hyprsunset temperature -500";
+      # exec = "echo test";
+      # exec-on-event = true;
+      # exec-if = "pidof hyprsunset";
+      # interval = "once";
+      tooltip = false;
     };
     "custom/suspend" = {
       exec = "suspend_state";

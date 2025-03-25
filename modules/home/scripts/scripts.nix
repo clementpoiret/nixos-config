@@ -15,7 +15,9 @@ let
   );
   toggle_waybar = pkgs.writeScriptBin "toggle_waybar" (builtins.readFile ./scripts/toggle_waybar.sh);
   toggle_float = pkgs.writeScriptBin "toggle_float" (builtins.readFile ./scripts/toggle_float.sh);
-  toggle_suspend = pkgs.writeScriptBin "toggle_suspend" (builtins.readFile ./scripts/toggle_suspend.sh);
+  toggle_suspend = pkgs.writeScriptBin "toggle_suspend" (
+    builtins.readFile ./scripts/toggle_suspend.sh
+  );
   suspend_state = pkgs.writeScriptBin "suspend_state" (builtins.readFile ./scripts/suspend_state.sh);
 
   maxfetch = pkgs.writeScriptBin "maxfetch" (builtins.readFile ./scripts/maxfetch.sh);
@@ -36,11 +38,6 @@ let
   record = pkgs.writeScriptBin "record" (builtins.readFile ./scripts/record.sh);
 
   run_nvim = pkgs.writeScriptBin "run_nvim" (builtins.readFile ./scripts/run_nvim.sh);
-
-  bluelightinfo = pkgs.writeScriptBin "bluelightinfo" (builtins.readFile ./scripts/bluelightinfo.sh);
-  bluelighttoggle = pkgs.writeScriptBin "bluelighttoggle" (
-    builtins.readFile ./scripts/bluelighttoggle.sh
-  );
 in
 {
   home.packages = [
@@ -74,8 +71,5 @@ in
     record
 
     run_nvim
-
-    bluelightinfo
-    bluelighttoggle
   ];
 }
