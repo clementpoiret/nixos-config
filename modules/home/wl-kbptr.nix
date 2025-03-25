@@ -18,6 +18,10 @@
     binde=,t,exec,wlrctl pointer move 0 -10
     binde=,i,exec,wlrctl pointer move 10 0
     binde=,l,exec,wlrctl pointer move -10 0
+    binde=SHIFT,r,exec,wlrctl pointer move 0 100
+    binde=SHIFT,t,exec,wlrctl pointer move 0 -100
+    binde=SHIFT,i,exec,wlrctl pointer move 100 0
+    binde=SHIFT,l,exec,wlrctl pointer move -100 0
 
     # Left button
     bind=,s,sendshortcut,,mouse:272,
