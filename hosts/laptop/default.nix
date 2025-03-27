@@ -44,7 +44,7 @@
       "acpi_call"
       "cros_ec"
       "cros_ec_lpcs"
-      "zenpower"
+      # "zenpower"
     ];
     kernelParams = [
       "amd_pstate=active"
@@ -63,7 +63,7 @@
         acpi_call
         cpupower
         framework-laptop-kmod
-        zenpower
+        # zenpower
       ]
       ++ [ pkgs.cpupower-gui ];
   };
