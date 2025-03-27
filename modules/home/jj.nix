@@ -10,12 +10,14 @@
         email = "poiret.clement@outlook.fr";
       };
       signing = {
-        sign-all = true;
+        behavior = "own";
         backend = "gpg";
         key = "71F084CEA427B23537934233CC6B0EED323A6C13";
       };
       git.sign-on-push = true;
       ui = {
+        default-command = "log";
+
         show-cryptographic-signatures = true;
 
         pager = [
