@@ -99,9 +99,10 @@
     "custom/fancontrol" = {
       format = "󰈐 {}";
       exec-if = "which fw-fanctrl";
-      exec = "fw-fanctrl print current";
-      interval = 5;
-      on-click = "sh -c 'current=$(fw-fanctrl print current); case $current in laziest) next=lazy;; lazy) next=medium;; medium) next=agile;; agile) next=very-agile;; very-agile) next=deaf;; deaf) next=aeolus;; aeolus) next=laziest;; *) next=medium;; esac; fw-fanctrl use $next'";
+      exec = "sleep 0.5; fw-fanctrl print current | rg \"Strategy in use: '(.+)'\" -r '$1'";
+      exec-on-event = true;
+      interval = "once";
+      on-click = "cycle-fan-strategy";
       tooltip = true;
       tooltip-format = "Current fan mode: {}";
     };

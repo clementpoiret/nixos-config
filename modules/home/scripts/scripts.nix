@@ -38,6 +38,10 @@ let
   record = pkgs.writeScriptBin "record" (builtins.readFile ./scripts/record.sh);
 
   run_nvim = pkgs.writeScriptBin "run_nvim" (builtins.readFile ./scripts/run_nvim.sh);
+
+  cycle-fan-strategy = pkgs.writeScriptBin "cycle-fan-strategy" (
+    builtins.readFile ./scripts/cycle-fan-strategy.sh
+  );
 in
 {
   home.packages = [
@@ -71,5 +75,7 @@ in
     record
 
     run_nvim
+
+    cycle-fan-strategy
   ];
 }
