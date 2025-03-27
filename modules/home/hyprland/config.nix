@@ -89,6 +89,19 @@ in
         vrr = 1;
       };
 
+      plugin = [
+        {
+          overview = {
+            gapsIn = 5;
+            gapsOut = 5;
+            panelHeight = 100;
+            showEmptyWorkspace = false;
+            showNewWorkspace = false;
+            workspaceActiveBorder = "0xee${colors.lavender.texthex}";
+          };
+        }
+      ];
+
       gestures = {
         workspace_swipe = true;
         workspace_swipe_fingers = 3;
@@ -188,6 +201,9 @@ in
         "$mainMod, V, exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
         "$mainMod, N, exec, swaync-client -t"
         "$mainMod, SEMICOLON, exec, uwsm-app -- ghostty -e zellij --layout nvim"
+
+        # plugins
+        "$mainMod, O, overview:toggle"
 
         # master layout bindings
         "$mainMod, M, layoutmsg, focusmaster"
