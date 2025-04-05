@@ -3,7 +3,7 @@ with lib;
 let
   defaultApps = {
     archive = [ "org.gnome.FileRoller.desktop" ];
-    browser = [ "zen.desktop" ];
+    browser = [ "zen-beta.desktop" ];
     text = [ "neovide.desktop" ];
     image = [ "pqiv.desktop" ];
     audio = [ "mpv.desktop" ];
