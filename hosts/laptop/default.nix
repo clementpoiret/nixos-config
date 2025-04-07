@@ -56,6 +56,7 @@
       # https://gitlab.freedesktop.org/drm/amd/-/issues/3647
       "amdgpu.dcdebugmask=0x10"
 
+      "microcode.amd_sha_check=off" # microcode from ucodenix couldn't be loaded without this
     ];
     extraModulePackages =
       with config.boot.kernelPackages;
