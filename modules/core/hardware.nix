@@ -47,6 +47,32 @@ in
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="bfq"
     # Set scheduler for HDD
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
+
+    # This is for picotool
+    SUBSYSTEM=="usb", \
+      ATTRS{idVendor}=="2e8a", \
+      ATTRS{idProduct}=="0003", \
+      TAG+="uaccess" \
+      MODE="660", \
+      GROUP="plugdev"
+    SUBSYSTEM=="usb", \
+      ATTRS{idVendor}=="2e8a", \
+      ATTRS{idProduct}=="0009", \
+      TAG+="uaccess" \
+      MODE="660", \
+      GROUP="plugdev"
+    SUBSYSTEM=="usb", \
+      ATTRS{idVendor}=="2e8a", \
+      ATTRS{idProduct}=="000a", \
+      TAG+="uaccess" \
+      MODE="660", \
+      GROUP="plugdev"
+    SUBSYSTEM=="usb", \
+      ATTRS{idVendor}=="2e8a", \
+      ATTRS{idProduct}=="000f", \
+      TAG+="uaccess" \
+      MODE="660", \
+      GROUP="plugdev"
   '';
 
   hardware.graphics = {
