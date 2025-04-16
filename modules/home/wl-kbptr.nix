@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    master.wl-kbptr
+    wl-kbptr
     wlrctl
   ];
 
@@ -12,6 +12,7 @@
 
     # Jump cursor to a position
     bind=,a,exec,hyprctl dispatch submap reset && wl-kbptr && hyprctl dispatch submap cursor
+    bind=,z,exec,hyprctl dispatch submap reset && wl-kbptr -o modes=floating,click -o mode_floating.source=detect && hyprctl dispatch submap cursor
 
     # Cursor movement
     binde=,r,exec,wlrctl pointer move 0 10
