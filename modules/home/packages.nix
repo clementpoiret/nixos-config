@@ -25,6 +25,7 @@
       gtrash # rm replacement, put deleted files in system trash
       graphviz
       hexdump
+      hub # wrapper around git
       inkscape
       inxi # system info
       killall # to kill our little friends
@@ -56,7 +57,7 @@
       # ]))
 
       # lldb
-      master.vscode-extensions.vadimcn.vscode-lldb
+      vscode-extensions.vadimcn.vscode-lldb
 
       # C / C++
       cmake
@@ -80,7 +81,7 @@
       micromamba
       ruff
       uv
-      master.basedpyright
+      basedpyright
       pylyzer
       ruff
 
@@ -138,6 +139,7 @@
       qmk
       rclone
       serpl
+      signal-desktop-bin
       tdf # read pdfs in terminal
       unzip
       via # keyboard config
