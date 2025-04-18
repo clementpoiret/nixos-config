@@ -4,6 +4,7 @@
     pkgs.hyprlock
   ];
 
+  # TODO: refactor to use the home manager implementation
   xdg.configFile."hypr/hyprlock.conf".text = ''
     $red = rgb(f38ba8)
     $yellow = rgb(f9e2af)

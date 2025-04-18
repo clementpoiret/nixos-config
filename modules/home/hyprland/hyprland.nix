@@ -9,7 +9,6 @@
   home.packages = with pkgs; [
     hyprcursor
     hyprpicker
-    hyprsunset
 
     glib
     grim
