@@ -183,8 +183,9 @@ in
         "$mainMod, F1, exec, show-keybinds"
 
         # app and scrips bindings
-        "$mainMod, Return, exec, uwsm-app -- ghostty -e zellij a -c --index 0"
-        "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e zellij"
+        "$mainMod, Return, exec, uwsm-app -- ghostty -e tmux new-session -t 'main'"
+        # "$mainMod, Return, exec, uwsm-app -- ghostty -e zellij a -c --index 0"
+        "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e tmux"
         "ALT, Return, exec, uwsm-app -- ghostty"
         "$mainMod, D, exec, fuzzel"
         "$mainMod, Q, killactive,"
@@ -200,7 +201,7 @@ in
         "$mainMod, W, exec, wallpaper-picker"
         "$mainMod, V, exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
         "$mainMod, N, exec, swaync-client -t"
-        "$mainMod, SEMICOLON, exec, uwsm-app -- ghostty -e zellij --layout nvim"
+        # "$mainMod, SEMICOLON, exec, uwsm-app -- ghostty -e zellij --layout nvim"
 
         # plugins
         "$mainMod, O, overview:toggle"
