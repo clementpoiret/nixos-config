@@ -31,6 +31,7 @@
     ./sops.nix # secrets mgmt
     ./swayosd.nix # volume and brightness feedbacks
     ./scripts/scripts.nix # personal scripts
+    ./tmux.nix
     ./waybar # status bar
     ./wl-kbptr.nix
     ./xdg-mimes.nix # default apps
