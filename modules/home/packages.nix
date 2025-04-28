@@ -82,7 +82,7 @@
       ruff
       uv
       basedpyright
-      pylyzer
+      # pylyzer
       ruff
 
       # Zig
@@ -130,8 +130,8 @@
       playerctl # controller for media players
       pqiv
       proton-pass
-      protonvpn-gui
-      protonvpn-cli
+      master.protonvpn-gui
+      master.protonvpn-cli
       poweralertd
       pueue # manage long running tasks
       qalculate-gtk # calculator
