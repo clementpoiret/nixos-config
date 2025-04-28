@@ -12,9 +12,12 @@
     shell = "${pkgs.nushell}/bin/nu";
     shortcut = "a";
     terminal = "xterm-256color";
+    mouse = true;
 
     plugins = with pkgs.tmuxPlugins; [
+      better-mouse-mode
       catppuccin
+      fingers
       sensible
       tmux-floax
       yank
