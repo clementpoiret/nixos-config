@@ -43,6 +43,7 @@
       tldr # user-friendly help
       wormhole-william # magic wormhole in Go
       yarn
+      youtube-music
       zenity
 
       # Markdown
