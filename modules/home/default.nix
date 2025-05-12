@@ -6,10 +6,8 @@
     ./aichat.nix
     ./bat.nix # better cat command
     ./btop.nix # resouces monitor
+    ./chtsh.nix
     ./easyeffect.nix # audio profile
-    # ./emacs/emacs.nix # emacs editor
-    # ./espanso.nix # expand keywords
-    # ./files/files.nix # custom files
     ./fuzzel.nix # launcher
     ./ghostty.nix # the best terminal emulator
     ./git/git.nix # version controle
@@ -27,7 +25,6 @@
     ./nemo.nix # file manager
     ./nvim/nvim.nix # neovim editor
     ./packages.nix # other packages
-    # ./qutebrowser/qutebrowser.nix # qutebrowser
     ./sops.nix # secrets mgmt
     ./swayosd.nix # volume and brightness feedbacks
     ./scripts/scripts.nix # personal scripts
