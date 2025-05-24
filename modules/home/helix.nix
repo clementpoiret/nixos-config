@@ -38,19 +38,32 @@
     # TODO: simple-completion-language-server
     languages = {
       language-server = {
+        tinymist = {
+          command = "tinymist";
+          config = {
+            exportPdf = "onType";
+            outputPath = "$root/target/$dir/$name";
+            formatterMode = "typstyle";
+            formatterPrintWidth = 80;
+            lint.enabled = true;
+          };
+        };
         basedpyright.config = {
-          basedpyright.analysis.typeCheckingMode = "basic";
+          basedpyright.analysis.typeCheckingMode = "off";
         };
         # pylyzer = {
         #   command = "pylyzer";
         #   args = [ "--server" ];
         # };
-
         bibli-ls = {
           command = "bibli_ls";
           required-root-patterns = [
             ".bibli.toml"
           ];
+        };
+        ty = {
+          command = "ty";
+          args = [ "server" ];
         };
         zk = {
           command = "zk";
@@ -92,8 +105,9 @@
           name = "python";
           auto-format = true;
           language-servers = [
-            "ruff"
             "basedpyright"
+            "ruff"
+            "ty"
             # "pylyzer"
           ];
         }
@@ -127,6 +141,11 @@
               "-"
             ];
           };
+        }
+        {
+          name = "typst";
+          auto-format = true;
+          language-servers = [ "tinymist" ];
         }
       ];
     };

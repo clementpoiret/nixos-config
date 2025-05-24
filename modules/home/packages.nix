@@ -57,6 +57,11 @@
       #   p.mdformat-footnote
       # ]))
 
+      # typst
+      typst
+      typstyle
+      tinymist
+      typst-live
       # lldb
       vscode-extensions.vadimcn.vscode-lldb
 
@@ -79,11 +84,11 @@
 
       # Python
       (import ./python-packages.nix { pkgs = pkgs; })
+      basedpyright
       micromamba
       ruff
+      master.ty
       uv
-      basedpyright
-      # pylyzer
       ruff
 
       # Zig
