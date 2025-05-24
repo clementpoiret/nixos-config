@@ -62,6 +62,7 @@
       typstyle
       tinymist
       typst-live
+
       # lldb
       vscode-extensions.vadimcn.vscode-lldb
 
@@ -107,12 +108,20 @@
       terraform
       terraform-ls
 
+      # wine
+      bottles
+      (wineWowPackages.stable.override { waylandSupport = true; })
+      winetricks
+
       # aider-chat
       aria2
       bibiman
+      brave
       bleachbit # cache cleaner
       bluetuith
-      chromium
+      # chromium
+      # google-chrome
+      # firefox-beta-bin
       devenv # reproducible dev env based on nix
       drawio
       dust
@@ -123,6 +132,7 @@
       gparted # partition manager
       hugo
       #lens
+      libation
       libnotify
       man-pages # extra man pages
       mpv # video player
@@ -157,6 +167,7 @@
       xdg-utils
       xxd
       zotero-beta
+      zoom-us
 
       flake.alejandra
       flake.zen-browser
