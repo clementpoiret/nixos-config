@@ -6,7 +6,7 @@
       # aerc # for emails
       age # for my secrets
       awscli2
-      bruno # for REST APIs tests
+      # bruno # for REST APIs tests
       bitwise # cli tool for bit / hex manipulation
       dconf-editor
       dmidecode
