@@ -42,6 +42,8 @@ let
   cycle-fan-strategy = pkgs.writeScriptBin "cycle-fan-strategy" (
     builtins.readFile ./scripts/cycle-fan-strategy.sh
   );
+
+  manage-dns = pkgs.writeScriptBin "manage-dns" (builtins.readFile ./scripts/manage-dns.sh);
 in
 {
   home.packages = [
@@ -77,5 +79,7 @@ in
     run_nvim
 
     cycle-fan-strategy
+
+    manage-dns
   ];
 }
