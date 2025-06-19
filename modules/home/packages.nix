@@ -128,7 +128,7 @@
       evince # gnome pdf viewer
       ffmpeg
       file-roller
-      firefox-devedition-bin
+      firefox-devedition
       gparted # partition manager
       hugo
       #lens
