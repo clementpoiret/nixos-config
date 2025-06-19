@@ -25,7 +25,7 @@
           "--diff-so-fancy"
           "--side-by-side"
         ];
-        diff.format = "git";
+        diff-formatter = ":git";
       };
     };
   };
