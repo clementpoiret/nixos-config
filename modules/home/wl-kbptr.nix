@@ -52,4 +52,50 @@
     bind=$mainMod,g,exec,hyprctl keyword cursor:inactive_timeout 0; hyprctl keyword cursor:hide_on_key_press false; hyprctl dispatch submap cursor
   '';
 
+  xdg.configFile."wl-kbptr/config".text = # toml
+    ''
+      # wl-kbptr can be configured with a configuration file.
+      # The file location can be passed with the -C parameter.
+      # Othewise the `$XDG_CONFIG_HOME/wl-kbptr/config` file will
+      # be loaded if it exits. Below is the default configuration.
+
+      # [general]
+      # home_row_keys=asenflrtiu
+      # modes=tile,bisect
+
+      [mode_tile]
+      label_color=#cdd6f4
+      label_select_color=#f38ba8
+      unselectable_bg_color=#1e1e2e40
+      selectable_bg_color=#1e1e2eB3
+      selectable_border_color=#b4befe
+      label_font_family=sans-serif
+      label_symbols=abcdefghijklmnopqrstuvwxyz
+
+      [mode_floating]
+      label_color=#cdd6f4
+      label_select_color=#f38ba8
+      unselectable_bg_color=#1e1e2e40
+      selectable_bg_color=#1e1e2eB3
+      selectable_border_color=#b4befe
+      label_font_family=sans-serif
+      label_symbols=abcdefghijklmnopqrstuvwxyz
+
+      # [mode_bisect]
+      # label_color=#cdd6f4
+      # label_font_size=20
+      # label_font_family=sans-serif
+      # label_padding=12
+      # pointer_size=20
+      # pointer_color=#e22d
+      # unselectable_bg_color=#2226
+      # even_area_bg_color=#0304
+      # even_area_border_color=#0408
+      # odd_area_bg_color=#0034
+      # odd_area_border_color=#0048
+      # history_border_color=#3339
+
+      # [mode_click]
+      # button=left
+    '';
 }
