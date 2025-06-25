@@ -31,6 +31,12 @@ in
     };
   };
 
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
+  };
+
   environment.systemPackages = with pkgs; [ networkmanagerapplet ];
 
   services.resolved = {
