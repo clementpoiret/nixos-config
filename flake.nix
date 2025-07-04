@@ -53,9 +53,9 @@
 
     bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
 
-    ghostty = {
-      url = "github:ghostty-org/ghostty";
-    };
+    # ghostty = {
+    #   url = "github:ghostty-org/ghostty";
+    # };
   };
 
   outputs =
@@ -67,7 +67,7 @@
       bibli-ls,
       chaotic,
       fw-fanctrl,
-      ghostty,
+      # ghostty,
       home-manager,
       nixpkgs,
       nixpkgs-master,
@@ -96,7 +96,7 @@
         alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
-        ghostty = ghostty.packages.${system}.default;
+        # ghostty = ghostty.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
       };
 
@@ -111,7 +111,7 @@
         hyprcursor = prev.hyprcursor.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
-        hyprpicker = prev.master.hyprpicker.overrideAttrs (old: {
+        hyprpicker = prev.hyprpicker.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
         hyprlock = prev.hyprlock.overrideAttrs (old: {
@@ -120,11 +120,20 @@
         hypridle = prev.hypridle.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
-        hyprsunset = prev.master.hyprsunset.overrideAttrs (old: {
+        hyprsunset = prev.hyprsunset.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
         waybar = prev.waybar.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
+
+        # temporary fix
+        ghostty = prev.ghostty.overrideAttrs (_: {
+          preBuild = ''
+            shopt -s globstar
+            sed -i 's/^const xev = @import("xev");$/const xev = @import("xev").Epoll;/' **/*.zig
+            shopt -u globstar
+          '';
         });
       };
 
