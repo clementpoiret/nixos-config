@@ -29,6 +29,7 @@
     ./superfile.nix # file manager
     ./swayosd.nix # volume and brightness feedbacks
     ./scripts/scripts.nix # personal scripts
+    ./taskwarrior.nix
     ./tmux.nix
     ./waybar # status bar
     ./wl-kbptr.nix
