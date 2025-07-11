@@ -10,7 +10,6 @@
       bitwise # cli tool for bit / hex manipulation
       dconf-editor
       dmidecode
-      drawio
       entr # perform action when file change
       exfat
       fd # find replacement
@@ -38,12 +37,12 @@
       pciutils
       ripgrep # grep replacement
       sops
-      spotify-player
+      # spotify-player
       toipe # typing test in the terminal
       tldr # user-friendly help
       wormhole-william # magic wormhole in Go
-      yarn
-      youtube-music
+      # yarn
+      # youtube-music
       zenity
 
       # Markdown
@@ -102,16 +101,11 @@
       k9s
       kubernetes-helm
       kubectl
-      lens
-      minikube
+      # lens
+      # minikube
       opentofu
       terraform
       terraform-ls
-
-      # wine
-      bottles
-      (wineWowPackages.stable.override { waylandSupport = true; })
-      winetricks
 
       # aider-chat
       aria2
@@ -131,9 +125,12 @@
       firefox-devedition
       gparted # partition manager
       hugo
+      hunspell
+      hunspellDicts.fr-any
       #lens
       libation
       libnotify
+      libreoffice-fresh
       man-pages # extra man pages
       mpv # video player
       ncdu # disk space
@@ -146,8 +143,8 @@
       playerctl # controller for media players
       pqiv
       proton-pass
-      master.protonvpn-gui
-      master.protonvpn-cli
+      protonvpn-gui
+      protonvpn-cli
       poweralertd
       pueue # manage long running tasks
       qalculate-gtk # calculator
@@ -161,7 +158,7 @@
       via # keyboard config
       wget
       wl-clipboard
-      stable.wush # transfer between computers, stable to have v0.3.0
+      wush # transfer between computers, stable to have v0.3.0
       cliphist
       wiper
       xdg-utils
