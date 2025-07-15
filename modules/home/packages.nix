@@ -149,7 +149,7 @@
       pueue # manage long running tasks
       qalculate-gtk # calculator
       qFlipper
-      qmk
+      stable.qmk
       rclone
       serpl
       signal-desktop-bin

@@ -52,10 +52,6 @@
     };
 
     bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
-
-    # ghostty = {
-    #   url = "github:ghostty-org/ghostty";
-    # };
   };
 
   outputs =
@@ -67,7 +63,6 @@
       bibli-ls,
       chaotic,
       fw-fanctrl,
-      # ghostty,
       home-manager,
       nixpkgs,
       nixpkgs-master,
@@ -96,7 +91,6 @@
         alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
-        # ghostty = ghostty.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
       };
 
@@ -128,13 +122,13 @@
         });
 
         # temporary fix
-        ghostty = prev.ghostty.overrideAttrs (_: {
-          preBuild = ''
-            shopt -s globstar
-            sed -i 's/^const xev = @import("xev");$/const xev = @import("xev").Epoll;/' **/*.zig
-            shopt -u globstar
-          '';
-        });
+        # ghostty = prev.ghostty.overrideAttrs (_: {
+        #   preBuild = ''
+        #     shopt -s globstar
+        #     sed -i 's/^const xev = @import("xev");$/const xev = @import("xev").Epoll;/' **/*.zig
+        #     shopt -u globstar
+        #   '';
+        # });
       };
 
       customOverlays = [
