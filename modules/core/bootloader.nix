@@ -17,7 +17,7 @@ in
   boot.kernelPackages = linuxPackage;
   services.scx = {
     enable = true;
-    package = pkgs.scx.full;
+    package = pkgs.stable.scx.full;
     scheduler = "scx_bpfland";
   };
 
