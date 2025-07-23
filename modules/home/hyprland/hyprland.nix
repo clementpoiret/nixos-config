@@ -19,7 +19,7 @@
     wl-clip-persist
     wf-recorder
   ];
-  systemd.user.targets.hyprland-session.Unit.Wants = [ "xdg-desktop-autostart.target" ];
+  # systemd.user.targets.hyprland-session.Unit.Wants = [ "xdg-desktop-autostart.target" ];
   wayland.windowManager.hyprland = {
     enable = true;
     package = null;
@@ -35,11 +35,12 @@
   };
 
   xdg.configFile = {
-    "uwsm/env".text = # sh
-      ''
-        export NIXOS_OZONE_WL=1
-        export ELECTRON_OZONE_PLATFORM_HINT="auto"
-      '';
+    # "uwsm/env".text = # sh
+    #   ''
+    #     export NIXOS_OZONE_WL=1
+    #     export ELECTRON_OZONE_PLATFORM_HINT="auto"
+    #   '';
+    "uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
 
     "uwsm/env-hyprland".text = # sh
       ''

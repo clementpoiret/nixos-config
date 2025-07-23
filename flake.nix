@@ -52,6 +52,8 @@
     };
 
     bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
+
+    hyprland.url = "github:hyprwm/Hyprland/v0.50.1";
   };
 
   outputs =

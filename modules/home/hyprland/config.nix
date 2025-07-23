@@ -196,7 +196,7 @@ in
         "$mainMod, Space, exec, toggle_float"
         "$mainMod, Escape, exec, uwsm-app -- hyprlock"
         "$mainMod SHIFT, Escape, exec, shutdown-script"
-        "$mainMod, E, exec, uwsm-app -- ghostty -e yazi"
+        "$mainMod, E, exec, uwsm-app -- ghostty -e superfile"
         "$mainMod ALT, B, exec, toggle_waybar"
         "$mainMod, C, exec, uwsm-app -- hyprpicker -a"
         "$mainMod, W, exec, wallpaper-picker"
