@@ -166,7 +166,7 @@
       zotero-beta
       zoom-us
 
-      flake.alejandra
+      # flake.alejandra
       flake.zen-browser
     ]
   );
