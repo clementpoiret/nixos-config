@@ -15,10 +15,10 @@
 
     ucodenix.url = "github:e-tho/ucodenix";
 
-    alejandra = {
-      url = "github:kamadorueda/alejandra/3.1.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # alejandra = {
+    #   url = "github:kamadorueda/alejandra/3.1.0";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -53,14 +53,15 @@
 
     bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
 
-    hyprland.url = "github:hyprwm/Hyprland/v0.50.1";
+    # hyprland.url = "github:hyprwm/Hyprland/v0.50.1";
+    # sherlock.url = "github:Skxxtz/sherlock";
   };
 
   outputs =
     {
       self,
 
-      alejandra,
+      # alejandra,
       bash-env-json,
       bibli-ls,
       chaotic,
@@ -90,7 +91,7 @@
         config.allowUnfree = true;
       };
       pkgs-flake = {
-        alejandra = alejandra.defaultPackage.${system};
+        # alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
