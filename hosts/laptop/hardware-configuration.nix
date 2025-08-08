@@ -111,4 +111,7 @@
   programs.fw-fanctrl.config = {
     defaultStrategy = "lazy";
   };
+
+  # Misc
+  # chaotic.hdr.enable = true;
 }
