@@ -13,8 +13,10 @@ let
       ]
     else
       [
-        "eDP-2, highres, auto, 1.6"
+        "eDP-2, highres, auto, 1.6, bitdepth, 10, cm, wide, vrr, 1"
         "DP-3, highres, auto-right, 1.6, transform, 0"
+        "DP-4, highres, auto-left, 2, bitdepth, 10, cm, wide, vrr, 1"
+        "DP-12, highres, auto-left, 2, bitdepth, 10, cm, wide, vrr, 1"
       ];
   theme = import ../theme.nix;
   colors = theme.mocha.colors;
@@ -62,7 +64,8 @@ in
       monitor = [
         # General rule
         ", preferred, auto, 1"
-      ] ++ monitors;
+      ]
+      ++ monitors;
 
       general = {
         "$mainMod" = "SUPER";
