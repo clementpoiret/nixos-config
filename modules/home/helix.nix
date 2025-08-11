@@ -212,7 +212,11 @@
 
       keys = {
         normal = {
-          space.space = "file_picker";
+          space = {
+            space = "file_picker";
+            m.l = ":theme modus_operandi";
+            m.d = ":theme modus_vivendi";
+          };
 
           # Movements
           j = [
