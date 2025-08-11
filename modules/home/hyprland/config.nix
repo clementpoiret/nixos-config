@@ -190,7 +190,7 @@ in
         # "$mainMod, Return, exec, uwsm-app -- ghostty -e zellij a -c --index 0"
         "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e tmux"
         "ALT, Return, exec, uwsm-app -- ghostty"
-        "$mainMod, T, exec, [float; size 950 600] uwsm-app -- ghostty -e 'uvx --from syncall[google,tw] tw_gtasks_sync -t shared -l Shared; task list; nu'"
+        "$mainMod, T, exec, [float; size 950 600] uwsm-app -- ghostty -e 'nu -e \"twsync; twl\"'"
         "$mainMod, D, exec, fuzzel"
         "$mainMod, Q, killactive,"
         "$mainMod, F, fullscreen, 1"

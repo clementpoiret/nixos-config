@@ -27,6 +27,8 @@
     "twsp" = "task stop";
     "twd" = "task done";
 
-    "twsync" = "uvx --from syncall[google,tw] tw_gtasks_sync -t shared -l Shared; task list";
+    # currently, remember that syncall is broken on nixpkgs,
+    # it needs to be installed via uvx (uvx install syncall[...])
+    "twsync" = "tw_gtasks_sync -t shared -l Shared";
   };
 }
