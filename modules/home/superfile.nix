@@ -16,6 +16,7 @@
       case_sensitive_sort = false;
 
       debug = false;
+      ignore_missing_fields = false;
 
       code_previewer = "bat";
       nerdfont = true;
