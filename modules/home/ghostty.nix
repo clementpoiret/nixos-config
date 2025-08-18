@@ -1,17 +1,21 @@
-{ pkgs, ... }:
+{ ... }:
 {
-  home.packages = with pkgs; [ ghostty ];
+  programs.ghostty = {
+    enable = true;
 
-  xdg.configFile."ghostty/config".text = ''
-    theme = catppuccin-mocha
-    gtk-titlebar = false
-    # gtk-tabs-location = hidden  # this renders a black window
-    window-decoration = false
-    font-family = "TX02 Nerd Font Ret"
-    # font-family = "TX-02"
-    font-size = 10
-    copy-on-select = true
-    confirm-close-surface = false
-    window-padding-color = "extend"
-  '';
+    settings = {
+      theme = "catppuccin-mocha";
+      gtk-titlebar = false;
+      "window-decoration" = false;
+      font-family = "TX02 Nerd Font Ret";
+      font-size = 10;
+      copy-on-select = true;
+      confirm-close-surface = false;
+      window-padding-color = "extend";
+
+      # keybind = [
+      #   "super+shift+j=write_screen_file:open"
+      # ];
+    };
+  };
 }
