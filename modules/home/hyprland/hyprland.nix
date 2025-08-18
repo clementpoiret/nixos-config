@@ -50,6 +50,10 @@
         export MOZ_ENABLE_WAYLAND=1
         export MOZ_WEBRENDER=1
 
+        # For Electron apps to run on Wayland
+        export NIXOS_OZONE_WL=1
+        export ELECTRON_OZONE_PLATFORM_HINT="auto"
+
         export XDG_CURRENT_DESKTOP=Hyprland
         export XDG_SESSION_DESKTOP=Hyprland
         export XDG_SESSION_TYPE="wayland"
