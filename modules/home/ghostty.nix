@@ -6,6 +6,7 @@
     settings = {
       theme = "catppuccin-mocha";
       gtk-titlebar = false;
+      gtk-single-instance = true;
       "window-decoration" = false;
       font-family = "TX02 Nerd Font Ret";
       font-size = 10;

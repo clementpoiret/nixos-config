@@ -5,6 +5,7 @@ let
     archive = [ "org.gnome.FileRoller.desktop" ];
     browser = [ "zen-beta.desktop" ];
     text = [ "neovide.desktop" ];
+    text = [ "Helix.desktop" ];
     image = [ "pqiv.desktop" ];
     audio = [ "mpv.desktop" ];
     video = [ "mpv.desktop" ];
