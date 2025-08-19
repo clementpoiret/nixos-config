@@ -123,6 +123,7 @@
       ffmpeg
       file-roller
       firefox-devedition
+      gemini-cli
       gparted # partition manager
       hugo
       hunspell
@@ -156,6 +157,8 @@
       tdf # read pdfs in terminal
       unzip
       via # keyboard config
+      vivaldi
+      vivaldi-ffmpeg-codecs
       wget
       wl-clipboard
       wush # transfer between computers, stable to have v0.3.0
