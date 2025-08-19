@@ -196,7 +196,7 @@ in
         "$mainMod, Q, killactive,"
         "$mainMod, F, fullscreen, 1"
         "$mainMod SHIFT, F, fullscreen, 0"
-        "$mainMod, B, exec, uwsm-app -- zen"
+        "$mainMod, B, exec, uwsm-app -- vivaldi"
         "$mainMod, Space, exec, toggle_float"
         "$mainMod, Escape, exec, uwsm-app -- hyprlock"
         "$mainMod SHIFT, Escape, exec, shutdown-script"
@@ -343,6 +343,7 @@ in
         "idleinhibit fullscreen, fullscreenstate:* 2"
         "idleinhibit focus, class:^(mpv)$"
         "idleinhibit fullscreen, title:^(.*Zen Browser.*)$"
+        "idleinhibit fullscreen, title:^(.*Vivaldi.*)$"
 
         "bordercolor rgb(${colors.red.texthex}) rgb(${colors.peach.texthex}) 45deg, fullscreen:1"
 

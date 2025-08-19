@@ -3,8 +3,7 @@ with lib;
 let
   defaultApps = {
     archive = [ "org.gnome.FileRoller.desktop" ];
-    browser = [ "zen-beta.desktop" ];
-    text = [ "neovide.desktop" ];
+    browser = [ "vivaldi-stable.desktop" ];
     text = [ "Helix.desktop" ];
     image = [ "pqiv.desktop" ];
     audio = [ "mpv.desktop" ];
