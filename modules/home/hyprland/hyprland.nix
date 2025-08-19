@@ -19,6 +19,7 @@
     wl-clip-persist
     wf-recorder
   ];
+
   # systemd.user.targets.hyprland-session.Unit.Wants = [ "xdg-desktop-autostart.target" ];
   wayland.windowManager.hyprland = {
     enable = true;
@@ -26,9 +27,7 @@
     # portalPackage = null;
     package = pkgs.hyprland;
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
-    xwayland = {
-      enable = true;
-    };
+    xwayland.enable = true;
     systemd.enable = false;
 
     plugins = [

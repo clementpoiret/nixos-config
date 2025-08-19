@@ -7,6 +7,7 @@
       theme = "catppuccin-mocha";
       gtk-titlebar = false;
       gtk-single-instance = true;
+      linux-cgroup = "single-instance";
       "window-decoration" = false;
       font-family = "TX02 Nerd Font Ret";
       font-size = 10;

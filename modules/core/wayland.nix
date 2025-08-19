@@ -1,14 +1,14 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 {
   programs.hyprland = {
     enable = true;
     package = pkgs.hyprland;
-    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
-    # portalPackage =
-    #   inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     withUWSM = true;
+    xwayland.enable = true;
   };
+
+  services.displayManager.defaultSession = "hyprland-uwsm";
 
   programs.uwsm.enable = true;
   # environment.variables.UWSM_USE_SESSION_SLICE = "true";
@@ -16,10 +16,9 @@
   xdg.portal = {
     enable = true;
     wlr.enable = false;
-    xdgOpenUsePortal = true;
+    xdgOpenUsePortal = false;
     extraPortals = [
-      pkgs.xdg-desktop-portal-hyprland
-      # inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
+      # pkgs.xdg-desktop-portal-hyprland
       pkgs.xdg-desktop-portal-gtk
     ];
   };

@@ -39,6 +39,7 @@ in
         "uwsm-app swaync"
         "wl-paste --watch cliphist store"
         "ghostty --gtk-single-instance=true --quit-after-last-window-closed=false --initial-window=false"
+        "systemctl --user start xdg-desktop-portal-gtk"
       ];
 
       input = {
