@@ -11,7 +11,7 @@
     ./fuzzel.nix # launcher
     ./ghostty.nix # the best terminal emulator
     ./git/git.nix # version controle
-    ./gitui/gitui.nix # lazygit replacement
+    # ./gitui/gitui.nix # lazygit replacement
     ./gtk.nix # gtk theme
     ./helix.nix
     ./hyprland # window manager

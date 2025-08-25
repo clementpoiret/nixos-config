@@ -8,10 +8,10 @@
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     nur.url = "github:nix-community/NUR";
 
-    fw-fanctrl = {
-      url = "github:TamtamHero/fw-fanctrl/packaging/nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # fw-fanctrl = {
+    #   url = "github:TamtamHero/fw-fanctrl/packaging/nix";
+    #   # inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     ucodenix.url = "github:e-tho/ucodenix";
 
@@ -65,7 +65,7 @@
       bash-env-json,
       bibli-ls,
       chaotic,
-      fw-fanctrl,
+      # fw-fanctrl,
       home-manager,
       nixpkgs,
       nixpkgs-master,
@@ -165,7 +165,7 @@
           modules = [
             { nixpkgs.overlays = customOverlays; }
             ./hosts/laptop
-            fw-fanctrl.nixosModules.default
+            # fw-fanctrl.nixosModules.default
             chaotic.nixosModules.default
           ];
           specialArgs = {
