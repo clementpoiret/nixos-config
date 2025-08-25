@@ -1,16 +1,17 @@
 { pkgs }:
 
-pkgs.python3.withPackages (p:
-  with p; [
-    requests # HTTP library
+pkgs.python3.withPackages (
+  p: with p; [
+    # requests # HTTP library
 
-    # lsp-bridge
-    epc
-    orjson
-    sexpdata
-    six
-    setuptools
-    paramiko
-    rapidfuzz
-    watchdog
-  ])
+    # # lsp-bridge
+    # epc
+    # orjson
+    # sexpdata
+    # six
+    # setuptools
+    # paramiko
+    # rapidfuzz
+    # watchdog
+  ]
+)

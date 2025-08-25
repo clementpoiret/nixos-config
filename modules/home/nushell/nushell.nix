@@ -17,7 +17,7 @@ in
 
     extraConfig = ''
       # Source the conda script to activate micromamba envs
-      use conda.nu [activate deactivate]
+      # use conda.nu [activate deactivate]
 
       # Jujutsu
       source ($nu.default-config-dir | path join 'completions/jj.nu')
@@ -26,38 +26,6 @@ in
       use ($nu.default-config-dir | path join 'aliases/bat.nu') *
       use ($nu.default-config-dir | path join 'aliases/git.nu') *
       use ($nu.default-config-dir | path join 'aliases/k8s.nu') *
-
-      # gitui ssh fix
-      # see https://github.com/extrawurst/gitui/issues/495
-      def sshgitui [] {
-        do --env {
-          let ssh_agent_file = (
-            $nu.temp-path | path join $"ssh-agent-($env.USER?).nuon"
-          )
-
-          if ($ssh_agent_file | path exists) {
-            let ssh_agent_env = open ($ssh_agent_file)
-            if ($"/proc/($ssh_agent_env.SSH_AGENT_PID)" | path exists) {
-              load-env $ssh_agent_env
-              return
-            } else {
-              rm $ssh_agent_file
-            }
-          }
-
-          let ssh_agent_env = ^ssh-agent -c
-            | lines
-            | first 2
-            | parse "setenv {name} {value};"
-            | transpose --header-row
-            | into record
-          load-env $ssh_agent_env
-          $ssh_agent_env | save --force $ssh_agent_file
-          }
-        ssh-add ~/.ssh/id_ed25519
-        gitui
-      }
-      alias g = sshgitui
     '';
 
     extraEnv = ''
@@ -142,9 +110,6 @@ in
 
     # Custom scripts
     file = {
-      ".config/nushell/scripts/conda.nu" = {
-        source = ./scripts/conda.nu;
-      };
       ".config/nushell/scripts/parse-env.nu" = {
         source = ./scripts/parse-env.nu;
       };

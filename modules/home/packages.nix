@@ -3,174 +3,159 @@
   home.packages = (
     with pkgs;
     [
-      # aerc # for emails
-      age # for my secrets
-      awscli2
-      # bruno # for REST APIs tests
-      bitwise # cli tool for bit / hex manipulation
-      dconf-editor
-      dmidecode
-      entr # perform action when file change
-      exfat
-      fd # find replacement
-      file # Show file information
-      fzf # fuzzy finder
-      gh # github cli
-      gh-dash
-      glab
-      gifsicle # gif utility
-      gnuplot
-      gtt # google translate TUI
-      gtrash # rm replacement, put deleted files in system trash
-      graphviz
-      hexdump
-      hub # wrapper around git
-      inkscape
-      inxi # system info
-      killall # to kill our little friends
-      lsd # ls replacement
-      lshw
-      lz4
-      # magic-wormhole # magic file transfer
-      nitch # systhem fetch util
-      nix-prefetch-github
-      pciutils
+      # General Utilities
+      # bitwise # CLI tool for bit/hex manipulation
+      # bleachbit # Disk space cleaner and privacy tool
+      bluetuith # Bluetooth device management
+      cliphist # Wayland clipboard history manager
+      # dconf-editor # Graphical editor for dconf database
+      dust # Intuitive disk usage analyzer (improved du)
+      entr # Run commands when files change
+      fd # Simple, fast alternative to 'find'
+      file # Determine file type
+      fzf # Command-line fuzzy finder
+      # gtt # Google Translate terminal interface (TUI)
+      gtrash # Move files to trash instead of permanent delete
+      # hexdump # Display files in hex/decimal/octal
+      killall # Terminate processes by name
+      lsd # Modern ls with colors/icons
+      lz4 # Extremely fast lossless compression
+      man-pages # Additional manual pages
+      ncdu # Disk usage analyzer with ncurses interface
+      nitch # System information fetch utility
+      pamixer # PulseAudio CLI mixer
+      pavucontrol # PulseAudio volume control GUI
+      playerctl # Media player controller
+      pqiv # Powerful X11 image viewer
+      # pueue # Background task manager for long-running jobs
+      qalculate-gtk # Advanced calculator (GTK interface)
       ripgrep # grep replacement
-      sops
-      # spotify-player
-      toipe # typing test in the terminal
-      tldr # user-friendly help
+      serpl # SerpAPI CLI for search engine results
+      tldr # Simplified community-driven man pages
+      # toipe # Terminal typing test
+      unzip # Extract ZIP archives
+      via # Keyboard layout configuration tool
+      wl-clipboard # Wayland clipboard utilities
       wormhole-william # magic wormhole in Go
-      # yarn
-      # youtube-music
+      # xxd # Hexdump/reverse hexdump utility
       zenity
 
-      # Markdown
-      ltex-ls-plus
-      marksman
-      # WARNING: This is broken, it only installs the first plugin in the list...
-      # I'll use uvx instead.
-      # (mdformat.withPlugins (p: [
-      #   p.mdformat-gfm
-      #   p.mdformat-frontmatter
-      #   p.mdformat-footnote
-      # ]))
+      # System Information & Monitoring
+      dmidecode # DMI/SMBIOS table decoder
+      inxi # Comprehensive system information tool
+      lshw # Hardware detection and listing
+      pciutils # PCI bus configuration tools
 
+      # Disk & Filesystems
+      exfat # exFAT filesystem utilities
+      gparted # Partition editor GUI
+
+      # Networking
+      aria2 # Multi-source command-line download utility
+      protonvpn-cli # ProtonVPN command-line interface
+      protonvpn-gui # ProtonVPN graphical interface
+      rclone # Cloud storage synchronization
+      wget # Non-interactive network downloader
+
+      # Development Tools
+      cmake # Cross-platform build system
+      devenv # Reproducible development environments with Nix
+      gcc # GNU Compiler Collection
+      gnumake # GNU make build automation
+      nixfmt-rfc-style # nix formatter
+      rustfmt # Rust code formatter
+      shfmt # Shell script formatter
+      zig # General-purpose programming language/toolchain
+
+      # Scientific writing
       # typst
       typst
       typstyle
       tinymist
       typst-live
 
-      # lldb
-      vscode-extensions.vadimcn.vscode-lldb
+      # Language Servers
+      basedpyright # Python language server (Pyright-based)
+      ltex-ls-plus
+      marksman
+      nixd # Nix language server
+      rubyPackages_3_4.ruby-lsp # Ruby language server
+      ruff # Python LSP
+      rust-analyzer # Rust language server
+      ty
+      vscode-extensions.vadimcn.vscode-lldb # VS Code LLDB debugger extension
+      zls # Zig language server
 
-      # C / C++
-      cmake
-      gcc
-      gnumake
+      # Package Management
+      nix-prefetch-github # Prefetch GitHub repository hashes for Nix
+      uv # Python package installer/resolver (Astral)
 
-      # Rust
-      cargo
-      rust-analyzer
-      rustfmt
+      # Version Control
+      gh # GitHub CLI
+      # gh-dash # GitHub CLI dashboard
+      glab # GitLab CLI
+      hub # GitHub-focused wrapper for git
 
-      # bash
-      shfmt
+      # Containers & Orchestration
+      docker # Container runtime
+      fluxcd # Continuous delivery for Kubernetes
+      k9s # Kubernetes CLI interface
+      kubernetes-helm # Kubernetes package manager
+      kubectl # Kubernetes command-line client
 
-      # Nix
-      nixd
-      nixfmt-rfc-style
+      # Infrastructure as Code
+      opentofu # Open-source Terraform-compatible IaC
+      terraform # Infrastructure as Code tool (HashiCorp)
+      terraform-ls # Terraform language server
 
-      # Python
-      (import ./python-packages.nix { pkgs = pkgs; })
-      basedpyright
-      micromamba
-      ruff
-      master.ty
-      uv
-      ruff
+      # Browsers
+      # brave # Privacy-focused web browser
+      firefox-devedition # Firefox Developer Edition
+      flake.zen-browser # Privacy-focused browser (Zen)
+      vivaldi # Feature-rich web browser
+      vivaldi-ffmpeg-codecs # Vivaldi media codecs
 
-      # Zig
-      zig
-      zls
+      # Graphics
+      gifsicle # GIF image manipulation
+      # graphviz # Graph visualization software
+      inkscape # Vector graphics editor
 
-      # infra
-      docker
-      fluxcd
-      k9s
-      kubernetes-helm
-      kubectl
-      # lens
-      # minikube
-      opentofu
-      terraform
-      terraform-ls
+      # Multimedia
+      ffmpeg # Multimedia framework
+      mpv # Media player
 
-      # aider-chat
-      aria2
-      bibiman
-      brave
-      bleachbit # cache cleaner
-      bluetuith
-      # chromium
-      # google-chrome
-      # firefox-beta-bin
-      devenv # reproducible dev env based on nix
-      drawio
-      dust
-      evince # gnome pdf viewer
-      ffmpeg
-      file-roller
-      firefox-devedition
-      gemini-cli
-      gparted # partition manager
-      hugo
-      hunspell
-      hunspellDicts.fr-any
-      #lens
-      libation
-      libnotify
-      libreoffice-fresh
-      man-pages # extra man pages
-      mpv # video player
-      ncdu # disk space
-      onlyoffice-desktopeditors
-      openssl
-      pamixer # pulseaudio command line mixer
-      pavucontrol # pulseaudio volume controle (GUI)
-      poppler # pdf preview
-      pdftk
-      playerctl # controller for media players
-      pqiv
-      proton-pass
-      protonvpn-gui
-      protonvpn-cli
-      poweralertd
-      pueue # manage long running tasks
-      qalculate-gtk # calculator
-      qFlipper
-      stable.qmk
-      rclone
-      serpl
-      signal-desktop-bin
-      tdf # read pdfs in terminal
-      unzip
-      via # keyboard config
-      vivaldi
-      vivaldi-ffmpeg-codecs
-      wget
-      wl-clipboard
-      wush # transfer between computers, stable to have v0.3.0
-      cliphist
-      wiper
-      xdg-utils
-      xxd
-      zotero-beta
-      zoom-us
+      # Office & Documents
+      drawio # Diagrams editor
+      evince # PDF/document viewer
+      hugo # Static site generator
+      hunspell # Spell checker engine
+      hunspellDicts.fr-any # French Hunspell dictionary
+      libreoffice-fresh # Office suite
+      onlyoffice-desktopeditors # Office suite
+      pdftk # PDF document manipulation toolkit
+      poppler # PDF rendering library (CLI tools)
+      tdf # Terminal PDF reader
+      zotero-beta # Reference management
 
-      # flake.alejandra
-      flake.zen-browser
+      # Security
+      age # Simple modern file encryption
+      openssl # SSL/TLS protocol implementation
+      proton-pass # Password manager
+      sops # Encrypted secrets management
+
+      # Communication
+      signal-desktop-bin # Signal messaging client
+      # zoom-us # Video conferencing client
+
+      # Miscellaneous
+      bibiman # Bibliography management CLI
+      gemini-cli # Gemini protocol client
+      # libation # Extract audio books
+      libnotify # Desktop notification library
+      poweralertd # Power alert daemon (low battery/etc.)
+      qmk
+      wiper # Secure file deletion tool
+      xdg-utils # Desktop integration scripts (open/mailto)
     ]
   );
 }
