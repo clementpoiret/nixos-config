@@ -3,22 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-24.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.05";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-    nur.url = "github:nix-community/NUR";
-
-    # fw-fanctrl = {
-    #   url = "github:TamtamHero/fw-fanctrl/packaging/nix";
-    #   # inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    # nur.url = "github:nix-community/NUR";
 
     ucodenix.url = "github:e-tho/ucodenix";
-
-    # alejandra = {
-    #   url = "github:kamadorueda/alejandra/3.1.0";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -54,18 +44,15 @@
     bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
 
     # hyprland.url = "github:hyprwm/Hyprland/v0.50.1";
-    # sherlock.url = "github:Skxxtz/sherlock";
   };
 
   outputs =
     {
       self,
 
-      # alejandra,
       bash-env-json,
       bibli-ls,
       chaotic,
-      # fw-fanctrl,
       home-manager,
       nixpkgs,
       nixpkgs-master,
@@ -91,7 +78,6 @@
         config.allowUnfree = true;
       };
       pkgs-flake = {
-        # alejandra = alejandra.defaultPackage.${system};
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
@@ -123,15 +109,6 @@
         waybar = prev.waybar.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
         });
-
-        # temporary fix
-        # ghostty = prev.ghostty.overrideAttrs (_: {
-        #   preBuild = ''
-        #     shopt -s globstar
-        #     sed -i 's/^const xev = @import("xev");$/const xev = @import("xev").Epoll;/' **/*.zig
-        #     shopt -u globstar
-        #   '';
-        # });
       };
 
       customOverlays = [
@@ -146,7 +123,7 @@
     {
       overlays.default = selfPkgs.overlay;
 
-      # niz-switch
+      # nix-switch
       nixosConfigurations = {
         desktop = nixpkgs.lib.nixosSystem {
           inherit system;
@@ -179,27 +156,27 @@
       homeConfigurations = {
         "clementpoiret@desktop" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgs;
-          #useUserPackages = true;
-          #useGlobalPkgs = true;
+          useUserPackages = true;
+          useGlobalPkgs = true;
           extraSpecialArgs = {
             inherit self inputs username;
             host = "desktop";
           };
           modules = [
-            { nixpkgs.overlays = customOverlays; }
+            # { nixpkgs.overlays = customOverlays; }
             (import ./home-manager)
           ];
         };
         "clementpoiret@laptop" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgs;
-          #useUserPackages = true;
-          #useGlobalPkgs = true;
+          useUserPackages = true;
+          useGlobalPkgs = true;
           extraSpecialArgs = {
             inherit self inputs username;
             host = "laptop";
           };
           modules = [
-            { nixpkgs.overlays = customOverlays; }
+            # { nixpkgs.overlays = customOverlays; }
             (import ./home-manager)
           ];
         };
