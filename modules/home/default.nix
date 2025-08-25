@@ -3,7 +3,7 @@
 }:
 {
   imports = [
-    ./aichat.nix
+    # ./aichat.nix
     ./bat.nix # better cat command
     ./btop.nix # resouces monitor
     ./chtsh.nix
@@ -19,8 +19,8 @@
     ./kitty.nix # terminal
     ./lazygit.nix
     ./nushell/nushell.nix # shell
-    ./ptpython.nix # python repl
-    ./spicetify.nix # spotify client
+    # ./ptpython.nix # python repl
+    # ./spicetify.nix # spotify client
     ./swaync/swaync.nix # notification deamon
     ./nemo.nix # file manager
     ./nvim/nvim.nix # neovim editor

@@ -1,11 +1,9 @@
 {
   self,
   pkgs,
-  inputs,
   ...
 }:
 {
-  # imports = [ inputs.nix-gaming.nixosModules.default ];
   nix = {
     settings = {
       auto-optimise-store = true;
@@ -36,7 +34,6 @@
   nixpkgs = {
     overlays = [
       self.overlays.default
-      inputs.nur.overlays.default
     ];
   };
 
@@ -52,6 +49,9 @@
 
   time.timeZone = "Europe/Paris";
   i18n.defaultLocale = "en_US.UTF-8";
-  nixpkgs.config.allowUnfree = true;
-  system.stateVersion = "24.11";
+  nixpkgs.config = {
+    allowUnfree = true;
+    allowUnfreePredicate = true;
+  };
+  system.stateVersion = "25.05";
 }
