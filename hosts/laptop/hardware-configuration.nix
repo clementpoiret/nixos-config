@@ -107,9 +107,11 @@
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
   # Fan Control
-  programs.fw-fanctrl.enable = true;
-  programs.fw-fanctrl.config = {
-    defaultStrategy = "lazy";
+  hardware.fw-fanctrl = {
+    enable = true;
+    config = {
+      defaultStrategy = "lazy";
+    };
   };
 
   # Misc
