@@ -72,6 +72,47 @@
             ".zk"
           ];
         };
+        rubocop = {
+          command = "rubocop";
+          args = [ "--lsp" ];
+        };
+        ruby-lsp = {
+          command = "ruby-lsp";
+          config = {
+            diagnostics = true;
+            formatting = true;
+            config = {
+              initializationOptions = {
+                enabledFeatures = {
+                  codeActions = true;
+                  codeLens = true;
+                  completion = true;
+                  definition = true;
+                  diagnostics = true;
+                  documentHighlights = true;
+                  documentLink = true;
+                  documentSymbols = true;
+                  foldingRanges = true;
+                  formatting = true;
+                  hover = true;
+                  inlayHint = true;
+                  onTypeFormatting = true;
+                  selectionRanges = true;
+                  semanticHighlighting = true;
+                  signatureHelp = true;
+                  typeHierarchy = true;
+                  workspaceSymbol = true;
+                };
+                featuresConfiguration = {
+                  inlayHint = {
+                    implicitHashValue = true;
+                    implicitRescue = true;
+                  };
+                };
+              };
+            };
+          };
+        };
       };
       ruff = {
         config.settings = {
@@ -146,6 +187,25 @@
           name = "typst";
           auto-format = true;
           language-servers = [ "tinymist" ];
+        }
+        {
+          name = "ruby";
+          language-servers = [
+            "rubocop"
+            "ruby-lsp"
+          ];
+          auto-format = true;
+        }
+        {
+          name = "erb";
+          language-servers = [
+            "ruby-lsp"
+          ];
+          auto-format = true;
+          formatter = {
+            command = "erb-format";
+            args = [ "--stdin" ];
+          };
         }
       ];
     };

@@ -52,6 +52,8 @@
 
       # Networking
       aria2 # Multi-source command-line download utility
+      protonmail-bridge
+      protonmail-bridge-gui
       protonvpn-cli # ProtonVPN command-line interface
       protonvpn-gui # ProtonVPN graphical interface
       rclone # Cloud storage synchronization
@@ -79,7 +81,6 @@
       ltex-ls-plus
       marksman
       nixd # Nix language server
-      rubyPackages_3_4.ruby-lsp # Ruby language server
       ruff # Python LSP
       rust-analyzer # Rust language server
       ty
@@ -155,6 +156,7 @@
       poweralertd # Power alert daemon (low battery/etc.)
       qmk
       wiper # Secure file deletion tool
+      wl-screenrec
       xdg-utils # Desktop integration scripts (open/mailto)
     ]
   );
