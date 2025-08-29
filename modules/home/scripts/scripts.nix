@@ -36,6 +36,7 @@ let
   ascii = pkgs.writeScriptBin "ascii" (builtins.readFile ./scripts/ascii.sh);
 
   record = pkgs.writeScriptBin "record" (builtins.readFile ./scripts/record.sh);
+  screenrec = pkgs.writeScriptBin "screenrec" (builtins.readFile ./scripts/screenrec.sh);
 
   run_nvim = pkgs.writeScriptBin "run_nvim" (builtins.readFile ./scripts/run_nvim.sh);
 
@@ -75,6 +76,7 @@ in
     ascii
 
     record
+    screenrec
 
     run_nvim
 
