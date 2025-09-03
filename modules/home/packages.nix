@@ -6,6 +6,7 @@
       # General Utilities
       # bitwise # CLI tool for bit/hex manipulation
       # bleachbit # Disk space cleaner and privacy tool
+      ast-grep
       bluetuith # Bluetooth device management
       cliphist # Wayland clipboard history manager
       # dconf-editor # Graphical editor for dconf database
@@ -13,11 +14,13 @@
       entr # Run commands when files change
       fd # Simple, fast alternative to 'find'
       file # Determine file type
+      file-roller # Archive viewer
       fzf # Command-line fuzzy finder
       # gtt # Google Translate terminal interface (TUI)
       gtrash # Move files to trash instead of permanent delete
       # hexdump # Display files in hex/decimal/octal
       killall # Terminate processes by name
+      lazysql # Like lazygit, but for sql
       lsd # Modern ls with colors/icons
       lz4 # Extremely fast lossless compression
       man-pages # Additional manual pages
