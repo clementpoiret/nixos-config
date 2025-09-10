@@ -153,6 +153,7 @@
 
       # Miscellaneous
       bibiman # Bibliography management CLI
+      # en-croissant # Chess Tool
       gemini-cli # Gemini protocol client
       # libation # Extract audio books
       libnotify # Desktop notification library

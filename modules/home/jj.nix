@@ -30,5 +30,5 @@
     };
   };
 
-  home.packages = with pkgs; [ lazyjj ];
+  # home.packages = with pkgs; [ lazyjj ];
 }

@@ -107,12 +107,12 @@
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
   # Fan Control
-  # hardware.fw-fanctrl = {
-  #   enable = true;
-  #   config = {
-  #     defaultStrategy = "lazy";
-  #   };
-  # };
+  hardware.fw-fanctrl = {
+    enable = true;
+    config = {
+      defaultStrategy = "lazy";
+    };
+  };
 
   # Misc
   # chaotic.hdr.enable = true;
