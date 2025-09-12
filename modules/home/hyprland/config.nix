@@ -108,9 +108,8 @@ in
       ];
 
       gestures = {
-        workspace_swipe = true;
-        workspace_swipe_fingers = 3;
         workspace_swipe_forever = true;
+        gesture = "3, horizontal, workspace";
       };
 
       dwindle = {
@@ -210,7 +209,7 @@ in
         # "$mainMod, SEMICOLON, exec, uwsm-app -- ghostty -e zellij --layout nvim"
 
         # plugins
-        "$mainMod, O, overview:toggle"
+        # "$mainMod, O, overview:toggle"
 
         # master layout bindings
         "$mainMod, M, layoutmsg, focusmaster"

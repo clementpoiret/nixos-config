@@ -30,9 +30,9 @@
     xwayland.enable = true;
     systemd.enable = false;
 
-    plugins = [
-      pkgs.hyprlandPlugins.hyprspace
-    ];
+    # plugins = [
+    #   pkgs.hyprlandPlugins.hyprspace
+    # ];
   };
 
   xdg.configFile = {
