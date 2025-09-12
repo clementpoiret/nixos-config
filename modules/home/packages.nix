@@ -60,6 +60,7 @@
       protonvpn-cli # ProtonVPN command-line interface
       protonvpn-gui # ProtonVPN graphical interface
       rclone # Cloud storage synchronization
+      sshfs
       wget # Non-interactive network downloader
 
       # Development Tools
