@@ -35,6 +35,7 @@ in
         "runapp poweralertd"
         "runapp syshud -p right -o v -m '0 10 0 0'"
         "runapp wl-paste --watch cliphist store"
+        "runapp ghostty --initial-window=false"
         "systemctl --user start xdg-desktop-portal-gtk"
       ];
 
