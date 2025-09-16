@@ -161,7 +161,7 @@
       # libation # Extract audio books
       libnotify # Desktop notification library
       poweralertd # Power alert daemon (low battery/etc.)
-      qmk
+      master.qmk
       wiper # Secure file deletion tool
       wl-screenrec
       xdg-utils # Desktop integration scripts (open/mailto)
