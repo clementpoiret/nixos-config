@@ -33,7 +33,6 @@ in
         "runapp nm-applet"
         "runapp wl-clip-persist --clipboard both"
         "runapp poweralertd"
-        "runapp swaync"
         "runapp syshud -p right -o v -m '0 10 0 0'"
         "runapp wl-paste --watch cliphist store"
         "systemctl --user start xdg-desktop-portal-gtk"
@@ -376,14 +375,11 @@ in
       ];
 
       layerrule = [
-        "blur, swaync-control-center"
-        "blur, swaync-notification-window"
-        "ignorezero, swaync-control-center"
-        "ignorezero, swaync-notification-window"
-        "ignorealpha 0.5, swaync-control-center"
-        "ignorealpha 0.5, swaync-notification-window"
+        # "blur, ^(swaync.*)$"
+        # "ignorezero, ^(swaync.*)$"
+        # "ignorealpha 0.5, ^(swaync.*)$"
+        # "animation popin, ^(swaync.*)$"
       ];
-
     };
   };
 }

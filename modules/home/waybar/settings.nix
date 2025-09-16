@@ -28,6 +28,7 @@
       "custom/hyprsunset"
       "custom/suspend"
       "custom/notification"
+      "custom/shutdown"
     ];
     clock = {
       timezone = "Europe/Paris";
@@ -160,13 +161,9 @@
     "custom/hyprsunset" = {
       format = "󱣖";
       on-click = "hyprctl hyprsunset temperature 3500";
-      on-click-right = "hyprctl hyprsunset temperature identity";
+      on-click-right = "hyprctl hyprsunset identity";
       on-scroll-up = "hyprctl hyprsunset temperature +500";
       on-scroll-down = "hyprctl hyprsunset temperature -500";
-      # exec = "echo test";
-      # exec-on-event = true;
-      # exec-if = "pidof hyprsunset";
-      # interval = "once";
       tooltip = false;
     };
     "custom/suspend" = {
@@ -179,20 +176,22 @@
       tooltip = false;
       format = "{icon} ";
       format-icons = {
-        notification = "<span foreground='red'><sup></sup></span>   ";
-        none = "   ";
-        dnd-notification = "<span foreground='red'><sup></sup></span>   ";
-        dnd-none = "   ";
-        inhibited-notification = "<span foreground='red'><sup></sup></span>   ";
-        inhibited-none = "   ";
-        dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>   ";
-        dnd-inhibited-none = "   ";
+        dnd = "";
+        normal = "";
       };
       return-type = "json";
-      exec-if = "which swaync-client";
-      exec = "swaync-client -swb";
-      on-click = "swaync-client -t -sw";
-      on-click-right = "swaync-client -d -sw";
+      exec-if = "which dunstctl";
+      exec = "sh -c 'paused=$(dunstctl is-paused 2>/dev/null || echo false); [ \"$paused\" = true ] && alt=dnd || alt=normal; printf \"{\\\"alt\\\":\\\"%s\\\"}\\n\" \"$alt\"'";
+      interval = 1;
+      signal = 1;
+      on-click = "sh -c 'dunstctl set-paused toggle'";
+      on-click-right = "sh -c 'dunstctl set-paused toggle'";
+      escape = true;
+    };
+    "custom/shutdown" = {
+      tooltip = false;
+      format = " ";
+      on-click = "shutdown-script";
       escape = true;
     };
   };

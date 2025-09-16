@@ -35,13 +35,13 @@
       };
 
       serif = {
-        package = pkgs.noto-fonts;
-        name = "Noto Serif";
+        package = pkgs.nerd-fonts.noto;
+        name = "NotoSerif Nerd Font";
       };
 
       sansSerif = {
-        package = pkgs.noto-fonts;
-        name = "Noto Sans";
+        package = pkgs.nerd-fonts.noto;
+        name = "NotoSans Nerd Font";
       };
 
       monospace = {
