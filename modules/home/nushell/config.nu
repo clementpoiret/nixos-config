@@ -908,6 +908,26 @@ $env.config = {
                 cmd: "commandline edit --insert (fzf --layout=reverse)"
             }
         }
+        {
+            name: fuzzy_file_pipe_wl_copy
+            modifier: control
+            keycode: char_y
+            mode: [emacs, vi_normal, vi_insert]
+            event: {
+                send: executehostcommand
+                cmd: 'let f = (fzf --layout=reverse); if $f != "" { commandline edit --insert $"\"($f)\" | wl-copy" }'
+            }
+        }
+        {
+            name: fuzzy_file_cat_wl_copy
+            modifier: control_shift
+            keycode: char_y
+            mode: [emacs, vi_normal, vi_insert]
+            event: {
+                send: executehostcommand
+                cmd: 'let f = (fzf --layout=reverse); if $f != "" { commandline edit --insert $"cat \"($f)\" | wl-copy" }'
+            }
+        }
     ]
 }
 
@@ -915,20 +935,3 @@ $env.config = {
 if (^uwsm check may-start | complete).exit_code == 0 {
     ^uwsm start hyprland-uwsm.desktop
 }
-
-# zellij
-# def start_zellij [] {
-#   if (not ($env.TERM == "linux")) and ('ZELLIJ' not-in ($env | columns)) {
-#     if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
-#       zellij attach -c
-#     } else {
-#       zellij
-#     }
-#
-#     if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
-#       exit
-#     }
-#   }
-# }
-#
-# start_zellij
