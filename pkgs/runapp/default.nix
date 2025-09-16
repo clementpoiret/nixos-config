@@ -12,16 +12,14 @@ let
 in
 stdenv'.mkDerivation rec {
   pname = "runapp";
-  version = "0.3.1";
+  version = "0.4.0";
 
   src = fetchFromGitHub {
     owner = "c4rlo";
     repo = pname;
     rev = version;
-    hash = "sha256-RSCjGKhkfbX9XYTyknjlJUBSWb4KRLIumpH0FIEpnnY=";
+    hash = "sha256-lmKBKVj+5BACPCwpxWnorxID9VVkh6/LJrAmTGIuHhM=";
   };
-
-  # patches = [ ./fix-std-format-span.patch ];
 
   strictDeps = true;
   nativeBuildInputs = [ pkg-config ];

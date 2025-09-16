@@ -13,7 +13,7 @@
         width = 35;
         horizontal-pad = 25;
         inner-pad = 5;
-        launch-prefix = "uwsm-app --";
+        launch-prefix = "runapp";
       };
       border = {
         radius = 12;
