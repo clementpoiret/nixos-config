@@ -38,7 +38,6 @@ in
         "poweralertd"
         "uwsm-app swaync"
         "wl-paste --watch cliphist store"
-        "ghostty --gtk-single-instance=true --quit-after-last-window-closed=false --initial-window=false"
         "systemctl --user start xdg-desktop-portal-gtk"
       ];
 
@@ -187,10 +186,11 @@ in
         "$mainMod, F1, exec, show-keybinds"
 
         # app and scrips bindings
-        "$mainMod, Return, exec, uwsm-app -- ghostty -e tmux new-session -t 'main'"
+        "$mainMod, Return, exec, uwsm-app -- ghostty +new-window"
+        "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e tmux new-session -t 'main'"
         # "$mainMod, Return, exec, uwsm-app -- ghostty -e zellij a -c --index 0"
-        "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e tmux"
-        "ALT, Return, exec, uwsm-app -- ghostty"
+        # "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e tmux"
+        # "ALT, Return, exec, uwsm-app -- ghostty +new-window"
         "$mainMod, T, exec, [float; size 950 600] uwsm-app -- ghostty -e 'nu -e \"twsync; twl\"'"
         "$mainMod, D, exec, fuzzel"
         "$mainMod, Q, killactive,"
@@ -207,6 +207,9 @@ in
         "$mainMod, V, exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
         "$mainMod, N, exec, swaync-client -t"
         # "$mainMod, SEMICOLON, exec, uwsm-app -- ghostty -e zellij --layout nvim"
+
+        # dbus global shortcuts
+        "ALT, Return, global, com.mitchellh.ghostty:ALT+Return" # toggle_quick_terminal
 
         # plugins
         # "$mainMod, O, overview:toggle"

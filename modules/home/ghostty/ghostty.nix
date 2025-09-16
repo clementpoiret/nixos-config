@@ -1,8 +1,7 @@
-{ pkgs, ... }:
+{ ... }:
 {
   programs.ghostty = {
     enable = true;
-    package = pkgs.master.ghostty;
 
     settings = {
       theme = "catppuccin-mocha.conf";
@@ -25,8 +24,7 @@
       custom-shader = "./shaders/cursor-smear.glsl";
 
       keybind = [
-        # "super+shift+j=write_screen_file:open"
-        "global:super+shift+enter=toggle_quick_terminal"
+        "global:alt+enter=toggle_quick_terminal"
       ];
     };
   };
