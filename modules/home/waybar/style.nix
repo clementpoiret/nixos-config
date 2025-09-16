@@ -21,7 +21,7 @@
           margin: 5px;
         }
         .modules-left #workspaces button {
-          background: @base00;
+          background: @base02;
           margin: 0px 5px;
           padding: 0px 10px;
           border-bottom: 0px solid @base02;
@@ -29,20 +29,20 @@
           transition: all 0.5s cubic-bezier(0.33, 1.0, 0.68, 1.0); /* easeInOutCubic */
         }
         .modules-left #workspaces button.active {
-          background: @base00;
+          background: @base02;
           border: 1px solid rgba(0, 0, 0, 0);
           border-bottom: 0px solid @base02;
           border-radius: 32px;
           padding: 0rem 1rem;
         }
         .modules-left #workspaces button.empty {
-          background: @base00;
+          background: @base02;
           border-bottom: 0px solid @base02;
           border-radius: 32px;
         }
         .modules-left #workspaces button:hover {
-          background: @base02;
-          border-bottom: 0px solid @base02;
+          background: @base03;
+          border-bottom: 0px solid @base03;
           border-radius: 32px;
           box-shadow: none;
           text-shadow: none;

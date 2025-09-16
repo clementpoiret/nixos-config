@@ -10,7 +10,7 @@
 
       auto_check_update = false;
 
-      default_directory = ".";
+      default_directory = "~";
       default_sort_type = 2;
       sort_order_reversed = false;
       case_sensitive_sort = false;

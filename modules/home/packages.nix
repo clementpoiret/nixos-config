@@ -117,7 +117,7 @@
 
       # Browsers
       # brave # Privacy-focused web browser
-      #firefox-devedition # Firefox Developer Edition
+      firefox-devedition # Firefox Developer Edition
       flake.zen-browser # Privacy-focused browser (Zen)
       vivaldi # Feature-rich web browser
       vivaldi-ffmpeg-codecs # Vivaldi media codecs
