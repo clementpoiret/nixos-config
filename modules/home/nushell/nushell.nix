@@ -16,12 +16,6 @@ in
     envFile.source = ./env.nu;
 
     extraConfig = ''
-      # Source the conda script to activate micromamba envs
-      # use conda.nu [activate deactivate]
-
-      # Jujutsu
-      source ($nu.default-config-dir | path join 'completions/jj.nu')
-
       # Program aliases
       use ($nu.default-config-dir | path join 'aliases/bat.nu') *
       use ($nu.default-config-dir | path join 'aliases/git.nu') *
@@ -73,16 +67,8 @@ in
       nix-test = "nh os test";
       nix-flake-update = "sudo nix flake update ~/nixos-config#";
 
-      # python
-      piv = "python -m venv .venv";
-      # psv = "source .venv/bin/activate";
-
       # custom tools
-      lakectl = "/home/clementpoiret/bin/lakectl";
       emacs = "emacsclient -c -a 'emacs'";
-
-      # to fix std lib issues
-      obsidian = "with-env { LD_LIBRARY_PATH: $env.NIX_LD_LIBRARY_PATH } { obsidian }";
     };
   };
 
@@ -113,9 +99,9 @@ in
       ".config/nushell/scripts/parse-env.nu" = {
         source = ./scripts/parse-env.nu;
       };
-      ".config/nushell/completions/jj.nu" = {
-        source = ./completions/jj.nu;
-      };
+      # ".config/nushell/completions/jj.nu" = {
+      #   source = ./completions/jj.nu;
+      # };
       ".config/nushell/aliases/bat.nu" = {
         source = ./aliases/bat.nu;
       };

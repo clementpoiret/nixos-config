@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   home.file.lesskey.text = "Q toggle-option -!^Predraw-on-quit\nq";
 
@@ -29,6 +29,16 @@
       };
     };
   };
+
+  # home.activation = {
+  #   generate_jj_nushell_completion = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  #     ${pkgs.jujutsu}/bin/jj util completion nushell > ~/.config/nushell/completions-jj.nu
+  #   '';
+  # };
+
+  # programs.nushell.extraConfig = ''
+  #   use ~/.config/nushell/completions-jj.nu *
+  # '';
 
   # home.packages = with pkgs; [ lazyjj ];
 }
