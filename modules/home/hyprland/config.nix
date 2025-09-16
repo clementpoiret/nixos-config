@@ -37,6 +37,7 @@ in
         "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f)"
         "poweralertd"
         "uwsm-app swaync"
+        "uwsm-app -- syshud -p right -o v -m \"0 10 0 0\""
         "wl-paste --watch cliphist store"
         "systemctl --user start xdg-desktop-portal-gtk"
       ];
@@ -294,9 +295,9 @@ in
         "$mainMod ALT, l, moveactive, 80 0"
 
         # media and volume controls
-        #",XF86AudioRaiseVolume, exec, pamixer -i 2"
-        #",XF86AudioLowerVolume, exec, pamixer -d 2"
-        #",XF86AudioMute, exec, pamixer -t"
+        ",XF86AudioRaiseVolume, exec, pamixer -i 5"
+        ",XF86AudioLowerVolume, exec, pamixer -d 5"
+        ",XF86AudioMute, exec, pamixer -t"
         ",XF86AudioPlay, exec, playerctl play-pause"
         ",XF86AudioNext, exec, playerctl next"
         ",XF86AudioPrev, exec, playerctl previous"
@@ -306,10 +307,14 @@ in
         "$mainMod, S, exec, select-sink"
 
         # laptop brigthness
-        #",XF86MonBrightnessUp, exec, brightnessctl set 5%+"
-        #",XF86MonBrightnessDown, exec, brightnessctl set 5%-"
-        #"$mainMod, XF86MonBrightnessUp, exec, brightnessctl set 100%+"
-        #"$mainMod, XF86MonBrightnessDown, exec, brightnessctl set 100%-"
+        ",XF86MonBrightnessUp, exec, brightnessctl set 5%+"
+        ",XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+        "$mainMod, XF86MonBrightnessUp, exec, brightnessctl set 100%+"
+        "$mainMod, XF86MonBrightnessDown, exec, brightnessctl set 100%-"
+        "ALT,XF86AudioRaiseVolume, exec, brightnessctl set 5%+"
+        "ALT,XF86AudioLowerVolume, exec, brightnessctl set 5%-"
+        "$mainMod ALT, XF86AudioRaiseVolume, exec, brightnessctl set 100%+"
+        "$mainMod ALT, XF86AudioLowerVolume, exec, brightnessctl set 100%-"
       ];
 
       # mouse binding

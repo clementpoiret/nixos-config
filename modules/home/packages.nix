@@ -34,6 +34,7 @@
       qalculate-gtk # Advanced calculator (GTK interface)
       ripgrep # grep replacement
       serpl # SerpAPI CLI for search engine results
+      syshud # OSD
       tldr # Simplified community-driven man pages
       # toipe # Terminal typing test
       unzip # Extract ZIP archives
@@ -115,7 +116,7 @@
 
       # Browsers
       # brave # Privacy-focused web browser
-      firefox-devedition # Firefox Developer Edition
+      #firefox-devedition # Firefox Developer Edition
       flake.zen-browser # Privacy-focused browser (Zen)
       vivaldi # Feature-rich web browser
       vivaldi-ffmpeg-codecs # Vivaldi media codecs
