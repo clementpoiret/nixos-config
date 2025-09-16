@@ -151,8 +151,8 @@
       homeConfigurations = {
         "clementpoiret@desktop" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgs;
-          useUserPackages = true;
-          useGlobalPkgs = true;
+          # useUserPackages = true;
+          # useGlobalPkgs = true;
           extraSpecialArgs = {
             inherit self inputs username;
             host = "desktop";
@@ -164,8 +164,8 @@
         };
         "clementpoiret@laptop" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgs;
-          useUserPackages = true;
-          useGlobalPkgs = true;
+          # useUserPackages = true;
+          # useGlobalPkgs = true;
           extraSpecialArgs = {
             inherit self inputs username;
             host = "laptop";

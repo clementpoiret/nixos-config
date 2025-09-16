@@ -24,7 +24,7 @@
       "custom/fancontrol"
       "power-profiles-daemon"
       "battery"
-      "network"
+      # "network"
       "custom/hyprsunset"
       "custom/suspend"
       "custom/notification"

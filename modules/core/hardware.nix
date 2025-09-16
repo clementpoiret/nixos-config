@@ -83,14 +83,14 @@ in
   hardware.graphics.extraPackages =
     with pkgs;
     lib.mkIf (host == "laptop") [
-      amdvlk
+      # amdvlk
       rocmPackages.clr
     ];
-  hardware.graphics.extraPackages32 =
-    with pkgs;
-    lib.mkIf (host == "laptop") [
-      driversi686Linux.amdvlk
-    ];
+  # hardware.graphics.extraPackages32 =
+  #   with pkgs;
+  #   lib.mkIf (host == "laptop") [
+  #     driversi686Linux.amdvlk
+  #   ];
 
   # nvidia and amdgpu
   services.xserver.videoDrivers = [ xserverDrivers."${host}" ];
