@@ -14,7 +14,6 @@
     grim
     grimblast
     slurp
-    swaybg
     wayland
     wl-clip-persist
     wf-recorder
