@@ -24,11 +24,6 @@
       flake = false;
     };
 
-    spicetify-nix = {
-      url = "github:gerg-l/spicetify-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     bash-env-json = {
       url = "github:tesujimath/bash-env-json/main";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -9,7 +9,7 @@
     ./chtsh.nix
     ./easyeffect.nix # audio profile
     ./fuzzel.nix # launcher
-    ./ghostty.nix # the best terminal emulator
+    ./ghostty/ghostty.nix # the best terminal emulator
     ./git/git.nix # version controle
     # ./gitui/gitui.nix # lazygit replacement
     ./gtk.nix # gtk theme
