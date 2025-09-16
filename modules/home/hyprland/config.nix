@@ -31,14 +31,13 @@ in
       # for hypridle, hyprsunset, and waybar
       exec-once = [
         "systemctl --user import-environment"
-        "uwsm finalize"
-        "nm-applet"
-        "wl-clip-persist --clipboard both"
-        "swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f)"
-        "poweralertd"
-        "uwsm-app swaync"
-        "uwsm-app -- syshud -p right -o v -m \"0 10 0 0\""
-        "wl-paste --watch cliphist store"
+        "uwsm app nm-applet"
+        "uwsm app -- wl-clip-persist --clipboard both"
+        "uwsm app -- swaybg -m fill -i $(find ~/Pictures/wallpapers/ -maxdepth 1 -type f)"
+        "uwsm app poweralertd"
+        "uwsm app swaync"
+        "uwsm app -- syshud -p right -o v -m '0 10 0 0'"
+        "uwsm app -- wl-paste --watch cliphist store"
         "systemctl --user start xdg-desktop-portal-gtk"
       ];
 
@@ -157,28 +156,25 @@ in
         enabled = true;
 
         bezier = [
-          "fluent_decel, 0, 0.2, 0.4, 1"
+          "linear, 0, 0, 1, 1"
+          "md3_standard, 0.2, 0, 0, 1"
+          "md3_decel, 0.05, 0.7, 0.1, 1"
+          "md3_accel, 0.3, 0, 0.8, 0.15"
+          "overshot, 0.05, 0.9, 0.1, 1.1"
+          "crazyshot, 0.1, 1.5, 0.76, 0.92 "
+          "hyprnostretch, 0.05, 0.9, 0.1, 1.0"
+          "fluent_decel, 0.1, 1, 0, 1"
+          "easeInOutCirc, 0.85, 0, 0.15, 1"
           "easeOutCirc, 0, 0.55, 0.45, 1"
-          "easeOutCubic, 0.33, 1, 0.68, 1"
-          "easeinoutsine, 0.37, 0, 0.63, 1"
-          "fade_curve, 0, 0.55, 0.45, 1"
+          "easeOutExpo, 0.16, 1, 0.3, 1"
         ];
 
         animation = [
-          # Windows
-          "windowsIn, 0, 4, easeOutCubic, popin 20%" # window open
-          "windowsOut, 0, 4, fluent_decel, popin 80%" # window close.
-          "windowsMove, 1, 2, fluent_decel, slide" # everything in between, moving, dragging, resizing.
-
-          # Fade
-          "fadeIn, 1, 3, fade_curve" # fade in (open) -> layers and windows
-          "fadeOut, 1, 3, fade_curve" # fade out (close) -> layers and windows
-          "fadeSwitch, 0, 1, easeOutCirc" # fade on changing activewindow and its opacity
-          "fadeShadow, 1, 10, easeOutCirc" # fade on changing activewindow for shadows
-          "fadeDim, 1, 4, fluent_decel" # the easing of the dimming of inactive windows
-          "border, 1, 2.7, easeOutCirc" # for animating the border's color switch speed
-          "borderangle, 1, 30, fluent_decel, once" # for animating the border's gradient angle - styles: once (default), loop
-          "workspaces, 1, 4, easeOutCubic, fade" # styles: slide, slidevert, fade, slidefade, slidefadevert
+          "windows, 1, 3, md3_decel, popin 60%"
+          "border, 1, 10, default"
+          "fade, 1, 2.5, md3_decel"
+          "workspaces, 1, 3.5, easeOutExpo, slide"
+          "specialWorkspace, 1, 3, md3_decel, slidevert"
         ];
       };
 
@@ -187,12 +183,12 @@ in
         "$mainMod, F1, exec, show-keybinds"
 
         # app and scrips bindings
-        "$mainMod, Return, exec, uwsm-app -- ghostty +new-window"
-        "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e tmux new-session -t 'main'"
+        "$mainMod, Return, exec, ghostty +new-window"
+        "$mainMod SHIFT, Return, exec, uwsm-app -T -- tmux new-session -t 'main'"
         # "$mainMod, Return, exec, uwsm-app -- ghostty -e zellij a -c --index 0"
         # "$mainMod SHIFT, Return, exec, uwsm-app -- ghostty -e tmux"
         # "ALT, Return, exec, uwsm-app -- ghostty +new-window"
-        "$mainMod, T, exec, [float; size 950 600] uwsm-app -- ghostty -e 'nu -e \"twsync; twl\"'"
+        "$mainMod, T, exec, [float; size 950 600] uwsm-app -T -- nu -e 'twsync; twl'"
         "$mainMod, D, exec, fuzzel"
         "$mainMod, Q, killactive,"
         "$mainMod, F, fullscreen, 1"
@@ -201,7 +197,7 @@ in
         "$mainMod, Space, exec, toggle_float"
         "$mainMod, Escape, exec, uwsm-app -- hyprlock"
         "$mainMod SHIFT, Escape, exec, shutdown-script"
-        "$mainMod, E, exec, uwsm-app -- ghostty -e superfile"
+        "$mainMod, E, exec, uwsm-app -T superfile"
         "$mainMod ALT, B, exec, toggle_waybar"
         "$mainMod, C, exec, uwsm-app -- hyprpicker -a"
         "$mainMod, W, exec, wallpaper-picker"
