@@ -211,7 +211,7 @@
     };
 
     settings = {
-      theme = "catppuccin_mocha_mod";
+      # theme = "catppuccin_mocha_mod";
 
       editor = {
         cursorline = true;

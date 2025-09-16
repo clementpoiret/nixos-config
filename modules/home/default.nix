@@ -26,6 +26,7 @@
     ./nvim/nvim.nix # neovim editor
     ./packages.nix # other packages
     ./sops.nix # secrets mgmt
+    ./stylix.nix # ricing
     ./superfile.nix # file manager
     # ./swayosd.nix # volume and brightness feedbacks
     ./scripts/scripts.nix # personal scripts

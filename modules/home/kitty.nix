@@ -3,13 +3,6 @@
   programs.kitty = {
     enable = true;
 
-    themeFile = "Catppuccin-Mocha";
-
-    font = {
-      name = "TX02 Nerd Font Ret";
-      size = 11;
-    };
-
     settings = {
       adjust_line_height = 0;
       adjust_column_width = 0;
@@ -42,8 +35,6 @@
       # Window settings
       remember_window_size = "no";
       confirm_os_window_close = 0;
-      background_opacity = "1.0";
-      inactive_text_alpha = "1.0";
       window_padding_width = 0;
       window_border_width = 0;
       window_margin_width = 0;
@@ -56,13 +47,8 @@
       tab_bar_edge = "bottom";
       active_tab_font_style = "normal";
       inactive_tab_font_style = "normal";
-      # tab_bar_style = "powerline";
       tab_bar_style = "hidden";
       tab_powerline_style = "slanted";
-      active_tab_foreground = "#1e1e2e";
-      active_tab_background = "#cba6f7";
-      inactive_tab_foreground = "#bac2de";
-      inactive_tab_background = "#313244";
       wayland_titlebar_color = "system";
 
       # Mouse bindings

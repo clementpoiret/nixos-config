@@ -15,15 +15,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    catppuccin-bat = {
-      url = "github:catppuccin/bat";
-      flake = false;
-    };
-    catppuccin-cava = {
-      url = "github:catppuccin/cava";
-      flake = false;
-    };
-
     bash-env-json = {
       url = "github:tesujimath/bash-env-json/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -37,6 +28,11 @@
     };
 
     bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
+
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # hyprland.url = "github:hyprwm/Hyprland/v0.50.1";
   };
@@ -52,6 +48,7 @@
       nixpkgs,
       nixpkgs-master,
       nixpkgs-stable,
+      stylix,
       zen-browser,
       ...
     }@inputs:
@@ -125,6 +122,7 @@
           modules = [
             { nixpkgs.overlays = customOverlays; }
             ./hosts/desktop
+            stylix.nixosModules.stylix
             chaotic.nixosModules.default
           ];
           specialArgs = {
@@ -138,6 +136,7 @@
             { nixpkgs.overlays = customOverlays; }
             ./hosts/laptop
             # fw-fanctrl.nixosModules.default
+            stylix.nixosModules.stylix
             chaotic.nixosModules.default
           ];
           specialArgs = {
@@ -159,6 +158,7 @@
           };
           modules = [
             # { nixpkgs.overlays = customOverlays; }
+            stylix.homeModules.stylix
             (import ./home-manager)
           ];
         };
@@ -172,6 +172,7 @@
           };
           modules = [
             # { nixpkgs.overlays = customOverlays; }
+            stylix.homeModules.stylix
             (import ./home-manager)
           ];
         };

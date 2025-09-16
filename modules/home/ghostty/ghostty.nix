@@ -4,8 +4,6 @@
     enable = true;
 
     settings = {
-      theme = "catppuccin-mocha.conf";
-
       gtk-titlebar = false;
       gtk-single-instance = true;
       window-show-tab-bar = "never";
@@ -29,6 +27,5 @@
     };
   };
 
-  xdg.configFile."ghostty/themes/catppuccin-mocha.conf".source = ./catppuccin-mocha.conf;
   xdg.configFile."ghostty/shaders/cursor-smear.glsl".source = ./cursor-smear.glsl;
 }

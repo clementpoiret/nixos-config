@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   host,
   ...
@@ -18,8 +19,6 @@ let
         "DP-4, highres, auto-left, 2, bitdepth, 10, cm, wide, vrr, 1"
         "DP-12, highres, auto-left, 2, bitdepth, 10, cm, wide, vrr, 1"
       ];
-  theme = import ../theme.nix;
-  colors = theme.mocha.colors;
 in
 {
   wayland.windowManager.hyprland = {
@@ -74,10 +73,7 @@ in
         gaps_in = 8;
         gaps_out = 8;
         border_size = 3;
-        "col.active_border" = "rgb(${colors.blue.texthex}) rgb(${colors.lavender.texthex}) 45deg";
-        "col.inactive_border" = "0x00000000";
         no_border_on_floating = false;
-        # border_part_of_window = false;
       };
 
       misc = {
@@ -101,7 +97,6 @@ in
             panelHeight = 100;
             showEmptyWorkspace = false;
             showNewWorkspace = false;
-            workspaceActiveBorder = "0xee${colors.lavender.texthex}";
           };
         }
       ];
@@ -126,7 +121,7 @@ in
       };
 
       decoration = {
-        rounding = 8;
+        rounding = 12;
         active_opacity = 1.0;
         inactive_opacity = 0.8;
 
@@ -144,7 +139,6 @@ in
 
         shadow = {
           enabled = true;
-          color = "rgba(00000055)";
           ignore_window = true;
           offset = "0 2";
           range = 15;
@@ -349,7 +343,7 @@ in
         "idleinhibit fullscreen, title:^(.*Zen Browser.*)$"
         "idleinhibit fullscreen, title:^(.*Vivaldi.*)$"
 
-        "bordercolor rgb(${colors.red.texthex}) rgb(${colors.peach.texthex}) 45deg, fullscreen:1"
+        "bordercolor rgb(${config.lib.stylix.colors.base08}) rgb(${config.lib.stylix.colors.base09}) 45deg, fullscreen:1"
 
         "opacity 1.0 override 1.0 override, title:^(Picture-in-Picture)$"
         "opacity 1.0 override 1.0 override, title:^(.*pqiv.*)$"

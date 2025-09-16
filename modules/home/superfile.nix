@@ -3,7 +3,7 @@
   programs.superfile = {
     enable = true;
     settings = {
-      theme = "catppuccin-mocha";
+      theme = "rose-pine";
 
       editor = "hx";
       dir_editor = "nvim";
