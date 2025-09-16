@@ -33,6 +33,7 @@
       # pueue # Background task manager for long-running jobs
       qalculate-gtk # Advanced calculator (GTK interface)
       ripgrep # grep replacement
+      runapp # faster uwsm-app replacement
       serpl # SerpAPI CLI for search engine results
       syshud # OSD
       tldr # Simplified community-driven man pages
