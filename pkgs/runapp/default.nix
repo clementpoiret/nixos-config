@@ -12,13 +12,13 @@ let
 in
 stdenv'.mkDerivation rec {
   pname = "runapp";
-  version = "0.4.0";
+  version = "0.4.1";
 
   src = fetchFromGitHub {
     owner = "c4rlo";
     repo = pname;
     rev = version;
-    hash = "sha256-lmKBKVj+5BACPCwpxWnorxID9VVkh6/LJrAmTGIuHhM=";
+    hash = "sha256-+dIawnBTf8QU0dv93NQUCgW60BrlUXljaoNnRQjfJZQ=";
   };
 
   strictDeps = true;
