@@ -1,9 +1,10 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   programs.git = {
     enable = true;
 
     userName = "clementpoiret";
-    userEmail = "poiret.clement@outlook.fr";
+    userEmail = "me@int8.tech";
     signing.key = "71F084CEA427B23537934233CC6B0EED323A6C13";
     #signing.key = "~/.ssh/id_ed25519_sk_main.pub";
 
@@ -37,7 +38,9 @@
   home.packages = [ pkgs.mergiraf ];
   home.file.".gitattributes".source = ./gitattributes;
 
-  programs.gpg = { enable = true; };
+  programs.gpg = {
+    enable = true;
+  };
 
   services.gpg-agent = {
     enable = true;

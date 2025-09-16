@@ -7,7 +7,7 @@
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
 (setq user-full-name "Clément POIRET"
-      user-mail-address "poiret.clement@outlook.fr")
+      user-mail-address "me@int8.tech")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;

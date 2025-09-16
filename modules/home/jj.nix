@@ -7,7 +7,7 @@
     settings = {
       user = {
         name = "Clément POIRET";
-        email = "poiret.clement@outlook.fr";
+        email = "me@int8.tech";
       };
       signing = {
         behavior = "own";
