@@ -22,6 +22,7 @@
     ./nemo.nix # file manager
     ./nvim/nvim.nix # neovim editor
     ./packages.nix # other packages
+    ./quickshell/quickshell.nix # UI widgets
     ./sops.nix # secrets mgmt
     ./stylix.nix # ricing
     ./ssh.nix # ssh

@@ -216,12 +216,14 @@ in
         "$mainMod SHIFT, TAB, layoutmsg, cycleprev"
 
         # screenshot
-        "$mainMod, Print, exec, runapp grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        "$mainMod, Insert, exec, runapp grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        "$mainMod SHIFT, S, exec, runapp grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        "$mainMod SHIFT, C, exec, runapp grimblast --notify --freeze copy area"
-        ",Print, exec, runapp grimblast --notify --cursor --freeze copy area"
-        "ALT, Insert, exec, runapp grimblast --notify --cursor --freeze copy area"
+        # "$mainMod, Print, exec, runapp grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        # "$mainMod, Insert, exec, runapp grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        # "$mainMod SHIFT, S, exec, runapp grimblast --notify --freeze save area ~/Pictures/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        # "$mainMod SHIFT, C, exec, runapp grimblast --notify --freeze copy area"
+        # ",Print, exec, runapp grimblast --notify --cursor --freeze copy area"
+        # "ALT, Insert, exec, runapp grimblast --notify --cursor --freeze copy area"
+        "$mainMod SHIFT, S, exec, runapp quickshell -c hyprquickshot -n"
+        ", Print, exec, quickshell -c runapp hyprquickshot -n"
 
         # switch focus
         "$mainMod, left, movefocus, l"
