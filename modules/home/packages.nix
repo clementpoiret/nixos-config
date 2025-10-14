@@ -20,6 +20,7 @@
       gtrash # Move files to trash instead of permanent delete
       # hexdump # Display files in hex/decimal/octal
       killall # Terminate processes by name
+      # kdePackages.ksshaskpass # askpass replacement
       lazysql # Like lazygit, but for sql
       lsd # Modern ls with colors/icons
       lz4 # Extremely fast lossless compression
@@ -104,7 +105,7 @@
       hub # GitHub-focused wrapper for git
 
       # Containers & Orchestration
-      docker # Container runtime
+      # docker # Container runtime
       fluxcd # Continuous delivery for Kubernetes
       k9s # Kubernetes CLI interface
       kubernetes-helm # Kubernetes package manager
@@ -165,6 +166,8 @@
       wiper # Secure file deletion tool
       wl-screenrec
       xdg-utils # Desktop integration scripts (open/mailto)
+      yubioath-flutter # Yubico Authenticator
+      yubikey-manager # Manage yubikeys :)
     ]
   );
 }
