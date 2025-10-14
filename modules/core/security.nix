@@ -7,6 +7,10 @@
     services = {
       login = {
         u2fAuth = true;
+        kwallet = {
+          enable = true;
+          package = pkgs.kdePackages.kwallet-pam;
+        };
       };
       sudo = {
         u2fAuth = true;

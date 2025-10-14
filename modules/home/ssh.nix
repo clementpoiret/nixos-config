@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -66,4 +65,6 @@ in
   home.activation.ensureSshCmDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     install -d -m 700 "${config.home.homeDirectory}/.ssh/cm"
   '';
+
+  services.ssh-agent.enable = true;
 }

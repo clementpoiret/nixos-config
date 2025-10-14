@@ -17,9 +17,10 @@
   services.pcscd.enable = true;
 
   environment.systemPackages = with pkgs; [
-    # lxqt.lxqt-openssh-askpass
     kdePackages.ksshaskpass
-    seahorse
+    kdePackages.kwallet
+    kdePackages.kwalletmanager
+    kdePackages.kwallet-pam
   ];
 
   programs.ssh = {
