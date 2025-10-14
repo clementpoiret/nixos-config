@@ -38,6 +38,8 @@ in
 
     wg-quick.interfaces = {
       wg0 = {
+        autostart = false;
+
         address = [
           addr1
           addr2
