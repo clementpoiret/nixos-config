@@ -6,7 +6,6 @@
     nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.05";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-    # nur.url = "github:nix-community/NUR";
 
     ucodenix.url = "github:e-tho/ucodenix";
 
@@ -35,6 +34,10 @@
     };
 
     # hyprland.url = "github:hyprwm/Hyprland/v0.50.1";
+    hyprquickshot = {
+      url = "github:JamDon2/hyprquickshot";
+      flake = false;
+    };
   };
 
   outputs =
