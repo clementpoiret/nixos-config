@@ -83,8 +83,8 @@ in
   hardware.graphics.extraPackages =
     with pkgs;
     lib.mkIf (host == "laptop") [
-      # amdvlk
       rocmPackages.clr
+      rocmPackages.rocm-smi
     ];
   # hardware.graphics.extraPackages32 =
   #   with pkgs;
