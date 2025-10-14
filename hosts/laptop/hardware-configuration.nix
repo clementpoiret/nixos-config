@@ -112,8 +112,8 @@
     enable = true;
     enable32Bit = true;
   };
-  hardware.graphics.extraPackages = [
-    pkgs.rocmPackages.clr
+  hardware.graphics.extraPackages = with pkgs; [
+    rocmPackages.clr
   ];
   hardware.amdgpu.initrd.enable = true;
   services.xserver.videoDrivers = [ "modesetting" ];
