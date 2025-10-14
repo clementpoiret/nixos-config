@@ -69,9 +69,12 @@
   };
 
   boot.initrd.luks.devices = {
-    "luks-187c8e34-7ab2-4735-8a2e-9453bd374042".device = "/dev/disk/by-uuid/187c8e34-7ab2-4735-8a2e-9453bd374042";
-    "luks-61da8f3f-b984-4894-a5fe-e7a9721ccdcf".device = "/dev/disk/by-uuid/61da8f3f-b984-4894-a5fe-e7a9721ccdcf";
-    "luks-240b3ed0-ccb4-4985-983b-f94aab0f2e2b".device = "/dev/disk/by-uuid/240b3ed0-ccb4-4985-983b-f94aab0f2e2b";
+    "luks-187c8e34-7ab2-4735-8a2e-9453bd374042".device =
+      "/dev/disk/by-uuid/187c8e34-7ab2-4735-8a2e-9453bd374042";
+    "luks-61da8f3f-b984-4894-a5fe-e7a9721ccdcf".device =
+      "/dev/disk/by-uuid/61da8f3f-b984-4894-a5fe-e7a9721ccdcf";
+    "luks-240b3ed0-ccb4-4985-983b-f94aab0f2e2b".device =
+      "/dev/disk/by-uuid/240b3ed0-ccb4-4985-983b-f94aab0f2e2b";
   };
 
   zramSwap = {
@@ -98,4 +101,7 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  # nvidia
+  services.xserver.videoDrivers = [ "nvidia" ];
 }

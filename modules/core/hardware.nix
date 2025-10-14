@@ -7,11 +7,6 @@
   ...
 }:
 let
-  xserverDrivers = {
-    "desktop" = "nvidia";
-    "laptop" = "amdgpu";
-  };
-
   # from `cpuid -1 -l 1 -r | sed -n 's/.*eax=0x\([0-9a-f]*\).*/\U\1/p'`
   cpuModelId = {
     "desktop" = "00870F10";
@@ -80,20 +75,11 @@ in
     enable32Bit = true;
   };
   hardware.enableRedistributableFirmware = true;
-  hardware.graphics.extraPackages =
-    with pkgs;
-    lib.mkIf (host == "laptop") [
-      rocmPackages.clr
-      rocmPackages.rocm-smi
-    ];
   # hardware.graphics.extraPackages32 =
   #   with pkgs;
   #   lib.mkIf (host == "laptop") [
   #     driversi686Linux.amdvlk
   #   ];
-
-  # nvidia and amdgpu
-  services.xserver.videoDrivers = [ xserverDrivers."${host}" ];
 
   hardware.nvidia = lib.mkIf (host == "desktop") {
     package = config.boot.kernelPackages.nvidiaPackages.beta;
@@ -121,7 +107,10 @@ in
   services.blueman.enable = true;
 
   # Firmware updates
-  services.fwupd.enable = true;
+  services.fwupd = {
+    enable = true;
+    extraRemotes = [ "lvfs-testing" ];
+  };
 
   # ucode updates
   services.ucodenix = {
