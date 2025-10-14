@@ -4,13 +4,13 @@
   ...
 }:
 let
-  jzHostName = builtins.readFile "/run/user/1000/secrets/hostnames/jz";
-  rpihomeHostName = builtins.readFile "/run/user/1000/secrets/hostnames/rpihome";
-  vpspersHostName = builtins.readFile "/run/user/1000/secrets/hostnames/vpspers";
-  vpsrhizomeHostName = builtins.readFile "/run/user/1000/secrets/hostnames/vpsrhizome";
+  jzHostName = builtins.readFile config.sops.secrets."hostnames/jz".path;
+  rpihomeHostName = builtins.readFile config.sops.secrets."hostnames/rpihome".path;
+  vpspersHostName = builtins.readFile config.sops.secrets."hostnames/vpspers".path;
+  vpsrhizomeHostName = builtins.readFile config.sops.secrets."hostnames/vpsrhizome".path;
 
-  defaultUser = builtins.readFile "/run/user/1000/secrets/hostusers/default";
-  jzUser = builtins.readFile "/run/user/1000/secrets/hostusers/jz";
+  defaultUser = builtins.readFile config.sops.secrets."hostusers/default".path;
+  jzUser = builtins.readFile config.sops.secrets."hostusers/jz".path;
 in
 {
   programs.ssh = {
