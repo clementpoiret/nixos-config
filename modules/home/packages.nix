@@ -158,11 +158,12 @@
       # Miscellaneous
       bibiman # Bibliography management CLI
       # en-croissant # Chess Tool
+      dstask
       gemini-cli # Gemini protocol client
       # libation # Extract audio books
       libnotify # Desktop notification library
       poweralertd # Power alert daemon (low battery/etc.)
-      master.qmk
+      qmk
       wiper # Secure file deletion tool
       wl-screenrec
       xdg-utils # Desktop integration scripts (open/mailto)
