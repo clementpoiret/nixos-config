@@ -2,6 +2,7 @@
   config,
   lib,
   host,
+  pkgs,
   ...
 }:
 let
@@ -30,6 +31,8 @@ in
       # for hypridle, hyprsunset, and waybar
       exec-once = [
         "systemctl --user import-environment"
+        "runapp ${pkgs.kdePackages.kwallet-pam}/libexec/pam_kwallet_init"
+        "runapp kwalletd6"
         "runapp nm-applet"
         "runapp wl-clip-persist --clipboard both"
         "runapp poweralertd"
