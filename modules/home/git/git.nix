@@ -4,7 +4,7 @@
     enable = true;
 
     userName = "clementpoiret";
-    userEmail = "me@int8.tech";
+    userEmail = "clement@linux.com";
     signing.key = "BBA69D0DB3494EDD127D7C80A0288D6D0CD0D231";
 
     delta = {
