@@ -5,8 +5,7 @@
 
     userName = "clementpoiret";
     userEmail = "me@int8.tech";
-    signing.key = "71F084CEA427B23537934233CC6B0EED323A6C13";
-    #signing.key = "~/.ssh/id_ed25519_sk_main.pub";
+    signing.key = "BBA69D0DB3494EDD127D7C80A0288D6D0CD0D231";
 
     delta = {
       enable = true;
@@ -20,13 +19,11 @@
     extraConfig = {
       init.defaultBranch = "main";
       credential.helper = "cache";
-      #core.sshCommand = "ssh -i /home/clementpoiret/.ssh/id_ed25519_pwd";
       core.attributesfile = "~/.gitattributes";
       commit.gpgsign = true;
       diff.colorMoved = "default";
       gpg.format = "openpgp";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
-      # status.showUntrackedFiles = "no";
       merge.conflictstyle = "diff3";
       "merge \"mergiraf\"" = {
         name = "mergiraf";
@@ -36,14 +33,6 @@
   };
 
   home.packages = [ pkgs.mergiraf ];
+
   home.file.".gitattributes".source = ./gitattributes;
-
-  programs.gpg = {
-    enable = true;
-  };
-
-  services.gpg-agent = {
-    enable = true;
-    enableSshSupport = true;
-  };
 }

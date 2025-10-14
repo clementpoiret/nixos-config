@@ -4,26 +4,33 @@
   programs.zsh.enable = true;
 
   services.udev.packages = with pkgs; [
+    libfido2
     qmk-udev-rules
     yubikey-personalization
   ];
   programs.gnupg.agent = {
     enable = true;
-    enableSSHSupport = true;
+    enableSSHSupport = false;
     # pinentryFlavor = "qt";
     # pinentryPackage = pkgs.pinentry-qt;
   };
   services.pcscd.enable = true;
 
   environment.systemPackages = with pkgs; [
-    #lxqt.lxqt-openssh-askpass
+    # lxqt.lxqt-openssh-askpass
+    kdePackages.ksshaskpass
     seahorse
   ];
 
   programs.ssh = {
-    enableAskPassword = true;
+    # enableAskPassword = true;
     # askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
+    # startAgent = true;
+    askPassword = "${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass";
   };
 
-  environment.variables.EDITOR = "hx";
+  environment.variables = {
+    EDITOR = "hx";
+    SSH_ASKPASS_REQUIRE = "prefer";
+  };
 }

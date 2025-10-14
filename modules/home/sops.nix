@@ -11,17 +11,21 @@ in
     defaultSymlinkPath = "/run/user/1000/secrets";
     defaultSecretsMountPoint = "/run/user/1000/secrets.d";
 
-    secrets."dns/${host}" = {
-      sopsFile = secretFile;
-    };
-    secrets."api_keys/anthropic" = {
-      sopsFile = secretFile;
-    };
-    secrets."api_keys/deepseek" = {
-      sopsFile = secretFile;
-    };
-    secrets."api_keys/pypi" = {
-      sopsFile = secretFile;
+    secrets = {
+      "dns/${host}" = {
+        sopsFile = secretFile;
+      };
+
+      "api_keys/anthropic".sopsFile = secretFile;
+      "api_keys/deepseek".sopsFile = secretFile;
+      "api_keys/pypi".sopsFile = secretFile;
+
+      "hostnames/vpsrhizome".sopsFile = secretFile;
+      "hostnames/vpspers".sopsFile = secretFile;
+      "hostnames/rpihome".sopsFile = secretFile;
+      "hostnames/jz".sopsFile = secretFile;
+      "hostusers/default".sopsFile = secretFile;
+      "hostusers/jz".sopsFile = secretFile;
     };
   };
 
