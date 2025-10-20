@@ -8,7 +8,8 @@
     extraPackages = with pkgs.bat-extras; [
       batman
       batpipe
-      batgrep
+      # batgrep
+      batdiff
       # batdiff is broken rn
     ];
   };
