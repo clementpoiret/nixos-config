@@ -1,6 +1,7 @@
 { pkgs, ... }:
 let
   wallchange = pkgs.writers.writeNuBin "wallchange" (builtins.readFile ./scripts/wallchange.nu);
+  dunst-dnd = pkgs.writers.writeNuBin "dunst-dnd" (builtins.readFile ./scripts/dunst-dnd.nu);
 
   runbg = pkgs.writeShellScriptBin "runbg" (builtins.readFile ./scripts/runbg.sh);
   music = pkgs.writeShellScriptBin "music" (builtins.readFile ./scripts/music.sh);
@@ -46,6 +47,7 @@ in
 {
   home.packages = [
     wallchange
+    dunst-dnd
 
     runbg
     music

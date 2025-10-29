@@ -176,16 +176,16 @@
       tooltip = false;
       format = "{icon} ";
       format-icons = {
-        dnd = "";
-        normal = "";
+        filtered = "";
+        normal = "";
       };
       return-type = "json";
-      exec-if = "which dunstctl";
-      exec = "sh -c 'paused=$(dunstctl is-paused 2>/dev/null || echo false); [ \"$paused\" = true ] && alt=dnd || alt=normal; printf \"{\\\"alt\\\":\\\"%s\\\"}\\n\" \"$alt\"'";
+      exec-if = "which dunst-dnd";
+      exec = "dunst-dnd waybar";
       interval = 1;
       signal = 1;
-      on-click = "sh -c 'dunstctl set-paused toggle'";
-      on-click-right = "sh -c 'dunstctl set-paused toggle'";
+      on-click = "dunst-dnd toggle";
+      on-click-right = "dunst-dnd toggle";
       escape = true;
     };
     "custom/shutdown" = {

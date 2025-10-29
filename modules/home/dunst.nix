@@ -13,6 +13,16 @@
 
         corner_radius = 16;
       };
+
+      "filter-low" = {
+        msg_urgency = "low";
+        skip_display = true;
+      };
+
+      "filter-normal" = {
+        msg_urgency = "normal";
+        skip_display = true;
+      };
     };
   };
 }
