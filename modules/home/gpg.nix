@@ -31,7 +31,7 @@
   services.gpg-agent = {
     enable = true;
     enableSshSupport = false; # do not hijack SSH
-    pinentryPackage = pkgs.pinentry-qt; # TTY-friendly alt: pkgs.pinentry-curses
+    pinentry.package = pkgs.pinentry-qt; # TTY-friendly alt: pkgs.pinentry-curses
     defaultCacheTtl = 28800;
     maxCacheTtl = 86400;
     extraConfig = ''

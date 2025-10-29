@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -16,6 +17,7 @@ in
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
+    package = pkgs.openssh_hpn;
 
     matchBlocks = {
       "*" = {
@@ -30,7 +32,7 @@ in
         # Connection multiplexing: one auth reused by many commands
         controlMaster = "auto";
         controlPersist = "15m";
-        controlPath = "~/.ssh/cm/%r@%h:%p";
+        controlPath = "/dev/shm/%r@%h:%p";
         serverAliveInterval = 30;
         serverAliveCountMax = 6;
 

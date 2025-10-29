@@ -8,7 +8,7 @@
     nerd-fonts.monaspace
     nerd-fonts.noto
     nerd-fonts.symbols-only
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     twemoji-color-font
   ];
 

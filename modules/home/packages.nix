@@ -59,8 +59,8 @@
       # Networking
       aria2 # Multi-source command-line download utility
       protonmail-bridge
-      protonmail-bridge-gui
-      protonvpn-cli # ProtonVPN command-line interface
+      # protonmail-bridge-gui
+      # protonvpn-cli # ProtonVPN command-line interface
       protonvpn-gui # ProtonVPN graphical interface
       rclone # Cloud storage synchronization
       sshfs
