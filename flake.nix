@@ -38,6 +38,10 @@
       url = "github:JamDon2/hyprquickshot";
       flake = false;
     };
+    ghosttyshaders = {
+      url = "github:sahaj-b/ghostty-cursor-shaders";
+      flake = false;
+    };
   };
 
   outputs =

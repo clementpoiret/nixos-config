@@ -1,4 +1,4 @@
-{ ... }:
+{ inputs, ... }:
 {
   programs.ghostty = {
     enable = true;
@@ -19,7 +19,8 @@
 
       quick-terminal-screen = "mouse";
 
-      custom-shader = "./shaders/cursor-smear.glsl";
+      custom-shader-animation = "always";
+      custom-shader = "./shaders/cursor_tail.glsl";
 
       keybind = [
         "global:alt+enter=toggle_quick_terminal"
@@ -27,5 +28,11 @@
     };
   };
 
-  xdg.configFile."ghostty/shaders/cursor-smear.glsl".source = ./cursor-smear.glsl;
+  xdg.configFile."ghostty/shaders/" = {
+    source = inputs.ghosttyshaders;
+    recursive = true;
+    force = true;
+  };
+
+  # xdg.configFile."ghostty/shaders/cursor-smear.glsl".source = ./cursor-smear.glsl;
 }

@@ -138,10 +138,11 @@
       hugo # Static site generator
       hunspell # Spell checker engine
       hunspellDicts.fr-any # French Hunspell dictionary
-      libreoffice-fresh # Office suite
-      onlyoffice-desktopeditors # Office suite
+      # libreoffice-fresh # Office suite
+      # onlyoffice-desktopeditors # Office suite
       pdftk # PDF document manipulation toolkit
       poppler # PDF rendering library (CLI tools)
+      softmaker-office-nx # Office suite
       tdf # Terminal PDF reader
       zotero-beta # Reference management
 
