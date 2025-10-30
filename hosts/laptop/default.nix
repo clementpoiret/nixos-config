@@ -71,4 +71,14 @@
 
   hardware.sensor.iio.enable = true;
   hardware.keyboard.qmk.enable = true;
+
+  services.udev.extraRules = ''
+    # AMD dGPU (Navi 33) by PCI slot
+    KERNEL=="card*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", KERNELS=="0000:03:00.0", SYMLINK+="dri/amd-dgpu"
+    KERNEL=="renderD*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", KERNELS=="0000:03:00.0", SYMLINK+="dri/amd-dgpu-render"
+
+    # AMD iGPU (Phoenix1) by PCI slot
+    KERNEL=="card*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", KERNELS=="0000:c5:00.0", SYMLINK+="dri/amd-igpu"
+    KERNEL=="renderD*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", KERNELS=="0000:c5:00.0", SYMLINK+="dri/amd-igpu-render"
+  '';
 }

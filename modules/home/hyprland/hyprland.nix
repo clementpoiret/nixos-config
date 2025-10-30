@@ -1,10 +1,14 @@
 {
-  lib,
   host,
   pkgs,
   config,
   ...
 }:
+let
+  drmCards = {
+    "laptop" = "/dev/dri/amd-igpu:/dev/dri/amd-dgpu";
+  };
+in
 {
   home.packages = with pkgs; [
     hyprcursor
@@ -68,22 +72,24 @@
         export ANKI_WAYLAND="1"
         export DIRENV_LOG_FORMAT=""
         # export WLR_DRM_NO_ATOMIC="1"
+
+        export AQ_DRM_DEVICES=${drmCards.${host}}
       '';
   };
 
-  home.file = lib.mkIf (host == "laptop") {
-    # iGPU
-    ".config/hypr/card" = {
-      source = config.lib.file.mkOutOfStoreSymlink "/dev/dri/by-path/pci-0000:c5:00.0-card";
-    };
+  # home.file = lib.mkIf (host == "laptop") {
+  #   # iGPU
+  #   ".config/hypr/card" = {
+  #     source = config.lib.file.mkOutOfStoreSymlink "/dev/dri/by-path/pci-0000:c5:00.0-card";
+  #   };
 
-    # dGPU
-    ".config/hypr/fallbackCard" = {
-      source = config.lib.file.mkOutOfStoreSymlink "/dev/dri/by-path/pci-0000:03:00.0-card";
-    };
-  };
+  #   # dGPU
+  #   ".config/hypr/fallbackCard" = {
+  #     source = config.lib.file.mkOutOfStoreSymlink "/dev/dri/by-path/pci-0000:03:00.0-card";
+  #   };
+  # };
 
-  home.sessionVariables = lib.mkIf (host == "laptop") {
-    WLR_DRM_DEVICES = "$HOME/.config/hypr/card:$HOME/.config/hypr/fallbackCard";
-  };
+  # home.sessionVariables = lib.mkIf (host == "laptop") {
+  #   WLR_DRM_DEVICES = "$HOME/.config/hypr/card:$HOME/.config/hypr/fallbackCard";
+  # };
 }
