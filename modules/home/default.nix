@@ -6,6 +6,7 @@
     ./bat.nix # better cat command
     ./btop.nix # resouces monitor
     ./chtsh.nix
+    ./cleanup.nix # auto delete files
     ./dunst.nix # notifications
     ./easyeffect.nix # audio profile
     ./fuzzel.nix # launcher
