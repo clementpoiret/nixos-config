@@ -119,7 +119,7 @@
       # Browsers
       # brave # Privacy-focused web browser
       firefox-devedition # Firefox Developer Edition
-      flake.zen-browser # Privacy-focused browser (Zen)
+      # flake.zen-browser # Privacy-focused browser (Zen)
       vivaldi # Feature-rich web browser
       vivaldi-ffmpeg-codecs # Vivaldi media codecs
 
@@ -157,12 +157,14 @@
       # zoom-us # Video conferencing client
 
       # Miscellaneous
+      stable.anytype
       bibiman # Bibliography management CLI
       # en-croissant # Chess Tool
       dstask
       gemini-cli # Gemini protocol client
       # libation # Extract audio books
       libnotify # Desktop notification library
+      logseq
       poweralertd # Power alert daemon (low battery/etc.)
       qmk
       wiper # Secure file deletion tool

@@ -146,7 +146,7 @@
           name = "python";
           auto-format = true;
           language-servers = [
-            "basedpyright"
+            # "basedpyright"
             "ruff"
             "ty"
             # "pylyzer"
