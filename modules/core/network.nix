@@ -7,13 +7,16 @@
 let
   nameserver = builtins.readFile config.sops.secrets."dns/${host}".path;
 
+  privateKey = builtins.readFile config.sops.secrets."vpn/${host}/interface/privateKey".path;
   addr1 = builtins.readFile config.sops.secrets."vpn/${host}/interface/address1".path;
   addr2 = builtins.readFile config.sops.secrets."vpn/${host}/interface/address2".path;
   dns1 = builtins.readFile config.sops.secrets."vpn/${host}/interface/dns1".path;
   dns2 = builtins.readFile config.sops.secrets."vpn/${host}/interface/dns2".path;
 
-  alip1 = builtins.readFile config.sops.secrets."vpn/${host}/peer/allowedIP1".path;
-  alip2 = builtins.readFile config.sops.secrets."vpn/${host}/peer/allowedIP2".path;
+  publicKey = builtins.readFile config.sops.secrets."vpn/${host}/peer/publicKey".path;
+  presharedKey = builtins.readFile config.sops.secrets."vpn/${host}/peer/presharedKey".path;
+  endpoint = builtins.readFile config.sops.secrets."vpn/${host}/peer/endpoint".path;
+  alips = builtins.readFile config.sops.secrets."vpn/${host}/peer/allowedIPs".path;
 in
 {
   networking = {
@@ -36,48 +39,40 @@ in
       ];
     };
 
-    wg-quick.interfaces = {
+    networkmanager.ensureProfiles.profiles = {
       wg0 = {
-        autostart = false;
+        connection = {
+          id = "vpn.rhizome-labs.com";
+          type = "wireguard";
+          autoconnect = false;
+          interface-name = "wg0";
+        };
 
-        address = [
-          addr1
-          addr2
-        ];
+        wireguard = {
+          private-key = privateKey;
+          private-key-flags = 0;
+        };
 
-        dns = [
-          dns1
-          dns2
-        ];
+        "wireguard-peer.${publicKey}" = {
+          endpoint = endpoint;
+          preshared-key = presharedKey;
+          preshared-key-flags = 0;
+          allowed-ips = alips;
+          persistent-keepalive = 25;
+        };
 
-        privateKeyFile = config.sops.secrets."vpn/${host}/interface/privateKey".path;
-
-        peers = [
-          {
-            publicKey = builtins.readFile config.sops.secrets."vpn/${host}/peer/publicKey".path;
-            presharedKeyFile = config.sops.secrets."vpn/${host}/peer/presharedKey".path;
-
-            allowedIPs = [
-              alip1
-              alip2
-            ];
-
-            endpoint = builtins.readFile config.sops.secrets."vpn/${host}/peer/endpoint".path;
-
-            # Helpful behind NAT
-            persistentKeepalive = 25;
-          }
-        ];
+        ipv4 = {
+          method = "manual";
+          address1 = addr1;
+          dns = dns1;
+        };
+        ipv6 = {
+          method = "manual";
+          address1 = addr2;
+          dns = dns2;
+        };
       };
     };
-  };
-
-  systemd.services.wg-quick-wg0 = {
-    after = [
-      "network-online.target"
-      "nss-lookup.target"
-    ];
-    wants = [ "network-online.target" ];
   };
 
   services.openssh = {
