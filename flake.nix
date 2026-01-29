@@ -3,14 +3,22 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.05";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.11";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    # nixpkgs-glide.url = "github:RobertCraigie/nixpkgs/feat/glide-browser";
+
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     ucodenix.url = "github:e-tho/ucodenix";
 
     home-manager = {
+      # url = "github:clementpoiret/home-manager/push-ozprkkyxykts";
       url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    niri = {
+      url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -20,6 +28,13 @@
     };
 
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    glide-browser = {
+      url = "github:clementpoiret/glide.nix/push-wzpszsmlkzlo";
+      # url = "github:clementpoiret/glide.nix/push-uskuxpzywooy";
+      # url = "github:clementpoiret/glide.nix/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # glide-browser.url = "github:glide-browser/glide.nix";
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
@@ -38,10 +53,19 @@
       url = "github:JamDon2/hyprquickshot";
       flake = false;
     };
+    dms = {
+      url = "github:AvengeMedia/DankMaterialShell/stable";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     ghosttyshaders = {
       url = "github:sahaj-b/ghostty-cursor-shaders";
       flake = false;
     };
+
+    superfile.url = "github:yorukot/superfile/v1.4.0";
+
+    jolt.url = "github:clementpoiret/jolt/push-suspqorpmsxk";
+    # jolt.url = "github:jordond/jolt/1.1.1";
   };
 
   outputs =
@@ -50,12 +74,17 @@
 
       bash-env-json,
       bibli-ls,
-      chaotic,
+      glide-browser,
       home-manager,
+      jolt,
+      niri,
+      nix-cachyos-kernel,
       nixpkgs,
       nixpkgs-master,
       nixpkgs-stable,
+      # nixpkgs-glide,
       stylix,
+      superfile,
       zen-browser,
       ...
     }@inputs:
@@ -76,9 +105,16 @@
         inherit system;
         config.allowUnfree = true;
       };
+      # pkgs-glide = import nixpkgs-glide {
+      #   inherit system;
+      #   config.allowUnfree = true;
+      # };
       pkgs-flake = {
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
+        glide-browser = glide-browser.packages.${system}.default;
+        jolt = jolt.packages.${system}.default;
+        superfile = superfile.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
       };
 
@@ -112,11 +148,14 @@
 
       customOverlays = [
         (final: prev: {
+          # glide = pkgs-glide;
           master = pkgs-master;
           stable = pkgs-stable;
           flake = pkgs-flake;
         })
         optimizedPackagesOverlay
+        niri.overlays.niri
+        nix-cachyos-kernel.overlays.pinned
       ];
     in
     {
@@ -130,7 +169,6 @@
             { nixpkgs.overlays = customOverlays; }
             ./hosts/desktop
             stylix.nixosModules.stylix
-            chaotic.nixosModules.default
           ];
           specialArgs = {
             host = "desktop";
@@ -144,7 +182,6 @@
             ./hosts/laptop
             # fw-fanctrl.nixosModules.default
             stylix.nixosModules.stylix
-            chaotic.nixosModules.default
           ];
           specialArgs = {
             host = "laptop";

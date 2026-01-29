@@ -1,6 +1,7 @@
 {
   config,
   host,
+  inputs,
   lib,
   pkgs,
   ...
@@ -14,11 +15,11 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.systemd-boot.configurationLimit = 10;
-  boot.kernelPackages = pkgs.linuxPackages_cachyos-lto;
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
   services.scx = {
     enable = true;
-    package = pkgs.stable.scx.full;
-    scheduler = "scx_bpfland";
+    scheduler = "scx_lavd";
+    extraArgs = [ "--autopower" ];
   };
 
   boot.extraModulePackages =
