@@ -6,13 +6,11 @@
     enable = true;
     overlays.enable = false;
 
-    image = ../../wallpapers/wallpaper.png;
-
     base16Scheme = "${pkgs.base16-schemes}/share/themes/rose-pine.yaml";
 
     cursor = {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Ice";
+      name = "BreezeX-RosePine-Linux";
+      package = pkgs.rose-pine-cursor;
       size = 22;
     };
 
@@ -20,12 +18,6 @@
       enable = true;
       dark = "rose-pine";
       package = pkgs.rose-pine-icon-theme;
-      # dark = "Papirus-Dark";
-      # light = "Papirus-Light";
-      # package = pkgs.catppuccin-papirus-folders.override {
-      #   flavor = "mocha";
-      #   accent = "lavender";
-      # };
     };
 
     fonts = {
@@ -57,6 +49,8 @@
 
     opacity.desktop = 0.0;
 
+    targets.hyprpaper.enable = false;
+    targets.hyprpaper.image.enable = false;
     targets.neovim.enable = false;
     targets.waybar.addCss = true;
   };

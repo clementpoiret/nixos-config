@@ -2,6 +2,7 @@
 {
   imports = [
     ./config.nix
+    ./dms.nix
     ./hyprland.nix
     ./hypridle.nix
     ./hyprlock.nix

@@ -21,16 +21,27 @@ in
     wayland
     wl-clip-persist
     wf-recorder
+
+    xdg-utils
   ];
+
+  services.hyprpolkitagent.enable = true;
+  services.gnome-keyring = {
+    enable = true;
+    components = [
+      "secrets"
+      "ssh"
+    ];
+  };
 
   # systemd.user.targets.hyprland-session.Unit.Wants = [ "xdg-desktop-autostart.target" ];
   wayland.windowManager.hyprland = {
-    enable = true;
-    # package = null;
-    # portalPackage = null;
-    package = pkgs.hyprland;
-    portalPackage = pkgs.xdg-desktop-portal-hyprland;
-    xwayland.enable = true;
+    enable = false;
+    package = null;
+    portalPackage = null;
+    # package = pkgs.hyprland;
+    # portalPackage = pkgs.xdg-desktop-portal-hyprland;
+    # xwayland.enable = true;
     systemd.enable = false;
 
     # plugins = [
@@ -38,58 +49,4 @@ in
     # ];
   };
 
-  xdg.configFile = {
-    # "uwsm/env".text = # sh
-    #   ''
-    #     export NIXOS_OZONE_WL=1
-    #     export ELECTRON_OZONE_PLATFORM_HINT="auto"
-    #   '';
-    "uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
-
-    "uwsm/env-hyprland".text = # sh
-      ''
-        # For Firefox to run on Wayland
-        export MOZ_ENABLE_WAYLAND=1
-        export MOZ_WEBRENDER=1
-
-        # For Electron apps to run on Wayland
-        export NIXOS_OZONE_WL=1
-        export ELECTRON_OZONE_PLATFORM_HINT="auto"
-
-        export XDG_CURRENT_DESKTOP=Hyprland
-        export XDG_SESSION_DESKTOP=Hyprland
-        export XDG_SESSION_TYPE="wayland"
-        export SDL_VIDEODRIVER="wayland"
-        export CLUTTER_BACKEND="wayland"
-        export GDK_BACKEND="wayland,x11,*"
-        export QT_AUTO_SCREEN_SCALE_FACTOR="1"
-        export QT_SCALE_FACTOR_ROUNDING_POLICY="RoundPreferFloor"
-        export QT_WAYLAND_DISABLE_WINDOWDECORATION="1"
-        export QT_QPA_PLATFORM="wayland;xcb"
-
-        export _JAVA_AWT_WM_NONEREPARENTING="1"
-        export DISABLE_QT5_COMPAT="0"
-        export ANKI_WAYLAND="1"
-        export DIRENV_LOG_FORMAT=""
-        # export WLR_DRM_NO_ATOMIC="1"
-
-        export AQ_DRM_DEVICES=${drmCards.${host}}
-      '';
-  };
-
-  # home.file = lib.mkIf (host == "laptop") {
-  #   # iGPU
-  #   ".config/hypr/card" = {
-  #     source = config.lib.file.mkOutOfStoreSymlink "/dev/dri/by-path/pci-0000:c5:00.0-card";
-  #   };
-
-  #   # dGPU
-  #   ".config/hypr/fallbackCard" = {
-  #     source = config.lib.file.mkOutOfStoreSymlink "/dev/dri/by-path/pci-0000:03:00.0-card";
-  #   };
-  # };
-
-  # home.sessionVariables = lib.mkIf (host == "laptop") {
-  #   WLR_DRM_DEVICES = "$HOME/.config/hypr/card:$HOME/.config/hypr/fallbackCard";
-  # };
 }

@@ -1,7 +1,7 @@
 { ... }:
 {
   programs.hyprlock = {
-    enable = true;
+    enable = false;
 
     settings = {
       disable_loading_bar = true;
