@@ -68,6 +68,9 @@ in
       TAG+="uaccess" \
       MODE="660", \
       GROUP="plugdev"
+
+    # Jolt
+    SUBSYSTEM=="powercap", ACTION=="add", RUN+="${pkgs.coreutils}/bin/chmod o+r /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj /sys/class/powercap/intel-rapl/intel-rapl:0/*/energy_uj"
   '';
 
   hardware.graphics = {

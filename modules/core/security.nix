@@ -2,15 +2,23 @@
 {
   security.rtkit.enable = true;
   security.sudo.enable = true;
+  security.polkit.enable = true;
+  security.pki.certificateFiles = [
+    ../../certs/cert.pem
+  ];
 
+  environment.systemPackages = with pkgs; [
+    libsecret
+    gnome-keyring
+    seahorse
+  ];
+
+  programs.seahorse.enable = true;
   security.pam = {
     services = {
       login = {
         u2fAuth = true;
-        kwallet = {
-          enable = true;
-          package = pkgs.kdePackages.kwallet-pam;
-        };
+        enableGnomeKeyring = true;
       };
       sudo = {
         u2fAuth = true;

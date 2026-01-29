@@ -2,11 +2,15 @@
 {
   services = {
     gvfs.enable = true;
-    gnome.gnome-keyring.enable = false;
     dbus = {
       enable = true;
       implementation = "broker";
-      packages = [ pkgs.kdePackages.kwallet ];
+      packages = with pkgs; [
+        gcr
+        gnome-keyring
+        libsecret
+        seahorse
+      ];
     };
     #fstrim.enable = true;
   };

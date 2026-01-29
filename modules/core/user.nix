@@ -17,7 +17,7 @@
       imports = if (host == "desktop") then [ ./../home/default.desktop.nix ] else [ ./../home ];
       home.username = "${username}";
       home.homeDirectory = "/home/${username}";
-      home.stateVersion = "25.05";
+      home.stateVersion = "25.11";
       programs.home-manager.enable = true;
     };
   };
@@ -32,7 +32,7 @@
       "wheel"
     ];
     shell = pkgs.nushell;
-    packages = [ inputs.home-manager.packages.${pkgs.system}.default ];
+    packages = [ inputs.home-manager.packages.${pkgs.stdenv.hostPlatform.system}.default ];
   };
   nix.settings.allowed-users = [ "${username}" ];
   environment.localBinInPath = true;
