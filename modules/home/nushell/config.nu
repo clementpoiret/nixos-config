@@ -931,7 +931,7 @@ $env.config = {
     ]
 }
 
-# Start hyprland
+# Start niri
 if (^uwsm check may-start | complete).exit_code == 0 {
-    ^uwsm start hyprland-uwsm.desktop
+    ^uwsm start default
 }

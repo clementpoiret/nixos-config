@@ -1,7 +1,7 @@
 { ... }:
 {
   programs.waybar = {
-    enable = true;
-    systemd.enable = true;
+    enable = false;
+    systemd.enable = false;
   };
 }

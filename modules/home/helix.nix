@@ -45,6 +45,7 @@
             outputPath = "$root/target/$dir/$name";
             formatterMode = "typstyle";
             formatterPrintWidth = 80;
+            formatterProseWrap = true;
             lint.enabled = true;
           };
         };
@@ -211,7 +212,7 @@
     };
 
     settings = {
-      # theme = "catppuccin_mocha_mod";
+      # theme = "rose_pine";
 
       editor = {
         cursorline = true;

@@ -4,6 +4,7 @@
     enable = true;
 
     settings = {
+      # theme = "dark:Rose Pine,light:Rose Pine Dawn";
       gtk-titlebar = false;
       gtk-single-instance = true;
       window-show-tab-bar = "never";
@@ -22,8 +23,11 @@
       custom-shader-animation = "always";
       custom-shader = "./shaders/cursor_tail.glsl";
 
+      shell-integration-features = "ssh-terminfo,ssh-env,sudo";
+
       keybind = [
         "global:alt+enter=toggle_quick_terminal"
+        "cmd+shift+w=close_surface"
       ];
     };
   };

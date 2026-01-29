@@ -8,7 +8,7 @@
       # bleachbit # Disk space cleaner and privacy tool
       ast-grep
       bluetuith # Bluetooth device management
-      cliphist # Wayland clipboard history manager
+      # cliphist # Wayland clipboard history manager
       # dconf-editor # Graphical editor for dconf database
       dust # Intuitive disk usage analyzer (improved du)
       entr # Run commands when files change
@@ -19,24 +19,25 @@
       # gtt # Google Translate terminal interface (TUI)
       gtrash # Move files to trash instead of permanent delete
       # hexdump # Display files in hex/decimal/octal
+      flake.jolt
       killall # Terminate processes by name
       # kdePackages.ksshaskpass # askpass replacement
       lazysql # Like lazygit, but for sql
       lsd # Modern ls with colors/icons
       lz4 # Extremely fast lossless compression
       man-pages # Additional manual pages
+      nautilus # File manager
       ncdu # Disk usage analyzer with ncurses interface
       nitch # System information fetch utility
       pamixer # PulseAudio CLI mixer
       pavucontrol # PulseAudio volume control GUI
       playerctl # Media player controller
-      pqiv # Powerful X11 image viewer
-      # pueue # Background task manager for long-running jobs
+      stable.pqiv # Powerful X11 image viewer
       qalculate-gtk # Advanced calculator (GTK interface)
       ripgrep # grep replacement
       runapp # faster uwsm-app replacement
       serpl # SerpAPI CLI for search engine results
-      syshud # OSD
+      # syshud # OSD
       tldr # Simplified community-driven man pages
       # toipe # Terminal typing test
       unzip # Extract ZIP archives
@@ -67,11 +68,12 @@
       wget # Non-interactive network downloader
 
       # Development Tools
+      antigravity-fhs
       cmake # Cross-platform build system
       devenv # Reproducible development environments with Nix
       gcc # GNU Compiler Collection
       gnumake # GNU make build automation
-      nixfmt-rfc-style # nix formatter
+      nixfmt # nix formatter
       rustfmt # Rust code formatter
       shfmt # Shell script formatter
       zig # General-purpose programming language/toolchain
@@ -119,7 +121,9 @@
       # Browsers
       # brave # Privacy-focused web browser
       firefox-devedition # Firefox Developer Edition
-      # flake.zen-browser # Privacy-focused browser (Zen)
+      flake.zen-browser # Privacy-focused browser (Zen)
+      # glide.glide-browser # Keyboard-focused browser
+      flake.glide-browser # Keyboard-focused browser
       vivaldi # Feature-rich web browser
       vivaldi-ffmpeg-codecs # Vivaldi media codecs
 
@@ -142,14 +146,23 @@
       # onlyoffice-desktopeditors # Office suite
       pdftk # PDF document manipulation toolkit
       poppler # PDF rendering library (CLI tools)
-      softmaker-office-nx # Office suite
+      # softmaker-office-nx # Office suite
+      (pkgs.softmaker-office-nx.override {
+        officeVersion = {
+          version = "1230";
+          edition = "";
+          hash = "sha256-/4qKFnLoou1ZuGkRt+2Yf/FPGOnYhx7fnE+8D3gutaY=";
+        };
+      })
       tdf # Terminal PDF reader
       zotero-beta # Reference management
 
       # Security
       age # Simple modern file encryption
+      gcr
       openssl # SSL/TLS protocol implementation
       proton-pass # Password manager
+      proton-pass-cli # CLI version :)
       sops # Encrypted secrets management
 
       # Communication
@@ -157,16 +170,17 @@
       # zoom-us # Video conferencing client
 
       # Miscellaneous
-      stable.anytype
+      # anytype
       bibiman # Bibliography management CLI
-      # en-croissant # Chess Tool
+      deezer-enhanced
       dstask
       gemini-cli # Gemini protocol client
       # libation # Extract audio books
       libnotify # Desktop notification library
       logseq
-      poweralertd # Power alert daemon (low battery/etc.)
+      # poweralertd # Power alert daemon (low battery/etc.)
       qmk
+      todoman # todo list
       wiper # Secure file deletion tool
       wl-screenrec
       xdg-utils # Desktop integration scripts (open/mailto)

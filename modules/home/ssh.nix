@@ -5,12 +5,15 @@
   ...
 }:
 let
+  bastionHostName = builtins.readFile config.sops.secrets."hostnames/bastion".path;
   jzHostName = builtins.readFile config.sops.secrets."hostnames/jz".path;
+  jzppHostName = builtins.readFile config.sops.secrets."hostnames/jzpp".path;
   rpihomeHostName = builtins.readFile config.sops.secrets."hostnames/rpihome".path;
   vpspersHostName = builtins.readFile config.sops.secrets."hostnames/vpspers".path;
   vpsrhizomeHostName = builtins.readFile config.sops.secrets."hostnames/vpsrhizome".path;
 
   defaultUser = builtins.readFile config.sops.secrets."hostusers/default".path;
+  bastionUser = builtins.readFile config.sops.secrets."hostusers/bastion".path;
   jzUser = builtins.readFile config.sops.secrets."hostusers/jz".path;
 in
 {
@@ -41,13 +44,20 @@ in
       };
 
       "github.com" = {
-        hostname = "github.com";
+        hostname = "ssh.github.com";
+        port = 443;
         user = "git";
       };
 
       "jz" = {
         hostname = jzHostName;
         user = jzUser;
+        proxyJump = "bastion";
+      };
+      "jzpp" = {
+        hostname = jzppHostName;
+        user = jzUser;
+        proxyJump = "bastion";
       };
 
       "rpihome" = {
@@ -60,6 +70,12 @@ in
 
       "vpsrhizome" = {
         hostname = vpsrhizomeHostName;
+      };
+
+      "bastion" = {
+        hostname = bastionHostName;
+        user = bastionUser;
+        port = 443;
       };
     };
   };
