@@ -19,10 +19,9 @@
       # gtt # Google Translate terminal interface (TUI)
       gtrash # Move files to trash instead of permanent delete
       # hexdump # Display files in hex/decimal/octal
-      flake.jolt
       killall # Terminate processes by name
       # kdePackages.ksshaskpass # askpass replacement
-      lazysql # Like lazygit, but for sql
+      # lazysql # Like lazygit, but for sql
       lsd # Modern ls with colors/icons
       lz4 # Extremely fast lossless compression
       man-pages # Additional manual pages
@@ -32,7 +31,7 @@
       pamixer # PulseAudio CLI mixer
       pavucontrol # PulseAudio volume control GUI
       playerctl # Media player controller
-      stable.pqiv # Powerful X11 image viewer
+      pqiv # Powerful X11 image viewer
       qalculate-gtk # Advanced calculator (GTK interface)
       ripgrep # grep replacement
       runapp # faster uwsm-app replacement
@@ -62,7 +61,7 @@
       protonmail-bridge
       # protonmail-bridge-gui
       # protonvpn-cli # ProtonVPN command-line interface
-      protonvpn-gui # ProtonVPN graphical interface
+      proton-vpn # ProtonVPN graphical interface
       rclone # Cloud storage synchronization
       sshfs
       wget # Non-interactive network downloader
@@ -73,8 +72,10 @@
       devenv # Reproducible development environments with Nix
       gcc # GNU Compiler Collection
       gnumake # GNU make build automation
+      # flake.ki-editor # Another editor
       nixfmt # nix formatter
       rustfmt # Rust code formatter
+      secretspec # Secret env vars for devenv
       shfmt # Shell script formatter
       zig # General-purpose programming language/toolchain
 
@@ -86,15 +87,15 @@
       typst-live
 
       # Language Servers
-      basedpyright # Python language server (Pyright-based)
+      # basedpyright # Python language server (Pyright-based)
       ltex-ls-plus
       marksman
       nixd # Nix language server
       ruff # Python LSP
-      rust-analyzer # Rust language server
+      # rust-analyzer # Rust language server
       ty
-      vscode-extensions.vadimcn.vscode-lldb # VS Code LLDB debugger extension
-      zls # Zig language server
+      # vscode-extensions.vadimcn.vscode-lldb # VS Code LLDB debugger extension
+      # zls # Zig language server
 
       # Package Management
       nix-prefetch-github # Prefetch GitHub repository hashes for Nix
@@ -108,6 +109,7 @@
 
       # Containers & Orchestration
       # docker # Container runtime
+      # google-cloud-sdk-gce
       fluxcd # Continuous delivery for Kubernetes
       k9s # Kubernetes CLI interface
       kubernetes-helm # Kubernetes package manager
@@ -119,13 +121,16 @@
       terraform-ls # Terraform language server
 
       # Browsers
-      # brave # Privacy-focused web browser
-      firefox-devedition # Firefox Developer Edition
-      flake.zen-browser # Privacy-focused browser (Zen)
+      brave # Privacy-focused web browser
+      flake.brave-origin-beta
+      # firefox-devedition # Firefox Developer Edition
+      # flake.zen-browser # Privacy-focused browser (Zen)
       # glide.glide-browser # Keyboard-focused browser
       flake.glide-browser # Keyboard-focused browser
-      vivaldi # Feature-rich web browser
-      vivaldi-ffmpeg-codecs # Vivaldi media codecs
+      mullvad-browser
+      # flake.orion-browser
+      # vivaldi # Feature-rich web browser
+      # vivaldi-ffmpeg-codecs # Vivaldi media codecs
 
       # Graphics
       gifsicle # GIF image manipulation
@@ -149,13 +154,13 @@
       # softmaker-office-nx # Office suite
       (pkgs.softmaker-office-nx.override {
         officeVersion = {
-          version = "1230";
+          version = "1234";
           edition = "";
-          hash = "sha256-/4qKFnLoou1ZuGkRt+2Yf/FPGOnYhx7fnE+8D3gutaY=";
+          hash = "sha256-00bscKt+4aE94x6wKGqXh6tE2GiDll6F4gWZZBEl2JE=";
         };
       })
       tdf # Terminal PDF reader
-      zotero-beta # Reference management
+      zotero # Reference management
 
       # Security
       age # Simple modern file encryption
@@ -166,21 +171,28 @@
       sops # Encrypted secrets management
 
       # Communication
-      signal-desktop-bin # Signal messaging client
+      # signal-desktop-bin # Signal messaging client
       # zoom-us # Video conferencing client
+
+      # Webcam stuff
+      guvcview
+      v4l-utils
 
       # Miscellaneous
       # anytype
       bibiman # Bibliography management CLI
+      flake.claude-code
       deezer-enhanced
       dstask
-      gemini-cli # Gemini protocol client
+      flake.gemini-cli # Gemini protocol client
       # libation # Extract audio books
       libnotify # Desktop notification library
-      logseq
+      logseq-appimage # Manually using AppImage because plugins are broken in the nixpkgs version
       # poweralertd # Power alert daemon (low battery/etc.)
+      qbittorrent
       qmk
-      todoman # todo list
+      # todoman # todo list
+      ventoy
       wiper # Secure file deletion tool
       wl-screenrec
       xdg-utils # Desktop integration scripts (open/mailto)
