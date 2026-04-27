@@ -2,21 +2,26 @@
 {
   programs.ghostty = {
     enable = true;
+    enableFishIntegration = true;
 
     settings = {
       # theme = "dark:Rose Pine,light:Rose Pine Dawn";
       gtk-titlebar = false;
       gtk-single-instance = true;
       window-show-tab-bar = "never";
+
       quit-after-last-window-closed = false;
       quit-after-last-window-closed-delay = "30m";
       linux-cgroup = "single-instance";
+
       "window-decoration" = false;
+      window-padding-color = "extend";
       font-family = "TX02 Nerd Font Ret";
       font-size = 10;
+
       copy-on-select = true;
+
       confirm-close-surface = false;
-      window-padding-color = "extend";
 
       quick-terminal-screen = "mouse";
 
@@ -24,6 +29,10 @@
       custom-shader = "./shaders/cursor_tail.glsl";
 
       shell-integration-features = "ssh-terminfo,ssh-env,sudo";
+
+      notify-on-command-finish = "unfocused";
+      notify-on-command-finish-action = "no-bell,notify";
+      notify-on-command-finish-after = "30s";
 
       keybind = [
         "global:alt+enter=toggle_quick_terminal"
