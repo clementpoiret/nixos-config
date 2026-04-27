@@ -17,6 +17,8 @@
     package = pkgs.niri;
 
     settings = {
+      prefer-no-csd = true;
+
       environment = {
         DMS_DISABLE_MATUGEN = "1";
         DMS_DANKBAR_LAYER = "overlay";
@@ -154,7 +156,15 @@
         }
       ];
       binds = {
-        "Mod+H".action.show-hotkey-overlay = [ ];
+        # "Mod+H".action.show-hotkey-overlay = [ ];
+        "Mod+H".action.spawn = [
+          "dms"
+          "ipc"
+          "call"
+          "keybinds"
+          "toggle"
+          "niri"
+        ];
         "Mod+D".action.spawn = [
           "dms"
           "ipc"
@@ -182,6 +192,107 @@
           "inhibit"
           "toggle"
         ];
+        "Mod+Ctrl+E".action.spawn = [
+          "dms"
+          "ipc"
+          "call"
+          "niri"
+          "screenshot"
+        ];
+        "Mod+Ctrl+S".action.spawn = [
+          "dms"
+          "ipc"
+          "call"
+          "niri"
+          "screenshotScreen"
+        ];
+        "Mod+Ctrl+W".action.spawn = [
+          "dms"
+          "ipc"
+          "call"
+          "niri"
+          "screenshotWindow"
+        ];
+        "Mod+Shift+B".action.spawn = [
+          "dms"
+          "ipc"
+          "call"
+          "bar"
+          "toggle"
+          "index"
+          "0"
+        ];
+
+        # Audio (Volume)
+        "XF86AudioRaiseVolume" = {
+          allow-when-locked = true;
+          action.spawn = [
+            "dms"
+            "ipc"
+            "call"
+            "audio"
+            "increment"
+            "5"
+          ];
+        };
+        "XF86AudioLowerVolume" = {
+          allow-when-locked = true;
+          action.spawn = [
+            "dms"
+            "ipc"
+            "call"
+            "audio"
+            "decrement"
+            "5"
+          ];
+        };
+        "XF86AudioMute" = {
+          allow-when-locked = true;
+          action.spawn = [
+            "dms"
+            "ipc"
+            "call"
+            "audio"
+            "mute"
+          ];
+        };
+        "XF86AudioMicMute" = {
+          allow-when-locked = true;
+          action.spawn = [
+            "dms"
+            "ipc"
+            "call"
+            "audio"
+            "micmute"
+          ];
+        };
+
+        # Brightness
+        "XF86MonBrightnessUp" = {
+          allow-when-locked = true;
+          # The empty string "" at the end tells DMS to use the default device
+          action.spawn = [
+            "dms"
+            "ipc"
+            "call"
+            "brightness"
+            "increment"
+            "5"
+            ""
+          ];
+        };
+        "XF86MonBrightnessDown" = {
+          allow-when-locked = true;
+          action.spawn = [
+            "dms"
+            "ipc"
+            "call"
+            "brightness"
+            "decrement"
+            "5"
+            ""
+          ];
+        };
 
         # Media keys
         "XF86AudioPlay" = {
@@ -318,8 +429,8 @@
         "Mod+Ctrl+8".action.move-column-to-workspace = 8;
         "Mod+Ctrl+9".action.move-column-to-workspace = 9;
 
-        "Mod+BracketLeft".action.consume-or-expel-window-left = [ ];
-        "Mod+BracketRight".action.consume-or-expel-window-right = [ ];
+        "Mod+Mod5+X".action.consume-or-expel-window-left = [ ]; # [
+        "Mod+Mod5+Minus".action.consume-or-expel-window-right = [ ]; # ]
         "Mod+Comma" = lib.mkForce { action.consume-window-into-column = [ ]; };
         "Mod+Period".action.expel-window-from-column = [ ];
 
@@ -333,10 +444,10 @@
         "Mod+C".action.center-column = [ ];
         "Mod+Ctrl+C".action.center-visible-columns = [ ];
 
-        "Mod+Minus".action.set-column-width = "-10%";
-        "Mod+Equal".action.set-column-width = "+10%";
-        "Mod+Shift+Minus".action.set-window-height = "-10%";
-        "Mod+Shift+Equal".action.set-window-height = "+10%";
+        "Mod+Mod5+T".action.set-column-width = "-10%"; # -
+        "Mod+Mod5+R".action.set-column-width = "+10%"; # +
+        "Mod+Mod5+Shift+T".action.set-window-height = "-10%";
+        "Mod+Mod5+Shift+R".action.set-window-height = "+10%";
 
         "Mod+V" = lib.mkForce { action.toggle-window-floating = [ ]; };
         "Mod+Shift+V".action.switch-focus-between-floating-and-tiling = [ ];
@@ -357,7 +468,7 @@
         ];
         "Mod+B".action.spawn = [
           "runapp"
-          "glide-browser"
+          "brave"
         ];
         "Mod+E".action.spawn = [
           "runapp"
@@ -386,7 +497,7 @@
     enable = true;
 
     niri = {
-      enableKeybinds = true;
+      # enableKeybinds = true;
       enableSpawn = true;
     };
 
@@ -400,7 +511,6 @@
     adw-gtk3
     glib
     grim
-    grimblast
     # polkit_gnome
     libdisplay-info
     pipewire
