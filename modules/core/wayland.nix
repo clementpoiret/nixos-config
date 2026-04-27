@@ -28,7 +28,7 @@ in
     systemPackages = with pkgs; [
       pkgs.niri
       xdg-desktop-portal
-      # xwayland-satellite.packages.${pkgs.system}.default
+      xwayland-satellite
     ];
     variables = {
       XDG_SESSION_TYPE = "wayland";
@@ -54,7 +54,8 @@ in
 
       # Misc
       _JAVA_AWT_WM_NONEREPARENTING = "1";
-      PROTON_PASS_KEY_PROVIDER = "fs";
+      PROTON_PASS_KEY_PROVIDER = "keyring";
+      PROTON_PASS_LINUX_KEYRING = "dbus";
     };
   };
 

@@ -14,9 +14,6 @@
     };
     #fstrim.enable = true;
   };
-  services.logind.settings.Login = {
-    HandlePowerekey = "ignore";
-  };
 
   services.syncthing = {
     enable = true;

@@ -6,7 +6,8 @@
     ./btop.nix # resouces monitor
     ./chtsh.nix
     ./cleanup.nix # auto delete files
-    ./easyeffect.nix # audio profile
+    ./easyeffects/easyeffects.nix # audio profile
+    ./fish.nix # shell
     ./fuzzel.nix # launcher
     ./ghostty/ghostty.nix # the best terminal emulator
     ./git/git.nix # version controle
@@ -26,13 +27,13 @@
     ./ssh.nix # ssh
     ./superfile.nix # file manager
     ./scripts/scripts.nix # personal scripts
-    ./tmux.nix
+    # ./tmux.nix
     ./wl-kbptr.nix
     ./xdg-mimes.nix # default apps
-    ./yazi.nix # terminal file manager
+    # ./yazi.nix # terminal file manager
     ./zed.nix
     # ./zellij/zellij.nix # terminal multiplexer
     ./zk/zk.nix # zettelkasten
-    ./zsh/zsh.nix # shell
+    # ./zsh/zsh.nix # shell
   ];
 }

@@ -30,8 +30,9 @@
       "input"
       "networkmanager"
       "wheel"
+      "video"
     ];
-    shell = pkgs.nushell;
+    shell = pkgs.fish;
     packages = [ inputs.home-manager.packages.${pkgs.stdenv.hostPlatform.system}.default ];
   };
   nix.settings.allowed-users = [ "${username}" ];
