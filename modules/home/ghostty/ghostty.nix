@@ -26,7 +26,8 @@
       quick-terminal-screen = "mouse";
 
       custom-shader-animation = "always";
-      custom-shader = "./shaders/cursor_tail.glsl";
+      custom-shader = "./shaders/cursor_warp.glsl";
+      # custom-shader = "./shaders/cursor_tail.glsl";
 
       shell-integration-features = "ssh-terminfo,ssh-env,sudo";
 

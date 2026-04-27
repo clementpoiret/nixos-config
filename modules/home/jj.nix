@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 {
   home.file.lesskey.text = "Q toggle-option -!^Predraw-on-quit\nq";
 
@@ -40,5 +40,5 @@
   #   use ~/.config/nushell/completions-jj.nu *
   # '';
 
-  # home.packages = with pkgs; [ lazyjj ];
+  # home.packages = [ pkgs.blazingjj ];
 }

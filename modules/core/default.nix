@@ -12,6 +12,7 @@
     ./services.nix
     ./sops.nix
     ./system.nix
+    ./tailscale.nix
     ./user.nix
     ./virtualization.nix
     ./wayland.nix

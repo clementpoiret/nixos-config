@@ -14,14 +14,16 @@
 
   programs.niri = {
     enable = true;
-    package = pkgs.niri;
+    # package = pkgs.niri;
+    package = pkgs.niri-unstable;
 
     settings = {
       prefer-no-csd = true;
 
       environment = {
         DMS_DISABLE_MATUGEN = "1";
-        DMS_DANKBAR_LAYER = "overlay";
+        DMS_DANKBAR_LAYER = "top";
+        # DMS_DANKBAR_LAYER = "overlay";
         DMS_HIDE_TRAYIDS = "discord,spotify";
       };
 
@@ -495,6 +497,12 @@
 
   programs.dank-material-shell = {
     enable = true;
+
+    quickshell.package =
+      (inputs.dms.inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default).overrideAttrs
+        (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        });
 
     niri = {
       # enableKeybinds = true;

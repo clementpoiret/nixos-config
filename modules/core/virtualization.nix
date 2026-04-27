@@ -19,6 +19,11 @@
         swtpm.enable = true;
       };
     };
+
+    # virtualbox.host = {
+    #   enable = true;
+    #   enableExtensionPack = true;
+    # };
   };
 
   # Add user to libvirtd group
@@ -26,6 +31,7 @@
     "libvirtd"
     "podman"
   ];
+  users.extraGroups.vboxusers.members = [ "clementpoiret" ];
 
   programs.virt-manager.enable = true;
 

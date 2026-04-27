@@ -13,8 +13,11 @@ let
   vpsrhizomeHostName = builtins.readFile config.sops.secrets."hostnames/vpsrhizome".path;
 
   defaultUser = builtins.readFile config.sops.secrets."hostusers/default".path;
+  bootUser = builtins.readFile config.sops.secrets."hostusers/defaultBoot".path;
   bastionUser = builtins.readFile config.sops.secrets."hostusers/bastion".path;
   jzUser = builtins.readFile config.sops.secrets."hostusers/jz".path;
+
+  vpsPersPort = builtins.fromJSON (builtins.readFile config.sops.secrets."ports/vpspersboot".path);
 in
 {
   programs.ssh = {
@@ -75,6 +78,12 @@ in
         hostname = rpihomeHostName;
       };
 
+      "vpspersboot" = {
+        user = bootUser;
+        hostname = vpspersHostName;
+        identityFile = "~/.ssh/id_ed25519_initramfs";
+        port = vpsPersPort;
+      };
       "vpspers" = {
         hostname = vpspersHostName;
       };

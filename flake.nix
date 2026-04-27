@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-26.05";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
 
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
@@ -16,7 +16,8 @@
     };
 
     niri = {
-      url = "github:sodiboo/niri-flake";
+      # url = "github:sodiboo/niri-flake";
+      url = "github:sodiboo/niri-flake/e43ef13f23c2c7ae5b10e842745cb345faff4f40"; # 26.04
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -47,13 +48,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hyprquickshot = {
-      url = "github:JamDon2/hyprquickshot";
-      flake = false;
-    };
+    # hyprquickshot = {
+    #   url = "github:JamDon2/hyprquickshot";
+    #   flake = false;
+    # };
+    # quickshell = {
+    #   url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=783c953987dc56ff0601abe6845ed96f1d00495a";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
     dms = {
       url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.quickshell.follows = "quickshell";
     };
     ghosttyshaders = {
       url = "github:sahaj-b/ghostty-cursor-shaders";
@@ -65,12 +71,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    gemini-cli = {
-      url = "github:clementpoiret/gemini-cli-nix";
+    antigravity = {
+      url = "github:Hy4ri/antigravity-flake";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     claude-code = {
       url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+    codex-cli = {
+      url = "github:sadjow/codex-cli-nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+    codex-desktop-linux = {
+      url = "github:ilysenko/codex-desktop-linux";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
@@ -79,23 +93,30 @@
       # inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
-    brave-origin = {
-      url = "github:clementpoiret/brave-origin-flake";
+    # brave-origin = {
+    #   url = "github:clementpoiret/brave-origin-flake";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+    orion-browser.url = "github:dokokitsune/orion-browser-flake";
+
+    helium = {
+      url = "github:schembriaiden/helium-browser-nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    orion-browser.url = "github:dokokitsune/orion-browser-flake";
   };
 
   outputs =
     {
       self,
 
+      antigravity,
       bash-env-json,
       bibli-ls,
-      brave-origin,
+      # brave-origin,
       claude-code,
-      gemini-cli,
+      codex-cli,
       glide-browser,
+      helium,
       home-manager,
       ki-editor,
       orion-browser,
@@ -132,45 +153,49 @@
       #   config.allowUnfree = true;
       # };
       pkgs-flake = {
+        antigravity-cli = antigravity.packages.${system}.antigravity-cli;
+        antigravity-ide = antigravity.packages.${system}.antigravity-ide;
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
-        brave-origin-beta = brave-origin.packages.${system}.brave-origin-beta;
-        claude-code = claude-code.packages.${system}.claude-code;
-        gemini-cli = gemini-cli.packages.${system}.gemini-cli;
+        # brave-origin-beta = brave-origin.packages.${system}.brave-origin-beta;
+        claude-code = claude-code.packages.${system}.default;
+        codex-cli = codex-cli.packages.${system}.default;
         glide-browser = glide-browser.packages.${system}.default;
+        helium = helium.packages.${system}.default;
         ki-editor = ki-editor.packages.${system}.default;
         orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
         zen-browser = zen-browser.packages.${system}.default;
       };
 
-      # optimizedPackagesOverlay = final: prev: {
-      #   # DE-related
-      #   hyprland = prev.hyprland.overrideAttrs (old: {
-      #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-      #   });
-      #   xdg-desktop-portal-hyprland = prev.xdg-desktop-portal-hyprland.overrideAttrs (old: {
-      #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-      #   });
-      #   hyprcursor = prev.hyprcursor.overrideAttrs (old: {
-      #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-      #   });
-      #   hyprpicker = prev.hyprpicker.overrideAttrs (old: {
-      #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-      #   });
-      #   hyprlock = prev.hyprlock.overrideAttrs (old: {
-      #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-      #   });
-      #   hypridle = prev.hypridle.overrideAttrs (old: {
-      #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-      #   });
-      #   hyprsunset = prev.hyprsunset.overrideAttrs (old: {
-      #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-      #   });
-      #   waybar = prev.waybar.overrideAttrs (old: {
-      #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-      #   });
-      # };
+      optimizedPackagesOverlay = final: prev: {
+        # DE-related
+
+        #   hyprland = prev.hyprland.overrideAttrs (old: {
+        #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        #   });
+        #   xdg-desktop-portal-hyprland = prev.xdg-desktop-portal-hyprland.overrideAttrs (old: {
+        #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        #   });
+        #   hyprcursor = prev.hyprcursor.overrideAttrs (old: {
+        #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        #   });
+        #   hyprpicker = prev.hyprpicker.overrideAttrs (old: {
+        #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        #   });
+        #   hyprlock = prev.hyprlock.overrideAttrs (old: {
+        #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        #   });
+        #   hypridle = prev.hypridle.overrideAttrs (old: {
+        #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        #   });
+        #   hyprsunset = prev.hyprsunset.overrideAttrs (old: {
+        #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        #   });
+        #   waybar = prev.waybar.overrideAttrs (old: {
+        #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+        #   });
+      };
 
       customOverlays = [
         (final: prev: {
@@ -179,7 +204,7 @@
           stable = pkgs-stable;
           flake = pkgs-flake;
         })
-        # optimizedPackagesOverlay
+        optimizedPackagesOverlay
         niri.overlays.niri
         nix-cachyos-kernel.overlays.pinned
       ];

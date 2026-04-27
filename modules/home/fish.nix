@@ -32,6 +32,9 @@
     shellInit = ''
       # (Interactive-only variables like fish_greeting & fish_escape_delay_ms moved to interactiveShellInit)
     '';
+    shellInitLast = ''
+      devenv hook fish | source
+    '';
     interactiveShellInit = ''
       fish_vi_key_bindings
       set fish_greeting # Disable greeting

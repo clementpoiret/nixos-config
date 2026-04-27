@@ -54,6 +54,7 @@
       "acpi_call"
       "cros_ec"
       "cros_ec_lpcs"
+      "framework_laptop"
       # "zenpower"
     ];
     kernelParams = [

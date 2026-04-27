@@ -1,5 +1,12 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
+let
+  codexCli = inputs.codex-cli.packages.${pkgs.stdenv.hostPlatform.system}.default;
+in
 {
+  imports = [
+    inputs.codex-desktop-linux.homeManagerModules.default
+  ];
+
   home.packages = (
     with pkgs;
     [
@@ -32,7 +39,7 @@
       pavucontrol # PulseAudio volume control GUI
       playerctl # Media player controller
       pqiv # Powerful X11 image viewer
-      qalculate-gtk # Advanced calculator (GTK interface)
+      # qalculate-gtk # Advanced calculator (GTK interface)
       ripgrep # grep replacement
       runapp # faster uwsm-app replacement
       serpl # SerpAPI CLI for search engine results
@@ -58,6 +65,7 @@
 
       # Networking
       aria2 # Multi-source command-line download utility
+      motrix-next # dl manager
       protonmail-bridge
       # protonmail-bridge-gui
       # protonvpn-cli # ProtonVPN command-line interface
@@ -67,7 +75,6 @@
       wget # Non-interactive network downloader
 
       # Development Tools
-      antigravity-fhs
       cmake # Cross-platform build system
       devenv # Reproducible development environments with Nix
       gcc # GNU Compiler Collection
@@ -122,13 +129,14 @@
 
       # Browsers
       brave # Privacy-focused web browser
-      flake.brave-origin-beta
+      # flake.brave-origin-beta
       # firefox-devedition # Firefox Developer Edition
       # flake.zen-browser # Privacy-focused browser (Zen)
       # glide.glide-browser # Keyboard-focused browser
       flake.glide-browser # Keyboard-focused browser
+      flake.helium
       mullvad-browser
-      # flake.orion-browser
+      flake.orion-browser
       # vivaldi # Feature-rich web browser
       # vivaldi-ffmpeg-codecs # Vivaldi media codecs
 
@@ -181,10 +189,13 @@
       # Miscellaneous
       # anytype
       bibiman # Bibliography management CLI
+      flake.antigravity-cli
+      flake.antigravity-ide
       flake.claude-code
+      flake.codex-cli
       deezer-enhanced
       dstask
-      flake.gemini-cli # Gemini protocol client
+      # flake.gemini-cli # Gemini protocol client
       # libation # Extract audio books
       libnotify # Desktop notification library
       logseq-appimage # Manually using AppImage because plugins are broken in the nixpkgs version
@@ -192,7 +203,7 @@
       qbittorrent
       qmk
       # todoman # todo list
-      ventoy
+      # ventoy
       wiper # Secure file deletion tool
       wl-screenrec
       xdg-utils # Desktop integration scripts (open/mailto)
@@ -200,4 +211,13 @@
       yubikey-manager # Manage yubikeys :)
     ]
   );
+
+  programs.codexDesktopLinux = {
+    enable = true;
+    # remoteMobileControl.enable = true;
+    remoteControl = {
+      enable = true;
+      package = codexCli;
+    };
+  };
 }

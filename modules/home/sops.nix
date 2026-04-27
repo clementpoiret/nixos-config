@@ -23,8 +23,11 @@
       "hostnames/jz" = { };
       "hostnames/jzpp" = { };
       "hostusers/default" = { };
+      "hostusers/defaultBoot" = { };
       "hostusers/bastion" = { };
       "hostusers/jz" = { };
+
+      "ports/vpspersboot" = { };
 
       "accounts/realName" = { };
       "accounts/pers1/name" = { };
