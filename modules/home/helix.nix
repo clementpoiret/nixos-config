@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 {
   xdg.configFile."helix/yazi-picker.sh".text = # sh
     ''
@@ -33,6 +33,7 @@
   programs.helix = {
     enable = true;
     defaultEditor = true;
+    package = pkgs.stable.helix;
 
     # TODO: Ltex-ls-plus
     # TODO: simple-completion-language-server
@@ -208,6 +209,20 @@
             args = [ "--stdin" ];
           };
         }
+        {
+          name = "mail";
+          scope = "source.mail";
+          file-types = [
+            "mail"
+            "eml"
+          ];
+          text-width = 72;
+          rulers = [ 72 ];
+          soft-wrap = {
+            enable = true;
+            wrap-at-text-width = true;
+          };
+        }
       ];
     };
 
@@ -332,40 +347,6 @@
             "search_prev"
           ];
 
-          # Zellij stuff
-          # space.ret = ":sh zellij run -ci -- lazygit";
-          # "C-a" = {
-          #   "C-a" = ":sh zellij ac toggle-floating-panes";
-          #   "z" = ":sh zellij ac toggle-fullscreen";
-          #   "n" = ":sh zellij ac new-pane";
-          #   "v" = ":sh zellij ac new-pane -d right";
-          #   "h" = ":sh zellij ac new-pane -d down";
-          #   "r" = [
-          #     ":sh zellij ac new-pane -d right -- devenv shell repl"
-          #     ":sh zellij ac move-focus left"
-          #   ];
-          #   "left" = ":sh zellij ac move-focus-or-tab left";
-          #   "down" = ":sh zellij ac move-focus-or-tab down";
-          #   "up" = ":sh zellij ac move-focus-or-tab up";
-          #   "right" = ":sh zellij ac move-focus-or-tab right";
-          # };
-          # "C-t".n = ":sh zellij ac new-tab";
-
-          # tmux stuff
-          space.ret = ":sh tmux popup -d '#{pane_current_path}' -E -w 90% -h 90% lazygit";
-
-          # REPL
-          # "C-space" = [
-          #   "select_mode"
-          #   "extend_to_line_bounds"
-          #   ":sh zellij ac move-focus-or-tab right"
-          #   ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
-          #   ":sh zellij ac move-focus-or-tab left"
-          #   "move_visual_line_down"
-          #   "goto_first_nonwhitespace"
-          #   "collapse_selection"
-          #   "normal_mode"
-          # ];
           # REPL: Send current line to 'REPL' pane
           "C-space" = [
             "select_mode"
@@ -377,18 +358,6 @@
             "goto_first_nonwhitespace"
             "normal_mode"
           ];
-          # "C-esc" = [
-          #   "goto_first_nonwhitespace"
-          #   "select_mode"
-          #   "extend_to_line_end"
-          #   ":sh zellij ac move-focus-or-tab right"
-          #   ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
-          #   ":sh zellij ac move-focus-or-tab left"
-          #   "move_visual_line_down"
-          #   "goto_first_nonwhitespace"
-          #   "collapse_selection"
-          #   "normal_mode"
-          # ];
           # REPL: Send from start of line to end of line to 'REPL' pane
           "C-e" = [
             "goto_first_nonwhitespace"
@@ -428,7 +397,13 @@
               "goto_definition"
               "collapse_selection"
             ];
+            q = ":reflow";
           };
+          "A-q" = ":reflow";
+          "A-w" = [
+            "extend_line"
+            ":reflow"
+          ];
         };
 
         insert = {
@@ -436,27 +411,6 @@
             "collapse_selection"
             "normal_mode"
           ];
-
-          # REPL
-          # "C-space" = [
-          #   "select_mode"
-          #   "extend_to_line_bounds"
-          #   ":sh zellij ac move-focus-or-tab right"
-          #   ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
-          #   ":sh zellij ac move-focus-or-tab left"
-          #   "collapse_selection"
-          #   "insert_mode"
-          # ];
-          # "C-esc" = [
-          #   "goto_first_nonwhitespace"
-          #   "select_mode"
-          #   "extend_to_line_end"
-          #   ":sh zellij ac move-focus-or-tab right"
-          #   ":pipe-to sh -c 'zellij ac write-chars \"$(cat)\n\"'"
-          #   ":sh zellij ac move-focus-or-tab left"
-          #   "collapse_selection"
-          #   "insert_mode"
-          # ];
 
           # REPL: Send current line to 'REPL' pane, stay in insert mode
           "C-space" = [
@@ -501,16 +455,6 @@
           ];
 
           # REPL
-          # "C-space" = [
-          #   ":sh zellij ac move-focus-or-tab right"
-          #   ":pipe-to sh -c 'rg -v \"^[[:space:]]*$\" | zellij ac write-chars \"$(cat)\n\"'"
-          #   ":sh zellij ac move-focus-or-tab left"
-          #   "collapse_selection"
-          #   "move_visual_line_down"
-          #   "goto_first_nonwhitespace"
-          #   "collapse_selection"
-          #   "normal_mode"
-          # ];
           "C-space" = [
             # Pipe selection through rg (remove empty lines), then to tmux: load, paste, send Enter
             ":pipe-to sh -c 'rg -v \"^[[:space:]]*$\" | tmux load-buffer - && tmux paste-buffer -t REPL && tmux send-keys -t REPL Enter'"
@@ -519,6 +463,11 @@
             "goto_first_nonwhitespace"
             "normal_mode"
           ];
+
+          "A-q" = ":reflow";
+          g = {
+            q = ":reflow";
+          };
         };
       };
     };
