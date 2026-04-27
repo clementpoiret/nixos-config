@@ -9,7 +9,7 @@
     keyMode = "vi";
     newSession = true;
     secureSocket = true;
-    shell = "${pkgs.nushell}/bin/nu";
+    shell = "${pkgs.fish}/bin/fish";
     shortcut = "a";
     terminal = "xterm-256color";
     mouse = true;

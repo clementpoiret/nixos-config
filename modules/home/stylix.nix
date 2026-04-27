@@ -49,6 +49,7 @@
 
     opacity.desktop = 0.0;
 
+    targets.dank-material-shell.enable = false;
     targets.hyprpaper.enable = false;
     targets.hyprpaper.image.enable = false;
     targets.neovim.enable = false;
