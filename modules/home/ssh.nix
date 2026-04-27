@@ -35,7 +35,7 @@ in
         # Connection multiplexing: one auth reused by many commands
         controlMaster = "auto";
         controlPersist = "15m";
-        controlPath = "/dev/shm/%r@%h:%p";
+        controlPath = "~/.ssh/sockets/%C";
         serverAliveInterval = 30;
         serverAliveCountMax = 6;
 
@@ -48,16 +48,27 @@ in
         port = 443;
         user = "git";
       };
+      "gitlab.com" = {
+        hostname = "altssh.gitlab.com";
+        port = 443;
+        user = "git";
+      };
 
       "jz" = {
         hostname = jzHostName;
         user = jzUser;
         proxyJump = "bastion";
+        setEnv = {
+          TERM = "xterm-256color";
+        };
       };
       "jzpp" = {
         hostname = jzppHostName;
         user = jzUser;
         proxyJump = "bastion";
+        setEnv = {
+          TERM = "xterm-256color";
+        };
       };
 
       "rpihome" = {
@@ -76,9 +87,17 @@ in
         hostname = bastionHostName;
         user = bastionUser;
         port = 443;
+        setEnv = {
+          TERM = "xterm-256color";
+        };
       };
     };
   };
+
+  systemd.user.tmpfiles.rules = [
+    # Type  Path              Mode  User  Group  Age  Argument
+    "d      %h/.ssh/sockets   0700  -     -      -    -"
+  ];
 
   home.activation.ensureSshCmDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     install -d -m 700 "${config.home.homeDirectory}/.ssh/cm"

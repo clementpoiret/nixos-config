@@ -63,7 +63,7 @@
   };
 
   home.sessionVariables = {
-    # ANTHROPIC_API_KEY = builtins.readFile /run/user/1000/secrets/api_keys/anthropic;
+    PYPI_API_KEY = builtins.readFile config.sops.secrets."api_keys/pypi".path;
     ANTHROPIC_API_KEY = builtins.readFile config.sops.secrets."api_keys/anthropic".path;
     CLAUDE_API_KEY = builtins.readFile config.sops.secrets."api_keys/anthropic".path;
   };
