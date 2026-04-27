@@ -137,10 +137,26 @@ let
       sentFolder = "[Gmail]/Messages envoyés";
     })
   ];
+
+  aerc-convert-save = pkgs.writeShellScriptBin "aerc-convert-save" ''
+    FINAL="/tmp/aerc-view.md"
+    TEMP_RAW="/tmp/aerc-view-temp.raw"
+
+    cat > "$TEMP_RAW"
+
+    if ${pkgs.ripgrep}/bin/rg -qim 1 "<\s*(html|head|body|div|p|br|span|table|a|ul|ol|li|blockquote)\b" "$TEMP_RAW"; then
+      ${pkgs.w3m}/bin/w3m -dump -T text/html -I UTF-8 -O UTF-8 -cols 100 "$TEMP_RAW" > "$FINAL"
+    else
+      cp "$TEMP_RAW" "$FINAL"
+    fi
+
+    rm -f "$TEMP_RAW"
+  '';
 in
 {
   home.packages = with pkgs; [
     aerc
+    aerc-convert-save
     bat
     catimg
     pandoc
@@ -212,9 +228,9 @@ in
         "image/*" = "${pkgs.xdg-utils}/bin/xdg-open";
       };
 
-      multipart-converters = {
-        "text/html" = "${pkgs.pandoc}/bin/pandoc -f gfm -t html --standalone";
-      };
+      # multipart-converters = {
+      #   "text/html" = "${pkgs.pandoc}/bin/pandoc -f gfm -t html --standalone";
+      # };
 
       compose = {
         editor = "hx";
@@ -222,6 +238,8 @@ in
         reply-to-self = true;
         no-attachment-warning = true;
         file-picker-cmd = "find . -maxdepth 2 -not -path '*/.*' | fzf";
+        wrap-at = 72;
+        format-flowed = true;
       };
 
       filters = ''
@@ -265,6 +283,8 @@ in
         "<C-r>" = ":check-mail<Enter>";
         "<C-u>" = ":prev 50%<Enter>";
         "<C-w>" = ":vsplit<Enter>";
+        "<C-e>" =
+          ":exec rm -f /tmp/aerc-view.md<Enter>:pipe -b aerc-convert-save<Enter>:term sh -c 'while [ ! -f /tmp/aerc-view.md ]; do sleep 0.05; done; hx /tmp/aerc-view.md'<Enter>";
         "<Down>" = ":next<Enter>";
         "<Enter>" = ":view<Enter>";
         "<Esc>" = ":clear<Enter>";
@@ -356,6 +376,8 @@ in
         "<C-i>" = ":toggle-key-passthrough<Enter>";
         "<C-j>" = ":next<Enter>";
         "<C-k>" = ":prev<Enter>";
+        "<C-e>" =
+          ":exec rm -f /tmp/aerc-view.md<Enter>:pipe -b aerc-convert-save<Enter>:term sh -c 'while [ ! -f /tmp/aerc-view.md ]; do sleep 0.05; done; hx /tmp/aerc-view.md'<Enter>";
         "dd" = ":delete<Enter>";
         "ea" = ":reply -a<Enter>";
         "ee" = ":reply <Enter>";

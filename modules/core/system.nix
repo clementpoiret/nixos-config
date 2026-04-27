@@ -18,6 +18,7 @@
         "https://cuda-maintainers.cachix.org"
         "https://devenv.cachix.org"
         "https://attic.xuyh0120.win/lantian"
+        "https://clementpoiret.cachix.org"
       ];
       trusted-public-keys = [
         "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
@@ -26,6 +27,7 @@
         "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
         "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
         "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+        "clementpoiret.cachix.org-1:+W8ndoDBppOP0zcLzkPYSCH6j3kKNH4ckfJCQ138PZo="
       ];
       trusted-users = [
         "root"
@@ -54,6 +56,7 @@
   nixpkgs.config = {
     allowUnfree = true;
     allowUnfreePredicate = true;
+    permittedInsecurePackages = [ "ventoy-1.1.10" ];
   };
   system.stateVersion = "25.11";
 }
