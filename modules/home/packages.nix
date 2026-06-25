@@ -79,7 +79,6 @@ in
       devenv # Reproducible development environments with Nix
       gcc # GNU Compiler Collection
       gnumake # GNU make build automation
-      # flake.ki-editor # Another editor
       nixfmt # nix formatter
       rustfmt # Rust code formatter
       secretspec # Secret env vars for devenv
@@ -131,7 +130,6 @@ in
       brave # Privacy-focused web browser
       # flake.brave-origin-beta
       # firefox-devedition # Firefox Developer Edition
-      # flake.zen-browser # Privacy-focused browser (Zen)
       # glide.glide-browser # Keyboard-focused browser
       flake.glide-browser # Keyboard-focused browser
       flake.helium
@@ -205,7 +203,6 @@ in
       # todoman # todo list
       # ventoy
       wiper # Secure file deletion tool
-      wl-screenrec
       xdg-utils # Desktop integration scripts (open/mailto)
       yubioath-flutter # Yubico Authenticator
       yubikey-manager # Manage yubikeys :)

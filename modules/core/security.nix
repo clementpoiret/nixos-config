@@ -23,8 +23,6 @@
       sudo = {
         u2fAuth = true;
       };
-
-      hyprlock = { };
     };
     u2f = {
       enable = true;

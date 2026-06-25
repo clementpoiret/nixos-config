@@ -24,11 +24,11 @@ def "main toggle" [] {
   print $"Urgency filters: ($new_state)"
 }
 
-# Get waybar JSON output
-def "main waybar" [] {
+# Get status JSON output for UI widgets
+def "main json" [] {
   let state = main status
   let alt = if $state == "true" { "filtered" } else { "normal" }
-  
+
   {alt: $alt} | to json --raw
 }
 
@@ -48,6 +48,6 @@ def main [] {
   print "Commands:"
   print "  status  - Get current filter state (true/false)"
   print "  toggle  - Toggle urgency filters on/off"
-  print "  waybar  - Output JSON for waybar module"
+  print "  json    - Output status JSON"
   print "  init    - Initialize filters as disabled"
 }

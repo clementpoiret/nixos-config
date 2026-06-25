@@ -21,7 +21,6 @@
     ./nushell/nushell.nix # shell
     ./nvim/nvim.nix # neovim editor
     ./packages.nix # other packages
-    ./quickshell/quickshell.nix # UI widgets
     ./sops.nix # secrets mgmt
     ./stylix.nix # ricing
     ./ssh.nix # ssh
@@ -34,6 +33,5 @@
     ./zed.nix
     # ./zellij/zellij.nix # terminal multiplexer
     ./zk/zk.nix # zettelkasten
-    # ./zsh/zsh.nix # shell
   ];
 }

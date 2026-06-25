@@ -2,7 +2,6 @@
 {
   programs.dconf.enable = true;
   programs.fish.enable = true;
-  # programs.zsh.enable = true;
 
   services.udev.packages = with pkgs; [
     libfido2

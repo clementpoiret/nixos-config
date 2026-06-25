@@ -1,18 +1,11 @@
 { pkgs, ... }:
 let
-  wallchange = pkgs.writers.writeNuBin "wallchange" (builtins.readFile ./scripts/wallchange.nu);
   dunst-dnd = pkgs.writers.writeNuBin "dunst-dnd" (builtins.readFile ./scripts/dunst-dnd.nu);
 
   runbg = pkgs.writeShellScriptBin "runbg" (builtins.readFile ./scripts/runbg.sh);
   music = pkgs.writeShellScriptBin "music" (builtins.readFile ./scripts/music.sh);
   lofi = pkgs.writeScriptBin "lofi" (builtins.readFile ./scripts/lofi.sh);
 
-  toggle_blur = pkgs.writeScriptBin "toggle_blur" (builtins.readFile ./scripts/toggle_blur.sh);
-  toggle_oppacity = pkgs.writeScriptBin "toggle_oppacity" (
-    builtins.readFile ./scripts/toggle_oppacity.sh
-  );
-  toggle_waybar = pkgs.writeScriptBin "toggle_waybar" (builtins.readFile ./scripts/toggle_waybar.sh);
-  toggle_float = pkgs.writeScriptBin "toggle_float" (builtins.readFile ./scripts/toggle_float.sh);
   toggle_suspend = pkgs.writeScriptBin "toggle_suspend" (
     builtins.readFile ./scripts/toggle_suspend.sh
   );
@@ -29,12 +22,9 @@ let
     builtins.readFile ./scripts/shutdown-script.sh
   );
 
-  show-keybinds = pkgs.writeScriptBin "show-keybinds" (builtins.readFile ./scripts/keybinds.sh);
-
   ascii = pkgs.writeScriptBin "ascii" (builtins.readFile ./scripts/ascii.sh);
 
   record = pkgs.writeScriptBin "record" (builtins.readFile ./scripts/record.sh);
-  screenrec = pkgs.writeScriptBin "screenrec" (builtins.readFile ./scripts/screenrec.sh);
 
   run_nvim = pkgs.writeScriptBin "run_nvim" (builtins.readFile ./scripts/run_nvim.sh);
 
@@ -46,17 +36,12 @@ let
 in
 {
   home.packages = [
-    wallchange
     dunst-dnd
 
     runbg
     music
     lofi
 
-    toggle_blur
-    toggle_oppacity
-    toggle_waybar
-    toggle_float
     toggle_suspend
     suspend_state
 
@@ -69,12 +54,9 @@ in
 
     shutdown-script
 
-    show-keybinds
-
     ascii
 
     record
-    screenrec
 
     run_nvim
 
