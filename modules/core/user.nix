@@ -35,6 +35,7 @@
       "docker"
       "input"
       "networkmanager"
+      "render"
       "wheel"
       "video"
     ];

@@ -29,6 +29,7 @@ Local host policy includes:
 
 - Hibernation resume device and swapfile offset.
 - AMD dGPU/iGPU stable DRM symlinks.
+- ROCm runtime, OpenCL, and ML-training support in `hosts/laptop/rocm.nix`.
 - `amdgpu.sg_display=0`.
 - AMD microcode loading workaround for `ucodenix`.
 - Local power-button and lid behavior.
@@ -39,4 +40,3 @@ Build target:
 ```bash
 nix build .#checks.x86_64-linux.laptop-toplevel
 ```
-

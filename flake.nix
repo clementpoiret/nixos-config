@@ -154,6 +154,12 @@
         nix-cachyos-kernel.overlays.pinned
       ];
 
+      pkgs-unstable = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+        overlays = customOverlays;
+      };
+
       mkHost = import ./lib/mkHost.nix {
         inherit
           customOverlays
@@ -184,13 +190,55 @@
         '';
       };
 
-      devShells.${system}.default = pkgs-stable.mkShellNoCC {
-        packages = with pkgs-stable; [
-          deadnix
-          nil
-          nixfmt
-          statix
-        ];
+      devShells.${system} = {
+        default = pkgs-stable.mkShellNoCC {
+          packages = with pkgs-stable; [
+            deadnix
+            nil
+            nixfmt
+            statix
+          ];
+        };
+
+        ml-rocm =
+          let
+            python = pkgs-unstable.python312;
+            wheelRuntimeLibPath = pkgs-unstable.lib.makeLibraryPath (
+              with pkgs-unstable;
+              [
+                bzip2
+                libdrm
+                libelf
+                numactl
+                stdenv.cc.cc.lib
+                xz
+                zlib
+                zstd
+              ]
+            );
+            rocmSmi = pkgs-unstable.writeShellScriptBin "rocm-smi" ''
+              export LD_LIBRARY_PATH="${wheelRuntimeLibPath}''${LD_LIBRARY_PATH:+:}''${LD_LIBRARY_PATH:-}"
+              exec ${pkgs-unstable.rocmPackages.rocm-smi}/bin/rocm-smi "$@"
+            '';
+          in
+          pkgs-unstable.mkShell {
+            packages = [
+              python
+              pkgs-unstable.uv
+              pkgs-unstable.clinfo
+              pkgs-unstable.rocmPackages.rocminfo
+              rocmSmi
+            ];
+
+            LD_LIBRARY_PATH = wheelRuntimeLibPath;
+            PYTHONNOUSERSITE = "1";
+            ROCM_JAX_WHEELHOUSE_URL = "https://github.com/ROCm/rocm-jax/releases/download/rocm-jax-v0.9.1/wheelhouse_post5_generic_archs_theRock7.12.zip";
+            PYTORCH_ROCM_INDEX_URL = "https://download.pytorch.org/whl/rocm7.2";
+            UV_LINK_MODE = "copy";
+            ROCR_VISIBLE_DEVICES = "0";
+            HIP_VISIBLE_DEVICES = "0";
+            GPU_DEVICE_ORDINAL = "0";
+          };
       };
 
       nixosConfigurations = {

@@ -107,40 +107,6 @@
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
-  # amdgpu
-  environment.systemPackages = with pkgs; [
-    amdgpu_top
-    rocmPackages.rocm-smi
-  ];
-
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
-  hardware.graphics.extraPackages = with pkgs; [
-    rocmPackages.clr
-  ];
-  hardware.amdgpu.initrd.enable = true;
-  services.xserver.videoDrivers = [ "modesetting" ];
-  systemd.tmpfiles.rules =
-    let
-      rocmEnv = pkgs.symlinkJoin {
-        name = "rocm-combined";
-        paths = with pkgs.rocmPackages; [
-          rocblas
-          hipblas
-          clr
-        ];
-      };
-    in
-    [
-      "L+    /opt/rocm   -    -    -     -    ${rocmEnv}"
-    ];
-  hardware.amdgpu.opencl.enable = true;
-  # systemd.tmpfiles.rules = [
-  #   "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
-  # ];
-
   # Fan Control
   hardware.fw-fanctrl = {
     enable = true;

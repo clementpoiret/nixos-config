@@ -7,6 +7,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./rocm.nix
     ./../../modules/core
   ];
 
