@@ -203,6 +203,23 @@
         ml-rocm =
           let
             python = pkgs-unstable.python312;
+            # Optional JAX runtime libraries from Nixpkgs.
+            #
+            # Keep this disabled by default: enabling it makes JAX use Nix's
+            # ROCm stack instead of borrowing ROCm shared libraries from the
+            # PyTorch ROCm wheel, but it may force large local ROCm builds,
+            # especially MIOpen.
+            #
+            # To opt in, uncomment `jaxNixRocmLibs` below and append it to
+            # `wheelRuntimeLibPath`.
+            # jaxNixRocmLibs = with pkgs-unstable.rocmPackages; [
+            #   hipblaslt
+            #   hipfft
+            #   miopen
+            #   rccl
+            #   rocm-smi
+            #   rocprofiler-sdk
+            # ];
             wheelRuntimeLibPath = pkgs-unstable.lib.makeLibraryPath (
               with pkgs-unstable;
               [
@@ -215,6 +232,7 @@
                 zlib
                 zstd
               ]
+              # ++ jaxNixRocmLibs
             );
             rocmSmi = pkgs-unstable.writeShellScriptBin "rocm-smi" ''
               export LD_LIBRARY_PATH="${wheelRuntimeLibPath}''${LD_LIBRARY_PATH:+:}''${LD_LIBRARY_PATH:-}"

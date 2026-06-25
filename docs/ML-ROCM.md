@@ -79,6 +79,22 @@ shared library they link against, and the plugin rejects native `gfx1102`, so
 the tested path uses the ROCm libraries bundled in the PyTorch wheel plus
 `HSA_OVERRIDE_GFX_VERSION=11.0.0`.
 
+The missing JAX runtime libraries are normal ROCm libraries:
+
+- `libMIOpen.so.1`
+- `libhipblaslt.so.1`
+- `libhipfft.so.0`
+- `librccl.so.1`
+- `libroctracer64.so.4`
+- `librocm_smi64.so.1`
+- `librocprofiler-sdk.so.1`
+
+They can come from Nixpkgs ROCm packages, but doing that in `.#ml-rocm` can
+force large local ROCm builds, especially `miopen`. For that reason the default
+documented path reuses the already-downloaded PyTorch ROCm wheel libraries.
+`flake.nix` contains a commented `jaxNixRocmLibs` block inside the `ml-rocm`
+shell if you want to opt into Nix-provided ROCm libraries later.
+
 Install JAX into the same uv environment as PyTorch:
 
 ```bash
