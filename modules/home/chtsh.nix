@@ -64,7 +64,12 @@ let
   '';
 in
 {
-  home.packages = [ tmux-cht ];
+  home.packages = with pkgs; [
+    curl
+    less
+    tmux
+    tmux-cht
+  ];
   home.file = {
     ".tmux-cht-languages".text = languages;
     ".tmux-cht-commands".text = commands;

@@ -128,7 +128,6 @@ in
 
       # Browsers
       brave # Privacy-focused web browser
-      # flake.brave-origin-beta
       # firefox-devedition # Firefox Developer Edition
       # glide.glide-browser # Keyboard-focused browser
       flake.glide-browser # Keyboard-focused browser

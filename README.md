@@ -12,6 +12,7 @@ with Home Manager integrated into each NixOS build.
 - `modules/home/`: Home Manager modules.
 - `pkgs/`: local packages exposed through the default overlay.
 - `secrets/`: sops-nix encrypted secrets.
+- `docs/`: bootstrap, operations, architecture decisions, and host notes.
 - `nixos-guide.md`: architecture and operations guide used for the current refactor.
 
 ## Hosts
@@ -33,8 +34,8 @@ nix fmt
 nix flake check --no-update-lock-file
 
 # Build host toplevels
-nix build .#nixosConfigurations.laptop.config.system.build.toplevel
-nix build .#nixosConfigurations.desktop.config.system.build.toplevel
+nix build .#checks.x86_64-linux.laptop-toplevel
+nix build .#checks.x86_64-linux.desktop-toplevel
 
 # Test or switch the local machine
 nh os test
@@ -47,6 +48,13 @@ nix flake update
 The shell aliases `nix-test`, `nix-switch`, `nix-update`, and
 `nix-flake-update` wrap the same workflow.
 
+## Documentation
+
+- `docs/BOOTSTRAP.md`: provisioning, recovery, and secret key setup.
+- `docs/OPERATIONS.md`: build, test, switch, boot, rollback, and update flows.
+- `docs/DECISIONS.md`: input, Home Manager, hardware, and secrets policy.
+- `docs/HOSTS.md`: host inventory and machine-specific notes.
+
 ## Secrets
 
 Secrets are managed with `sops-nix`. Decrypted values are consumed at runtime
@@ -54,8 +62,8 @@ through `/run/secrets` for system services and Home Manager's
 `~/.config/sops-nix/secrets` symlinks for user services.
 
 Do not read decrypted secret files during Nix evaluation. Runtime writer
-services generate user files such as SSH, mail, and `.pypirc` configs after
-`sops-nix.service` has decrypted the relevant values.
+services generate user files such as SSH and mail configs after `sops-nix`
+has decrypted the relevant values.
 
 ## Notes
 

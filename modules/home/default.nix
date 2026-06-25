@@ -26,12 +26,9 @@
     ./ssh.nix # ssh
     ./superfile.nix # file manager
     ./scripts/scripts.nix # personal scripts
-    # ./tmux.nix
     ./wl-kbptr.nix
     ./xdg-mimes.nix # default apps
-    # ./yazi.nix # terminal file manager
     ./zed.nix
-    # ./zellij/zellij.nix # terminal multiplexer
     ./zk/zk.nix # zettelkasten
   ];
 }

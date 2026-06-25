@@ -8,6 +8,11 @@
 
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ucodenix.url = "github:e-tho/ucodenix";
 
     home-manager = {
@@ -50,7 +55,6 @@
     dms = {
       url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
-      # inputs.quickshell.follows = "quickshell";
     };
     ghosttyshaders = {
       url = "github:sahaj-b/ghostty-cursor-shaders";
@@ -79,10 +83,6 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
-    # brave-origin = {
-    #   url = "github:clementpoiret/brave-origin-flake";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
     orion-browser = {
       url = "github:dokokitsune/orion-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -101,7 +101,6 @@
       antigravity,
       bash-env-json,
       bibli-ls,
-      # brave-origin,
       claude-code,
       codex-cli,
       glide-browser,
@@ -110,10 +109,10 @@
       orion-browser,
       niri,
       nix-cachyos-kernel,
+      nixos-hardware,
       nixpkgs,
       nixpkgs-master,
       nixpkgs-stable,
-      # nixpkgs-glide,
       stylix,
       superfile,
       ...
@@ -131,16 +130,11 @@
         inherit system;
         config.allowUnfree = true;
       };
-      # pkgs-glide = import nixpkgs-glide {
-      #   inherit system;
-      #   config.allowUnfree = true;
-      # };
       pkgs-flake = {
         antigravity-cli = antigravity.packages.${system}.antigravity-cli;
         antigravity-ide = antigravity.packages.${system}.antigravity-ide;
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
-        # brave-origin-beta = brave-origin.packages.${system}.brave-origin-beta;
         claude-code = claude-code.packages.${system}.default;
         codex-cli = codex-cli.packages.${system}.default;
         glide-browser = glide-browser.packages.${system}.default;
@@ -151,7 +145,6 @@
 
       customOverlays = [
         (final: prev: {
-          # glide = pkgs-glide;
           # Keep master as an explicit escape hatch for fixes not yet in unstable.
           master = pkgs-master;
           stable = pkgs-stable;
@@ -200,10 +193,17 @@
         ];
       };
 
-      # nix-switch
       nixosConfigurations = {
         desktop = mkHost { host = "desktop"; };
-        laptop = mkHost { host = "laptop"; };
+        laptop = mkHost {
+          host = "laptop";
+          extraModules = [ nixos-hardware.nixosModules.framework-16-7040-amd ];
+        };
+      };
+
+      checks.${system} = {
+        desktop-toplevel = self.nixosConfigurations.desktop.config.system.build.toplevel;
+        laptop-toplevel = self.nixosConfigurations.laptop.config.system.build.toplevel;
       };
     };
 }

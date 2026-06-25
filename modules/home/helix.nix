@@ -1,33 +1,10 @@
 { pkgs, ... }:
 {
-  xdg.configFile."helix/yazi-picker.sh".text = # sh
-    ''
-      #!/usr/bin/env bash
-
-      paths=$(yazi --chooser-file=/dev/stdout | while read -r; do printf "%q " "$REPLY"; done)
-
-      if [[ -n "$paths" ]]; then
-          zellij action toggle-floating-panes
-          zellij action write 27 # send <Escape> key
-          zellij action write-chars ":$1 $paths"
-          zellij action write 13 # send <Enter> key
-      else
-          zellij action toggle-floating-panes
-      fi
-    '';
-
   xdg.configFile."helix/serpl-replace.sh".text = # sh
     ''
       #!/usr/bin/env bash
 
       serpl
-      exit_code=$?
-
-      if [[ $exit_code -eq 0 ]]; then
-          zellij action toggle-floating-panes
-          zellij action write-chars ":reload-all"
-          zellij action write 13 # send <Enter> key
-      fi
     '';
 
   programs.helix = {
@@ -371,15 +348,7 @@
             "normal_mode"
           ];
 
-          # Yazi
-          space.q = {
-            q = ":sh zellij run -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh open";
-            v = ":sh zellij run -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh vsplit";
-            s = ":sh zellij run -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh hsplit";
-          };
-
           # Search and Replace
-          # space.H = ":sh zellij run -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/serpl-replace.sh";
           space.H = ":sh tmux display-popup -w 80% -h 80% -E 'bash ~/.config/helix/serpl-replace.sh'";
 
           # Misc

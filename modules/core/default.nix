@@ -3,7 +3,6 @@
   imports = [
     ./bootloader.nix
     ./hardware.nix
-    # ./kanata/kanata.nix
     ./network.nix
     ./nh.nix
     ./pipewire.nix

@@ -1,9 +1,6 @@
 { pkgs, ... }:
 let
-  dunst-dnd = pkgs.writers.writeNuBin "dunst-dnd" (builtins.readFile ./scripts/dunst-dnd.nu);
-
   runbg = pkgs.writeShellScriptBin "runbg" (builtins.readFile ./scripts/runbg.sh);
-  music = pkgs.writeShellScriptBin "music" (builtins.readFile ./scripts/music.sh);
   lofi = pkgs.writeScriptBin "lofi" (builtins.readFile ./scripts/lofi.sh);
 
   toggle_suspend = pkgs.writeScriptBin "toggle_suspend" (
@@ -36,10 +33,7 @@ let
 in
 {
   home.packages = [
-    dunst-dnd
-
     runbg
-    music
     lofi
 
     toggle_suspend
