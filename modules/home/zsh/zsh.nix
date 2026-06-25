@@ -58,10 +58,11 @@
       cdnix = "cd ~/nixos-config && nvim ~/nixos-config";
       ns = "nix-shell --run zsh";
       nix-shell = "nix-shell --run zsh";
-      nix-switch = "sudo nixos-rebuild switch --flake ~/nixos-config#${host}";
-      nix-switchu = "sudo nixos-rebuild switch --upgrade --flake ~/nixos-config#${host}";
-      nix-flake-update = "sudo nix flake update ~/nixos-config#";
-      nix-clean = "sudo nix-collect-garbage && sudo nix-collect-garbage -d && sudo rm /nix/var/nix/gcroots/auto/* && nix-collect-garbage && nix-collect-garbage -d";
+      nix-switch = "nh os switch";
+      nix-update = "nh os switch --update";
+      nix-test = "nh os test";
+      nix-flake-update = "nix flake update ~/nixos-config#";
+      nix-clean = "nh clean all --keep 5";
 
       # Git
       ga = "git add";
@@ -88,7 +89,7 @@
       psv = "source .venv/bin/activate";
 
       # custom tools
-      lakectl = "/home/clementpoiret/bin/lakectl";
+      lakectl = "~/bin/lakectl";
       emacs = "emacsclient -c -a 'emacs'";
 
       # to fix std lib issues

@@ -1,6 +1,7 @@
 {
   self,
   pkgs,
+  username,
   ...
 }:
 {
@@ -31,7 +32,7 @@
       ];
       trusted-users = [
         "root"
-        "clementpoiret"
+        username
       ];
     };
   };

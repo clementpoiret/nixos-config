@@ -136,10 +136,6 @@
       username = "clementpoiret";
       system = "x86_64-linux";
 
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
       pkgs-master = import nixpkgs-master {
         inherit system;
         config.allowUnfree = true;
@@ -200,6 +196,7 @@
       customOverlays = [
         (final: prev: {
           # glide = pkgs-glide;
+          # Keep master as an explicit escape hatch for fixes not yet in unstable.
           master = pkgs-master;
           stable = pkgs-stable;
           flake = pkgs-flake;
@@ -208,69 +205,26 @@
         niri.overlays.niri
         nix-cachyos-kernel.overlays.pinned
       ];
+
+      mkHost = import ./lib/mkHost.nix {
+        inherit
+          customOverlays
+          inputs
+          nixpkgs
+          self
+          stylix
+          system
+          username
+          ;
+      };
     in
     {
       overlays.default = selfPkgs.overlay;
 
       # nix-switch
       nixosConfigurations = {
-        desktop = nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [
-            { nixpkgs.overlays = customOverlays; }
-            ./hosts/desktop
-            stylix.nixosModules.stylix
-          ];
-          specialArgs = {
-            host = "desktop";
-            inherit self inputs username;
-          };
-        };
-        laptop = nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [
-            { nixpkgs.overlays = customOverlays; }
-            ./hosts/laptop
-            # fw-fanctrl.nixosModules.default
-            stylix.nixosModules.stylix
-          ];
-          specialArgs = {
-            host = "laptop";
-            inherit self inputs username;
-          };
-        };
-      };
-
-      # home-manager switch --flake .#clementpoiret@desktop --impure
-      homeConfigurations = {
-        "clementpoiret@desktop" = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgs;
-          # useUserPackages = true;
-          # useGlobalPkgs = true;
-          extraSpecialArgs = {
-            inherit self inputs username;
-            host = "desktop";
-          };
-          modules = [
-            # { nixpkgs.overlays = customOverlays; }
-            stylix.homeModules.stylix
-            (import ./home-manager)
-          ];
-        };
-        "clementpoiret@laptop" = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgs;
-          # useUserPackages = true;
-          # useGlobalPkgs = true;
-          extraSpecialArgs = {
-            inherit self inputs username;
-            host = "laptop";
-          };
-          modules = [
-            # { nixpkgs.overlays = customOverlays; }
-            stylix.homeModules.stylix
-            (import ./home-manager)
-          ];
-        };
+        desktop = mkHost { host = "desktop"; };
+        laptop = mkHost { host = "laptop"; };
       };
     };
 }

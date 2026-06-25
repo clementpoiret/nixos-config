@@ -1,13 +1,27 @@
 {
   config,
   inputs,
+  lib,
   ...
 }:
+let
+  secretSessionVariables = {
+    PYPI_API_KEY = config.sops.secrets."api_keys/pypi".path;
+    ANTHROPIC_API_KEY = config.sops.secrets."api_keys/anthropic".path;
+    CLAUDE_API_KEY = config.sops.secrets."api_keys/anthropic".path;
+  };
+
+  exportSecret = name: path: ''
+    if [ -r ${lib.escapeShellArg path} ]; then
+      export ${name}="$(cat ${lib.escapeShellArg path})"
+    fi
+  '';
+in
 {
   imports = [ inputs.sops-nix.homeManagerModules.sops ];
 
   sops = {
-    age.keyFile = "/home/clementpoiret/.config/sops/age/keys.txt";
+    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
     defaultSopsFile = ../../secrets/user-secrets.yaml;
 
@@ -65,9 +79,7 @@
     };
   };
 
-  home.sessionVariables = {
-    PYPI_API_KEY = builtins.readFile config.sops.secrets."api_keys/pypi".path;
-    ANTHROPIC_API_KEY = builtins.readFile config.sops.secrets."api_keys/anthropic".path;
-    CLAUDE_API_KEY = builtins.readFile config.sops.secrets."api_keys/anthropic".path;
-  };
+  home.sessionVariablesExtra = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList exportSecret secretSessionVariables
+  );
 }

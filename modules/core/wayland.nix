@@ -2,6 +2,7 @@
   inputs,
   lib,
   pkgs,
+  username,
   ...
 }:
 
@@ -21,7 +22,7 @@ in
   programs.dank-material-shell.greeter = {
     enable = true;
     compositor.name = "niri";
-    configHome = "/home/clementpoiret";
+    configHome = "/home/${username}";
   };
 
   environment = {

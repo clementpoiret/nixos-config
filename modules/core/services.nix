@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 {
   services = {
     gvfs.enable = true;
@@ -17,7 +17,7 @@
 
   services.syncthing = {
     enable = true;
-    user = "clementpoiret";
-    dataDir = "/home/clementpoiret/Sync/";
+    user = username;
+    dataDir = "/home/${username}/Sync/";
   };
 }

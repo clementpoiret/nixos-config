@@ -31,7 +31,7 @@
     "libvirtd"
     "podman"
   ];
-  users.extraGroups.vboxusers.members = [ "clementpoiret" ];
+  users.extraGroups.vboxusers.members = [ username ];
 
   programs.virt-manager.enable = true;
 

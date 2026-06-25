@@ -27,7 +27,7 @@
       nix-clean = "nh clean all --keep 5";
       nix-search = "nh search";
       nix-test = "nh os test";
-      nix-flake-update = "sudo nix flake update ~/nixos-config#";
+      nix-flake-update = "nix flake update ~/nixos-config#";
     };
     shellInit = ''
       # (Interactive-only variables like fish_greeting & fish_escape_delay_ms moved to interactiveShellInit)

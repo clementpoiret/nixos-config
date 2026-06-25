@@ -2,7 +2,7 @@
 
 init() {
     # Vars
-    CURRENT_USERNAME='frostphoenix'
+    CURRENT_USERNAME='clementpoiret'
 
     # Colors
     NORMAL=$(tput sgr0)
@@ -59,7 +59,6 @@ get_username() {
 
 set_username() {
     sed -i -e "s/${CURRENT_USERNAME}/${username}/g" ./flake.nix
-    sed -i -e "s/${CURRENT_USERNAME}/${username}/g" ./modules/home/audacious/config
 }
 
 get_host() {

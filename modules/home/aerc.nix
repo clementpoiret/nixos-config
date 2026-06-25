@@ -5,8 +5,7 @@
   ...
 }:
 let
-  readSecret = subPath: builtins.readFile config.sops.secrets."accounts/${subPath}".path;
-  readPort = subPath: builtins.fromJSON (readSecret subPath);
+  mbsyncPackage = pkgs.isync.override { withCyrusSaslXoauth2 = true; };
 
   commonPatterns = [
     "*"
@@ -14,129 +13,235 @@ let
     "![Gmail]/All Mail"
   ];
 
-  mkAccount =
-    {
-      id,
-      primary ? false,
-      authMethod ? "password",
-      timeout ? 120,
-      pipelineDepth ? 1,
-      extraPatterns ? [ ],
-      useImapStartTls ? false,
-      useSmtpStartTls ? false,
-      copyToSent ? true,
-      trashFolder ? "Trash",
-      draftsFolder ? "Drafts",
-      sentFolder ? "Sent",
-    }:
-    let
-      isOAuth = authMethod == "xoauth2";
-      rn = readSecret "realName";
-      name = readSecret "${id}/name";
-    in
-    {
-      "${name}" = {
-        inherit primary;
-        address = readSecret "${id}/address";
-        realName = rn;
-        userName = readSecret "${id}/userName";
-        passwordCommand = readSecret "${id}/passwordCommand";
+  quotePattern = pattern: if lib.hasInfix " " pattern then ''"${pattern}"'' else pattern;
 
-        folders = {
-          inbox = "Inbox";
-          trash = trashFolder;
-          drafts = draftsFolder;
-          sent = if copyToSent then sentFolder else null;
-        };
-
-        imap = {
-          host = readSecret "${id}/imap/host";
-          port = readPort "${id}/imap/port";
-          tls.enable = true;
-          tls.useStartTls = useImapStartTls;
-          authentication = if isOAuth then "xoauth2" else "plain";
-        };
-
-        smtp = {
-          host = readSecret "${id}/smtp/host";
-          port = readPort "${id}/smtp/port";
-          tls.enable = true;
-          tls.useStartTls = useSmtpStartTls;
-          authentication = if isOAuth then "xoauth2" else "plain";
-        };
-
-        mbsync = {
-          enable = true;
-          create = "maildir";
-          expunge = "both";
-          patterns = commonPatterns ++ extraPatterns;
-          extraConfig.account = {
-            PipelineDepth = pipelineDepth;
-            Timeout = timeout;
-            AuthMechs = if isOAuth then "XOAUTH2" else "LOGIN";
-          };
-        };
-
-        msmtp = {
-          enable = true;
-          extraConfig = {
-            auth = if isOAuth then "xoauth2" else "on";
-          };
-        };
-
-        aerc.enable = true;
-        aerc.extraAccounts = {
-          source = "maildir://${config.home.homeDirectory}/Maildir/${name}";
-          outgoing = "${pkgs.msmtp}/bin/msmtp -a ${name}";
-          default = "Inbox";
-          trash = trashFolder;
-          check-mail = "5m";
-          check-mail-cmd = "${config.programs.mbsync.package}/bin/mbsync ${name}";
-          folders-sort = "Inbox,INBOX,Starred,Sent,Sent Items,[Gmail]/Sent Mail,[Gmail]/Messages envoyés,Drafts,[Gmail]/Brouillons,Archive,Archives,Trash,Bin,Junk,[Gmail]/Corbeille";
-        };
-      };
-    };
-
-  myAccounts = lib.mkMerge [
-    (mkAccount {
-      id = "pers1";
+  accountSpecs = {
+    pers1 = {
       timeout = 220;
       primary = true;
       extraPatterns = [ "!Labels*" ];
       useImapStartTls = true;
       useSmtpStartTls = true;
       copyToSent = false;
-    })
-    (mkAccount {
-      id = "pers2";
+      authMethod = "password";
+      pipelineDepth = 1;
+      trashFolder = "Trash";
+      draftsFolder = "Drafts";
+      sentFolder = "Sent";
+    };
+    pers2 = {
       timeout = 220;
       pipelineDepth = 2;
       useImapStartTls = false;
       useSmtpStartTls = false;
       copyToSent = true;
-    })
-    (mkAccount {
-      id = "pers3";
+      authMethod = "password";
+      extraPatterns = [ ];
+      primary = false;
+      trashFolder = "Trash";
+      draftsFolder = "Drafts";
+      sentFolder = "Sent";
+    };
+    pers3 = {
       authMethod = "xoauth2";
       timeout = 220;
       pipelineDepth = 3;
       useImapStartTls = false;
       useSmtpStartTls = true;
       copyToSent = false;
-    })
-    (mkAccount {
-      id = "work1";
+      extraPatterns = [ ];
+      primary = false;
+      trashFolder = "Trash";
+      draftsFolder = "Drafts";
+      sentFolder = "Sent";
+    };
+    work1 = {
       authMethod = "xoauth2";
       timeout = 220;
       pipelineDepth = 3;
       useImapStartTls = false;
       useSmtpStartTls = false;
       copyToSent = false;
+      extraPatterns = [ ];
+      primary = false;
       trashFolder = "[Gmail]/Corbeille";
       draftsFolder = "[Gmail]/Brouillons";
       sentFolder = "[Gmail]/Messages envoyés";
-    })
-  ];
+    };
+  };
+
+  mkAccountScript =
+    id: spec:
+    let
+      patterns = lib.concatStringsSep " " (map quotePattern (commonPatterns ++ spec.extraPatterns));
+    in
+    ''
+      write_account \
+        ${lib.escapeShellArg id} \
+        ${lib.escapeShellArg spec.authMethod} \
+        ${lib.escapeShellArg (toString spec.timeout)} \
+        ${lib.escapeShellArg (toString spec.pipelineDepth)} \
+        ${lib.escapeShellArg patterns} \
+        ${lib.escapeShellArg (if spec.useImapStartTls then "yes" else "no")} \
+        ${lib.escapeShellArg (if spec.useSmtpStartTls then "yes" else "no")} \
+        ${lib.escapeShellArg (if spec.copyToSent then "yes" else "no")} \
+        ${lib.escapeShellArg spec.trashFolder} \
+        ${lib.escapeShellArg spec.draftsFolder} \
+        ${lib.escapeShellArg spec.sentFolder} \
+        ${lib.escapeShellArg (if spec.primary then "true" else "false")}
+    '';
+
+  writeMailSecretConfig = pkgs.writeShellScript "write-mail-secret-config" ''
+    set -eu
+
+    accounts_dir=${lib.escapeShellArg "${config.home.homeDirectory}/.config/sops-nix/secrets/accounts"}
+    config_home="''${XDG_CONFIG_HOME:-''${HOME}/.config}"
+
+    read_secret() {
+      tr -d '\r\n' < "$1"
+    }
+
+    account_secret() {
+      read_secret "''${accounts_dir}/$1"
+    }
+
+    mkdir -p \
+      "''${HOME}/Maildir" \
+      "''${HOME}/.local/state/msmtp" \
+      "''${config_home}/aerc" \
+      "''${config_home}/msmtp"
+
+    mbsync_tmp="''${HOME}/.mbsyncrc.tmp"
+    msmtp_tmp="''${config_home}/msmtp/config.tmp"
+    aerc_tmp="''${config_home}/aerc/accounts.conf.tmp"
+
+    : > "$mbsync_tmp"
+    : > "$msmtp_tmp"
+    : > "$aerc_tmp"
+    chmod 600 "$mbsync_tmp" "$msmtp_tmp" "$aerc_tmp"
+
+    cat > "$msmtp_tmp" <<EOF
+    defaults
+    tls on
+    tls_trust_file /etc/ssl/certs/ca-certificates.crt
+    logfile ~/.local/state/msmtp/msmtp.log
+
+    EOF
+
+    write_account() {
+      id="$1"
+      auth_method="$2"
+      timeout="$3"
+      pipeline_depth="$4"
+      patterns="$5"
+      imap_starttls="$6"
+      smtp_starttls="$7"
+      copy_to_sent="$8"
+      trash_folder="$9"
+      drafts_folder="''${10}"
+      sent_folder="''${11}"
+      primary="''${12}"
+
+      name="$(account_secret "''${id}/name")"
+      address="$(account_secret "''${id}/address")"
+      username="$(account_secret "''${id}/userName")"
+      imap_host="$(account_secret "''${id}/imap/host")"
+      imap_port="$(account_secret "''${id}/imap/port")"
+      smtp_host="$(account_secret "''${id}/smtp/host")"
+      smtp_port="$(account_secret "''${id}/smtp/port")"
+      password_command="$(account_secret "''${id}/passwordCommand")"
+
+      if [ "$auth_method" = "xoauth2" ]; then
+        mbsync_auth="XOAUTH2"
+        msmtp_auth="xoauth2"
+      else
+        mbsync_auth="LOGIN"
+        msmtp_auth="on"
+      fi
+
+      if [ "$imap_starttls" = "yes" ]; then
+        imap_ssl_type="STARTTLS"
+      else
+        imap_ssl_type="IMAPS"
+      fi
+
+      if [ "$smtp_starttls" = "yes" ]; then
+        smtp_tls_starttls="on"
+      else
+        smtp_tls_starttls="off"
+      fi
+
+      mkdir -p "''${HOME}/Maildir/''${id}"
+
+      cat >> "$mbsync_tmp" <<EOF
+    IMAPAccount ''${id}
+    Host ''${imap_host}
+    Port ''${imap_port}
+    User ''${username}
+    PassCmd ''${password_command}
+    AuthMechs ''${mbsync_auth}
+    SSLType ''${imap_ssl_type}
+    PipelineDepth ''${pipeline_depth}
+    Timeout ''${timeout}
+
+    IMAPStore ''${id}-remote
+    Account ''${id}
+
+    MaildirStore ''${id}-local
+    SubFolders Verbatim
+    Path ~/Maildir/''${id}/
+    Inbox ~/Maildir/''${id}/Inbox
+
+    Channel ''${id}
+    Far :''${id}-remote:
+    Near :''${id}-local:
+    Patterns ''${patterns}
+    Create Near
+    Expunge Both
+    SyncState *
+
+    EOF
+
+      cat >> "$msmtp_tmp" <<EOF
+    account ''${id}
+    host ''${smtp_host}
+    port ''${smtp_port}
+    from ''${address}
+    user ''${username}
+    passwordeval ''${password_command}
+    auth ''${msmtp_auth}
+    tls_starttls ''${smtp_tls_starttls}
+
+    EOF
+
+      cat >> "$aerc_tmp" <<EOF
+    [''${id}]
+    source = maildir://''${HOME}/Maildir/''${id}
+    outgoing = ${pkgs.msmtp}/bin/msmtp -a ''${id}
+    from = ''${name} <''${address}>
+    default = Inbox
+    trash = ''${trash_folder}
+    check-mail = 5m
+    check-mail-cmd = ${mbsyncPackage}/bin/mbsync ''${id}
+    folders-sort = Inbox,INBOX,Starred,Sent,Sent Items,[Gmail]/Sent Mail,[Gmail]/Messages envoyés,Drafts,[Gmail]/Brouillons,Archive,Archives,Trash,Bin,Junk,[Gmail]/Corbeille
+
+    EOF
+
+      if [ "$primary" = "true" ]; then
+        printf 'account default : %s\n' "$id" >> "$msmtp_tmp"
+      fi
+
+      if [ "$copy_to_sent" = "no" ]; then
+        :
+      fi
+    }
+
+    ${lib.concatStringsSep "\n" (lib.mapAttrsToList mkAccountScript accountSpecs)}
+
+    mv "$mbsync_tmp" "''${HOME}/.mbsyncrc"
+    mv "$msmtp_tmp" "''${config_home}/msmtp/config"
+    mv "$aerc_tmp" "''${config_home}/aerc/accounts.conf"
+  '';
 
   aerc-convert-save = pkgs.writeShellScriptBin "aerc-convert-save" ''
     FINAL="/tmp/aerc-view.md"
@@ -159,17 +264,25 @@ in
     aerc-convert-save
     bat
     catimg
+    mbsyncPackage
+    msmtp
     pandoc
     w3m
     xdg-utils
   ];
-  accounts.email.accounts = myAccounts;
 
-  programs.mbsync = {
-    enable = true;
-    package = pkgs.isync.override { withCyrusSaslXoauth2 = true; };
+  systemd.user.services.write-mail-secret-config = {
+    Unit = {
+      Description = "Write mail configs generated from sops secrets";
+      After = [ "sops-nix.service" ];
+      Requires = [ "sops-nix.service" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${writeMailSecretConfig}";
+    };
+    Install.WantedBy = [ "default.target" ];
   };
-  programs.msmtp.enable = true;
 
   xdg.configFile."mailcap".text = ''
     text/html; w3m -I %{charset} -T text/html -dump; copiousoutput;

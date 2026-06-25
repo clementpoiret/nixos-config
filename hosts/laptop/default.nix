@@ -1,4 +1,9 @@
-{ pkgs, config, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -25,6 +30,22 @@
   services = {
     # thermald.enable = true;
     # cpupower-gui.enable = true;
+    ananicy = {
+      enable = true;
+
+      # Use the C++ daemon, not the original shell implementation.
+      package = pkgs.ananicy-cpp;
+
+      # Use CachyOS' ruleset.
+      rulesProvider = pkgs.ananicy-rules-cachyos;
+
+      settings = {
+        loglevel = "warn";
+        log_applied_rule = false;
+        cgroup_realtime_workaround = lib.mkForce false;
+      };
+    };
+
     power-profiles-daemon.enable = true;
 
     fprintd.enable = true;

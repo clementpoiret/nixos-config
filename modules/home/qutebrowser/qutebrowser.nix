@@ -1,4 +1,10 @@
-{ inputs, pkgs, ... }: {
+{
+  config,
+  inputs,
+  pkgs,
+  ...
+}:
+{
   programs.qutebrowser = {
     enable = true;
     searchEngines = {
@@ -39,8 +45,7 @@
         headers.accept_language = "en-US,en;q=0.9";
         headers.do_not_track = true;
         headers.referer = "same-domain";
-        headers.user_agent =
-          "Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}";
+        headers.user_agent = "Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}";
         javascript.clipboard = "none";
         javascript.enabled = false;
         pdfjs = false;
@@ -206,9 +211,9 @@
       config.set('content.javascript.clipboard', 'access-paste', r"*://*.proton.me/*")
 
       config.set('content.local_content_can_access_remote_urls', True,
-        'file:///home/clementpoiret/.local/share/qutebrowser/userscripts/*')
+        'file://${config.home.homeDirectory}/.local/share/qutebrowser/userscripts/*')
       config.set('content.local_content_can_access_file_urls', False,
-           'file:///home/clementpoiret/.local/share/qutebrowser/userscripts/*')
+           'file://${config.home.homeDirectory}/.local/share/qutebrowser/userscripts/*')
 
       c.spellcheck.languages = ["en-US", "fr-FR"]
 

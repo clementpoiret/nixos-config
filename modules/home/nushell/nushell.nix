@@ -65,7 +65,7 @@ in
       nix-clean = "nh clean all --keep 5";
       nix-search = "nh search";
       nix-test = "nh os test";
-      nix-flake-update = "sudo nix flake update ~/nixos-config#";
+      nix-flake-update = "nix flake update ~/nixos-config#";
 
       # custom tools
       emacs = "emacsclient -c -a 'emacs'";
