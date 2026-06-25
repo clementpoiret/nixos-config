@@ -23,6 +23,12 @@ with Home Manager integrated into each NixOS build.
 ## Common Commands
 
 ```bash
+# Enter a shell with Nix tooling
+nix develop
+
+# Format Nix files
+nix fmt
+
 # Evaluate without changing the system
 nix flake check --no-update-lock-file
 

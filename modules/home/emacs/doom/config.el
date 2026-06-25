@@ -175,7 +175,8 @@
   :config
   ;; because of direnv, emacs sometimes tries to launch lsp-bridge w/ a local
   ;; python venv.
-  (setq lsp-bridge-python-command "/etc/profiles/per-user/clementpoiret/bin/python")
+  (setq lsp-bridge-python-command
+        (format "/etc/profiles/per-user/%s/bin/python" (user-login-name)))
   (setq lsp-bridge-enable-log nil)
   (setq lsp-bridge-nix-lsp-server :nil)
   (setq lsp-bridge-python-lsp-server :pylsp)

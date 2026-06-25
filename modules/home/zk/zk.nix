@@ -1,15 +1,13 @@
 {
   config,
-  host,
+  hostFacts,
   pkgs,
   ...
 }:
 let
+  configuredDir = hostFacts.home.zk.notebookDir or null;
   dir =
-    if (host == "desktop") then
-      "/mnt/hdd/Sync/Notes/zk/"
-    else
-      "${config.home.homeDirectory}/Sync/Notes/zk/";
+    if configuredDir == null then "${config.home.homeDirectory}/Sync/Notes/zk/" else configuredDir;
 in
 {
   home.packages = with pkgs; [

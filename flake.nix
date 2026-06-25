@@ -221,6 +221,30 @@
     {
       overlays.default = selfPkgs.overlay;
 
+      formatter.${system} = pkgs-stable.writeShellApplication {
+        name = "nixfmt-tree";
+        runtimeInputs = with pkgs-stable; [
+          findutils
+          nixfmt
+        ];
+        text = ''
+          if [ "$#" -eq 0 ]; then
+            set -- .
+          fi
+
+          find "$@" -name '*.nix' -type f -not -path '*/.git/*' -not -path './secrets/*' -not -path 'secrets/*' -print0 | xargs -0 -r nixfmt
+        '';
+      };
+
+      devShells.${system}.default = pkgs-stable.mkShellNoCC {
+        packages = with pkgs-stable; [
+          deadnix
+          nil
+          nixfmt
+          statix
+        ];
+      };
+
       # nix-switch
       nixosConfigurations = {
         desktop = mkHost { host = "desktop"; };
