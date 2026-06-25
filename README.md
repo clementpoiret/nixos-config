@@ -59,6 +59,10 @@ services generate user files such as SSH, mail, and `.pypirc` configs after
 
 ## Notes
 
+Active app and tool flakes should follow the root `nixpkgs` input when that is
+compatible with the upstream flake. Boot-critical or upstream-sensitive flakes
+may keep their own `nixpkgs` pin to reduce upgrade risk.
+
 `pkgs.master` is intentionally exposed through the overlay as an emergency
 escape hatch when a fix is available on `nixpkgs/master` but has not reached
 `nixpkgs-unstable` yet.

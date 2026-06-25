@@ -41,7 +41,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    bibli-ls.url = "github:clementpoiret/bibli-ls/fix/flake";
+    bibli-ls = {
+      url = "github:clementpoiret/bibli-ls/fix/flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     stylix = {
       url = "github:nix-community/stylix";
@@ -97,7 +100,10 @@
     #   url = "github:clementpoiret/brave-origin-flake";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
-    orion-browser.url = "github:dokokitsune/orion-browser-flake";
+    orion-browser = {
+      url = "github:dokokitsune/orion-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     helium = {
       url = "github:schembriaiden/helium-browser-nix-flake";
