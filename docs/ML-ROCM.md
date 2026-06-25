@@ -15,10 +15,16 @@ by default through `ROCR_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`, and
 nix develop .#ml-rocm
 ```
 
-This shell intentionally does not package PyTorch through Nix. It provides
-Python 3.12, `uv`, ROCm diagnostics, dGPU selection, and the system library path
-needed by common manylinux wheels on NixOS. Install PyTorch from the official
-ROCm wheel index inside a project or temporary virtual environment.
+This shell intentionally does not package PyTorch or JAX through Nix. It
+provides Python 3.12, `uv`, ROCm diagnostics, dGPU selection, and the system
+library path needed by common manylinux wheels on NixOS.
+
+The JAX ROCm plugin needs local ROCm shared libraries. `.#ml-rocm` provides
+those from the `nixpkgs-stable` ROCm package set because stable `miopen-7.2.3`
+is available from `cache.nixos.org`; the matching unstable/master MIOpen output
+was not cached for this flake revision. The first shell entry may therefore
+download a large cached ROCm runtime closure, but it should not compile MIOpen
+locally.
 
 ## Validate ROCm
 
@@ -72,47 +78,16 @@ PyTorch reported the dGPU as `gfx1102` with about 8 GiB VRAM.
 
 ## JAX
 
-ROCm JAX is less clean on this laptop. The `ROCm/rocm-jax` repository is
-deprecated for wheel development, but its `rocm-jax-v0.9.1` release still
-publishes usable wheelhouses. The release wheels do not include every ROCm
-shared library they link against, and the plugin rejects native `gfx1102`, so
-the tested path uses the ROCm libraries bundled in the PyTorch wheel plus
-`HSA_OVERRIDE_GFX_VERSION=11.0.0`.
-
-The missing JAX runtime libraries are normal ROCm libraries:
-
-- `libMIOpen.so.1`
-- `libhipblaslt.so.1`
-- `libhipfft.so.0`
-- `librccl.so.1`
-- `libroctracer64.so.4`
-- `librocm_smi64.so.1`
-- `librocprofiler-sdk.so.1`
-
-They can come from Nixpkgs ROCm packages, but doing that in `.#ml-rocm` can
-force large local ROCm builds, especially `miopen`. For that reason the default
-documented path reuses the already-downloaded PyTorch ROCm wheel libraries.
-`flake.nix` contains a commented `jaxNixRocmLibs` block inside the `ml-rocm`
-shell if you want to opt into Nix-provided ROCm libraries later.
-
-Install JAX into the same uv environment as PyTorch:
+Install JAX from the official ROCm local extra:
 
 ```bash
-curl -L --fail --show-error --remote-name "$ROCM_JAX_WHEELHOUSE_URL"
-unzip -q "$(basename "$ROCM_JAX_WHEELHOUSE_URL")"
-
-uv pip install \
-  jax==0.9.1 \
-  wheelhouse_post5_generic_archs_theRock7.12/jax_rocm7_pjrt-0.9.1.post5-py3-none-manylinux_2_28_x86_64.whl \
-  wheelhouse_post5_generic_archs_theRock7.12/jax_rocm7_plugin-0.9.1.post5-cp312-cp312-manylinux_2_28_x86_64.whl
+uv pip install --upgrade "jax[rocm7-local]"
 ```
 
-Prepare the compatibility library path:
+The JAX plugin still rejects native `gfx1102`, so scope the gfx override to JAX
+commands:
 
 ```bash
-export LD_LIBRARY_PATH="$(
-  bash /home/clementpoiret/nixos-config/templates/ml-rocm-uv/prepare-jax-rocm-libs.sh
-):$LD_LIBRARY_PATH"
 export HSA_OVERRIDE_GFX_VERSION=11.0.0
 ```
 
@@ -124,14 +99,14 @@ python /home/clementpoiret/nixos-config/templates/ml-rocm-uv/jax-smoke.py
 
 The tested JAX stack was:
 
-- `jax==0.9.1`
-- `jaxlib==0.9.1`
-- `jax-rocm7-pjrt==0.9.1.post5`
-- `jax-rocm7-plugin==0.9.1.post5`
+- `jax==0.10.2`
+- `jaxlib==0.10.2`
+- `jax-rocm7-pjrt==0.10.2`
+- `jax-rocm7-plugin==0.10.2`
 
 It reported `backend: gpu`, `devices: [RocmDevice(id=0)]`, and completed a
 1024x1024 matrix multiply on the dGPU.
 
 Keep `HSA_OVERRIDE_GFX_VERSION=11.0.0` scoped to JAX commands unless another
-framework explicitly needs it. The ROCm runtime and PyTorch both detect the dGPU
-as `gfx1102` directly.
+framework explicitly needs it. The ROCm runtime and PyTorch both detect the
+dGPU as `gfx1102` directly.

@@ -203,24 +203,19 @@
         ml-rocm =
           let
             python = pkgs-unstable.python312;
-            # Optional JAX runtime libraries from Nixpkgs.
-            #
-            # Keep this disabled by default: enabling it makes JAX use Nix's
-            # ROCm stack instead of borrowing ROCm shared libraries from the
-            # PyTorch ROCm wheel, but it may force large local ROCm builds,
-            # especially MIOpen.
-            #
-            # To opt in, uncomment `jaxNixRocmLibs` below and append it to
-            # `wheelRuntimeLibPath`.
-            # jaxNixRocmLibs = with pkgs-unstable.rocmPackages; [
-            #   hipblaslt
-            #   hipfft
-            #   miopen
-            #   rccl
-            #   rocm-smi
-            #   rocprofiler-sdk
-            # ];
-            wheelRuntimeLibPath = pkgs-unstable.lib.makeLibraryPath (
+            # JAX ROCm plugin runtime libraries. Use the stable input here
+            # because the current unstable/master MIOpen output is not cached,
+            # while stable MIOpen 7.2.3 is available from cache.nixos.org.
+            jaxNixRocmLibs = with pkgs-unstable.stable.rocmPackages; [
+              hipblaslt
+              hipfft
+              miopen
+              rccl
+              rocm-smi
+              rocprofiler-sdk
+              roctracer
+            ];
+            mlRuntimeLibPath = pkgs-unstable.lib.makeLibraryPath (
               with pkgs-unstable;
               [
                 bzip2
@@ -232,10 +227,10 @@
                 zlib
                 zstd
               ]
-              # ++ jaxNixRocmLibs
+              ++ jaxNixRocmLibs
             );
             rocmSmi = pkgs-unstable.writeShellScriptBin "rocm-smi" ''
-              export LD_LIBRARY_PATH="${wheelRuntimeLibPath}''${LD_LIBRARY_PATH:+:}''${LD_LIBRARY_PATH:-}"
+              export LD_LIBRARY_PATH="${mlRuntimeLibPath}''${LD_LIBRARY_PATH:+:}''${LD_LIBRARY_PATH:-}"
               exec ${pkgs-unstable.rocmPackages.rocm-smi}/bin/rocm-smi "$@"
             '';
           in
@@ -248,9 +243,8 @@
               rocmSmi
             ];
 
-            LD_LIBRARY_PATH = wheelRuntimeLibPath;
+            LD_LIBRARY_PATH = mlRuntimeLibPath;
             PYTHONNOUSERSITE = "1";
-            ROCM_JAX_WHEELHOUSE_URL = "https://github.com/ROCm/rocm-jax/releases/download/rocm-jax-v0.9.1/wheelhouse_post5_generic_archs_theRock7.12.zip";
             PYTORCH_ROCM_INDEX_URL = "https://download.pytorch.org/whl/rocm7.2";
             UV_LINK_MODE = "copy";
             ROCR_VISIBLE_DEVICES = "0";
