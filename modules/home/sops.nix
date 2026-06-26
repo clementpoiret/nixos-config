@@ -36,10 +36,13 @@ in
       "hostnames/bastion" = { };
       "hostnames/jz" = { };
       "hostnames/jzpp" = { };
+      "hostnames/leo" = { };
+      "hostnames/leo-data" = { };
       "hostusers/default" = { };
       "hostusers/defaultBoot" = { };
       "hostusers/bastion" = { };
       "hostusers/jz" = { };
+      "hostusers/leo" = { };
 
       "ports/vpspersboot" = { };
 

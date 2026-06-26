@@ -174,6 +174,7 @@ in
       proton-pass # Password manager
       proton-pass-cli # CLI version :)
       sops # Encrypted secrets management
+      step-cli # X509, OAuth, JWT, OATH OTP, etc
 
       # Communication
       # signal-desktop-bin # Signal messaging client
@@ -197,6 +198,7 @@ in
       libnotify # Desktop notification library
       logseq-appimage # Manually using AppImage because plugins are broken in the nixpkgs version
       # poweralertd # Power alert daemon (low battery/etc.)
+      flake.herdr
       qbittorrent
       qmk
       # todoman # todo list

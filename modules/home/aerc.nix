@@ -322,7 +322,7 @@ in
 
         index-columns = "date<8,name<17,subject<*,flags<4";
         pinned-tab-marker = "*";
-        styleset-name = "rose-pine";
+        # styleset-name = "rose-pine";
         threading-enabled = true;
         timestamp-format = "06-01-02 15:04";
       };
@@ -573,90 +573,90 @@ in
     };
   };
 
-  xdg.configFile."aerc/stylesets/rose-pine".text = ''
-    # Rosé Pine Theme for Aerc
-    # All natural pine, faux fur and a bit of soho vibes for the classy minimalist
-    # Save as ~/.config/aerc/stylesets/rose-pine
+  # xdg.configFile."aerc/stylesets/rose-pine".text = ''
+  #   # Rosé Pine Theme for Aerc
+  #   # All natural pine, faux fur and a bit of soho vibes for the classy minimalist
+  #   # Save as ~/.config/aerc/stylesets/rose-pine
 
-    # Base styling
-    default.fg=#9ccfd8
-    default.bg=#191724
+  #   # Base styling
+  #   default.fg=#9ccfd8
+  #   default.bg=#191724
 
-    success.fg=#31748f
-    error.fg=#eb6f92
-    warning.fg=#f6c177
+  #   success.fg=#31748f
+  #   error.fg=#eb6f92
+  #   warning.fg=#f6c177
 
-    title.bg=#26233a
-    title.fg=#c4a7e7
+  #   title.bg=#26233a
+  #   title.fg=#c4a7e7
 
-    header.fg=#c4a7e7
+  #   header.fg=#c4a7e7
 
-    spinner.fg=#6e6a86
+  #   spinner.fg=#6e6a86
 
-    part_filename.fg=#f6c177
-    part_mimetype.fg=#c4a7e7
+  #   part_filename.fg=#f6c177
+  #   part_mimetype.fg=#c4a7e7
 
-    # Global selection
-    *.selected.fg=#191724
-    *.selected.bg=#ebbcba
-    *.selected.bold=true
+  #   # Global selection
+  #   *.selected.fg=#191724
+  #   *.selected.bg=#ebbcba
+  #   *.selected.bold=true
 
-    # Message list
-    msglist_default.fg=#9ccfd8
-    msglist_default.bg=#1f1d2e
-    msglist_unread.fg=#e0def4
-    msglist_unread.bold=true
-    msglist_read.fg=#6e6a86
-    msglist_flagged.fg=#f6c177
-    msglist_flagged.bold=true
-    msglist_deleted.bg=#eb6f92
-    msglist_deleted.fg=#191724
-    msglist_deleted.bold=true
-    msglist_marked.fg=#191724
-    msglist_marked.bg=#31748f
-    msglist_marked.bold=true
+  #   # Message list
+  #   msglist_default.fg=#9ccfd8
+  #   msglist_default.bg=#1f1d2e
+  #   msglist_unread.fg=#e0def4
+  #   msglist_unread.bold=true
+  #   msglist_read.fg=#6e6a86
+  #   msglist_flagged.fg=#f6c177
+  #   msglist_flagged.bold=true
+  #   msglist_deleted.bg=#eb6f92
+  #   msglist_deleted.fg=#191724
+  #   msglist_deleted.bold=true
+  #   msglist_marked.fg=#191724
+  #   msglist_marked.bg=#31748f
+  #   msglist_marked.bold=true
 
-    # Status bar
-    statusline_*.bold=true
-    statusline_default.fg=#9ccfd8
-    statusline_default.bg=#191724
-    statusline_error.fg=#191724
-    statusline_error.bg=#eb6f92
-    statusline_success.fg=#191724
-    statusline_success.bg=#31748f
+  #   # Status bar
+  #   statusline_*.bold=true
+  #   statusline_default.fg=#9ccfd8
+  #   statusline_default.bg=#191724
+  #   statusline_error.fg=#191724
+  #   statusline_error.bg=#eb6f92
+  #   statusline_success.fg=#191724
+  #   statusline_success.bg=#31748f
 
-    # Completion
-    completion_default.fg=#9ccfd8
-    completion_default.bg=#1f1d2e
-    completion_gutter.bg=#26233a
-    completion_description.bg=#26233a
+  #   # Completion
+  #   completion_default.fg=#9ccfd8
+  #   completion_default.bg=#1f1d2e
+  #   completion_gutter.bg=#26233a
+  #   completion_description.bg=#26233a
 
-    # Scrollbars
-    *_pill.fg=#191724
-    *_pill.bg=#6e6a86
+  #   # Scrollbars
+  #   *_pill.fg=#191724
+  #   *_pill.bg=#6e6a86
 
-    # Border
-    border.fg=#191724
-    border.bg=#191724
+  #   # Border
+  #   border.fg=#191724
+  #   border.bg=#191724
 
-    # Tab
-    tab.bg=#191724
-    tab.selected.fg=#ebbcba
-    tab.selected.bg=#191724
-    tab.selected.bold=true
+  #   # Tab
+  #   tab.bg=#191724
+  #   tab.selected.fg=#ebbcba
+  #   tab.selected.bg=#191724
+  #   tab.selected.bold=true
 
-    [viewer]
-    url.fg=#c4a7e7
-    url.underline=true
-    header.bold=true
-    signature.dim=true
-    diff_meta.bold=true
-    diff_chunk.fg=#c4a7e7
-    diff_chunk_func.fg=#c4a7e7
-    diff_chunk_func.bold=true
-    diff_add.fg=#524f67
-    diff_del.fg=#eb6f92
-    quote_*.fg=#908caa
-    quote_1.fg=#21202e
-  '';
+  #   [viewer]
+  #   url.fg=#c4a7e7
+  #   url.underline=true
+  #   header.bold=true
+  #   signature.dim=true
+  #   diff_meta.bold=true
+  #   diff_chunk.fg=#c4a7e7
+  #   diff_chunk_func.fg=#c4a7e7
+  #   diff_chunk_func.bold=true
+  #   diff_add.fg=#524f67
+  #   diff_del.fg=#eb6f92
+  #   quote_*.fg=#908caa
+  #   quote_1.fg=#21202e
+  # '';
 }

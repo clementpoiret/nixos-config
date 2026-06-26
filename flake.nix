@@ -62,7 +62,7 @@
     };
 
     superfile = {
-      url = "github:yorukot/superfile/v1.4.0";
+      url = "github:yorukot/superfile/v1.6.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -81,6 +81,10 @@
     codex-desktop-linux = {
       url = "github:ilysenko/codex-desktop-linux";
       inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+
+    herdr = {
+      url = "github:ogulcancelik/herdr/v0.7.1";
     };
 
     orion-browser = {
@@ -105,6 +109,7 @@
       codex-cli,
       glide-browser,
       helium,
+      herdr,
       home-manager,
       orion-browser,
       niri,
@@ -139,6 +144,7 @@
         codex-cli = codex-cli.packages.${system}.default;
         glide-browser = glide-browser.packages.${system}.default;
         helium = helium.packages.${system}.default;
+        herdr = herdr.packages.${system}.default;
         orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };

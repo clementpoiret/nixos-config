@@ -16,12 +16,16 @@
       default_sort_type = 2;
       sort_order_reversed = false;
       case_sensitive_sort = false;
+      page_scroll_size = 0;
 
       debug = false;
       ignore_missing_fields = false;
+      file_panel_extra_columns = 0;
+      file_panel_name_percent = 50;
 
       code_previewer = "bat";
       nerdfont = true;
+      show_select_icons = true;
       transparent_background = true;
 
       zoxide_support = true;
@@ -33,7 +37,13 @@
       file_size_use_si = false;
       shell_close_on_success = false;
       file_preview_width = 0;
+      enable_file_preview_border = false;
       sidebar_width = 20;
+      sidebar_sections = [
+        "home"
+        "pinned"
+        "disks"
+      ];
 
       border_top = "─";
       border_bottom = "─";
@@ -49,6 +59,113 @@
       metadata = false;
       enable_md5_checksum = false;
     };
+
+    hotkeys =
+      let
+        key = primary: [
+          primary
+          ""
+        ];
+      in
+      {
+        confirm = [
+          "enter"
+          "right"
+          "l"
+        ];
+        cd_quit = key "Q";
+        quit = [
+          "q"
+          "esc"
+        ];
+
+        list_down = [
+          "down"
+          "j"
+        ];
+        list_up = [
+          "up"
+          "k"
+        ];
+        page_down = key "pgdown";
+        page_up = key "pgup";
+
+        close_file_panel = key "w";
+        create_new_file_panel = key "n";
+        next_file_panel = [
+          "tab"
+          "L"
+        ];
+        open_sort_options_menu = key "o";
+        pinned_directory = key "P";
+        previous_file_panel = [
+          "shift+left"
+          "H"
+        ];
+        split_file_panel = key "N";
+        toggle_file_preview_panel = key "f";
+        toggle_reverse_sort = key "R";
+
+        focus_on_metadata = key "m";
+        focus_on_process_bar = key "p";
+        focus_on_sidebar = key "s";
+
+        file_panel_item_create = key "ctrl+n";
+        file_panel_item_rename = key "ctrl+r";
+
+        copy_items = key "ctrl+c";
+        cut_items = key "ctrl+x";
+        delete_items = [
+          "ctrl+d"
+          "delete"
+          ""
+        ];
+        paste_items = [
+          "ctrl+v"
+          "ctrl+w"
+          ""
+        ];
+        permanently_delete_items = key "D";
+
+        compress_file = key "ctrl+a";
+        extract_file = key "ctrl+e";
+
+        open_current_directory_with_editor = key "E";
+        open_file_with_editor = key "e";
+
+        change_panel_mode = key "v";
+        copy_path = key "ctrl+p";
+        copy_present_working_directory = key "c";
+        open_command_line = key ":";
+        open_help_menu = key "?";
+        open_spf_prompt = key ">";
+        open_zoxide = key "z";
+        toggle_dot_file = key ".";
+        toggle_footer = key "F";
+
+        confirm_typing = key "enter";
+        cancel_typing = [
+          "ctrl+c"
+          "esc"
+        ];
+
+        parent_directory = [
+          "h"
+          "left"
+          "backspace"
+        ];
+        search_bar = key "/";
+
+        file_panel_select_mode_items_select_down = [
+          "shift+down"
+          "J"
+        ];
+        file_panel_select_mode_items_select_up = [
+          "shift+up"
+          "K"
+        ];
+        file_panel_select_all_items = key "A";
+      };
   };
 
   xdg.configFile."superfile/themes/rose-pine.toml".text = # toml

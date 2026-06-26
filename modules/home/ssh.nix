@@ -31,6 +31,22 @@ let
       ProxyJump bastion
       SetEnv TERM="xterm-256color"
 
+    Host leo leonardo
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/leo")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/leo")})
+      ForwardAgent yes
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+
+    Host leo-data leonardo-data
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/leo-data")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/leo")})
+      ForwardAgent yes
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+      
     Host rpihome
       HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/rpihome")})
 
@@ -65,17 +81,21 @@ in
     enable = true;
     enableDefaultConfig = false;
     package = pkgs.openssh_hpn;
-    extraConfig = "Include ~/.ssh/config.secrets";
+    includes = [ "~/.ssh/config.secrets" ];
 
     settings = {
-      "*" = {
+      defaultAuth = {
+        header = "Host * !leo !leonardo !leo-data !leonardo-data";
         IdentityAgent = "none"; # bypass agent everywhere
         IdentitiesOnly = true;
-        AddKeysToAgent = "no";
         IdentityFile = [
           "~/.ssh/id_ed25519_sk_yk1"
           "~/.ssh/id_ed25519_sk_yk2"
         ];
+      };
+
+      "*" = {
+        AddKeysToAgent = "no";
 
         # Connection multiplexing: one auth reused by many commands
         ControlMaster = "auto";

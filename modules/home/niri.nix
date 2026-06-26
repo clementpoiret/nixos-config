@@ -5,6 +5,25 @@
   lib,
   ...
 }:
+let
+  importEnvironmentCommand = ''systemctl --user import-environment $(env | sed -En "s/^([A-Za-z_][A-Za-z0-9_]*)=.*/\1/p")'';
+  niriPackage =
+    (pkgs.symlinkJoin {
+      name = "niri-session-import-environment-fix";
+      paths = [ pkgs.niri-unstable ];
+      postBuild = ''
+        rm "$out/bin/niri-session"
+        cp "${pkgs.niri-unstable}/bin/niri-session" "$out/bin/niri-session"
+        chmod +w "$out/bin/niri-session"
+        substituteInPlace "$out/bin/niri-session" \
+          --replace-fail '    systemctl --user import-environment' \
+            '    ${importEnvironmentCommand}'
+      '';
+    })
+    // {
+      inherit (pkgs.niri-unstable) cargoBuildFeatures cargoBuildNoDefaultFeatures;
+    };
+in
 {
   imports = [
     inputs.niri.homeModules.niri
@@ -15,7 +34,8 @@
   programs.niri = {
     enable = true;
     # package = pkgs.niri;
-    package = pkgs.niri-unstable;
+    # package = pkgs.niri-unstable;
+    package = niriPackage;
 
     settings = {
       prefer-no-csd = true;
@@ -100,9 +120,9 @@
       spawn-at-startup = [
         {
           command = [
-            "systemctl"
-            "--user"
-            "import-environment"
+            "sh"
+            "-c"
+            importEnvironmentCommand
           ];
         }
         {

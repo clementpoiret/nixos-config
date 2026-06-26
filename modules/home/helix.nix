@@ -134,6 +134,7 @@
         {
           name = "markdown";
           auto-format = true;
+          text-width = 120;
           roots = [
             ".marksman.toml"
             ".zk"
@@ -152,12 +153,14 @@
               "--with"
               "mdformat-gfm"
               "--with"
-              "mdformat-frontmatter"
-              "--with"
               "mdformat-footnote"
+              "--with"
+              "mdformat-myst"
               "--from"
               "mdformat"
               "mdformat"
+              "--wrap"
+              "120"
               "-"
             ];
           };
