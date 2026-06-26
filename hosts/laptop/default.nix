@@ -46,13 +46,14 @@
     };
 
     logind.settings.Login = {
-      powerKey = "hibernate";
-      powerKeyLongPress = "poweroff";
-      lidSwitch = "suspend-then-hibernate";
+      HandlePowerKey = "hibernate";
+      HandlePowerKeyLongPress = "poweroff";
+      HandleLidSwitch = "suspend-then-hibernate";
     };
   };
   systemd.sleep.settings.Sleep = {
     HibernateDelaySec = "30m";
+    MemorySleepMode = "s2idle";
     SuspendState = "mem";
   };
 
@@ -66,8 +67,6 @@
       "amdgpu.sg_display=0"
 
       "microcode.amd_sha_check=off" # microcode from ucodenix couldn't be loaded without this
-
-      "mem_sleep_default=deep"
 
       # hibernation
       # sudo btrfs inspect-internal map-swapfile -r /var/lib/swapfile

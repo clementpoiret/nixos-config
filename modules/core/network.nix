@@ -44,7 +44,7 @@ in
     enable = true;
     settings = {
       Resolve = {
-        DNSoverTLS = "true";
+        DNSOverTLS = "true";
       };
     };
   };
