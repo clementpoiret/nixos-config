@@ -518,11 +518,9 @@ in
   programs.dank-material-shell = {
     enable = true;
 
-    quickshell.package =
-      (inputs.dms.inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default).overrideAttrs
-        (old: {
-          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-        });
+    quickshell.package = pkgs.quickshell.overrideAttrs (old: {
+      NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
+    });
 
     niri = {
       # enableKeybinds = true;
