@@ -20,6 +20,7 @@
         "https://devenv.cachix.org"
         "https://attic.xuyh0120.win/lantian"
         "https://clementpoiret.cachix.org"
+        "https://pi.cachix.org"
       ];
       trusted-public-keys = [
         "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
@@ -29,6 +30,7 @@
         "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
         "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
         "clementpoiret.cachix.org-1:+W8ndoDBppOP0zcLzkPYSCH6j3kKNH4ckfJCQ138PZo="
+        "pi.cachix.org-1:lGeoGJaZ5ZDabuRzkcD5EBTNnDM4HJ1vqeOxlWk1Flk="
       ];
       trusted-users = [
         "root"

@@ -82,6 +82,10 @@
       url = "github:ilysenko/codex-desktop-linux";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+    pi = {
+      url = "github:lukasl-dev/pi.nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
 
     herdr = {
       url = "github:ogulcancelik/herdr/v0.7.1";
