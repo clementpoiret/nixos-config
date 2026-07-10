@@ -2,6 +2,7 @@
   inputs,
   pkgs,
   config,
+  host,
   lib,
   ...
 }:
@@ -23,6 +24,53 @@ let
     // {
       inherit (pkgs.niri-unstable) cargoBuildFeatures cargoBuildNoDefaultFeatures;
     };
+
+  displayPowerMode = pkgs.writeShellApplication {
+    name = "niri-display-power-mode";
+    runtimeInputs = [
+      niriPackage
+      pkgs.systemd
+      pkgs.upower
+    ];
+    text = ''
+      last_state=""
+
+      apply_mode() {
+        power_state="$(busctl --system get-property \
+          org.freedesktop.UPower \
+          /org/freedesktop/UPower \
+          org.freedesktop.UPower \
+          OnBattery)"
+
+        case "$power_state" in
+          "b true")
+            state="battery"
+            mode="2560x1600@60.002"
+            ;;
+          "b false")
+            state="ac"
+            mode="2560x1600@165.000"
+            ;;
+          *)
+            echo "Unexpected UPower OnBattery value: $power_state" >&2
+            return 1
+            ;;
+        esac
+
+        if [[ "$state" == "$last_state" ]]; then
+          return 0
+        fi
+
+        niri msg output eDP-2 mode "$mode"
+        last_state="$state"
+      }
+
+      apply_mode
+      while IFS= read -r _; do
+        apply_mode
+      done < <(upower --monitor)
+    '';
+  };
 in
 {
   imports = [
@@ -514,6 +562,22 @@ in
     };
   };
   # systemd.user.services.niri-flake-polkit.enable = false;
+
+  systemd.user.services.niri-display-power-mode = lib.mkIf (host == "laptop") {
+    Unit = {
+      Description = "Adjust the internal display refresh rate for battery power";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+
+    Service = {
+      ExecStart = lib.getExe displayPowerMode;
+      Restart = "always";
+      RestartSec = 2;
+    };
+
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 
   programs.dank-material-shell = {
     enable = true;

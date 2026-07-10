@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
   codexCli = inputs.codex-cli.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
@@ -134,8 +139,8 @@ in
       flake.helium
       mullvad-browser
       flake.orion-browser
-      # vivaldi # Feature-rich web browser
-      # vivaldi-ffmpeg-codecs # Vivaldi media codecs
+      vivaldi # Feature-rich web browser
+      vivaldi-ffmpeg-codecs # Vivaldi media codecs
 
       # Graphics
       gifsicle # GIF image manipulation
@@ -219,4 +224,6 @@ in
       package = codexCli;
     };
   };
+
+  systemd.user.services.codex-remote-control.Install.WantedBy = lib.mkForce [ ];
 }

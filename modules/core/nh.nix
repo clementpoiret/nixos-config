@@ -8,6 +8,8 @@
     flake = "/home/${username}/nixos-config";
   };
 
+  systemd.services.nh-clean.unitConfig.ConditionACPower = true;
+
   environment.systemPackages = with pkgs; [
     nix-output-monitor
     nvd

@@ -64,7 +64,8 @@
       "framework_laptop"
     ];
     kernelParams = [
-      "amdgpu.sg_display=0"
+      # Re-enable S/G display; restore this workaround if display corruption returns.
+      # "amdgpu.sg_display=0"
 
       "microcode.amd_sha_check=off" # microcode from ucodenix couldn't be loaded without this
 
@@ -87,6 +88,8 @@
 
   # Hibernation
   powerManagement.enable = true;
+
+  networking.networkmanager.wifi.powersave = true;
 
   services.udev.extraRules = ''
     # AMD dGPU (Navi 33) by PCI slot

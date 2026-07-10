@@ -9,6 +9,10 @@ in
     preset = "none";
   };
 
+  systemd.user.services.easyeffects = lib.mkIf (easyeffects.enable or false) {
+    Install.WantedBy = lib.mkForce [ ];
+  };
+
   xdg.configFile = {
     # For defaults
     "easyeffects/output/none.json".text = # json
