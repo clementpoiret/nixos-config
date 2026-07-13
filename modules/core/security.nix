@@ -23,6 +23,10 @@
       sudo = {
         u2fAuth = true;
       };
+      greetd = {
+        fprintAuth = true;
+        u2fAuth = true;
+      };
     };
     u2f = {
       enable = true;

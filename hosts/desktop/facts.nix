@@ -1,5 +1,5 @@
 {
-  hardware.cpuModelId = "00870F10";
+  hardware.cpuModelId = "00B40F40";
 
   home = {
     easyeffects = {
@@ -7,7 +7,7 @@
       framework16Presets = false;
     };
 
-    zk.notebookDir = "/mnt/hdd/Sync/Notes/zk/";
+    zk.notebookDir = null;
   };
 
   network.nameservers = [ ];

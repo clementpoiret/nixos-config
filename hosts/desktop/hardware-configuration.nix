@@ -15,8 +15,9 @@
 
   boot.initrd.availableKernelModules = [
     "nvme"
-    "ahci"
     "xhci_pci"
+    "ahci"
+    "thunderbolt"
     "usbhid"
     "usb_storage"
     "sd_mod"
@@ -27,54 +28,52 @@
 
   fileSystems = {
     "/" = {
-      device = "/dev/disk/by-uuid/c56b3988-3ac8-4277-9223-d79b3dec2cee";
-      fsType = "f2fs";
+      device = "/dev/mapper/luks-57594530-d51d-466c-98ae-b046c1413d0b";
+      fsType = "btrfs";
       options = [
-        "atgc"
-        "gc_merge"
-        "lazytime"
-        "discard"
-        "compress_algorithm=zstd:6"
-        "compress_chksum"
+        "compress=zstd:3"
+        "discard=async"
+        "noatime"
+      ];
+    };
+    "/nix" = {
+      device = "/dev/mapper/luks-57594530-d51d-466c-98ae-b046c1413d0b";
+      fsType = "btrfs";
+      options = [
+        "subvol=nix"
+        "compress=zstd:3"
+        "discard=async"
+        "noatime"
       ];
     };
     "/boot" = {
-      device = "/dev/disk/by-uuid/30E4-9849";
+      device = "/dev/disk/by-uuid/EBF9-102F";
       fsType = "vfat";
       options = [
-        "fmask=0022"
-        "dmask=0022"
+        "fmask=0077"
+        "dmask=0077"
       ];
     };
     "/home" = {
-      device = "/dev/disk/by-uuid/15426f33-9399-4ac0-b276-baff0229010c";
-      fsType = "f2fs";
-      options = [
-        "compress_algorithm=zstd:6"
-        "compress_chksum"
-        "atgc"
-        "gc_merge"
-        "lazytime"
-        "discard"
-      ];
-    };
-    "/mnt/hdd" = {
-      device = "/dev/disk/by-uuid/4ca96338-156a-4cfe-9113-220ceb2fcf73";
+      device = "/dev/mapper/luks-a4364608-7adf-474b-89c9-47a5e1d07deb";
       fsType = "btrfs";
       options = [
-        "compress=zstd:6"
-        "autodefrag"
+        "compress=zstd:3"
+        "discard=async"
+        "noatime"
       ];
     };
   };
 
   boot.initrd.luks.devices = {
-    "luks-187c8e34-7ab2-4735-8a2e-9453bd374042".device =
-      "/dev/disk/by-uuid/187c8e34-7ab2-4735-8a2e-9453bd374042";
-    "luks-61da8f3f-b984-4894-a5fe-e7a9721ccdcf".device =
-      "/dev/disk/by-uuid/61da8f3f-b984-4894-a5fe-e7a9721ccdcf";
-    "luks-240b3ed0-ccb4-4985-983b-f94aab0f2e2b".device =
-      "/dev/disk/by-uuid/240b3ed0-ccb4-4985-983b-f94aab0f2e2b";
+    "luks-57594530-d51d-466c-98ae-b046c1413d0b" = {
+      device = "/dev/disk/by-uuid/57594530-d51d-466c-98ae-b046c1413d0b";
+      allowDiscards = true;
+    };
+    "luks-a4364608-7adf-474b-89c9-47a5e1d07deb" = {
+      device = "/dev/disk/by-uuid/a4364608-7adf-474b-89c9-47a5e1d07deb";
+      allowDiscards = true;
+    };
   };
 
   zramSwap = {
@@ -101,7 +100,4 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-  # nvidia
-  services.xserver.videoDrivers = [ "nvidia" ];
 }

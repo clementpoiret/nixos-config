@@ -2,14 +2,22 @@
 
 ## desktop
 
-Desktop workstation with Nvidia-specific configuration.
+Desktop workstation with an MSI MAG X870E Tomahawk WiFi motherboard, Ryzen 9
+9950X3D, AMD integrated graphics, and an RTX 4080 reserved for CUDA/AI workloads.
 
 Local host policy includes:
 
 - Performance CPU governor.
-- Nvidia beta driver package.
-- Nvidia Wayland environment variables.
+- CachyOS latest LTO Zen4 kernel and AMD P-State active mode.
+- Encrypted Btrfs filesystems with Zstd level 3 compression and asynchronous
+  discard.
+- AMD integrated graphics for Niri and the stable Nvidia driver for compute.
+- Niri is pinned to the AMD render device; Nvidia PRIME/offload is disabled.
 - AMD microcode loading workaround for `ucodenix`.
+
+Keep the integrated GPU enabled in UEFI when the RTX 4080 is installed. Connect
+monitors to the motherboard HDMI or USB-C DisplayPort outputs so that the RTX
+4080 is not involved in desktop rendering.
 
 Build target:
 

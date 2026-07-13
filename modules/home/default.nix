@@ -18,7 +18,7 @@
     ./kitty.nix # terminal
     ./lazygit.nix
     ./niri.nix # wm
-    ./nushell/nushell.nix # shell
+    # ./nushell/nushell.nix # shell
     ./nvim/nvim.nix # neovim editor
     ./packages.nix # other packages
     ./pi.nix # agent

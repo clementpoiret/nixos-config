@@ -1,4 +1,8 @@
-{ config, ... }:
+{
+  config,
+  username,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -8,26 +12,29 @@
   powerManagement.cpuFreqGovernor = "performance";
 
   boot.kernelParams = [
-    "nvidia_drm.modeset=1"
-    "fbdev=1"
+    "amd_pstate=active"
     "microcode.amd_sha_check=off" # microcode from ucodenix couldn't be loaded without this
   ];
 
+  hardware.amdgpu.initrd.enable = true;
+
   hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
-    modesetting.enable = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    modesetting.enable = false;
     powerManagement.enable = true;
-    # powerManagement.finegrained = false;
     open = true;
     nvidiaSettings = true;
   };
 
-  environment.variables = {
-    LIBVA_DRIVER_NAME = "nvidia";
-    GBM_BACKEND = "nvidia-drm";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    NVD_BACKEND = "direct";
-    __GL_GSYNC_ALLOWED = "1";
-    __GL_VRR_ALLOWED = "1";
-  };
+  services.xserver.videoDrivers = [
+    "amdgpu"
+    "nvidia"
+  ];
+
+  services.udev.extraRules = ''
+    SUBSYSTEM=="drm", KERNEL=="renderD*", DRIVERS=="amdgpu", SYMLINK+="dri/amd-igpu-render"
+  '';
+
+  home-manager.users.${username}.programs.niri.settings.debug.render-drm-device =
+    "/dev/dri/amd-igpu-render";
 }
