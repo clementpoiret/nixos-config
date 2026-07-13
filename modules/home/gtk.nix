@@ -26,6 +26,7 @@
     enable = true;
   };
 
+  home.pointerCursor.enable = true;
   # home.pointerCursor = {
   #   hyprcursor = {
   #     enable = true;

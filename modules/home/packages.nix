@@ -86,7 +86,7 @@ in
       gnumake # GNU make build automation
       nixfmt # nix formatter
       rustfmt # Rust code formatter
-      secretspec # Secret env vars for devenv
+      # secretspec # Secret env vars for devenv
       shfmt # Shell script formatter
       zig # General-purpose programming language/toolchain
 
