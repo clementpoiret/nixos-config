@@ -92,6 +92,9 @@
   networking.networkmanager.wifi.powersave = true;
 
   services.udev.extraRules = ''
+    # Framework Laptop Webcam Module (2nd Gen)
+    ACTION=="add", SUBSYSTEM=="video4linux", ENV{ID_V4L_CAPABILITIES}=="*:capture:*", ATTRS{idVendor}=="32ac", ATTRS{idProduct}=="001c", RUN+="${pkgs.v4l-utils}/bin/v4l2-ctl --device=/dev/%k --set-ctrl=saturation=50"
+
     # AMD dGPU (Navi 33) by PCI slot
     KERNEL=="card*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", KERNELS=="0000:03:00.0", SYMLINK+="dri/amd-dgpu"
     KERNEL=="renderD*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", KERNELS=="0000:03:00.0", SYMLINK+="dri/amd-dgpu-render"
