@@ -313,26 +313,40 @@ different machine; the new device must keep its own host identity.
 
 For GPG:
 
-- export and restore public keys and owner trust;
+- export public keys in backup mode and import them in restore mode so that
+  GnuPG-specific metadata and local signatures are retained;
+- export and restore owner trust;
 - transfer software-backed private keys only through encrypted media;
 - for smartcard/YubiKey-backed keys, import the public keys but leave private
   key material on the token;
-- after the switch, insert the token and run `gpg --card-status`.
+- preserve `~/.gnupg/openpgp-revocs.d/` separately in secure offline storage;
+- preserve any local GnuPG configuration that is not declared in
+  `modules/home/gpg.nix`, such as a custom `dirmngr.conf`.
+
+Home Manager regenerates `gpg.conf`, `gpg-agent.conf`, and `scdaemon.conf` from
+`modules/home/gpg.nix`. Card-resident settings remain on the token. After the
+switch, import the public keys, insert the token, and run `gpg --card-status`;
+GnuPG should recreate the local smartcard key stubs automatically.
 
 Example public-key migration:
 
 ```bash
 # On the old machine
+umask 077
 gpg --export-options backup --export > public-keys.gpg
 gpg --export-ownertrust > ownertrust.txt
 
 # On the new machine
-gpg --import public-keys.gpg
+gpg --import-options restore --import public-keys.gpg
 gpg --import-ownertrust ownertrust.txt
+gpg --card-status
+gpg --list-secret-keys
 ```
 
 Treat the exported files as sensitive metadata and remove the transfer copies
-after verifying the import.
+after verifying the import. A revocation certificate can revoke its
+corresponding key, so keep the `openpgp-revocs.d` backup offline and tightly
+protected.
 
 ### 8. Enroll FIDO/U2F Before the First Switch
 
