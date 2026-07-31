@@ -88,10 +88,15 @@ for private keys. Never place them in this repository.
 
 ### 2. Obtain the Repository
 
-The stock system only needs Git for the initial clone:
+The stock system needs Git for the initial clone and later flake evaluation.
+Some pinned package sources, including Niri's Rust dependencies, are fetched
+with Git while Nix evaluates the system. `nix-shell -p git` only provides Git
+inside the temporary shell, so either keep that shell open through the
+migration or enter it again in step 9:
 
 ```bash
 nix-shell -p git
+# Run the remaining commands from the nix-shell prompt.
 git clone https://github.com/clementpoiret/nixos-config.git "$REPO_DIR"
 cd "$REPO_DIR"
 ```
@@ -383,9 +388,14 @@ hostname is not automatically valid for another.
 
 ### 9. Evaluate and Build
 
-Run evaluation and the host-specific check without updating `flake.lock`:
+Make Git available before evaluating. This is required even after the
+repository has been cloned because some package sources are fetched with Git
+during evaluation:
 
 ```bash
+nix-shell -p git
+# Run the remaining commands from the nix-shell prompt.
+
 cd "$REPO_DIR"
 
 nix --extra-experimental-features 'nix-command flakes' \
@@ -394,17 +404,21 @@ nix --extra-experimental-features 'nix-command flakes' \
 nix --extra-experimental-features 'nix-command flakes' \
   build ".#checks.x86_64-linux.${NEW_HOST}-toplevel"
 
-sudo nixos-rebuild build \
+sudo env "PATH=$PATH" nixos-rebuild build \
   --flake "$REPO_DIR#$NEW_HOST" \
   --option experimental-features "nix-command flakes"
 ```
+
+The explicit `PATH` preserves the temporary Git package when `sudo` starts
+`nixos-rebuild`. Without it, evaluation can fail with `executing "git": No such
+file or directory` while fetching a Git dependency.
 
 Inspect every failure rather than bypassing it. For storage, bootloader,
 initrd, kernel, microcode, or GPU changes, install the new configuration for
 the next boot instead of switching the running system immediately:
 
 ```bash
-sudo nixos-rebuild boot \
+sudo env "PATH=$PATH" nixos-rebuild boot \
   --flake "$REPO_DIR#$NEW_HOST" \
   --option experimental-features "nix-command flakes"
 
