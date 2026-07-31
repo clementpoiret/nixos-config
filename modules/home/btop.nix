@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ host, pkgs, ... }:
 {
   programs.btop = {
     enable = true;
@@ -9,7 +9,9 @@
     };
   };
 
-  home.packages = (with pkgs; [ nvtopPackages.intel ]);
+  home.packages = [
+    (if host == "desktop" then pkgs.nvtopPackages.full else pkgs.nvtopPackages.intel)
+  ];
 
   xdg.configFile."btop/themes/rose-pine.theme".text = ''
     # Main background, empty for terminal default, need to be empty if you want transparent background

@@ -6,10 +6,9 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./performance.nix
     ./../../modules/core
   ];
-
-  powerManagement.cpuFreqGovernor = "performance";
 
   boot.kernelParams = [
     "amd_pstate=active"
