@@ -16,6 +16,31 @@
     "microcode.amd_sha_check=off" # microcode from ucodenix couldn't be loaded without this
   ];
 
+  environment.etc."crypttab".text = ''
+    crypt-syncthing UUID=b2a3176d-92eb-4df4-b20f-3bb2c1a77229 none luks,discard
+    crypt-cache     UUID=80c11c8a-d26d-4a9a-9782-9c38de05fa72 none luks,discard
+  '';
+
+  fileSystems."/srv/syncthing" = {
+    device = "/dev/mapper/crypt-syncthing";
+    fsType = "btrfs";
+    options = [
+      "noatime"
+      "compress=zstd:3"
+      "discard=async"
+    ];
+  };
+
+  fileSystems."/cache" = {
+    device = "/dev/mapper/crypt-cache";
+    fsType = "btrfs";
+    options = [
+      "noatime"
+      "compress=zstd:1"
+      "discard=async"
+    ];
+  };
+
   hardware.amdgpu.initrd.enable = true;
 
   hardware.nvidia = {
@@ -35,6 +60,8 @@
     SUBSYSTEM=="drm", KERNEL=="renderD*", DRIVERS=="amdgpu", SYMLINK+="dri/amd-igpu-render"
   '';
 
-  home-manager.users.${username}.programs.niri.settings.debug.render-drm-device =
-    "/dev/dri/amd-igpu-render";
+  home-manager.users.${username}.programs.niri.settings.debug = {
+    render-drm-device = "/dev/dri/amd-igpu-render";
+    ignore-drm-device = "/dev/dri/by-path/pci-0000:01:00.0-render";
+  };
 }
