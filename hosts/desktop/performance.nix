@@ -55,16 +55,17 @@
       };
 
       script = ''
-        mode_file="$(${pkgs.findutils}/bin/find \
-          /sys/bus/platform/drivers/amd_x3d_vcache \
-          -name amd_x3d_mode -print -quit)"
+        for mode_file in \
+          /sys/bus/platform/drivers/amd_x3d_vcache/*/amd_x3d_mode
+        do
+          if [ -e "$mode_file" ]; then
+            printf '%s\n' frequency > "$mode_file"
+            exit 0
+          fi
+        done
 
-        if [ -z "$mode_file" ]; then
-          echo "amd_x3d_mode was not exposed by the kernel" >&2
-          exit 1
-        fi
-
-        printf '%s\n' frequency > "$mode_file"
+        echo "amd_x3d_mode was not exposed by the kernel" >&2
+        exit 1
       '';
     };
 

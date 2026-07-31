@@ -37,8 +37,7 @@ After testing a new generation on the desktop, verify the policy and services:
 powerprofilesctl get
 cat /sys/devices/system/cpu/amd_pstate/status
 cat /sys/devices/system/cpu/amd_pstate/prefcore
-find /sys/bus/platform/drivers/amd_x3d_vcache \
-  -name amd_x3d_mode -exec cat {} \;
+cat /sys/bus/platform/drivers/amd_x3d_vcache/*/amd_x3d_mode
 systemctl is-active scx lactd rasdaemon \
   desktop-power-profile-balanced desktop-x3d-frequency
 cat /sys/kernel/sched_ext/state

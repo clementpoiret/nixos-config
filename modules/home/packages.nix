@@ -4,13 +4,13 @@
   pkgs,
   ...
 }:
-let
-  codexCli = inputs.codex-cli.packages.${pkgs.stdenv.hostPlatform.system}.default;
-in
+# let
+#   codexCli = inputs.codex-cli.packages.${pkgs.stdenv.hostPlatform.system}.default;
+# in
 {
-  # imports = [
-  #   inputs.codex-desktop-linux.homeManagerModules.default
-  # ];
+  imports = [
+    inputs.codex-desktop-linux.homeManagerModules.default
+  ];
 
   home.packages = (
     with pkgs;
@@ -216,14 +216,20 @@ in
     ]
   );
 
-  # programs.codexDesktopLinux = {
-  #   enable = true;
-  #   # remoteMobileControl.enable = true;
-  #   remoteControl = {
-  #     enable = true;
-  #     package = codexCli;
-  #   };
-  # };
+  programs.codexDesktopLinux = {
+    enable = true;
+    remoteControl = {
+      enable = true;
+      package = pkgs.flake.codex-cli;
+    };
+    remoteMobileControl.enable = true;
+    linuxFeatures = [
+      "appshots"
+      "open-target-discovery"
+      "node-repl-reaper"
+    ];
+    cliPackage = pkgs.flake.codex-cli;
+  };
 
-  # systemd.user.services.codex-remote-control.Install.WantedBy = lib.mkForce [ ];
+  systemd.user.services.codex-remote-control.Install.WantedBy = lib.mkForce [ ];
 }
