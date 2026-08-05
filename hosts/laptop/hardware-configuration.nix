@@ -119,6 +119,24 @@
   ## Ambiant light
   services.clight = {
     enable = true;
+    settings = {
+      sensor.devname = "iio:device0";
+      screen.disabled = true;
+
+      backlight = {
+        # [ day, night, sunrise/sunset event ]
+        ac_timeouts = [
+          60
+          60
+          60
+        ];
+        batt_timeouts = [
+          60
+          60
+          60
+        ];
+      };
+    };
   };
   location = {
     latitude = 45.763420;

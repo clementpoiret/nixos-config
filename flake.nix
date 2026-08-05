@@ -145,7 +145,16 @@
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
         claude-code = claude-code.packages.${system}.default;
-        codex-cli = codex-cli.packages.${system}.default;
+        codex-cli =
+          let
+            upstream = codex-cli.packages.${system}.default;
+          in
+          upstream.overrideAttrs (oldAttrs: {
+            postFixup = (oldAttrs.postFixup or "") + ''
+              wrapProgram "$out/bin/codex" \
+                --set-default HERDR_AGENT codex
+            '';
+          });
         glide-browser = glide-browser.packages.${system}.default;
         helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
