@@ -29,7 +29,6 @@ in
     systemPackages = with pkgs; [
       pkgs.niri
       xdg-desktop-portal
-      xwayland-satellite
     ];
     variables = {
       XDG_SESSION_TYPE = "wayland";
@@ -77,7 +76,7 @@ in
   xdg.portal = {
     enable = true;
     wlr.enable = false;
-    xdgOpenUsePortal = false;
+    xdgOpenUsePortal = true;
     configPackages = [ pkgs.niri ];
 
     config.common = {

@@ -8,11 +8,18 @@
     ./hardware-configuration.nix
     ./performance.nix
     ./../../modules/core
+    ./../../modules/features/bluetooth.nix
+    ./../../modules/features/desktop-compatibility.nix
+    ./../../modules/features/development-hardware.nix
+    ./../../modules/features/virtualization.nix
+    ./../../modules/features/xwayland.nix
   ];
 
   boot.kernelParams = [
     "amd_pstate=active"
-    "microcode.amd_sha_check=off" # microcode from ucodenix couldn't be loaded without this
+    # Deliberate exception: the pinned ucodenix blob fails the kernel SHA
+    # allowlist; its exact provenance and hash remain recorded in flake.lock.
+    "microcode.amd_sha_check=off"
   ];
 
   environment.etc."crypttab".text = ''

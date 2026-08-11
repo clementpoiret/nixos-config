@@ -7,7 +7,6 @@
 
 {
   config,
-  host,
   lib,
   username,
   ...
@@ -129,7 +128,7 @@ in
 
     allowedTCPPorts = lib.mkForce [ ];
     allowedUDPPorts = lib.mkForce (lib.optionals tailscaleEnabled [ tailscalePort ]);
-    trustedInterfaces = lib.mkForce [ ];
+    trustedInterfaces = lib.mkForce [ "lo" ];
 
     # Loose RPF is retained because the repository uses Tailscale/Mullvad and
     # may use exit-node or policy-routing paths.
@@ -211,21 +210,11 @@ in
     sandbox = true;
     require-sigs = true;
     accept-flake-config = false;
-    trusted-users = lib.mkForce [ "root" ];
     allowed-users = lib.mkForce [
       "root"
       username
     ];
   };
-
-  # The encrypted DNS value should not be world-readable after decryption.
-  sops.secrets."dns/${host}".mode = lib.mkForce "0400";
-
-  # Use only stable LVFS metadata by default.
-  services.fwupd.extraRemotes = lib.mkForce [ ];
-
-  # Prefer portal-mediated file/application opening in the Wayland session.
-  xdg.portal.xdgOpenUsePortal = lib.mkForce true;
 
   # Keep the current upstream TCP timestamp policy. Do not set
   # net.ipv4.tcp_timestamps=0; mode 1 preserves PAWS/RTT behavior while Linux

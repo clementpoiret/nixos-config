@@ -1,7 +1,7 @@
 {
+  lib,
   self,
   pkgs,
-  username,
   ...
 }:
 {
@@ -32,10 +32,7 @@
         "clementpoiret.cachix.org-1:+W8ndoDBppOP0zcLzkPYSCH6j3kKNH4ckfJCQ138PZo="
         "pi.cachix.org-1:lGeoGJaZ5ZDabuRzkcD5EBTNnDM4HJ1vqeOxlWk1Flk="
       ];
-      trusted-users = [
-        "root"
-        username
-      ];
+      trusted-users = lib.mkForce [ "root" ];
     };
   };
   nixpkgs = {
@@ -59,7 +56,14 @@
   nixpkgs.config = {
     allowUnfree = true;
     allowUnfreePredicate = true;
-    permittedInsecurePackages = [ "ventoy-1.1.10" ];
   };
+
+  # To prevent getting stuck at shutdown.
+  systemd.settings.Manager = {
+    DefaultIOAccounting = true;
+    DefaultIPAccounting = true;
+    DefaultTimeoutStopSec = "10s";
+  };
+
   system.stateVersion = "26.05";
 }

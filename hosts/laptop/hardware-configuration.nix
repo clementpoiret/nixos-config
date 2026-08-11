@@ -46,8 +46,8 @@
       device = "/dev/disk/by-uuid/BB14-DA46";
       fsType = "vfat";
       options = [
-        "fmask=0022"
-        "dmask=0022"
+        "fmask=0077"
+        "dmask=0077"
       ];
     };
     "/home" = {
@@ -139,7 +139,9 @@
     };
   };
   location = {
-    latitude = 45.763420;
-    longitude = 4.834277;
+    # City-level coordinates preserve clight's day/night behavior without
+    # publishing a precise location.
+    latitude = 45.75;
+    longitude = 4.85;
   };
 }

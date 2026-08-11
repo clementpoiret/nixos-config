@@ -1,7 +1,6 @@
 {
   inputs,
   hostFacts,
-  pkgs,
   ...
 }:
 {
@@ -14,7 +13,6 @@
     "vm.vfs_cache_pressure" = 50;
     "vm.dirty_background_ratio" = 5;
     "vm.dirty_ratio" = 10;
-    "kernel.nmi_watchdog" = 0;
 
     # TCP Fast Open
     "net.ipv4.tcp_fastopen" = 3;
@@ -34,58 +32,16 @@
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="bfq"
     # Set scheduler for HDD
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
-
-    # This is for picotool
-    SUBSYSTEM=="usb", \
-      ATTRS{idVendor}=="2e8a", \
-      ATTRS{idProduct}=="0003", \
-      TAG+="uaccess" \
-      MODE="660", \
-      GROUP="plugdev"
-    SUBSYSTEM=="usb", \
-      ATTRS{idVendor}=="2e8a", \
-      ATTRS{idProduct}=="0009", \
-      TAG+="uaccess" \
-      MODE="660", \
-      GROUP="plugdev"
-    SUBSYSTEM=="usb", \
-      ATTRS{idVendor}=="2e8a", \
-      ATTRS{idProduct}=="000a", \
-      TAG+="uaccess" \
-      MODE="660", \
-      GROUP="plugdev"
-    SUBSYSTEM=="usb", \
-      ATTRS{idVendor}=="2e8a", \
-      ATTRS{idProduct}=="000f", \
-      TAG+="uaccess" \
-      MODE="660", \
-      GROUP="plugdev"
-
-    # Jolt
-    SUBSYSTEM=="powercap", ACTION=="add", RUN+="${pkgs.coreutils}/bin/chmod o+r /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj /sys/class/powercap/intel-rapl/intel-rapl:0/*/energy_uj"
   '';
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
+  hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
-
-  # bluetooth
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = false;
-    settings = {
-      General = {
-        Experimental = true;
-      };
-    };
-  };
-  services.blueman.enable = true;
 
   # Firmware updates
   services.fwupd = {
     enable = true;
+    # Deliberate exception: testing metadata is required for selected signed
+    # device firmware and remains opt-in at update time.
     extraRemotes = [ "lvfs-testing" ];
   };
 
@@ -100,6 +56,4 @@
     useTmpfs = true;
     # tmpfsSize = "50%";
   };
-
-  hardware.flipperzero.enable = true;
 }

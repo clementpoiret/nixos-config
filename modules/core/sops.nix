@@ -13,7 +13,7 @@
     defaultSopsFile = ../../secrets/user-secrets.yaml;
 
     secrets = {
-      "dns/${host}".mode = "0444";
+      "dns/${host}".mode = "0400";
     };
   };
 }

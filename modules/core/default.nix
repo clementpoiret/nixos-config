@@ -3,6 +3,7 @@
   imports = [
     ./bootloader.nix
     ./hardware.nix
+    ./input.nix
     ./network.nix
     ./nh.nix
     ./pipewire.nix
@@ -13,9 +14,7 @@
     ./system.nix
     ./tailscale.nix
     ./user.nix
-    ./virtualization.nix
     ./wayland.nix
-    ./xserver.nix
     ../hardening
   ];
 }

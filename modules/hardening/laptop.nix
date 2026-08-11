@@ -12,13 +12,6 @@
   # Preserve the existing battery-oriented choice.
   boot.kernel.sysctl."kernel.nmi_watchdog" = lib.mkForce 0;
 
-  # The reviewed laptop currently mounts the unencrypted ESP with 0022 masks.
-  # Match the desktop's owner-only view.
-  fileSystems."/boot".options = lib.mkForce [
-    "fmask=0077"
-    "dmask=0077"
-  ];
-
   networking.networkmanager.wifi = {
     powersave = true;
     scanRandMacAddress = true;

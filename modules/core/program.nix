@@ -5,7 +5,6 @@
 
   services.udev.packages = with pkgs; [
     libfido2
-    qmk-udev-rules
     yubikey-personalization
   ];
   programs.gnupg.agent = {

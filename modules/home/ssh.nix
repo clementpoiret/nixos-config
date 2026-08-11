@@ -34,7 +34,6 @@ let
     Host leo leonardo
       HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/leo")})
       User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/leo")})
-      ForwardAgent yes
       IdentityAgent SSH_AUTH_SOCK
       IdentityFile none
       IdentitiesOnly no
@@ -42,11 +41,10 @@ let
     Host leo-data leonardo-data
       HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/leo-data")})
       User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/leo")})
-      ForwardAgent yes
       IdentityAgent SSH_AUTH_SOCK
       IdentityFile none
       IdentitiesOnly no
-      
+
     Host rpihome
       HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/rpihome")})
 

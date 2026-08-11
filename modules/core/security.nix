@@ -3,9 +3,6 @@
   security.rtkit.enable = true;
   security.sudo.enable = true;
   security.polkit.enable = true;
-  security.pki.certificateFiles = [
-    ../../certs/cert.pem
-  ];
 
   environment.systemPackages = with pkgs; [
     libsecret

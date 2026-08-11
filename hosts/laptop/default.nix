@@ -9,6 +9,10 @@
     ./hardware-configuration.nix
     ./rocm.nix
     ./../../modules/core
+    ./../../modules/features/bluetooth.nix
+    ./../../modules/features/development-hardware.nix
+    ./../../modules/features/virtualization.nix
+    ./../../modules/features/xwayland.nix
   ];
 
   environment.systemPackages = with pkgs; [
@@ -67,7 +71,9 @@
       # Re-enable S/G display; restore this workaround if display corruption returns.
       # "amdgpu.sg_display=0"
 
-      "microcode.amd_sha_check=off" # microcode from ucodenix couldn't be loaded without this
+      # Deliberate exception: the pinned ucodenix blob fails the kernel SHA
+      # allowlist; its exact provenance and hash remain recorded in flake.lock.
+      "microcode.amd_sha_check=off"
 
       # hibernation
       # sudo btrfs inspect-internal map-swapfile -r /var/lib/swapfile
@@ -90,6 +96,10 @@
   powerManagement.enable = true;
 
   networking.networkmanager.wifi.powersave = true;
+
+  # nixos-hardware enables this for compatibility; this host deliberately
+  # keeps the 32-bit graphics ABI disabled.
+  hardware.graphics.enable32Bit = lib.mkForce false;
 
   services.udev.extraRules = ''
     # Framework Laptop Webcam Module (2nd Gen)

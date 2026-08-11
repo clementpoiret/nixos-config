@@ -1,7 +1,6 @@
 { ... }:
 {
   imports = [
-    ./aerc.nix # mail
     ./bat.nix # better cat command
     ./btop.nix # resouces monitor
     ./chtsh.nix
@@ -28,6 +27,7 @@
     ./ssh.nix # ssh
     ./superfile.nix # file manager
     ./scripts/scripts.nix # personal scripts
+    ./thunderbird.nix # mail
     ./wl-kbptr.nix
     ./xdg-mimes.nix # default apps
     ./zed.nix

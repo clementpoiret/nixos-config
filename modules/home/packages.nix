@@ -184,7 +184,6 @@
       # Communication
       # signal-desktop-bin # Signal messaging client
       # zoom-us # Video conferencing client
-      thunderbird
 
       # Webcam stuff
       guvcview
