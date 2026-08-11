@@ -67,6 +67,7 @@ keyboard/module access rules, AMD common defaults, and power profile defaults.
 
 Local host policy includes:
 
+- CachyOS latest LTO Zen4 kernel with laptop-specific 300 Hz and lazy RCU tuning.
 - LAVD Autopower follows the active platform power profile when selecting its
   power mode, CPU preference order, and core-compaction policy.
 - Hibernation resume device and swapfile offset.

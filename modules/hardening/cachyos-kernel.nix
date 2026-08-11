@@ -1,9 +1,9 @@
 # Host-aware CachyOS kernel profile.
 #
-# Desktop: latest CachyOS kernel, 500 Hz.
-# Laptop:  CachyOS LTS kernel, 300 Hz and lazy RCU.
-# Both:    EEVDF, Clang ThinLTO, KCFI, NO_HZ_IDLE, full preemption,
-#          Zen 4 optimization, THP madvise.
+# Both:    latest CachyOS kernel, EEVDF, Clang ThinLTO, KCFI, NO_HZ_IDLE,
+#          full preemption, Zen 4 optimization, THP madvise.
+# Desktop: 500 Hz.
+# Laptop:  300 Hz and lazy RCU.
 #
 # This is a custom derivation and may not be present in the CachyOS binary
 # cache. Keep the generated cached-CachyOS and stock-NixOS specialisations.
@@ -19,11 +19,7 @@
 let
   isLaptop = host == "laptop";
 
-  baseKernel =
-    if isLaptop then
-      pkgs.cachyosKernels.linux-cachyos-lts
-    else
-      pkgs.cachyosKernels.linux-cachyos-latest;
+  baseKernel = pkgs.cachyosKernels.linux-cachyos-latest;
 
   customKernel = baseKernel.override {
     lto = "thin";
@@ -46,11 +42,7 @@ let
     pkgs.linuxKernel.packagesFor customKernel
   );
 
-  cachedKernelPackages =
-    if isLaptop then
-      pkgs.cachyosKernels.linuxPackages-cachyos-lts-lto-zen4
-    else
-      pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
+  cachedKernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
 in
 {
   # Override the repository's current generic latest-CachyOS selection, while

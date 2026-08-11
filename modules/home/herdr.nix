@@ -4,6 +4,9 @@
 
   xdg.configFile."herdr/config.toml".text = # toml
     ''
+      [theme]
+      name = "rose-pine"
+
       [keys]
       # Use Ctrl-Space as Herdr's prefix.
       prefix = "ctrl+space"

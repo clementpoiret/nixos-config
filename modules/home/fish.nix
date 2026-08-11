@@ -34,7 +34,7 @@
     '';
     shellInitLast = ''
       # devenv integration currently breaks herdr
-      devenv hook fish | source
+      # devenv hook fish | source
     '';
     interactiveShellInit = ''
       fish_vi_key_bindings
