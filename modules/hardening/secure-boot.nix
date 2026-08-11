@@ -1,5 +1,5 @@
-# Staged module: import only after adding the Lanzaboote input, creating keys,
-# backing them up, and confirming firmware recovery access.
+# Secure Boot enrollment is prepared automatically after this configuration is
+# booted. Enter firmware Setup Mode before booting it for the first time.
 
 {
   inputs,
@@ -17,5 +17,9 @@
   boot.lanzaboote = {
     enable = true;
     pkiBundle = "/var/lib/sbctl";
+    autoEnrollKeys = {
+      enable = true;
+      autoReboot = false;
+    };
   };
 }

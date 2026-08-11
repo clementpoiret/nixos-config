@@ -13,6 +13,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # v1.1.0 predates autoEnrollKeys.includeFirmwareBuiltinKeys, which the
+    # Framework laptop needs to retain its OEM certificates.
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ucodenix.url = "github:e-tho/ucodenix";
 
     home-manager = {

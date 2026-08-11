@@ -9,6 +9,7 @@
   imports = [
     ./common.nix
     ./cachyos-kernel.nix
+    ./secure-boot.nix
     (
       if host == "desktop" then
         ./desktop.nix

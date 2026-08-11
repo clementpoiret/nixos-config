@@ -62,6 +62,8 @@
   };
 
   boot = {
+    lanzaboote.autoEnrollKeys.includeFirmwareBuiltinKeys = true;
+
     blacklistedKernelModules = [ "k10temp" ];
     kernelModules = [
       "acpi_call"
