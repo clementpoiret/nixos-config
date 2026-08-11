@@ -14,6 +14,7 @@
     ./gpg.nix # gpg
     ./gtk.nix # gtk theme
     ./helix.nix
+    ./herdr.nix # terminal workspace manager
     ./jj.nix # just another version control tool
     ./kitty.nix # terminal
     ./lazygit.nix

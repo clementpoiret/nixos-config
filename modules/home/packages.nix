@@ -204,7 +204,6 @@
       libnotify # Desktop notification library
       logseq-appimage # Manually using AppImage because plugins are broken in the nixpkgs version
       # poweralertd # Power alert daemon (low battery/etc.)
-      flake.herdr
       qbittorrent
       qmk
       # todoman # todo list
