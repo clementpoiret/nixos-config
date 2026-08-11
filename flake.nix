@@ -144,7 +144,16 @@
         antigravity-ide = antigravity.packages.${system}.antigravity-ide;
         bash-env-json = bash-env-json.packages.${system}.default;
         bibli-ls = bibli-ls.packages.${system}.default;
-        claude-code = claude-code.packages.${system}.default;
+        claude-code =
+          let
+            upstream = claude-code.packages.${system}.default;
+          in
+          upstream.overrideAttrs (oldAttrs: {
+            postFixup = (oldAttrs.postFixup or "") + ''
+              wrapProgram "$out/bin/claude" \
+                --set-default HERDR_AGENT claude
+            '';
+          });
         codex-cli =
           let
             upstream = codex-cli.packages.${system}.default;
