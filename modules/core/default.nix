@@ -16,5 +16,6 @@
     ./virtualization.nix
     ./wayland.nix
     ./xserver.nix
+    ../hardening
   ];
 }

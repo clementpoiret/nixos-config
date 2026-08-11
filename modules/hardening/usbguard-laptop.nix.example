@@ -1,0 +1,20 @@
+# Do not import this example until usbguard-laptop.rules has been generated,
+# reviewed, and tested with every required Framework expansion card, keyboard,
+# pointing device, webcam, YubiKey, dock, headset, and recovery device.
+
+{ ... }:
+
+{
+  services.usbguard = {
+    enable = true;
+    rules = builtins.readFile ./usbguard-laptop.rules;
+
+    implicitPolicyTarget = "block";
+    presentDevicePolicy = "apply-policy";
+    insertedDevicePolicy = "apply-policy";
+
+    IPCAllowedUsers = [ "root" ];
+    IPCAllowedGroups = [ ];
+    dbus.enable = false;
+  };
+}
