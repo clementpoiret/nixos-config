@@ -22,12 +22,12 @@
       cdnix = "cd ~/nixos-config";
       ns = "nom-shell --run fish";
       nix-shell = "nix-shell --run fish";
-      nix-switch = "nh os switch";
-      nix-update = "nh os switch --update";
+      nix-switch = "nixos-rebuild switch --flake ~/nixos-config --elevate=run0";
+      nix-update = "nix flake update --flake ~/nixos-config && nixos-rebuild switch --flake ~/nixos-config --elevate=run0";
       nix-clean = "nh clean all --keep 5";
       nix-search = "nh search";
-      nix-test = "nh os test";
-      nix-flake-update = "nix flake update ~/nixos-config#";
+      nix-test = "nixos-rebuild test --flake ~/nixos-config --elevate=run0";
+      nix-flake-update = "nix flake update --flake ~/nixos-config";
     };
     shellInit = ''
       # (Interactive-only variables like fish_greeting & fish_escape_delay_ms moved to interactiveShellInit)

@@ -1,5 +1,5 @@
-# Do not import this example until usbguard-laptop.rules has been generated,
-# reviewed, and tested with every required Framework expansion card, keyboard,
+# Do not import this example until a policy has been generated, reviewed, and
+# cold-boot tested with every required Framework expansion card, keyboard,
 # pointing device, webcam, YubiKey, dock, headset, and recovery device.
 
 { ... }:

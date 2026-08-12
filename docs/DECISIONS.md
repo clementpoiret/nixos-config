@@ -47,3 +47,14 @@ store. Use runtime secret paths from `config.sops.secrets.*.path`.
 This repo is local-first for now. CI and cache publishing are intentionally left
 out until they are needed.
 
+## Hardening ownership
+
+Security policy is not kept in a separate catch-all module. Each active option
+lives with its subsystem: boot-chain, hardware/kernel, local security, network,
+services, Nix daemon, or host-specific policy. This avoids priority overrides
+that merely cancel a permissive value defined elsewhere.
+
+Compatibility-sensitive controls remain explicit host decisions. Development
+hardware access is retained as a feature, USBGuard stays disabled until a
+reviewed laptop policy exists, and high-breakage strict controls are commented
+beside their owners for one-at-a-time trials.

@@ -14,38 +14,85 @@ in
   networking = {
     hostName = "${host}";
     networkmanager.enable = true;
+    tempAddresses = "default";
     inherit nameservers;
+    nftables.enable = true;
     firewall = {
       enable = true;
-      allowedTCPPorts = [
-        22
-        80
-        443
-        59010
-        59011
-      ];
-      allowedUDPPorts = [
-        51820
-        59010
-        59011
-      ];
+      backend = "nftables";
+      allowedTCPPorts = [ ];
+      allowedUDPPorts = [ ];
+      # NixOS adds loopback itself, but force this list so services cannot
+      # silently turn another interface into a trusted firewall bypass.
+      trustedInterfaces = lib.mkForce [ "lo" ];
+
+      # Loose RPF is required by Tailscale/Mullvad exit-node and policy-routing
+      # paths. It is not equivalent to trusting the Tailscale interface.
+      checkReversePath = "loose";
+      autoLoadConntrackHelpers = false;
+      connectionTrackingModules = [ ];
+      logRefusedConnections = false;
     };
+  };
+
+  # These systems are network endpoints, not routers.
+  boot.kernel.sysctl = {
+    "net.ipv4.tcp_syncookies" = 1;
+    "net.ipv4.tcp_rfc1337" = 1;
+    "net.ipv4.icmp_echo_ignore_broadcasts" = 1;
+    "net.ipv4.icmp_ignore_bogus_error_responses" = 1;
+
+    "net.ipv4.conf.all.accept_redirects" = 0;
+    "net.ipv4.conf.default.accept_redirects" = 0;
+    "net.ipv4.conf.all.secure_redirects" = 0;
+    "net.ipv4.conf.default.secure_redirects" = 0;
+    "net.ipv4.conf.all.send_redirects" = 0;
+    "net.ipv4.conf.default.send_redirects" = 0;
+    "net.ipv4.conf.all.accept_source_route" = 0;
+    "net.ipv4.conf.default.accept_source_route" = 0;
+    "net.ipv4.conf.all.log_martians" = 1;
+    "net.ipv4.conf.default.log_martians" = 1;
+
+    "net.ipv6.conf.all.accept_redirects" = 0;
+    "net.ipv6.conf.default.accept_redirects" = 0;
+    "net.ipv6.conf.all.accept_source_route" = 0;
+    "net.ipv6.conf.default.accept_source_route" = 0;
   };
 
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = false;
-    settings.KbdInteractiveAuthentication = false;
+    openFirewall = false;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+      PubkeyAuthentication = true;
+
+      X11Forwarding = false;
+      AllowAgentForwarding = false;
+      AllowTcpForwarding = false;
+      GatewayPorts = "no";
+      PermitTunnel = false;
+      PermitUserEnvironment = false;
+
+      MaxAuthTries = 3;
+      MaxSessions = 4;
+      LoginGraceTime = 30;
+      LogLevel = "VERBOSE";
+      AllowGroups = [ "ssh-users" ];
+    };
   };
 
   environment.systemPackages = with pkgs; [ networkmanagerapplet ];
 
   services.resolved = {
     enable = true;
-    settings = {
-      Resolve = {
-        DNSOverTLS = "true";
-      };
+    settings.Resolve = {
+      DNSOverTLS = "true";
+      DNSSEC = "true";
+      FallbackDNS = [ ];
+      LLMNR = "false";
+      MulticastDNS = "false";
     };
   };
 

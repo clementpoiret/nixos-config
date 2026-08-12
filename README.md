@@ -29,7 +29,9 @@ with Home Manager integrated into each NixOS build.
 - `pkgs/`: local packages exposed through the default overlay.
 - `secrets/`: sops-nix encrypted secrets.
 - `docs/`: bootstrap, operations, architecture decisions, and host notes.
-- `nixos-guide.md`: architecture and operations guide used for the current refactor.
+- `docs/HARDENING.md`: active security posture, strict-control trials, and
+  runtime verification.
+- `docs/USBGUARD.md`: staged laptop USBGuard tutorial and recovery procedure.
 
 ## Hosts
 
@@ -355,8 +357,9 @@ protected.
 
 ### 8. Enroll FIDO/U2F Before the First Switch
 
-The repository enables PAM U2F for login, greetd, and sudo. Enroll at least one
-device while the stock generation and password-based sudo still work.
+The repository enables PAM U2F for login, greetd, and run0's Polkit path.
+Enroll at least one device while the stock generation and password-based sudo
+still work.
 
 The credential origin must use the final hostname:
 
@@ -385,6 +388,11 @@ nix --extra-experimental-features 'nix-command flakes' \
 
 Repeat enrollment for each hostname; a PAM credential enrolled for one
 hostname is not automatically valid for another.
+
+This preserves the current user-owned enrollment, so U2F is an authentication
+alternative rather than a hardened privilege boundary. Before relying on it
+to protect run0, migrate the mapping to a root-owned authfile as described in
+[`docs/HARDENING.md`](docs/HARDENING.md#known-audit-gaps).
 
 ### 9. Evaluate and Build
 
@@ -440,15 +448,14 @@ systemctl --failed
 systemctl status sops-install-secrets.service
 systemctl --user status sops-nix.service
 systemctl --user status write-ssh-secret-config.service
-sudo dmesg | grep -E 'microcode|firmware|amdgpu|nvidia'
+run0 -- dmesg | grep -E 'microcode|firmware|amdgpu|nvidia'
 ```
 
 Then validate the authentication paths:
 
 ```bash
 # Keep the existing root or local console session open while testing.
-sudo -k
-sudo true
+run0 -- id
 ssh -T git@github.com
 gpg --card-status
 fc-match "TX02 Nerd Font Ret"
@@ -461,7 +468,7 @@ ordinary desktop applications.
 
 ### 11. Post-Install Checklist
 
-- Run `sudo tailscale up` and authorize the new Tailscale node.
+- Run `run0 -- tailscale up` and authorize the new Tailscale node.
 - Open Syncthing, add the new device to the existing cluster, and verify
   `~/Sync` before accepting large synchronization changes. Preserve the old
   Syncthing configuration only when intentionally preserving the same device
@@ -470,7 +477,7 @@ ordinary desktop applications.
   are healthy.
 - Restore any remaining application data that is not declarative or
   synchronized.
-- Run `sudo fwupdmgr refresh` and `fwupdmgr get-updates`.
+- Run `run0 -- fwupdmgr refresh` and `fwupdmgr get-updates`.
 - Verify SSH access from another machine before relying on remote-only access.
 - Change the repository remote back to SSH if it was cloned over HTTPS.
 - Optionally initialize a colocated Jujutsu workspace with
@@ -484,7 +491,7 @@ If the new generation does not boot, select the previous stock generation in
 the bootloader. From a working generation:
 
 ```bash
-sudo nixos-rebuild switch --rollback
+nixos-rebuild switch --rollback --elevate=run0
 ```
 
 From a live installer, mount the filesystems under `/mnt`, enter the system,
@@ -512,9 +519,9 @@ nix flake check --no-update-lock-file
 nix build .#checks.x86_64-linux.laptop-toplevel
 nix build .#checks.x86_64-linux.desktop-toplevel
 
-# Test or switch the local machine
-nh os test
-nh os switch
+# Test or switch the local machine through run0
+nixos-rebuild test --flake ".#$NEW_HOST" --elevate=run0
+nixos-rebuild switch --flake ".#$NEW_HOST" --elevate=run0
 
 # Update flake inputs
 nix flake update
@@ -529,6 +536,9 @@ The shell aliases `nix-test`, `nix-switch`, `nix-update`, and
 - `docs/OPERATIONS.md`: build, test, switch, boot, rollback, and update flows.
 - `docs/DECISIONS.md`: input, Home Manager, hardware, and secrets policy.
 - `docs/HOSTS.md`: host inventory and machine-specific notes.
+- `docs/HARDENING.md`: hardening invariants, strict trials, verification, and
+  recovery.
+- `docs/USBGUARD.md`: disabled-by-default laptop USBGuard rollout.
 
 ## Secrets
 

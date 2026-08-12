@@ -20,6 +20,13 @@ in
       use ($nu.default-config-dir | path join 'aliases/bat.nu') *
       use ($nu.default-config-dir | path join 'aliases/git.nu') *
       use ($nu.default-config-dir | path join 'aliases/k8s.nu') *
+
+      def nix-update [] {
+        nix flake update --flake ~/nixos-config
+        if $env.LAST_EXIT_CODE == 0 {
+          nixos-rebuild switch --flake ~/nixos-config --elevate=run0
+        }
+      }
     '';
 
     extraEnv = ''
@@ -60,12 +67,11 @@ in
       cdnix = "cd ~/nixos-config";
       ns = "nom-shell --run bash";
       nix-shell = "nix-shell --run bash";
-      nix-switch = "nh os switch";
-      nix-update = "nh os switch --update";
+      nix-switch = "nixos-rebuild switch --flake ~/nixos-config --elevate=run0";
       nix-clean = "nh clean all --keep 5";
       nix-search = "nh search";
-      nix-test = "nh os test";
-      nix-flake-update = "nix flake update ~/nixos-config#";
+      nix-test = "nixos-rebuild test --flake ~/nixos-config --elevate=run0";
+      nix-flake-update = "nix flake update --flake ~/nixos-config";
 
       # custom tools
       emacs = "emacsclient -c -a 'emacs'";

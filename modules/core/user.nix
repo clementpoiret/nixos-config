@@ -8,6 +8,9 @@
 }:
 {
   imports = [ inputs.home-manager.nixosModules.home-manager ];
+
+  users.groups.ssh-users = { };
+
   home-manager = {
     useUserPackages = true;
     useGlobalPkgs = true;
@@ -34,12 +37,12 @@
     extraGroups = [
       "networkmanager"
       "render"
+      "ssh-users"
       "wheel"
       "video"
     ];
     shell = pkgs.fish;
     packages = [ inputs.home-manager.packages.${pkgs.stdenv.hostPlatform.system}.default ];
   };
-  nix.settings.allowed-users = [ "${username}" ];
   environment.localBinInPath = true;
 }

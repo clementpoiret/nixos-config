@@ -10,11 +10,11 @@ nix build .#checks.x86_64-linux.laptop-toplevel
 nix build .#checks.x86_64-linux.desktop-toplevel
 ```
 
-Use `nh os test` before switching the current host:
+Use run0 elevation and test before switching the current host:
 
 ```bash
-nh os test
-nh os switch
+nixos-rebuild test --flake .#laptop --elevate=run0
+nixos-rebuild switch --flake .#laptop --elevate=run0
 ```
 
 ## Riskier Changes
@@ -23,14 +23,14 @@ Use `boot` instead of `switch` for kernel, bootloader, initrd, filesystem,
 hibernation, or GPU-driver changes:
 
 ```bash
-sudo nixos-rebuild boot --flake .#laptop
-sudo reboot
+nixos-rebuild boot --flake .#laptop --elevate=run0
+run0 -- reboot
 ```
 
 Use `build-vm` when a change can be checked in a VM:
 
 ```bash
-sudo nixos-rebuild build-vm --flake .#desktop
+nixos-rebuild build-vm --flake .#desktop
 ./result/bin/run-*-vm
 ```
 
@@ -39,7 +39,7 @@ sudo nixos-rebuild build-vm --flake .#desktop
 Rollback the current system generation:
 
 ```bash
-sudo nixos-rebuild switch --rollback
+nixos-rebuild switch --rollback --elevate=run0
 ```
 
 If the machine does not boot, select an older generation from the bootloader.
@@ -47,6 +47,8 @@ For bootloader repair from a live ISO, mount the system, enter it, and activate
 a known-good generation:
 
 ```bash
+# The stock live installer has sudo; the installed system's run0 policy is not
+# active until after entering it.
 sudo nixos-enter
 NIXOS_INSTALL_BOOTLOADER=1 /run/current-system/bin/switch-to-configuration boot
 ```
@@ -64,3 +66,8 @@ nix build .#checks.x86_64-linux.desktop-toplevel
 
 Prefer one input or one related input group per update when debugging breakage.
 
+## Hardening changes
+
+Follow [HARDENING.md](HARDENING.md) for boot-first deployment, the recovery
+specialisation, runtime checks, and optional strict controls. USBGuard has a
+separate cold-boot rollout in [USBGUARD.md](USBGUARD.md).

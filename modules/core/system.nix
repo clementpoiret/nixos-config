@@ -1,7 +1,8 @@
 {
-  lib,
   self,
+  lib,
   pkgs,
+  username,
   ...
 }:
 {
@@ -32,7 +33,16 @@
         "clementpoiret.cachix.org-1:+W8ndoDBppOP0zcLzkPYSCH6j3kKNH4ckfJCQ138PZo="
         "pi.cachix.org-1:lGeoGJaZ5ZDabuRzkcD5EBTNnDM4HJ1vqeOxlWk1Flk="
       ];
+      sandbox = true;
+      require-sigs = true;
+      accept-flake-config = false;
+      # NixOS adds root itself, but force the complete trust boundary so
+      # imported modules cannot silently grant daemon-level trust to others.
       trusted-users = lib.mkForce [ "root" ];
+      allowed-users = [
+        "root"
+        username
+      ];
     };
   };
   nixpkgs = {
@@ -50,6 +60,10 @@
     enable = true;
     libraries = with pkgs; [ stdenv.cc.cc ];
   };
+
+  # Optional strict trial. Enable only in a separate generation after testing
+  # every persistent daemon and graphical/development workload.
+  # environment.memoryAllocator.provider = "graphene-hardened-light";
 
   time.timeZone = "Europe/Paris";
   i18n.defaultLocale = "en_US.UTF-8";

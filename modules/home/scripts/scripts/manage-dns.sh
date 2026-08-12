@@ -52,8 +52,8 @@ action_disable_private_dns() {
     echo "Warning: Could not retrieve DHCP-provided DNS servers for '$interface'." >&2
     echo "Attempting to disable DoT and set domain '~.' only for '$interface'."
     echo "systemd-resolved might still pick up DHCP DNS if available from NM."
-    if sudo resolvectl dnsovertls "$interface" no && \
-       sudo resolvectl domain "$interface" '~.'; then
+    if run0 -- resolvectl dnsovertls "$interface" no && \
+       run0 -- resolvectl domain "$interface" '~.'; then
       echo "Successfully disabled DoT and set routing domain for '$interface'."
       echo "If this still fails, DHCP might not be providing DNS, or another issue exists."
     else
@@ -65,20 +65,20 @@ action_disable_private_dns() {
     echo "Disabling DNS-over-TLS for this interface."
     echo "Setting search domain to '~.' to prioritize these settings for all lookups on this interface."
 
-    if sudo resolvectl dns "$interface" $dhcp_dns_servers && \
-       sudo resolvectl dnsovertls "$interface" no && \
-       sudo resolvectl domain "$interface" '~.'; then
+    if run0 -- resolvectl dns "$interface" $dhcp_dns_servers && \
+       run0 -- resolvectl dnsovertls "$interface" no && \
+       run0 -- resolvectl domain "$interface" '~.'; then
       echo "Successfully configured '$interface' to use DNS: $dhcp_dns_servers (DoT disabled) for all domains."
     else
       echo "Error: Failed to configure DNS/DoT/domain for '$interface' via resolvectl." >&2
-      sudo resolvectl revert "$interface" 2>/dev/null
+      run0 -- resolvectl revert "$interface" 2>/dev/null
       exit 1
     fi
   fi
 
   echo "You should now be able to access the captive portal."
   echo "After logging in, run: $0 enable"
-  # sudo resolvectl flush-caches
+  # run0 -- resolvectl flush-caches
   # echo "DNS caches flushed."
 }
 
@@ -87,21 +87,21 @@ action_enable_private_dns() {
   interface=$(get_active_interface)
   if [[ $? -ne 0 ]]; then
     echo "No active interface found to revert. If settings were applied to an" >&2
-    echo "interface that is now down, 'sudo resolvectl revert <iface_name>'" >&2
+    echo "interface that is now down, 'run0 -- resolvectl revert <iface_name>'" >&2
     echo "might be needed manually, or simply reconnecting the interface." >&2
     exit 1
   fi
   echo "Using interface: $interface"
 
   echo "Restoring default DNS settings for interface '$interface'."
-  if sudo resolvectl revert "$interface"; then
+  if run0 -- resolvectl revert "$interface"; then
     echo "DNS settings for '$interface' reverted."
     echo "Your private DNS configuration should now be active for this interface."
   else
     echo "Warning: 'resolvectl revert' for '$interface' failed or did nothing." >&2
     echo "This can happen if settings were already default." >&2
   fi
-  # sudo resolvectl flush-caches
+  # run0 -- resolvectl flush-caches
   # echo "DNS caches flushed."
 }
 

@@ -15,6 +15,5 @@
     ./tailscale.nix
     ./user.nix
     ./wayland.nix
-    ../hardening
   ];
 }

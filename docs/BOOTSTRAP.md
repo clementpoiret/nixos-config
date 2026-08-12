@@ -40,8 +40,8 @@ For a machine that already boots this configuration:
 ```bash
 nix flake check --no-build --no-update-lock-file
 nix build .#nixosConfigurations.$(hostname).config.system.build.toplevel
-nh os test
-nh os switch
+nixos-rebuild test --flake . --elevate=run0
+nixos-rebuild switch --flake . --elevate=run0
 ```
 
 ## Secrets
@@ -51,4 +51,3 @@ Home Manager secrets decrypt from `~/.config/sops/age/keys.txt`.
 
 Do not read decrypted secret values during Nix evaluation. Services and user
 activation scripts should consume paths from `config.sops.secrets.*.path`.
-

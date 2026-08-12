@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -10,7 +9,7 @@
 
     # Let LAVD adapt its scheduling policy to desktop load instead of pinning
     # it to the Balanced platform power profile selected below.
-    scx.extraArgs = lib.mkForce [ "--autopilot" ];
+    scx.extraArgs = [ "--autopilot" ];
 
     # Keep GPU limits mutable until each LACT profile has been validated on the
     # desktop. A non-empty settings value would make the GUI configuration

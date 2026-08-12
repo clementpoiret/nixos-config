@@ -19,7 +19,12 @@ Local host policy includes:
   persistence mode is imposed at boot.
 - RAS logging and CPU, GPU, memory, and stress-test tooling are installed for
   stability validation.
-- AMD microcode loading workaround for `ucodenix`.
+- The ucodenix SHA-check bypass is disabled; verify the loaded microcode
+  revision and kernel log after firmware, kernel, or ucodenix updates.
+- Running-kernel image protection is enabled; hibernation is intentionally
+  unavailable.
+- Integrity Lockdown and module enforcement remain optional trials gated on
+  NVIDIA signer and recovery validation.
 
 Keep the integrated GPU enabled in UEFI when the RTX 4080 is installed. Connect
 monitors to the motherboard HDMI or USB-C DisplayPort outputs so that the RTX
@@ -74,9 +79,13 @@ Local host policy includes:
 - AMD dGPU/iGPU stable DRM symlinks.
 - ROCm runtime, OpenCL, and ML-training support in `hosts/laptop/rocm.nix`.
 - `amdgpu.sg_display=0`.
-- AMD microcode loading workaround for `ucodenix`.
+- The ucodenix SHA-check bypass is disabled; verify the loaded microcode
+  revision and kernel log after firmware, kernel, or ucodenix updates.
 - Local power-button and lid behavior.
 - Local `ananicy-cpp` policy.
+- Kexec is disabled while encrypted hibernation remains available. Linux
+  Lockdown must remain disabled while hibernation is required.
+- USBGuard remains deferred to the reviewed rollout in `docs/USBGUARD.md`.
 
 Build target:
 

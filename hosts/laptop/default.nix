@@ -23,6 +23,8 @@
   ];
 
   services = {
+    scx.extraArgs = [ "--autopower" ];
+
     # thermald.enable = true;
     # cpupower-gui.enable = true;
     ananicy = {
@@ -75,10 +77,14 @@
 
       # Deliberate exception: the pinned ucodenix blob fails the kernel SHA
       # allowlist; its exact provenance and hash remain recorded in flake.lock.
-      "microcode.amd_sha_check=off"
+      # "microcode.amd_sha_check=off"
+
+      # Optional strict trial, only after `acpi_call` and every other external
+      # module reports a signer trusted by the running kernel.
+      # "module.sig_enforce=1"
 
       # hibernation
-      # sudo btrfs inspect-internal map-swapfile -r /var/lib/swapfile
+      # run0 -- btrfs inspect-internal map-swapfile -r /var/lib/swapfile
       "resume_offset=10238424"
     ];
 
@@ -92,12 +98,25 @@
         cpupower
       ]
       ++ [ pkgs.cpupower-gui ];
+
+    kernel.sysctl."kernel.kexec_load_disabled" = 1;
   };
 
   # Hibernation
   powerManagement.enable = true;
+  security.protectKernelImage = false;
+  # Optional strict trial after preloading every module required by Framework
+  # expansion cards, docks, VPNs, virtualization, and hibernation.
+  # security.lockKernelModules = true;
 
-  networking.networkmanager.wifi.powersave = true;
+  networking.networkmanager.wifi = {
+    powersave = true;
+    scanRandMacAddress = true;
+    macAddress = "stable-ssid";
+  };
+
+  # Do not enable Linux Lockdown while hibernation remains required. See
+  # docs/HARDENING.md for the compatibility and recovery procedure.
 
   # nixos-hardware enables this for compatibility; this host deliberately
   # keeps the 32-bit graphics ABI disabled.
