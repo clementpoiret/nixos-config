@@ -206,6 +206,30 @@
           username
           ;
       };
+
+      mkAppArmorTestHost =
+        mode: profileOverrides:
+        mkHost {
+          host = "laptop";
+          extraModules = [
+            nixos-hardware.nixosModules.framework-16-7040-amd
+            {
+              security.localAppArmor = {
+                inherit mode profileOverrides;
+              };
+            }
+          ];
+        };
+
+      appArmorTestHosts = {
+        disable = mkAppArmorTestHost "disable" { };
+        complain = mkAppArmorTestHost "complain" { };
+        enforce = mkAppArmorTestHost "enforce" { };
+        staged = mkAppArmorTestHost "staged" { };
+        override = mkAppArmorTestHost "disable" {
+          local-syncthing = "enforce";
+        };
+      };
     in
     {
       overlays.default = selfPkgs.overlay;
@@ -297,6 +321,98 @@
       };
 
       checks.${system} = {
+        apparmor-mode-matrix =
+          let
+            states =
+              hostConfig:
+              pkgs-unstable.lib.mapAttrs (_: policy: policy.state) hostConfig.config.security.apparmor.policies;
+            allStatesAre =
+              expected: hostConfig:
+              builtins.all (state: state == expected) (builtins.attrValues (states hostConfig));
+            stagedStates = states appArmorTestHosts.staged;
+            complainPolicies = appArmorTestHosts.complain.config.security.apparmor.policies;
+            enforcePolicies = appArmorTestHosts.enforce.config.security.apparmor.policies;
+            disabledSyncthingService = appArmorTestHosts.disable.config.systemd.services.syncthing;
+            overrideSyncthingService = appArmorTestHosts.override.config.systemd.services.syncthing;
+            dnsService = self.nixosConfigurations.laptop.config.systemd.services.apply-secret-dns;
+            desktopSyncthingPaths =
+              self.nixosConfigurations.desktop.config.systemd.services.syncthing.serviceConfig.ReadWritePaths;
+          in
+          assert allStatesAre "disable" appArmorTestHosts.disable;
+          assert allStatesAre "complain" appArmorTestHosts.complain;
+          assert allStatesAre "enforce" appArmorTestHosts.enforce;
+          assert stagedStates.local-apply-secret-dns == "enforce";
+          assert builtins.all (name: name == "local-apply-secret-dns" || stagedStates.${name} == "complain") (
+            builtins.attrNames stagedStates
+          );
+          assert !(disabledSyncthingService.serviceConfig ? AppArmorProfile);
+          assert
+            !(
+              appArmorTestHosts.disable.config.systemd.services.apply-secret-dns.serviceConfig ? AppArmorProfile
+            );
+          assert (states appArmorTestHosts.override).local-syncthing == "enforce";
+          assert overrideSyncthingService.serviceConfig.AppArmorProfile == "local-syncthing";
+          assert
+            !(pkgs-unstable.lib.hasInfix "audit deny owner @{HOME}/.ssh/" complainPolicies.local-brave.profile);
+          assert pkgs-unstable.lib.hasInfix "audit deny owner @{HOME}/.ssh/"
+            enforcePolicies.local-brave.profile;
+          assert
+            !(pkgs-unstable.lib.hasInfix "audit deny owner @{HOME}/.ssh/" enforcePolicies.local-codex-cli.profile);
+          assert dnsService.serviceConfig.UMask == "0077";
+          assert dnsService.serviceConfig.CapabilityBoundingSet == [ "CAP_CHOWN" ];
+          assert pkgs-unstable.lib.hasInfix ''
+            chmod 0600 "$temporary_file"
+            chown systemd-resolve:systemd-resolve "$temporary_file"
+          '' dnsService.script;
+          assert pkgs-unstable.lib.elem "/home/${username}/Sync" desktopSyncthingPaths;
+          assert pkgs-unstable.lib.elem "/srv/syncthing" desktopSyncthingPaths;
+          pkgs-unstable.runCommand "apparmor-mode-matrix" { } ''
+            touch "$out"
+          '';
+
+        apparmor-policy-parser =
+          let
+            configurations = [
+              self.nixosConfigurations.desktop
+              self.nixosConfigurations.laptop
+              appArmorTestHosts.enforce
+            ];
+            profileDirectories = map (
+              configuration: configuration.config.environment.etc."apparmor.d".source
+            ) configurations;
+            includeDirectories = pkgs-unstable.lib.unique (
+              builtins.concatMap (
+                configuration:
+                map (package: "${package}/etc/apparmor.d") configuration.config.security.apparmor.packages
+              ) configurations
+            );
+            includeArguments = pkgs-unstable.lib.concatMapStringsSep " " (
+              directory: "--Include ${pkgs-unstable.lib.escapeShellArg directory}"
+            ) includeDirectories;
+          in
+          pkgs-unstable.runCommand "apparmor-policy-parser"
+            {
+              nativeBuildInputs = [ pkgs-unstable.apparmor-parser ];
+            }
+            ''
+              for profile_directory in ${
+                pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg profileDirectories
+              }; do
+                for policy in "$profile_directory"/local-*; do
+                  attachment="$(sed -n 's/^[[:space:]]*profile local-[^[:space:]]* \([^[:space:]]*\) flags=.*/\1/p' "$policy")"
+                  if [ -n "$attachment" ]; then
+                    test -x "$attachment"
+                  fi
+                  apparmor_parser --config-file /dev/null --quiet --skip-kernel-load --skip-cache \
+                    --Include "$profile_directory" ${includeArguments} "$policy"
+                done
+              done
+              touch "$out"
+            '';
+
+        apparmor-vm = import ./tests/apparmor.nix {
+          pkgs = pkgs-unstable.extend selfPkgs.overlay;
+        };
         desktop-toplevel = self.nixosConfigurations.desktop.config.system.build.toplevel;
         laptop-toplevel = self.nixosConfigurations.laptop.config.system.build.toplevel;
       };

@@ -46,8 +46,6 @@
     allowSimultaneousMultithreading = true; # Strict trial: set false.
     forcePageTableIsolation = false; # Strict trial: set true.
 
-    apparmor.enable = true;
-
     run0 = {
       enable = true;
       wheelNeedsPassword = true;

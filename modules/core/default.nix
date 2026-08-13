@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./apparmor.nix
     ./bootloader.nix
     ./hardware.nix
     ./input.nix

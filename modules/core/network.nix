@@ -98,6 +98,10 @@ in
 
   sops.secrets.${dnsSecretName}.restartUnits = [ "apply-secret-dns.service" ];
 
+  systemd.tmpfiles.rules = [
+    "d /run/systemd/resolved.conf.d 0755 root root -"
+  ];
+
   systemd.services.apply-secret-dns = lib.mkIf (builtins.hasAttr dnsSecretName config.sops.secrets) {
     description = "Apply sops-managed DNS settings to systemd-resolved";
     after = [
@@ -111,7 +115,29 @@ in
       gnused
       systemd
     ];
-    serviceConfig.Type = "oneshot";
+    serviceConfig = {
+      Type = "oneshot";
+      UMask = "0077";
+      NoNewPrivileges = true;
+      CapabilityBoundingSet = [ "CAP_CHOWN" ];
+      AmbientCapabilities = [ ];
+      PrivateDevices = true;
+      PrivateTmp = true;
+      ProtectClock = true;
+      ProtectControlGroups = true;
+      ProtectHome = true;
+      ProtectHostname = true;
+      ProtectKernelLogs = true;
+      ProtectKernelModules = true;
+      ProtectKernelTunables = true;
+      ProtectSystem = "strict";
+      ReadWritePaths = [ "/run/systemd/resolved.conf.d" ];
+      RestrictAddressFamilies = [ "AF_UNIX" ];
+      RestrictNamespaces = true;
+      RestrictRealtime = true;
+      RestrictSUIDSGID = true;
+      SystemCallArchitectures = "native";
+    };
     script = ''
       secret_file=${lib.escapeShellArg config.sops.secrets.${dnsSecretName}.path}
       if [ ! -s "$secret_file" ]; then
@@ -124,12 +150,21 @@ in
       fi
 
       install -d -m 0755 /run/systemd/resolved.conf.d
-      cat > /run/systemd/resolved.conf.d/90-sops-dns.conf <<EOF
-      [Resolve]
-      DNS=$dns
-      Domains=~.
-      DNSOverTLS=true
-      EOF
+      output_file=/run/systemd/resolved.conf.d/90-sops-dns.conf
+      temporary_file="$(mktemp /run/systemd/resolved.conf.d/.90-sops-dns.conf.XXXXXX)"
+      trap 'rm -f "$temporary_file"' EXIT
+
+      {
+        printf '[Resolve]\n'
+        printf 'DNS=%s\n' "$dns"
+        printf 'Domains=~.\n'
+        printf 'DNSOverTLS=true\n'
+      } > "$temporary_file"
+
+      chmod 0600 "$temporary_file"
+      chown systemd-resolve:systemd-resolve "$temporary_file"
+      mv -f "$temporary_file" "$output_file"
+      trap - EXIT
 
       systemctl reload-or-restart systemd-resolved.service
     '';
