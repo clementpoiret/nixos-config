@@ -164,9 +164,9 @@
       # softmaker-office-nx # Office suite
       (pkgs.softmaker-office-nx.override {
         officeVersion = {
-          version = "1234";
+          version = "1502";
           edition = "";
-          hash = "sha256-00bscKt+4aE94x6wKGqXh6tE2GiDll6F4gWZZBEl2JE=";
+          hash = "sha256-24CnmZ5lnx7+NvZxiAgib0uYCfUQuUgRuVW+K6AeB3U=";
         };
       })
       tdf # Terminal PDF reader
@@ -216,17 +216,18 @@
 
   programs.codexDesktopLinux = {
     enable = true;
-    remoteControl = {
-      enable = true;
-      package = pkgs.flake.codex-cli;
-    };
-    remoteMobileControl.enable = true;
+    # remoteControl = {
+    #   enable = true;
+    #   package = pkgs.flake.codex-cli;
+    # };
+    # remoteMobileControl.enable = true;
     linuxFeatures = [
       "appshots"
-      "open-target-discovery"
+      "remote-control-ui"
+      "remote-mobile-control"
       "node-repl-reaper"
     ];
-    cliPackage = pkgs.flake.codex-cli;
+    # cliPackage = pkgs.flake.codex-cli;
   };
 
   systemd.user.services.codex-remote-control.Install.WantedBy = lib.mkForce [ ];

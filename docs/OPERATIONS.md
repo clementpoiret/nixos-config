@@ -66,6 +66,17 @@ nix build .#checks.x86_64-linux.desktop-toplevel
 
 Prefer one input or one related input group per update when debugging breakage.
 
+## Continuous Integration and Cachix
+
+The GitHub Actions workflow builds every flake check on pushes to `main`. Every
+Sunday it updates all flake inputs, builds the updated checks, and pushes the
+verified `flake.lock` directly to `main`.
+
+Configure a repository Actions secret named `CACHIX_AUTH_TOKEN` with a
+cache-scoped write token for the `clementpoiret` Cachix cache. The workflow
+fails before building if this secret is unavailable. Existing paths are pulled
+from configured binary caches; only newly built paths are uploaded to Cachix.
+
 ## Hardening changes
 
 Follow [HARDENING.md](HARDENING.md) for boot-first deployment, the recovery

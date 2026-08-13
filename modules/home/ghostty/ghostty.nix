@@ -1,8 +1,9 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 {
   programs.ghostty = {
     enable = true;
     enableFishIntegration = true;
+    package = pkgs.ghostty-host;
 
     settings = {
       # theme = "dark:Rose Pine,light:Rose Pine Dawn";

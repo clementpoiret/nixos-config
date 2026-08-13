@@ -23,12 +23,13 @@ in
     enable = true;
     compositor.name = "niri";
     configHome = "/home/${username}";
+    quickshell.package = pkgs.quickshell-host;
   };
 
   environment = {
-    systemPackages = with pkgs; [
-      pkgs.niri
-      xdg-desktop-portal
+    systemPackages = [
+      pkgs.niri-host
+      pkgs.xdg-desktop-portal
     ];
     variables = {
       XDG_SESSION_TYPE = "wayland";
@@ -77,7 +78,7 @@ in
     enable = true;
     wlr.enable = false;
     xdgOpenUsePortal = true;
-    configPackages = [ pkgs.niri ];
+    configPackages = [ pkgs.niri-host ];
 
     config.common = {
       default = [

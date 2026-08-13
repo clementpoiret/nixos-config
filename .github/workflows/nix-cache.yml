@@ -1,0 +1,106 @@
+name: Build and cache NixOS configurations
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "17 3 * * 0"
+      timezone: Europe/Paris
+
+permissions: {}
+
+concurrency:
+  group: nix-cache-main
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Reclaim runner disk space
+        run: |
+          sudo rm -rf -- /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache
+          df -h /
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@630ae543ea3a38a9a4166f03376c02c50f408342 # v31.11.0
+
+      - name: Require Cachix credentials
+        env:
+          CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        run: test -n "$CACHIX_AUTH_TOKEN"
+
+      - name: Configure Cachix
+        uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
+        with:
+          name: clementpoiret
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: nix-community,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
+          useDaemon: true
+
+      - name: Build all flake checks
+        run: nix flake check --no-update-lock-file --print-build-logs --keep-going
+
+  weekly-update:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Reclaim runner disk space
+        run: |
+          sudo rm -rf -- /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache
+          df -h /
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@630ae543ea3a38a9a4166f03376c02c50f408342 # v31.11.0
+
+      - name: Require Cachix credentials
+        env:
+          CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        run: test -n "$CACHIX_AUTH_TOKEN"
+
+      - name: Configure Cachix
+        uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
+        with:
+          name: clementpoiret
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: nix-community,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
+          useDaemon: true
+
+      - name: Update flake inputs
+        run: nix flake update
+
+      - name: Build all flake checks
+        run: nix flake check --no-update-lock-file --print-build-logs --keep-going
+
+      - name: Commit updated lock file
+        run: |
+          if git diff --quiet -- flake.lock; then
+            echo "flake.lock is already current"
+            exit 0
+          fi
+
+          if ! git diff --quiet -- . ':(exclude)flake.lock'; then
+            echo "Refusing to commit changes outside flake.lock" >&2
+            git diff --stat >&2
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add flake.lock
+          git commit -m "chore(deps): update flake inputs"
+          git push origin HEAD:main

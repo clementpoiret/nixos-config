@@ -4,6 +4,7 @@
     ./apparmor.nix
     ./bootloader.nix
     ./hardware.nix
+    ./host-cpu-packages.nix
     ./input.nix
     ./network.nix
     ./nh.nix

@@ -42,8 +42,7 @@ in
   imports = [ inputs.ucodenix.nixosModules.default ];
 
   boot = {
-    # This custom profile may require a local build. Keep the cached CachyOS
-    # profile as a bootable fallback for updates and module regressions.
+    # This optimized CachyOS profile may require a local build.
     kernelPackages = customKernelPackages;
     kernelParams = [
       "transparent_hugepage=madvise"
@@ -82,9 +81,14 @@ in
     };
   };
 
-  specialisation.cached-cachyos.configuration = {
-    system.nixos.tags = [ "cached-cachyos" ];
-    boot.kernelPackages = lib.mkForce cachedKernelPackages;
+  # specialisation.cached-cachyos.configuration = {
+  #   system.nixos.tags = [ "cached-cachyos" ];
+  #   boot.kernelPackages = lib.mkForce cachedKernelPackages;
+  # };
+
+  specialisation.latest-nixos.configuration = {
+    system.nixos.tags = [ "latest-nixos" ];
+    boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
   };
 
   services = {

@@ -22,11 +22,11 @@
       cdnix = "cd ~/nixos-config";
       ns = "nom-shell --run fish";
       nix-shell = "nix-shell --run fish";
-      nix-switch = "nixos-rebuild switch --flake ~/nixos-config --elevate=run0";
-      nix-update = "nix flake update --flake ~/nixos-config && nixos-rebuild switch --flake ~/nixos-config --elevate=run0";
+      nix-switch = "nh os switch";
+      nix-update = "nh os switch --update";
       nix-clean = "nh clean all --keep 5";
       nix-search = "nh search";
-      nix-test = "nixos-rebuild test --flake ~/nixos-config --elevate=run0";
+      nix-test = "nh os test";
       nix-flake-update = "nix flake update --flake ~/nixos-config";
     };
     shellInit = ''

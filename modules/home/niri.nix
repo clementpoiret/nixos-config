@@ -8,13 +8,14 @@
 }:
 let
   importEnvironmentCommand = ''systemctl --user import-environment $(env | sed -En "s/^([A-Za-z_][A-Za-z0-9_]*)=.*/\1/p")'';
+  niriBasePackage = pkgs.niri-host;
   niriPackage =
     (pkgs.symlinkJoin {
       name = "niri-session-import-environment-fix";
-      paths = [ pkgs.niri-unstable ];
+      paths = [ niriBasePackage ];
       postBuild = ''
         rm "$out/bin/niri-session"
-        cp "${pkgs.niri-unstable}/bin/niri-session" "$out/bin/niri-session"
+        cp "${niriBasePackage}/bin/niri-session" "$out/bin/niri-session"
         chmod +w "$out/bin/niri-session"
         substituteInPlace "$out/bin/niri-session" \
           --replace-fail '    systemctl --user import-environment' \
@@ -22,7 +23,7 @@ let
       '';
     })
     // {
-      inherit (pkgs.niri-unstable) cargoBuildFeatures cargoBuildNoDefaultFeatures;
+      inherit (niriBasePackage) cargoBuildFeatures cargoBuildNoDefaultFeatures;
     };
 
   displayPowerMode = pkgs.writeShellApplication {
@@ -582,9 +583,7 @@ in
   programs.dank-material-shell = {
     enable = true;
 
-    quickshell.package = pkgs.quickshell.overrideAttrs (old: {
-      NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=native";
-    });
+    quickshell.package = pkgs.quickshell-host;
 
     niri = {
       # enableKeybinds = true;

@@ -184,6 +184,9 @@
           master = pkgs-master;
           stable = pkgs-stable;
           flake = pkgs-flake;
+
+          # The pinned niri-flake package still requires libdisplay-info 0.2.
+          libdisplay-info_0_2 = pkgs-stable.libdisplay-info_0_2;
         })
         niri.overlays.niri
         nix-cachyos-kernel.overlays.pinned
