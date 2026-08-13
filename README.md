@@ -538,6 +538,8 @@ The shell aliases `nix-test`, `nix-switch`, `nix-update`, and
 - `docs/HOSTS.md`: host inventory and machine-specific notes.
 - `docs/HARDENING.md`: hardening invariants, strict trials, verification, and
   recovery.
+- `docs/APPARMOR.md`: AppArmor modes, profile testing, policy changes, and
+  rollout.
 - `docs/USBGUARD.md`: disabled-by-default laptop USBGuard rollout.
 
 ## Secrets

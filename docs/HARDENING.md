@@ -16,8 +16,9 @@ Both hosts use:
   specialisation;
 - kernel information, BPF, userfaultfd, TTY, filesystem-link, ASLR, and
   end-host network sysctl restrictions;
-- AppArmor infrastructure, user namespaces for application and Nix sandboxing,
-  and coredump handlers configured to retain no payload;
+- AppArmor with locally managed application and service profiles, user
+  namespaces for application and Nix sandboxing, and coredump handlers
+  configured to retain no payload;
 - nftables with no globally open TCP port, no trusted Tailscale interface, and
   only Tailscale transport globally plus SSH/Syncthing on `tailscale0`;
 - key-only SSH with root login and forwarding disabled;
@@ -26,9 +27,11 @@ Both hosts use:
 - run0/Polkit elevation without sudo, sudo-rs, a sudo shim, persistent
   authorization, or a global pkexec wrapper.
 
-AppArmor being enabled is infrastructure, not proof that every application is
-confined. Review `aa-status` and add tested profiles for high-risk services as
-they are introduced.
+The local AppArmor policy defaults to a staged rollout: the narrow DNS helper
+is enforced, while Syncthing and the application profiles are loaded in
+complain mode. This makes their labels and audit evidence available without
+pretending that desktop workloads have already been exhaustively learned.
+See [AppArmor policy](#apparmor-policy) before promoting a profile.
 
 The desktop additionally prevents replacement of the running kernel image and
 does not support hibernation. The laptop keeps encrypted hibernation, disables
@@ -50,11 +53,6 @@ These findings are documented but intentionally not changed by this refactor:
   administrative access outside run0. Remove that group, use a per-user daemon,
   or constrain system-daemon authorization if run0 is meant to be the only
   elevation path.
-- `apply-secret-dns.service` writes the decrypted DNS configuration under
-  `/run/systemd/resolved.conf.d` without an explicit restrictive umask or file
-  mode. Treat its current contents as locally readable until the service uses a
-  `0077` umask and an atomic mode-`0600` install.
-
 Lower-priority user-session issues also remain outside this refactor: the
 archive extraction helper does not safely preserve arbitrary filenames, the
 Helix Markdown formatter executes unpinned `uvx` packages, Syncthing's
@@ -67,6 +65,10 @@ uses a predictable PID file in `/tmp`.
 - User namespaces, SMT, automatic PTI selection, SCX/LAVD, rootless Podman,
   libvirt, Xwayland, Bluetooth, QMK/RP2040, Flipper Zero, and host udev rules
   remain available for current workflows.
+- AppArmor does not globally restrict unprivileged user namespaces. Browser,
+  Electron, AppImage, Flatpak, Bubblewrap, Nix, and rootless-container
+  compatibility remains controlled by their own profiles and existing kernel
+  settings.
 - `lvfs-testing` remains an explicit firmware-update source; selecting and
   applying an update is still an administrative action.
 - USBGuard is not enabled. Follow [USBGUARD.md](USBGUARD.md) only after every
@@ -96,6 +98,92 @@ before trying the next control.
 
 Do not apply a broad module blacklist without first inventorying `lsmod`,
 `lspci -k`, `lsusb -t`, and mounted network or uncommon filesystems.
+
+## AppArmor policy
+
+`modules/core/apparmor.nix` owns the local policy and exposes two settings. The
+complete mode reference, testing commands, policy-editing recipes, and rollback
+procedure are in [APPARMOR.md](APPARMOR.md).
+
+A typical configuration is:
+
+```nix
+security.localAppArmor = {
+  mode = "staged";
+  profileOverrides.local-syncthing = "enforce";
+};
+```
+
+The complete modes are active configuration, not commented examples:
+
+| Mode | Result |
+|---|---|
+| `staged` | Enforce `local-apply-secret-dns`; load every other managed profile in complain mode |
+| `disable` | Keep all policy definitions evaluable, but load none and omit systemd AppArmor attachments |
+| `complain` | Load every managed profile in complain mode |
+| `enforce` | Enforce every managed profile |
+
+`profileOverrides` accepts `disable`, `complain`, or `enforce` for any managed
+profile and always wins over the selected mode. Unknown names fail evaluation.
+AppArmor remains enabled when the local mode is `disable`, so upstream or
+future service profiles are not silently disabled with the local set.
+
+The application inventory covers:
+
+- untrusted files and documents: File Roller, Evince, mpv, pqiv, Inkscape,
+  Draw.io, Zotero, Logseq, and the three SoftMaker applications;
+- browsers and network clients: Brave, Glide, Helium, Mullvad Browser, Orion,
+  Vivaldi, Thunderbird, Proton Mail Bridge, Proton Pass and its CLI, Proton
+  VPN, qBittorrent, Motrix, and Deezer;
+- development tools: Codex Desktop and CLI, Claude Code, Antigravity CLI and
+  IDE, and Zed.
+
+Application attachments use their exact Nix store executables, and inherited
+children receive rules generated from the package closure. Development-agent
+profiles additionally receive a bounded closure of installed compilers,
+interpreters, editors, Nix/VCS, and shell tools so repository work remains
+possible. Their home/repository execution and authentication access is an
+intentional compatibility exception.
+
+When a non-development application is enforced, explicit exclusions protect
+SOPS/age keys and decrypted user secrets, SSH private-key patterns, GPG private
+keys, the U2F mapping, and common password-store locations. Those explicit
+`deny` rules are deliberately emitted only for enforced profiles: AppArmor
+applies explicit denies even when a profile is otherwise in complain mode.
+Therefore complain mode is for learning compatibility, and the credential
+boundary becomes active at promotion.
+
+Syncthing is always configured at `/home/clementpoiret/Sync`. On the desktop,
+both that logical path and `/srv/syncthing` are authorized because `~/Sync` is
+a symlink to the encrypted mount and AppArmor/systemd may mediate the canonical
+target. Its systemd unit uses a read-only home and system image with only those
+roots writable. The DNS helper has a narrow enforced profile, an explicit
+`CAP_CHOWN` ceiling, and atomically installs a `0600` drop-in owned by
+`systemd-resolve`.
+
+Shells, terminal emulators, Nautilus, Neovim, Helix, GPG/SSH agents, Podman,
+libvirt, sshd, and Tailscale are intentionally not attached to these local
+profiles. Profiling broad interactive launchers would either transitively
+confine unrelated work or require a policy so permissive that the label would
+be misleading. Existing service sandboxing and subsystem controls still apply.
+
+### Promotion workflow
+
+Promote one profile at a time. Exercise its file-open/save/export paths,
+desktop portals, audio/video, hardware acceleration, network behavior, and
+child processes before enforcement:
+
+```bash
+run0 -- journalctl -b --grep 'apparmor="DENIED"'
+run0 -- aa-status
+nix build .#checks.x86_64-linux.apparmor-policy-parser
+nix build .#checks.x86_64-linux.apparmor-vm
+```
+
+Set a single override to `enforce`, rebuild both hosts, and repeat the workload
+and journal review. Use `complain` to continue learning or `disable` to unload a
+problem profile; do not add broad `/nix/store/**` execution rules to silence
+denials. Exact package closures keep store access bounded across upgrades.
 
 ## Deployment and recovery
 
