@@ -4,6 +4,8 @@
 
   xdg.configFile."herdr/config.toml".text = # toml
     ''
+      onboarding = false
+
       [theme]
       name = "rose-pine"
 

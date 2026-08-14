@@ -16,8 +16,8 @@
   services.pcscd.enable = true;
 
   programs.ssh = {
-    # enableAskPassword = true;
-    # askPassword = "${pkgs.lxqt.lxqt-openssh-askpass}/bin/lxqt-openssh-askpass";
+    enableAskPassword = true;
+    askPassword = "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
     # startAgent = true;
     # askPassword = "${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass";
   };

@@ -337,6 +337,7 @@
             enforcePolicies = appArmorTestHosts.enforce.config.security.apparmor.policies;
             disabledSyncthingService = appArmorTestHosts.disable.config.systemd.services.syncthing;
             overrideSyncthingService = appArmorTestHosts.override.config.systemd.services.syncthing;
+            laptopConfig = self.nixosConfigurations.laptop.config;
             dnsService = self.nixosConfigurations.laptop.config.systemd.services.apply-secret-dns;
             desktopSyncthingPaths =
               self.nixosConfigurations.desktop.config.systemd.services.syncthing.serviceConfig.ReadWritePaths;
@@ -361,6 +362,8 @@
             enforcePolicies.local-brave.profile;
           assert
             !(pkgs-unstable.lib.hasInfix "audit deny owner @{HOME}/.ssh/" enforcePolicies.local-codex-cli.profile);
+          assert laptopConfig.programs.ssh.enableAskPassword;
+          assert laptopConfig.environment.variables.SSH_ASKPASS == laptopConfig.programs.ssh.askPassword;
           assert dnsService.serviceConfig.UMask == "0077";
           assert dnsService.serviceConfig.CapabilityBoundingSet == [ "CAP_CHOWN" ];
           assert pkgs-unstable.lib.hasInfix ''

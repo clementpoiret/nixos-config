@@ -297,7 +297,8 @@ let
     git
     jujutsu
     nix
-    openssh
+    openssh_hpn
+    seahorse
     ripgrep
     fd
     gcc
