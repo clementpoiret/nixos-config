@@ -252,6 +252,49 @@
         '';
       };
 
+      packages.${system}.cache-root =
+        let
+          mkHostEntries =
+            hostName:
+            let
+              cfg = self.nixosConfigurations.${hostName};
+              kernel = cfg.config.boot.kernelPackages.kernel;
+            in
+            [
+              {
+                name = "${hostName}-ghostty";
+                path = cfg.pkgs.ghostty-host;
+              }
+              {
+                name = "${hostName}-niri";
+                path = cfg.pkgs.niri-host;
+              }
+              {
+                name = "${hostName}-quickshell";
+                path = cfg.pkgs.quickshell-host;
+              }
+              {
+                name = "${hostName}-kernel";
+                path = kernel.out;
+              }
+              {
+                name = "${hostName}-kernel-dev";
+                path = kernel.dev;
+              }
+              {
+                name = "${hostName}-kernel-modules";
+                path = kernel.modules;
+              }
+              {
+                name = "${hostName}-modules-tree";
+                path = cfg.config.system.modulesTree;
+              }
+            ];
+        in
+        pkgs-unstable.linkFarm "nixos-config-cache-root" (
+          mkHostEntries "desktop" ++ mkHostEntries "laptop"
+        );
+
       devShells.${system} = {
         default = pkgs-stable.mkShellNoCC {
           packages = with pkgs-stable; [
