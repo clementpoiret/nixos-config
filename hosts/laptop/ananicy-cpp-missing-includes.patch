@@ -1,0 +1,26 @@
+diff --git a/src/platform/linux/backtrace.cpp b/src/platform/linux/backtrace.cpp
+--- a/src/platform/linux/backtrace.cpp
++++ b/src/platform/linux/backtrace.cpp
+@@ -1,5 +1,6 @@
+ #include "utility/backtrace.hpp"
+ 
++#include <cstdint>    // for int32_t
+ #include <cstdlib>    // for free
+ #include <cxxabi.h>   // for abi::__cxa_demangle
+ #include <execinfo.h> // for backtrace, backtrace_symbols
+diff --git a/src/utility/argument_parsing/argument.cpp b/src/utility/argument_parsing/argument.cpp
+--- a/src/utility/argument_parsing/argument.cpp
++++ b/src/utility/argument_parsing/argument.cpp
+@@ -1,6 +1,7 @@
+ #include "utility/argument_parser.hpp"
+ 
+ #include <cstdlib>
++#include <cstring>
+ #include <cxxabi.h>
+ #include <iostream>
+ #include <memory>
+diff --git a/src/platform/linux/singleton_process.cpp b/src/platform/linux/singleton_process.cpp
+--- a/src/platform/linux/singleton_process.cpp
++++ b/src/platform/linux/singleton_process.cpp
+@@ -4,0 +5,1 @@
++#include <cstring>
