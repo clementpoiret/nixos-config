@@ -1,7 +1,7 @@
 { ... }:
 {
   programs.zed-editor = {
-    enable = true;
+    enable = false;
 
     userSettings = {
       helix_mode = true;

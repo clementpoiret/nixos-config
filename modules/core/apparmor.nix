@@ -195,26 +195,26 @@ let
       executable = "claude";
       developer = true;
     }
-    {
-      name = "antigravity-cli";
-      package = pkgs.flake.antigravity-cli;
-      executable = "agy";
-      developer = true;
-    }
-    {
-      name = "antigravity-ide";
-      package = pkgs.flake.antigravity-ide;
-      executable = "antigravity-ide";
-      developer = true;
-      userns = true;
-    }
-    {
-      name = "zed";
-      package = pkgs.zed-editor;
-      executable = "zeditor";
-      developer = true;
-      userns = true;
-    }
+    # {
+    #   name = "antigravity-cli";
+    #   package = pkgs.flake.antigravity-cli;
+    #   executable = "agy";
+    #   developer = true;
+    # }
+    # {
+    #   name = "antigravity-ide";
+    #   package = pkgs.flake.antigravity-ide;
+    #   executable = "antigravity-ide";
+    #   developer = true;
+    #   userns = true;
+    # }
+    # {
+    #   name = "zed";
+    #   package = pkgs.zed-editor;
+    #   executable = "zeditor";
+    #   developer = true;
+    #   userns = true;
+    # }
   ]
   ++ lib.optionals (codexDesktopPackages != [ ]) [
     {

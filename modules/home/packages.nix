@@ -192,8 +192,8 @@
       # Miscellaneous
       # anytype
       bibiman # Bibliography management CLI
-      flake.antigravity-cli
-      flake.antigravity-ide
+      # flake.antigravity-cli
+      # flake.antigravity-ide
       flake.claude-code
       flake.codex-cli
       deezer-enhanced
