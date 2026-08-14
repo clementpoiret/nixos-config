@@ -44,10 +44,26 @@ jobs:
           name: clementpoiret
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           extraPullNames: nix-community,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
-          useDaemon: true
+          skipPush: true
 
       - name: Build all flake checks
         run: nix flake check --no-update-lock-file --print-build-logs --keep-going
+
+      - name: Push selected runtime closure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          root="$(
+            nix build \
+              --no-link \
+              --print-out-paths \
+              --no-update-lock-file \
+              .#cache-root
+          )"
+
+          cachix push clementpoiret "$root"
+          cachix pin clementpoiret host-optimized "$root" --keep-revisions 2
 
   weekly-update:
     if: github.event_name == 'schedule'
@@ -78,13 +94,29 @@ jobs:
           name: clementpoiret
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           extraPullNames: nix-community,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
-          useDaemon: true
+          skipPush: true
 
       - name: Update flake inputs
         run: nix flake update
 
       - name: Build all flake checks
         run: nix flake check --no-update-lock-file --print-build-logs --keep-going
+
+      - name: Push selected runtime closure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          root="$(
+            nix build \
+              --no-link \
+              --print-out-paths \
+              --no-update-lock-file \
+              .#cache-root
+          )"
+
+          cachix push clementpoiret "$root"
+          cachix pin clementpoiret host-optimized "$root" --keep-revisions 2
 
       - name: Commit updated lock file
         run: |
