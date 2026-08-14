@@ -252,7 +252,7 @@
         '';
       };
 
-      packages.${system}.cache-root =
+      packages.${system} =
         let
           mkHostEntries =
             hostName:
@@ -290,10 +290,16 @@
                 path = cfg.config.system.modulesTree;
               }
             ];
+
+          desktopCacheEntries = mkHostEntries "desktop";
+          laptopCacheEntries = mkHostEntries "laptop";
+          mkCacheRoot = name: entries: pkgs-unstable.linkFarm name entries;
         in
-        pkgs-unstable.linkFarm "nixos-config-cache-root" (
-          mkHostEntries "desktop" ++ mkHostEntries "laptop"
-        );
+        {
+          cache-root-desktop = mkCacheRoot "nixos-config-cache-root-desktop" desktopCacheEntries;
+          cache-root-laptop = mkCacheRoot "nixos-config-cache-root-laptop" laptopCacheEntries;
+          cache-root = mkCacheRoot "nixos-config-cache-root" (desktopCacheEntries ++ laptopCacheEntries);
+        };
 
       devShells.${system} = {
         default = pkgs-stable.mkShellNoCC {
@@ -367,6 +373,46 @@
       };
 
       checks.${system} = {
+        host-cpu-optimizations =
+          let
+            desktopPkgs = self.nixosConfigurations.desktop.pkgs;
+            laptopPkgs = self.nixosConfigurations.laptop.pkgs;
+            desktopKernel = self.nixosConfigurations.desktop.config.boot.kernelPackages.kernel;
+            laptopKernel = self.nixosConfigurations.laptop.config.boot.kernelPackages.kernel;
+
+            flagsText =
+              flags: if builtins.isList flags then pkgs-unstable.lib.concatStringsSep " " flags else flags;
+            hasFlag = flag: flags: pkgs-unstable.lib.hasInfix flag (flagsText flags);
+            niriRustFlags =
+              package:
+              if builtins.isAttrs (package.env or null) && package.env ? RUSTFLAGS then
+                package.env.RUSTFLAGS
+              else
+                package.RUSTFLAGS or "";
+            unwrapConfig = value: if value ? content then unwrapConfig value.content else value;
+            configIs = expected: value: ((unwrapConfig value).tristate or null) == expected;
+          in
+          assert !(desktopPkgs.stdenv.hostPlatform ? gcc.arch);
+          assert !(laptopPkgs.stdenv.hostPlatform ? gcc.arch);
+          assert hasFlag "-march=znver5" (desktopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
+          assert hasFlag "-C target-cpu=znver5" (niriRustFlags desktopPkgs.niri-host);
+          assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigBuildFlags;
+          assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigCheckFlags;
+          assert hasFlag "-march=znver4" (laptopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
+          assert hasFlag "-C target-cpu=znver4" (niriRustFlags laptopPkgs.niri-host);
+          assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigBuildFlags;
+          assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigCheckFlags;
+          assert configIs "y" desktopKernel.structuredExtraConfig.MZEN4;
+          assert configIs "n" desktopKernel.structuredExtraConfig.GENERIC_CPU;
+          assert configIs "n" desktopKernel.structuredExtraConfig.X86_NATIVE_CPU;
+          assert configIs "y" laptopKernel.structuredExtraConfig.MZEN4;
+          assert configIs "n" laptopKernel.structuredExtraConfig.GENERIC_CPU;
+          assert configIs "n" laptopKernel.structuredExtraConfig.X86_NATIVE_CPU;
+          assert desktopKernel.drvPath != laptopKernel.drvPath;
+          pkgs-unstable.runCommand "host-cpu-optimizations" { } ''
+            touch "$out"
+          '';
+
         apparmor-mode-matrix =
           let
             states =
