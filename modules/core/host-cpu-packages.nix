@@ -86,6 +86,7 @@ in
         quickshell = quickshellHost;
 
         niri-host = niriHost;
+        niri-baseline = niriBaseline;
         niri = niriHost;
         niri-unstable = niriHost;
 

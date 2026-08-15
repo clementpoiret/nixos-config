@@ -387,6 +387,10 @@
             laptopPkgs = self.nixosConfigurations.laptop.pkgs;
             desktopKernel = self.nixosConfigurations.desktop.config.boot.kernelPackages.kernel;
             laptopKernel = self.nixosConfigurations.laptop.config.boot.kernelPackages.kernel;
+            desktopNiriConfig =
+              self.nixosConfigurations.desktop.config.home-manager.users.${username}.xdg.configFile."niri-config".source;
+            laptopNiriConfig =
+              self.nixosConfigurations.laptop.config.home-manager.users.${username}.xdg.configFile."niri-config".source;
 
             flagsText =
               flags: if builtins.isList flags then pkgs-unstable.lib.concatStringsSep " " flags else flags;
@@ -398,12 +402,12 @@
               else
                 package.RUSTFLAGS or "";
             niriUsesBaselineCompletions =
-              package:
+              baseline: package:
               let
+                baselineCommand = builtins.unsafeDiscardStringContext "${baseline}/bin/niri completions";
                 postInstall = package.postInstall or "";
               in
-              pkgs-unstable.lib.hasInfix "/nix/store/" postInstall
-              && pkgs-unstable.lib.hasInfix "/bin/niri completions" postInstall
+              pkgs-unstable.lib.hasInfix baselineCommand postInstall
               && !(pkgs-unstable.lib.hasInfix "$out/bin/niri completions" postInstall);
             unwrapConfig = value: if value ? content then unwrapConfig value.content else value;
             configIs = expected: value: ((unwrapConfig value).tristate or null) == expected;
@@ -414,14 +418,23 @@
           assert hasFlag "-C target-cpu=znver5" (niriRustFlags desktopPkgs.niri-host);
           assert !(desktopPkgs.niri-host.doCheck or true);
           assert !(desktopPkgs.niri-host.doInstallCheck or true);
-          assert niriUsesBaselineCompletions desktopPkgs.niri-host;
+          assert niriUsesBaselineCompletions desktopPkgs.niri-baseline desktopPkgs.niri-host;
+          assert
+            builtins.map builtins.toString desktopNiriConfig.buildInputs == [
+              (builtins.toString desktopPkgs.niri-baseline)
+            ];
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigBuildFlags;
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigCheckFlags;
           assert hasFlag "-march=znver4" (laptopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
           assert hasFlag "-C target-cpu=znver4" (niriRustFlags laptopPkgs.niri-host);
           assert !(laptopPkgs.niri-host.doCheck or true);
           assert !(laptopPkgs.niri-host.doInstallCheck or true);
-          assert niriUsesBaselineCompletions laptopPkgs.niri-host;
+          assert niriUsesBaselineCompletions laptopPkgs.niri-baseline laptopPkgs.niri-host;
+          assert
+            builtins.map builtins.toString laptopNiriConfig.buildInputs == [
+              (builtins.toString laptopPkgs.niri-baseline)
+            ];
+          assert desktopPkgs.niri-baseline.drvPath == laptopPkgs.niri-baseline.drvPath;
           assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigBuildFlags;
           assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigCheckFlags;
           assert configIs "y" desktopKernel.structuredExtraConfig.MZEN4;

@@ -25,6 +25,9 @@ let
     // {
       inherit (niriBasePackage) cargoBuildFeatures cargoBuildNoDefaultFeatures;
     };
+  niriValidatedConfig =
+    inputs.niri.lib.internal."validated-config-for" pkgs pkgs.niri-baseline
+      config.programs.niri.finalConfig;
 
   displayPowerMode = pkgs.writeShellApplication {
     name = "niri-display-power-mode";
@@ -625,6 +628,7 @@ in
   };
 
   xdg.configFile = {
+    "niri-config".source = lib.mkForce niriValidatedConfig;
     "uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
   };
 }
