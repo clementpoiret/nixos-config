@@ -72,6 +72,10 @@ jobs:
 
       - name: Install Nix
         uses: cachix/install-nix-action@630ae543ea3a38a9a4166f03376c02c50f408342 # v31.11.0
+        with:
+          extra_nix_config: |
+            extra-substituters = https://attic.xuyh0120.win/lantian
+            extra-trusted-public-keys = lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=
 
       - name: Configure Cachix
         uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
@@ -134,6 +138,10 @@ jobs:
 
       - name: Install Nix
         uses: cachix/install-nix-action@630ae543ea3a38a9a4166f03376c02c50f408342 # v31.11.0
+        with:
+          extra_nix_config: |
+            extra-substituters = https://attic.xuyh0120.win/lantian
+            extra-trusted-public-keys = lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=
 
       - name: Require Cachix credentials
         env:
@@ -148,18 +156,17 @@ jobs:
           extraPullNames: nix-community,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
           skipPush: true
 
-      - name: Build host configuration
-        run: |
-          nix build \
-            --no-link \
-            --no-update-lock-file \
-            --print-build-logs \
-            ".#checks.x86_64-linux.${{ matrix.host }}-toplevel"
-
-      - name: Push host runtime closure
+      - name: Build and cache selected host outputs
         shell: bash
         run: |
           set -euo pipefail
+
+          cachix watch-exec clementpoiret -- \
+            nix build \
+              --no-link \
+              --no-update-lock-file \
+              --print-build-logs \
+              ".#cache-root-${{ matrix.host }}"
 
           root="$(
             nix build \
@@ -169,8 +176,15 @@ jobs:
               ".#cache-root-${{ matrix.host }}"
           )"
 
-          cachix push clementpoiret "$root"
-          cachix pin clementpoiret "host-optimized-${{ matrix.host }}" "$root" --keep-revisions 2
+          cachix pin clementpoiret "host-optimized-${{ matrix.host }}" "$root" --keep-revisions 1
+
+      - name: Build host configuration
+        run: |
+          nix build \
+            --no-link \
+            --no-update-lock-file \
+            --print-build-logs \
+            ".#checks.x86_64-linux.${{ matrix.host }}-toplevel"
 
   commit-update:
     if: github.event_name == 'schedule'

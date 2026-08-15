@@ -11,7 +11,7 @@ let
 in
 {
   home.packages = with pkgs; [
-    flake.bibli-ls
+    # flake.bibli-ls
     zk
   ];
 

@@ -27,12 +27,18 @@ let
       old:
       if builtins.isAttrs (old.env or null) then
         {
+          # Generic builders may not support the host CPU instructions emitted
+          # for test binaries. Keep the optimized build without executing it.
+          doCheck = false;
+          doInstallCheck = false;
           env = old.env // {
             RUSTFLAGS = appendFlag (old.env.RUSTFLAGS or null) "-C target-cpu=${cpuTarget}";
           };
         }
       else
         {
+          doCheck = false;
+          doInstallCheck = false;
           RUSTFLAGS = appendFlag (old.RUSTFLAGS or null) "-C target-cpu=${cpuTarget}";
         }
     );

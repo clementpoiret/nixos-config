@@ -141,7 +141,7 @@
             ".bibli.toml"
           ];
           language-servers = [
-            "bibli-ls"
+            # "bibli-ls"
             "ltex-ls-plus"
             "marksman"
             "zk"

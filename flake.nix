@@ -49,10 +49,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    bibli-ls = {
-      url = "github:clementpoiret/bibli-ls/fix/flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # bibli-ls = {
+    #   url = "github:clementpoiret/bibli-ls/fix/flake";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     stylix = {
       url = "github:nix-community/stylix";
@@ -115,7 +115,7 @@
 
       antigravity,
       bash-env-json,
-      bibli-ls,
+      # bibli-ls,
       claude-code,
       codex-cli,
       glide-browser,
@@ -150,7 +150,7 @@
         antigravity-cli = antigravity.packages.${system}.antigravity-cli;
         antigravity-ide = antigravity.packages.${system}.antigravity-ide;
         bash-env-json = bash-env-json.packages.${system}.default;
-        bibli-ls = bibli-ls.packages.${system}.default;
+        # bibli-ls = bibli-ls.packages.${system}.default;
         claude-code =
           let
             upstream = claude-code.packages.${system}.default;
@@ -266,6 +266,10 @@
                 path = cfg.pkgs.ghostty-host;
               }
               {
+                name = "${hostName}-herdr";
+                path = cfg.pkgs.flake.herdr;
+              }
+              {
                 name = "${hostName}-niri";
                 path = cfg.pkgs.niri-host;
               }
@@ -289,7 +293,11 @@
                 name = "${hostName}-modules-tree";
                 path = cfg.config.system.modulesTree;
               }
-            ];
+            ]
+            ++ pkgs-unstable.lib.optional (hostName == "desktop") {
+              name = "desktop-nvidia-settings";
+              path = cfg.config.hardware.nvidia.package.settings;
+            };
 
           desktopCacheEntries = mkHostEntries "desktop";
           laptopCacheEntries = mkHostEntries "laptop";
@@ -396,10 +404,14 @@
           assert !(laptopPkgs.stdenv.hostPlatform ? gcc.arch);
           assert hasFlag "-march=znver5" (desktopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
           assert hasFlag "-C target-cpu=znver5" (niriRustFlags desktopPkgs.niri-host);
+          assert !(desktopPkgs.niri-host.doCheck or true);
+          assert !(desktopPkgs.niri-host.doInstallCheck or true);
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigBuildFlags;
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigCheckFlags;
           assert hasFlag "-march=znver4" (laptopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
           assert hasFlag "-C target-cpu=znver4" (niriRustFlags laptopPkgs.niri-host);
+          assert !(laptopPkgs.niri-host.doCheck or true);
+          assert !(laptopPkgs.niri-host.doInstallCheck or true);
           assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigBuildFlags;
           assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigCheckFlags;
           assert configIs "y" desktopKernel.structuredExtraConfig.MZEN4;
