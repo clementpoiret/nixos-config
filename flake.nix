@@ -425,6 +425,7 @@
             ];
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigBuildFlags;
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigCheckFlags;
+          assert !(desktopPkgs.ghostty-host.doInstallCheck or true);
           assert hasFlag "-march=znver4" (laptopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
           assert hasFlag "-C target-cpu=znver4" (niriRustFlags laptopPkgs.niri-host);
           assert !(laptopPkgs.niri-host.doCheck or true);
@@ -437,6 +438,7 @@
           assert desktopPkgs.niri-baseline.drvPath == laptopPkgs.niri-baseline.drvPath;
           assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigBuildFlags;
           assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigCheckFlags;
+          assert !(laptopPkgs.ghostty-host.doInstallCheck or true);
           assert configIs "y" desktopKernel.structuredExtraConfig.MZEN4;
           assert configIs "n" desktopKernel.structuredExtraConfig.GENERIC_CPU;
           assert configIs "n" desktopKernel.structuredExtraConfig.X86_NATIVE_CPU;
