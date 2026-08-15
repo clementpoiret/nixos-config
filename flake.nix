@@ -397,6 +397,14 @@
                 package.env.RUSTFLAGS
               else
                 package.RUSTFLAGS or "";
+            niriUsesBaselineCompletions =
+              package:
+              let
+                postInstall = package.postInstall or "";
+              in
+              pkgs-unstable.lib.hasInfix "/nix/store/" postInstall
+              && pkgs-unstable.lib.hasInfix "/bin/niri completions" postInstall
+              && !(pkgs-unstable.lib.hasInfix "$out/bin/niri completions" postInstall);
             unwrapConfig = value: if value ? content then unwrapConfig value.content else value;
             configIs = expected: value: ((unwrapConfig value).tristate or null) == expected;
           in
@@ -406,12 +414,14 @@
           assert hasFlag "-C target-cpu=znver5" (niriRustFlags desktopPkgs.niri-host);
           assert !(desktopPkgs.niri-host.doCheck or true);
           assert !(desktopPkgs.niri-host.doInstallCheck or true);
+          assert niriUsesBaselineCompletions desktopPkgs.niri-host;
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigBuildFlags;
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigCheckFlags;
           assert hasFlag "-march=znver4" (laptopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
           assert hasFlag "-C target-cpu=znver4" (niriRustFlags laptopPkgs.niri-host);
           assert !(laptopPkgs.niri-host.doCheck or true);
           assert !(laptopPkgs.niri-host.doInstallCheck or true);
+          assert niriUsesBaselineCompletions laptopPkgs.niri-host;
           assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigBuildFlags;
           assert builtins.elem "-Dcpu=znver4" laptopPkgs.ghostty-host.zigCheckFlags;
           assert configIs "y" desktopKernel.structuredExtraConfig.MZEN4;

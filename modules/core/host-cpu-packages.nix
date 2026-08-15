@@ -43,6 +43,16 @@ let
         }
     );
 
+  replaceNiriCompletionGenerator =
+    baseline: postInstall:
+    let
+      optimizedCommand = "$out/bin/niri completions";
+    in
+    if lib.hasInfix optimizedCommand postInstall then
+      lib.replaceStrings [ optimizedCommand ] [ "${baseline}/bin/niri completions" ] postInstall
+    else
+      throw "host-cpu-packages: Niri no longer generates completions with its installed binary";
+
   replaceGhosttyCpu =
     flags:
     if builtins.any (lib.hasInfix "-Dcpu=baseline") flags then
@@ -60,7 +70,12 @@ in
         quickshellHost = prev.quickshell.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = appendFlag (old.NIX_CFLAGS_COMPILE or null) "-march=${cpuTarget}";
         });
-        niriHost = rustFor prev.niri-unstable;
+        niriBaseline = prev.niri;
+        niriHost = (rustFor prev.niri-unstable).overrideAttrs (old: {
+          # GitHub's generic builders cannot execute host-optimized binaries.
+          # Use the baseline package only to generate architecture-independent completions.
+          postInstall = replaceNiriCompletionGenerator niriBaseline (old.postInstall or "");
+        });
         ghosttyHost = prev.ghostty.overrideAttrs (old: {
           zigBuildFlags = replaceGhosttyCpu old.zigBuildFlags;
           zigCheckFlags = replaceGhosttyCpu old.zigCheckFlags;
