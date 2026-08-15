@@ -80,6 +80,15 @@ jobs:
           extraPullNames: nix-community,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
           skipPush: true
 
+      - name: Realize flake evaluation dependencies
+        run: |
+          # Stylix and fw-fanctrl read generated files while evaluating the flake.
+          nix build \
+            --no-link \
+            --no-update-lock-file \
+            .#nixosConfigurations.desktop.pkgs.base16-schemes \
+            .#nixosConfigurations.laptop.pkgs.fw-fanctrl
+
       - name: Evaluate all flake checks
         run: nix flake check --no-build --no-update-lock-file
 
