@@ -1,7 +1,7 @@
 { ... }:
 {
   programs.kitty = {
-    enable = true;
+    enable = false;
 
     settings = {
       adjust_line_height = 0;
