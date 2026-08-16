@@ -35,7 +35,7 @@
       fsType = "btrfs";
       options = [
         "subvol=@"
-        "compress=zstd:6"
+        "compress=zstd:3"
         "noatime"
         "ssd"
         "discard=async"
@@ -54,7 +54,7 @@
       device = "/dev/disk/by-uuid/7556b3b1-f898-483b-a8b6-58fefe883c33";
       fsType = "btrfs";
       options = [
-        "compress=zstd:6"
+        "compress=zstd:3"
         "noatime"
         "ssd"
         "discard=async"
