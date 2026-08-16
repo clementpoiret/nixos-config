@@ -32,6 +32,8 @@ with Home Manager integrated into each NixOS build.
 - `docs/HARDENING.md`: active security posture, strict-control trials, and
   runtime verification.
 - `docs/USBGUARD.md`: staged laptop USBGuard tutorial and recovery procedure.
+- `docs/MEASURED-BOOT.md`: laptop Secure Boot, measured boot, TPM enrollment,
+  and hardware-replacement recovery.
 
 ## Hosts
 
@@ -541,6 +543,8 @@ The shell aliases `nix-test`, `nix-switch`, `nix-update`, and
 - `docs/APPARMOR.md`: AppArmor modes, profile testing, policy changes, and
   rollout.
 - `docs/USBGUARD.md`: disabled-by-default laptop USBGuard rollout.
+- `docs/MEASURED-BOOT.md`: laptop measured-boot deployment, TPM enrollment,
+  and recovery lifecycle.
 
 ## Secrets
 

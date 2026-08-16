@@ -38,6 +38,12 @@ does not support hibernation. The laptop keeps encrypted hibernation, disables
 kexec through sysctl, and must not enable Linux Lockdown while hibernation is a
 requirement.
 
+The laptop's migration from Secure Boot alone to managed PCR 0/4/7 measured
+boot with TPM-plus-PIN LUKS unlock is documented in
+[MEASURED-BOOT.md](MEASURED-BOOT.md). That runbook owns enrollment order,
+recovery-key requirements, firmware-update handling, and motherboard/TPM
+replacement; do not improvise keyslot removal outside it.
+
 ## Known audit gaps
 
 These findings are documented but intentionally not changed by this refactor:

@@ -66,7 +66,34 @@
   };
 
   boot = {
-    lanzaboote.autoEnrollKeys.includeFirmwareBuiltinKeys = true;
+    initrd = {
+      systemd = {
+        enable = true;
+        tpm2.enable = true;
+      };
+
+      luks.devices = {
+        "luks-4b1c13e3-af35-4286-b534-674ca54de75a".crypttabExtraOpts = [
+          "tpm2-device=auto"
+        ];
+        "luks-5ee5fadf-22f0-4a53-a33d-63e22931255f".crypttabExtraOpts = [
+          "tpm2-device=auto"
+        ];
+      };
+    };
+
+    lanzaboote = {
+      autoEnrollKeys.includeFirmwareBuiltinKeys = true;
+      configurationLimit = 4;
+      measuredBoot = {
+        enable = true;
+        pcrs = [
+          0
+          4
+          7
+        ];
+      };
+    };
 
     blacklistedKernelModules = [ "k10temp" ];
     kernelModules = [

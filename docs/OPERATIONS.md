@@ -82,4 +82,6 @@ from configured binary caches; only newly built paths are uploaded to Cachix.
 
 Follow [HARDENING.md](HARDENING.md) for boot-first deployment, the recovery
 specialisation, runtime checks, and optional strict controls. USBGuard has a
-separate cold-boot rollout in [USBGUARD.md](USBGUARD.md).
+separate cold-boot rollout in [USBGUARD.md](USBGUARD.md). Laptop Secure Boot,
+measured boot, TPM enrollment, firmware updates, and motherboard replacement
+are covered by [MEASURED-BOOT.md](MEASURED-BOOT.md).
