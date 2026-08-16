@@ -396,7 +396,7 @@
             flagsText =
               flags: if builtins.isList flags then pkgs-unstable.lib.concatStringsSep " " flags else flags;
             hasFlag = flag: flags: pkgs-unstable.lib.hasInfix flag (flagsText flags);
-            niriRustFlags =
+            rustFlags =
               package:
               if builtins.isAttrs (package.env or null) && package.env ? RUSTFLAGS then
                 package.env.RUSTFLAGS
@@ -416,7 +416,10 @@
           assert !(desktopPkgs.stdenv.hostPlatform ? gcc.arch);
           assert !(laptopPkgs.stdenv.hostPlatform ? gcc.arch);
           assert hasFlag "-march=znver5" (desktopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
-          assert hasFlag "-C target-cpu=znver5" (niriRustFlags desktopPkgs.niri-host);
+          assert hasFlag "-C target-cpu=znver5" (rustFlags desktopPkgs.flake.herdr);
+          assert !(desktopPkgs.flake.herdr.doCheck or true);
+          assert !(desktopPkgs.flake.herdr.doInstallCheck or true);
+          assert hasFlag "-C target-cpu=znver5" (rustFlags desktopPkgs.niri-host);
           assert !(desktopPkgs.niri-host.doCheck or true);
           assert !(desktopPkgs.niri-host.doInstallCheck or true);
           assert niriUsesBaselineCompletions desktopPkgs.niri-baseline desktopPkgs.niri-host;
@@ -428,7 +431,11 @@
           assert builtins.elem "-Dcpu=znver5" desktopPkgs.ghostty-host.zigCheckFlags;
           assert !(desktopPkgs.ghostty-host.doInstallCheck or true);
           assert hasFlag "-march=znver4" (laptopPkgs.quickshell-host.NIX_CFLAGS_COMPILE or "");
-          assert hasFlag "-C target-cpu=znver4" (niriRustFlags laptopPkgs.niri-host);
+          assert hasFlag "-C target-cpu=znver4" (rustFlags laptopPkgs.flake.herdr);
+          assert !(laptopPkgs.flake.herdr.doCheck or true);
+          assert !(laptopPkgs.flake.herdr.doInstallCheck or true);
+          assert desktopPkgs.flake.herdr.drvPath != laptopPkgs.flake.herdr.drvPath;
+          assert hasFlag "-C target-cpu=znver4" (rustFlags laptopPkgs.niri-host);
           assert !(laptopPkgs.niri-host.doCheck or true);
           assert !(laptopPkgs.niri-host.doInstallCheck or true);
           assert niriUsesBaselineCompletions laptopPkgs.niri-baseline laptopPkgs.niri-host;

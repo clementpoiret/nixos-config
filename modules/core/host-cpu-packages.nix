@@ -70,6 +70,7 @@ in
         quickshellHost = prev.quickshell.overrideAttrs (old: {
           NIX_CFLAGS_COMPILE = appendFlag (old.NIX_CFLAGS_COMPILE or null) "-march=${cpuTarget}";
         });
+        herdrHost = rustFor prev.flake.herdr;
         niriBaseline = prev.niri;
         niriHost = (rustFor prev.niri-unstable).overrideAttrs (old: {
           # GitHub's generic builders cannot execute host-optimized binaries.
@@ -85,6 +86,10 @@ in
         });
       in
       {
+        flake = prev.flake // {
+          herdr = herdrHost;
+        };
+
         quickshell-host = quickshellHost;
         quickshell = quickshellHost;
 
