@@ -14,7 +14,8 @@
     };
 
     # v1.1.0 predates autoEnrollKeys.includeFirmwareBuiltinKeys, which the
-    # Framework laptop needs to retain its OEM certificates.
+    # Framework laptop needs to retain its OEM certificates. TODO: Pin the
+    # first stable release after v1.1.0 once it includes this option.
     lanzaboote = {
       url = "github:nix-community/lanzaboote/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -95,7 +96,7 @@
     };
 
     herdr = {
-      url = "github:ogulcancelik/herdr/v0.7.1";
+      url = "github:herdrdev/herdr/v0.8.0";
     };
 
     orion-browser = {

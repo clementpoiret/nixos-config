@@ -69,8 +69,9 @@ Prefer one input or one related input group per update when debugging breakage.
 ## Continuous Integration and Cachix
 
 The GitHub Actions workflow builds every flake check on pushes to `main`. Every
-Sunday it updates all flake inputs, builds the updated checks, and pushes the
-verified `flake.lock` directly to `main`.
+Sunday it updates Herdr and Superfile to their latest stable release tags,
+updates all flake inputs, builds the updated checks, and pushes the verified
+`flake.nix` and `flake.lock` directly to `main`.
 
 Configure a repository Actions secret named `CACHIX_AUTH_TOKEN` with a
 cache-scoped write token for the `clementpoiret` Cachix cache. The workflow
