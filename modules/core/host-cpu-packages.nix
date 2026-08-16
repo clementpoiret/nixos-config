@@ -71,8 +71,8 @@ in
           NIX_CFLAGS_COMPILE = appendFlag (old.NIX_CFLAGS_COMPILE or null) "-march=${cpuTarget}";
         });
         herdrHost = rustFor prev.flake.herdr;
-        niriBaseline = prev.niri;
-        niriHost = (rustFor prev.niri-unstable).overrideAttrs (old: {
+        niriBaseline = prev.flake.niri-unstable;
+        niriHost = (rustFor niriBaseline).overrideAttrs (old: {
           # GitHub's generic builders cannot execute host-optimized binaries.
           # Use the baseline package only to generate architecture-independent completions.
           postInstall = replaceNiriCompletionGenerator niriBaseline (old.postInstall or "");

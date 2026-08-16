@@ -127,7 +127,7 @@ jobs:
         uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
         with:
           name: clementpoiret
-          extraPullNames: nix-community,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
+          extraPullNames: nix-community,niri,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
           skipPush: true
 
       - name: Realize flake evaluation dependencies
@@ -199,7 +199,7 @@ jobs:
         with:
           name: clementpoiret
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          extraPullNames: nix-community,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
+          extraPullNames: nix-community,niri,nixpkgs-python,nix-gaming,cuda-maintainers,devenv,pi
           skipPush: true
 
       - name: Build and cache selected host outputs
