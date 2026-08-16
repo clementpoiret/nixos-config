@@ -2,6 +2,7 @@
   lib,
   fetchurl,
   appimageTools,
+  makeWrapper,
 }:
 
 let
@@ -20,6 +21,8 @@ in
 appimageTools.wrapType2 {
   inherit pname version src;
 
+  nativeBuildInputs = [ makeWrapper ];
+
   extraInstallCommands = ''
     install -m 444 -D ${appimageContents}/*.desktop $out/share/applications/${pname}.desktop
 
@@ -30,6 +33,12 @@ appimageTools.wrapType2 {
       
     # Copy the icons out of the AppImage into the Nix store
     cp -r ${appimageContents}/usr/share/icons $out/share
+
+    # Keep Logseq's self-installed CLI launcher inside the AppImage FHS environment.
+    wrapProgram $out/bin/${pname} --set APPIMAGE $out/bin/${pname}
+    makeWrapper $out/bin/${pname} $out/bin/logseq \
+      --set ELECTRON_RUN_AS_NODE 1 \
+      --add-flags ${appimageContents}/resources/app.asar/js/logseq-cli.js
   '';
 
   meta = with lib; {
