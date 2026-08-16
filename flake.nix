@@ -512,6 +512,31 @@
             touch "$out"
           '';
 
+        apparmor-report =
+          let
+            reportPackage =
+              pkgs-unstable.lib.findFirst (package: pkgs-unstable.lib.getName package == "apparmor-report")
+                (throw "apparmor-report is missing from environment.systemPackages")
+                self.nixosConfigurations.laptop.config.environment.systemPackages;
+          in
+          pkgs-unstable.runCommand "apparmor-report"
+            {
+              nativeBuildInputs = [
+                pkgs-unstable.python3
+                reportPackage
+              ];
+            }
+            ''
+              APPARMOR_REPORT_SOURCE=${./modules/core/apparmor_report.py} \
+                python ${./tests/test_apparmor_report.py}
+
+              printf '%s\n' \
+                'apparmor="ALLOWED" operation="open" class="file" profile="local-test" name="/tmp/test" requested_mask="r" denied_mask="r"' \
+                | apparmor-report --input - --json > report.json
+              grep -F '"profile": "local-test"' report.json
+              touch "$out"
+            '';
+
         apparmor-policy-parser =
           let
             configurations = [

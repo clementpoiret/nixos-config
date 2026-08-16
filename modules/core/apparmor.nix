@@ -44,6 +44,18 @@ let
     package: lib.hasPrefix "codex-desktop-" (lib.getName package)
   ) homePackages;
 
+  apparmorReport = pkgs.writeShellApplication {
+    name = "apparmor-report";
+    runtimeInputs = [
+      pkgs.apparmor-bin-utils
+      pkgs.python3
+      pkgs.systemd
+    ];
+    text = ''
+      exec python3 ${./apparmor_report.py} "$@"
+    '';
+  };
+
   appProfiles = [
     {
       name = "file-roller";
@@ -467,6 +479,8 @@ in
         local-apply-secret-dns = dnsPolicy;
       };
     };
+
+    environment.systemPackages = [ apparmorReport ];
 
     systemd.services.syncthing = {
       after = lib.optional (stateFor "local-syncthing" != "disable") "apparmor.service";

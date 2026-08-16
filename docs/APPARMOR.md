@@ -181,15 +181,38 @@ Exercise the application's real workflow, including:
 Review both enforced denials and complain-mode observations:
 
 ```bash
-run0 -- journalctl -k -b --grep 'apparmor="(DENIED|ALLOWED)"'
+run0 -- apparmor-report
 run0 -- journalctl -b -u apparmor.service
 systemctl --failed
 ```
 
-Filter by `profile="local-..."` when the log is busy. A complain-mode log is
-evidence to review, not automatically a reason to add an allow rule: deny
-optional telemetry, probing, or unrelated filesystem discovery when the
-application works without it.
+`apparmor-report` reads the current boot by default, restricts records to the
+locally managed profiles, groups repeated events that need the same policy
+rule, and reports profile-loading errors. Run it through `run0` so it can also
+show the current loaded modes. `DENIED` entries were blocked by an enforced
+profile or an explicit deny; `ALLOWED` entries are complain-mode observations
+that would be blocked after promotion. Both can occur in one boot when a
+profile was reloaded in a different mode.
+
+Focus a workload or save structured output for comparison:
+
+```bash
+run0 -- apparmor-report --profile local-brave --since '30 minutes ago'
+run0 -- apparmor-report --boot -1
+run0 -- apparmor-report --json > apparmor-report.json
+```
+
+A `null_profile=yes` finding identifies an unresolved executable transition;
+fix those before ordinary file-access noise because the execution will fail in
+enforce mode. The report deliberately does not modify policy or suggest that
+every observation should be allowed. Deny optional telemetry, probing, or
+unrelated filesystem discovery when the application works without it.
+
+Do not run `aa-logprof` directly against `/etc/apparmor.d`: the active profiles
+are generated from immutable Nix store paths, while the declarative source of
+truth is `modules/core/apparmor.nix`. Use its suggestions only as research if
+you explicitly point it at a disposable copy, then make and test the narrow
+rule in Nix.
 
 Once runtime testing succeeds, activate the persistent generation with the
 normal deployment workflow:
