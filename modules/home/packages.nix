@@ -136,9 +136,9 @@
       # firefox-devedition # Firefox Developer Edition
       # glide.glide-browser # Keyboard-focused browser
       flake.glide-browser # Keyboard-focused browser
-      flake.helium
+      # flake.helium
       mullvad-browser
-      flake.orion-browser
+      # flake.orion-browser
       vivaldi # Feature-rich web browser
       vivaldi-ffmpeg-codecs # Vivaldi media codecs
 

@@ -100,15 +100,15 @@
       url = "github:herdrdev/herdr/v0.8.0";
     };
 
-    orion-browser = {
-      url = "github:dokokitsune/orion-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # orion-browser = {
+    #   url = "github:dokokitsune/orion-browser-flake";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
-    helium = {
-      url = "github:schembriaiden/helium-browser-nix-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # helium = {
+    #   url = "github:schembriaiden/helium-browser-nix-flake";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
 
   outputs =
@@ -121,10 +121,10 @@
       claude-code,
       codex-cli,
       glide-browser,
-      helium,
+      # helium,
       herdr,
       home-manager,
-      orion-browser,
+      # orion-browser,
       niri,
       nix-cachyos-kernel,
       nixos-hardware,
@@ -174,10 +174,10 @@
             '';
           });
         glide-browser = glide-browser.packages.${system}.default;
-        helium = helium.packages.${system}.default;
+        # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
         niri-unstable = niri.packages.${system}.niri-unstable;
-        orion-browser = orion-browser.packages.${system}.default;
+        # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };
 

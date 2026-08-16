@@ -115,24 +115,24 @@ let
       executable = "glide";
       userns = true;
     }
-    {
-      name = "helium";
-      package = pkgs.flake.helium;
-      executable = "helium";
-      userns = true;
-    }
+    # {
+    #   name = "helium";
+    #   package = pkgs.flake.helium;
+    #   executable = "helium";
+    #   userns = true;
+    # }
     {
       name = "mullvad-browser";
       package = pkgs.mullvad-browser;
       executable = "mullvad-browser";
       userns = true;
     }
-    {
-      name = "orion";
-      package = pkgs.flake.orion-browser;
-      executable = "orion-browser";
-      userns = true;
-    }
+    # {
+    #   name = "orion";
+    #   package = pkgs.flake.orion-browser;
+    #   executable = "orion-browser";
+    #   userns = true;
+    # }
     {
       name = "vivaldi";
       package = pkgs.vivaldi;
