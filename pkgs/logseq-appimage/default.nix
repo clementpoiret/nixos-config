@@ -2,6 +2,7 @@
   lib,
   fetchurl,
   appimageTools,
+  asar,
   makeWrapper,
 }:
 
@@ -21,7 +22,10 @@ in
 appimageTools.wrapType2 {
   inherit pname version src;
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [
+    asar
+    makeWrapper
+  ];
 
   extraInstallCommands = ''
     install -m 444 -D ${appimageContents}/*.desktop $out/share/applications/${pname}.desktop
@@ -34,11 +38,26 @@ appimageTools.wrapType2 {
     # Copy the icons out of the AppImage into the Nix store
     cp -r ${appimageContents}/usr/share/icons $out/share
 
+    # The CLI resolves its bundled skill relative to its entry point, while
+    # electron-builder installs the skill next to app.asar. Extract the CLI
+    # runtime next to a copy of that skill so all skill commands can find it.
+    install -d $out/share/logseq/js
+    (
+      cd $out/share/logseq/js
+      asar extract-file ${appimageContents}/resources/app.asar js/logseq-cli.js
+      asar extract-file ${appimageContents}/resources/app.asar js/db-worker-node.js
+    )
+    install -m 444 -D \
+      ${appimageContents}/resources/.agents/skills/logseq-cli/SKILL.md \
+      $out/share/logseq/js/.agents/skills/logseq-cli/SKILL.md
+
     # Keep Logseq's self-installed CLI launcher inside the AppImage FHS environment.
-    wrapProgram $out/bin/${pname} --set APPIMAGE $out/bin/${pname}
+    wrapProgram $out/bin/${pname} \
+      --set APPIMAGE $out/bin/${pname} \
+      --run "if [ \"\$#\" -gt 0 ] && [ \"\$1\" = '${appimageContents}/resources/app.asar/js/logseq-cli.js' ]; then shift; set -- '$out/share/logseq/js/logseq-cli.js' \"\$@\"; fi"
     makeWrapper $out/bin/${pname} $out/bin/logseq \
       --set ELECTRON_RUN_AS_NODE 1 \
-      --add-flags ${appimageContents}/resources/app.asar/js/logseq-cli.js
+      --add-flags $out/share/logseq/js/logseq-cli.js
   '';
 
   meta = with lib; {
