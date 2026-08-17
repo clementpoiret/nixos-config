@@ -1,0 +1,75 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-protonmail-bridge"
+  ],
+  "summary": {
+    "events": 6,
+    "denied": 0,
+    "allowed": 6,
+    "groups": 2,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-protonmail-bridge": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-protonmail-bridge",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/d3fblr9xpsxngxjp2ivw1yjdzxa57z6j-etc-lsb-release"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        "protonmail-brid"
+      ],
+      "first": "2026-08-17T13:48:04+02:00",
+      "last": "2026-08-17T13:48:05+02:00",
+      "sample": "audit: type=1400 audit(1786967284.441:195577): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-protonmail-bridge\" name=\"/nix/store/d3fblr9xpsxngxjp2ivw1yjdzxa57z6j-etc-lsb-release\" pid=12585 comm=\"protonmail-brid\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-protonmail-bridge",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/ipjgnwb15kqn0wmnfszgcim7q2qv37s7-etc-os-release"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        "protonmail-brid"
+      ],
+      "first": "2026-08-17T13:48:04+02:00",
+      "last": "2026-08-17T13:48:05+02:00",
+      "sample": "audit: type=1400 audit(1786967284.441:195578): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-protonmail-bridge\" name=\"/nix/store/ipjgnwb15kqn0wmnfszgcim7q2qv37s7-etc-os-release\" pid=12585 comm=\"protonmail-brid\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}

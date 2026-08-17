@@ -1,0 +1,51 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-proton-pass-cli"
+  ],
+  "summary": {
+    "events": 2,
+    "denied": 0,
+    "allowed": 2,
+    "groups": 1,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-proton-pass-cli": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-proton-pass-cli",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/ipjgnwb15kqn0wmnfszgcim7q2qv37s7-etc-os-release"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 2,
+      "commands": [
+        ".pass-cli-wrapp"
+      ],
+      "first": "2026-08-17T13:49:00+02:00",
+      "last": "2026-08-17T13:49:18+02:00",
+      "sample": "audit: type=1400 audit(1786967340.924:195584): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-proton-pass-cli\" name=\"/nix/store/ipjgnwb15kqn0wmnfszgcim7q2qv37s7-etc-os-release\" pid=12945 comm=\".pass-cli-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}

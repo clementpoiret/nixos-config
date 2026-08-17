@@ -1,0 +1,702 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-logseq"
+  ],
+  "summary": {
+    "events": 50,
+    "denied": 0,
+    "allowed": 50,
+    "groups": 28,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-logseq": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.pki/nssdb/cert9.db"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 10,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:43:30+02:00",
+      "last": "2026-08-17T13:43:30+02:00",
+      "sample": "audit: type=1400 audit(1786967010.199:44011): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/home/clementpoiret/.pki/nssdb/cert9.db\" pid=8011 comm=\"ThreadPoolForeg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/logseq/graphs/Main/client-ops-/db.sqlite"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 10,
+      "commands": [
+        "logseq"
+      ],
+      "first": "2026-08-17T13:43:36+02:00",
+      "last": "2026-08-17T13:43:36+02:00",
+      "sample": "audit: type=1400 audit(1786967016.459:44077): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/home/clementpoiret/logseq/graphs/Main/client-ops-/db.sqlite\" pid=8202 comm=\"logseq\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Logseq/Cache/Cache_Data/d761370ecbebd387_0"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 3,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:43:25+02:00",
+      "last": "2026-08-17T13:43:25+02:00",
+      "sample": "audit: type=1400 audit(1786967005.192:43839): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/home/clementpoiret/.config/Logseq/Cache/Cache_Data/d761370ecbebd387_0\" pid=8094 comm=\"ThreadPoolForeg\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/libc.so.6"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        ".logseq-appimag"
+      ],
+      "first": "2026-08-17T13:43:14+02:00",
+      "last": "2026-08-17T13:43:14+02:00",
+      "sample": "audit: type=1400 audit(1786966994.953:26449): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/libc.so.6\" pid=8001 comm=\".logseq-appimag\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/libdl.so.2"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        ".logseq-appimag"
+      ],
+      "first": "2026-08-17T13:43:14+02:00",
+      "last": "2026-08-17T13:43:14+02:00",
+      "sample": "audit: type=1400 audit(1786966994.953:26446): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/libdl.so.2\" pid=8001 comm=\".logseq-appimag\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.7JeFAV"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:25+02:00",
+      "last": "2026-08-17T13:43:25+02:00",
+      "sample": "audit: type=1400 audit(1786967005.192:43842): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.7JeFAV\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.7JeFAV"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:25+02:00",
+      "last": "2026-08-17T13:43:25+02:00",
+      "sample": "audit: type=1400 audit(1786967005.192:43843): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.7JeFAV\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.NOsF2v"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "CompositorTileW"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.376:43635): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.NOsF2v\" pid=8011 comm=\"CompositorTileW\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.NOsF2v"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "CompositorTileW"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.376:43636): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.NOsF2v\" pid=8011 comm=\"CompositorTileW\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.NOsF2v"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "CompositorTileW"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.376:43637): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.NOsF2v\" pid=8011 comm=\"CompositorTileW\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.NOsF2v"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "CompositorTileW"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.376:43638): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.NOsF2v\" pid=8011 comm=\"CompositorTileW\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.TUP16X"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.046:43630): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.TUP16X\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.TUP16X"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.046:43631): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.TUP16X\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.TUP16X"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.046:43632): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.TUP16X\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.TUP16X"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.046:43633): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.TUP16X\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.TUP16X"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.046:43634): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.TUP16X\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.oY7CUJ"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:25+02:00",
+      "last": "2026-08-17T13:43:25+02:00",
+      "sample": "audit: type=1400 audit(1786967005.189:43834): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.oY7CUJ\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.oY7CUJ"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:25+02:00",
+      "last": "2026-08-17T13:43:25+02:00",
+      "sample": "audit: type=1400 audit(1786967005.189:43835): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.oY7CUJ\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.oY7CUJ"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:25+02:00",
+      "last": "2026-08-17T13:43:25+02:00",
+      "sample": "audit: type=1400 audit(1786967005.189:43836): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.oY7CUJ\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.oY7CUJ"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:25+02:00",
+      "last": "2026-08-17T13:43:25+02:00",
+      "sample": "audit: type=1400 audit(1786967005.189:43837): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.oY7CUJ\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.oY7CUJ"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:43:25+02:00",
+      "last": "2026-08-17T13:43:25+02:00",
+      "sample": "audit: type=1400 audit(1786967005.192:43838): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/dev/shm/.org.chromium.Chromium.oY7CUJ\" pid=8094 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "logseq-appimage"
+      ],
+      "first": "2026-08-17T13:43:14+02:00",
+      "last": "2026-08-17T13:43:14+02:00",
+      "sample": "audit: type=1400 audit(1786966994.943:26442): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-logseq\" name=\"/dev/tty\" pid=8001 comm=\"logseq-appimage\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/logseq/graphs/Main/search/db.sqlite"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "logseq"
+      ],
+      "first": "2026-08-17T13:43:20+02:00",
+      "last": "2026-08-17T13:43:20+02:00",
+      "sample": "audit: type=1400 audit(1786967000.046:43629): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap//null-/nix/store/lqndphylsxqwbwm804n473pb4sqb98sh-bubblewrap-0.11.2/bin/bwrap\" name=\"/home/clementpoiret/logseq/graphs/Main/search/db.sqlite\" pid=8202 comm=\"logseq\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".logseq-appimag"
+      ],
+      "first": "2026-08-17T13:43:14+02:00",
+      "last": "2026-08-17T13:43:14+02:00",
+      "sample": "audit: type=1400 audit(1786966994.953:26445): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2\" pid=8001 comm=\".logseq-appimag\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "rm",
+      "denied": "rm",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/libc.so.6"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".logseq-appimag"
+      ],
+      "first": "2026-08-17T13:43:14+02:00",
+      "last": "2026-08-17T13:43:14+02:00",
+      "sample": "audit: type=1400 audit(1786966994.953:26451): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/libc.so.6\" pid=8001 comm=\".logseq-appimag\" requested_mask=\"rm\" denied_mask=\"rm\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "rm",
+      "denied": "rm",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/libdl.so.2"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".logseq-appimag"
+      ],
+      "first": "2026-08-17T13:43:14+02:00",
+      "last": "2026-08-17T13:43:14+02:00",
+      "sample": "audit: type=1400 audit(1786966994.953:26448): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/libdl.so.2\" pid=8001 comm=\".logseq-appimag\" requested_mask=\"rm\" denied_mask=\"rm\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/byi2zpy2bgcf3dr6y0l8m50rmjj8z7q1-bash-5.3p15/bin/bash"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".logseq-appimag"
+      ],
+      "first": "2026-08-17T13:43:14+02:00",
+      "last": "2026-08-17T13:43:14+02:00",
+      "sample": "audit: type=1400 audit(1786966994.953:26444): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap\" name=\"/nix/store/byi2zpy2bgcf3dr6y0l8m50rmjj8z7q1-bash-5.3p15/bin/bash\" pid=8001 comm=\".logseq-appimag\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-logseq",
+      "class": "file",
+      "operations": [
+        "exec"
+      ],
+      "requested": "x",
+      "denied": "x",
+      "targets": {
+        "name": "/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap"
+      },
+      "details": {
+        "owner_match": "no",
+        "target": "local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "logseq-appimage"
+      ],
+      "first": "2026-08-17T13:43:14+02:00",
+      "last": "2026-08-17T13:43:14+02:00",
+      "sample": "audit: type=1400 audit(1786966994.943:26443): apparmor=\"ALLOWED\" operation=\"exec\" class=\"file\" profile=\"local-logseq\" name=\"/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap\" pid=8001 comm=\"logseq-appimage\" requested_mask=\"x\" denied_mask=\"x\" fsuid=1000 ouid=0 target=\"local-logseq//null-/nix/store/j5c80avshfihl3gi12v584d3h5grpn75-logseq-appimage-2.0.1-bwrap\""
+    }
+  ]
+}

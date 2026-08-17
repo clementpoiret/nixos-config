@@ -1,0 +1,436 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-mullvad-browser"
+  ],
+  "summary": {
+    "events": 20,
+    "denied": 0,
+    "allowed": 20,
+    "groups": 17,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-mullvad-browser": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.mullvad/mullvadbrowser/pfkxs1lm.default-release-5/storage/default/moz-extension+++12a448d7-2389-4464-b248-e9bb9205c75e^userContextId=4294967295/idb/3647222921wleabcEoxlt-eengsairo.sqlite"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 3,
+      "commands": [
+        "IndexedDB IO #4"
+      ],
+      "first": "2026-08-17T13:46:36+02:00",
+      "last": "2026-08-17T13:46:36+02:00",
+      "sample": "audit: type=1400 audit(1786967196.588:172856): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/home/clementpoiret/.mullvad/mullvadbrowser/pfkxs1lm.default-release-5/storage/default/moz-extension+++12a448d7-2389-4464-b248-e9bb9205c75e^userContextId=4294967295/idb/3647222921wleabcEoxlt-eengsairo.sqlite\" pid=11299 comm=496E6465786564444220494F202334 requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/home/clementpoiret/.mullvad/mullvadbrowser/pfkxs1lm.default-release-5/storage/default/moz-extension+++12a448d7-2389-4464-b248-e9bb9205c75e^userContextId=4294967295/idb/3647222921wleabcEoxlt-eengsairo.sqlite"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "IndexedDB IO #4"
+      ],
+      "first": "2026-08-17T13:46:36+02:00",
+      "last": "2026-08-17T13:46:36+02:00",
+      "sample": "audit: type=1400 audit(1786967196.591:172858): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/home/clementpoiret/.mullvad/mullvadbrowser/pfkxs1lm.default-release-5/storage/default/moz-extension+++12a448d7-2389-4464-b248-e9bb9205c75e^userContextId=4294967295/idb/3647222921wleabcEoxlt-eengsairo.sqlite\" pid=11299 comm=496E6465786564444220494F202334 requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "BgIOThr~Pool #1"
+      ],
+      "first": "2026-08-17T13:46:35+02:00",
+      "last": "2026-08-17T13:46:35+02:00",
+      "sample": "audit: type=1400 audit(1786967195.891:172853): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/\" pid=11299 comm=4267494F5468727E506F6F6C202331 requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "rename_dest"
+      ],
+      "requested": "wc",
+      "denied": "wc",
+      "targets": {
+        "name": "/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/webext.sc.lz4"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "BgIOThr~Pool #1"
+      ],
+      "first": "2026-08-17T13:46:35+02:00",
+      "last": "2026-08-17T13:46:35+02:00",
+      "sample": "audit: type=1400 audit(1786967195.891:172855): apparmor=\"ALLOWED\" operation=\"rename_dest\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/webext.sc.lz4\" pid=11299 comm=4267494F5468727E506F6F6C202331 requested_mask=\"wc\" denied_mask=\"wc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/webext.sc.lz4.tmp"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "BgIOThr~Pool #1"
+      ],
+      "first": "2026-08-17T13:46:35+02:00",
+      "last": "2026-08-17T13:46:35+02:00",
+      "sample": "audit: type=1400 audit(1786967195.891:172851): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/webext.sc.lz4.tmp\" pid=11299 comm=4267494F5468727E506F6F6C202331 requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wc",
+      "denied": "wc",
+      "targets": {
+        "name": "/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/webext.sc.lz4.tmp"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "BgIOThr~Pool #1"
+      ],
+      "first": "2026-08-17T13:46:35+02:00",
+      "last": "2026-08-17T13:46:35+02:00",
+      "sample": "audit: type=1400 audit(1786967195.891:172852): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/webext.sc.lz4.tmp\" pid=11299 comm=4267494F5468727E506F6F6C202331 requested_mask=\"wc\" denied_mask=\"wc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "rename_src"
+      ],
+      "requested": "wrd",
+      "denied": "wrd",
+      "targets": {
+        "name": "/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/webext.sc.lz4.tmp"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "BgIOThr~Pool #1"
+      ],
+      "first": "2026-08-17T13:46:35+02:00",
+      "last": "2026-08-17T13:46:35+02:00",
+      "sample": "audit: type=1400 audit(1786967195.891:172854): apparmor=\"ALLOWED\" operation=\"rename_src\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/home/clementpoiret/.cache/mullvad/mullvadbrowser/pfkxs1lm.default-release-5/startupCache/webext.sc.lz4.tmp\" pid=11299 comm=4267494F5468727E506F6F6C202331 requested_mask=\"wrd\" denied_mask=\"wrd\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157335): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/5gazxn5x85bkqjxcnwzkzn0yps81fqal-freetype-2.14.3/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157342): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/5gazxn5x85bkqjxcnwzkzn0yps81fqal-freetype-2.14.3/lib/\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/846r2knifw60684yjrmlri56vsl4cnq7-cairo-1.18.4/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157338): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/846r2knifw60684yjrmlri56vsl4cnq7-cairo-1.18.4/lib/\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/akwszv4qid3cg2xqsiy6m7qdndvh552i-fontconfig-2.18.2-lib/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157341): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/akwszv4qid3cg2xqsiy6m7qdndvh552i-fontconfig-2.18.2-lib/lib/\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/cjraidmmw39g7xsxsj51sszbx8wplig5-at-spi2-core-2.60.6/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157337): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/cjraidmmw39g7xsxsj51sszbx8wplig5-at-spi2-core-2.60.6/lib/\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/nywiagmgnhwjf2jj48sb55mc0pp5bdq2-dbus-glib-0.114/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157340): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/nywiagmgnhwjf2jj48sb55mc0pp5bdq2-dbus-glib-0.114/lib/\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/pdr1dyni8b3y5cakzmjkrwyn8ygizj0z-dbus-1.16.2-lib/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157339): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/pdr1dyni8b3y5cakzmjkrwyn8ygizj0z-dbus-1.16.2-lib/lib/\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "exec"
+      ],
+      "requested": "x",
+      "denied": "x",
+      "targets": {
+        "name": "/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser"
+      },
+      "details": {
+        "owner_match": "no",
+        "target": "local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".mullvad-browse"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157333): apparmor=\"ALLOWED\" operation=\"exec\" class=\"file\" profile=\"local-mullvad-browser\" name=\"/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" pid=11299 comm=\".mullvad-browse\" requested_mask=\"x\" denied_mask=\"x\" fsuid=1000 ouid=0 target=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157334): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-mullvad-browser",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/y4iw2bnyk2l5xgx5ayhj8sp01928sh3x-alsa-lib-1.2.16.1/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "mullvadbrowser"
+      ],
+      "first": "2026-08-17T13:46:30+02:00",
+      "last": "2026-08-17T13:46:30+02:00",
+      "sample": "audit: type=1400 audit(1786967190.368:157336): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-mullvad-browser//null-/nix/store/vgk3cbd1vbz6f86472k9p7h2wsfcmccj-mullvad-browser-15.0.19/share/mullvad-browser/mullvadbrowser\" name=\"/nix/store/y4iw2bnyk2l5xgx5ayhj8sp01928sh3x-alsa-lib-1.2.16.1/lib/\" pid=11299 comm=\"mullvadbrowser\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}

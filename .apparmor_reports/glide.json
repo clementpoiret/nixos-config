@@ -1,0 +1,536 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-glide"
+  ],
+  "summary": {
+    "events": 29,
+    "denied": 0,
+    "allowed": 29,
+    "groups": 21,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-glide": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/autofill-profiles.json"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 3,
+      "commands": [
+        ".glide-wrapped",
+        "BgIOThr~Pool #1"
+      ],
+      "first": "2026-08-17T13:45:54+02:00",
+      "last": "2026-08-17T13:45:54+02:00",
+      "sample": "audit: type=1400 audit(1786967154.602:147098): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/autofill-profiles.json\" pid=10367 comm=4267494F5468727E506F6F6C202331 requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 3,
+      "commands": [
+        "Permission"
+      ],
+      "first": "2026-08-17T13:45:59+02:00",
+      "last": "2026-08-17T13:45:59+02:00",
+      "sample": "audit: type=1400 audit(1786967159.608:154720): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite\" pid=10367 comm=\"Permission\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite-journal"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "Permission"
+      ],
+      "first": "2026-08-17T13:45:59+02:00",
+      "last": "2026-08-17T13:45:59+02:00",
+      "sample": "audit: type=1400 audit(1786967159.608:154719): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite-journal\" pid=10367 comm=\"Permission\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/signedInUser.json"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "BgIOThr~Pool #1"
+      ],
+      "first": "2026-08-17T13:45:54+02:00",
+      "last": "2026-08-17T13:45:54+02:00",
+      "sample": "audit: type=1400 audit(1786967154.605:147105): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/signedInUser.json\" pid=10367 comm=4267494F5468727E506F6F6C202331 requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/q57ym6x72ry5486v9m7lc5iqh6wm6hrg-brave-1.93.129/bin/brave"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:54+02:00",
+      "last": "2026-08-17T13:45:54+02:00",
+      "sample": "audit: type=1400 audit(1786967154.602:147103): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/q57ym6x72ry5486v9m7lc5iqh6wm6hrg-brave-1.93.129/bin/brave\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/q57ym6x72ry5486v9m7lc5iqh6wm6hrg-brave-1.93.129/share/applications/brave-browser.desktop"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:54+02:00",
+      "last": "2026-08-17T13:45:54+02:00",
+      "sample": "audit: type=1400 audit(1786967154.602:147101): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/q57ym6x72ry5486v9m7lc5iqh6wm6hrg-brave-1.93.129/share/applications/brave-browser.desktop\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "glide"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.845:127917): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-glide\" name=\"/dev/tty\" pid=10367 comm=\"glide\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:54+02:00",
+      "last": "2026-08-17T13:45:54+02:00",
+      "sample": "audit: type=1400 audit(1786967154.608:147107): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Permission"
+      ],
+      "first": "2026-08-17T13:45:59+02:00",
+      "last": "2026-08-17T13:45:59+02:00",
+      "sample": "audit: type=1400 audit(1786967159.608:154726): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/\" pid=10367 comm=\"Permission\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/cert9.db"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Socket Thread"
+      ],
+      "first": "2026-08-17T13:45:59+02:00",
+      "last": "2026-08-17T13:45:59+02:00",
+      "sample": "audit: type=1400 audit(1786967159.621:154728): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/cert9.db\" pid=10367 comm=536F636B657420546872656164 requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite-journal"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Permission"
+      ],
+      "first": "2026-08-17T13:45:59+02:00",
+      "last": "2026-08-17T13:45:59+02:00",
+      "sample": "audit: type=1400 audit(1786967159.608:154723): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite-journal\" pid=10367 comm=\"Permission\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite-journal"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Permission"
+      ],
+      "first": "2026-08-17T13:45:59+02:00",
+      "last": "2026-08-17T13:45:59+02:00",
+      "sample": "audit: type=1400 audit(1786967159.608:154724): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite-journal\" pid=10367 comm=\"Permission\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite-journal"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Permission"
+      ],
+      "first": "2026-08-17T13:45:59+02:00",
+      "last": "2026-08-17T13:45:59+02:00",
+      "sample": "audit: type=1400 audit(1786967159.608:154725): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/home/clementpoiret/.config/glide/glide/fbv5pnmm.default/permissions.sqlite-journal\" pid=10367 comm=\"Permission\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.848:127920): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "exec"
+      ],
+      "requested": "x",
+      "denied": "x",
+      "targets": {
+        "name": "/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide"
+      },
+      "details": {
+        "owner_match": "no",
+        "target": "local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "glide"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.848:127918): apparmor=\"ALLOWED\" operation=\"exec\" class=\"file\" profile=\"local-glide\" name=\"/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" pid=10367 comm=\"glide\" requested_mask=\"x\" denied_mask=\"x\" fsuid=1000 ouid=0 target=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.848:127919): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/gyrar45kwxnnzwfw5k018prs6scmj0mz-libva-2.24.1/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.848:127922): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/gyrar45kwxnnzwfw5k018prs6scmj0mz-libva-2.24.1/lib/\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/m5wp1l4kqbacif4wcmif00c6kqzpqij5-systemd-minimal-libs-261.1/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.848:127921): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/m5wp1l4kqbacif4wcmif00c6kqzpqij5-systemd-minimal-libs-261.1/lib/\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/pma8p3yv2ahnfhs71mfx36id341nk1j3-libnotify-0.8.8/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.848:127924): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/pma8p3yv2ahnfhs71mfx36id341nk1j3-libnotify-0.8.8/lib/\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/qdz5ms1bzjpjq2nx4pvsjq629gqm7g6g-mesa-libgbm-26.1.3/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.848:127923): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/qdz5ms1bzjpjq2nx4pvsjq629gqm7g6g-mesa-libgbm-26.1.3/lib/\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-glide",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/wxghi90d4mxp1sql2s1bqhp5g7bmfz8n-libxscrnsaver-1.2.5/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".glide-wrapped"
+      ],
+      "first": "2026-08-17T13:45:51+02:00",
+      "last": "2026-08-17T13:45:51+02:00",
+      "sample": "audit: type=1400 audit(1786967151.848:127925): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-glide//null-/nix/store/2rnjn8idd7z5cc0yyjjbh9g9l2lvz756-glide-browser-0.1.63a/lib/glide-browser-bin-0.1.63a/glide\" name=\"/nix/store/wxghi90d4mxp1sql2s1bqhp5g7bmfz8n-libxscrnsaver-1.2.5/lib/\" pid=10367 comm=\".glide-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-drawio"
+  ],
+  "summary": {
+    "events": 12,
+    "denied": 0,
+    "allowed": 12,
+    "groups": 9,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-drawio": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "cap",
+      "operations": [
+        "capable"
+      ],
+      "requested": null,
+      "denied": null,
+      "targets": {},
+      "details": {
+        "capability": "21",
+        "capname": "sys_admin"
+      },
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        "electron"
+      ],
+      "first": "2026-08-17T13:41:46+02:00",
+      "last": "2026-08-17T13:41:46+02:00",
+      "sample": "audit: type=1400 audit(1786966906.420:6162): apparmor=\"ALLOWED\" operation=\"capable\" class=\"cap\" profile=\"local-drawio\" pid=7045 comm=\"electron\" capability=21  capname=\"sys_admin\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 2,
+      "commands": [
+        "drawio",
+        "electron"
+      ],
+      "first": "2026-08-17T13:41:46+02:00",
+      "last": "2026-08-17T13:41:46+02:00",
+      "sample": "audit: type=1400 audit(1786966906.296:6159): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-drawio\" name=\"/dev/tty\" pid=7043 comm=\"drawio\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "cap",
+      "operations": [
+        "capable"
+      ],
+      "requested": null,
+      "denied": null,
+      "targets": {},
+      "details": {
+        "capability": "19",
+        "capname": "sys_ptrace"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "electron"
+      ],
+      "first": "2026-08-17T13:42:02+02:00",
+      "last": "2026-08-17T13:42:02+02:00",
+      "sample": "audit: type=1400 audit(1786966922.893:8380): apparmor=\"ALLOWED\" operation=\"capable\" class=\"cap\" profile=\"local-drawio\" pid=7043 comm=\"electron\" capability=19  capname=\"sys_ptrace\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/6wkcdiynh2rgqwlljcg4h9iljf5q9zi1-liberation-fonts-2.1.5/share/fonts/truetype/LiberationSans-BoldItalic.ttf"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:41:57+02:00",
+      "last": "2026-08-17T13:41:57+02:00",
+      "sample": "audit: type=1400 audit(1786966917.970:8379): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-drawio\" name=\"/nix/store/6wkcdiynh2rgqwlljcg4h9iljf5q9zi1-liberation-fonts-2.1.5/share/fonts/truetype/LiberationSans-BoldItalic.ttf\" pid=7043 comm=\"ThreadPoolForeg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/proc/7045/gid_map"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "electron"
+      ],
+      "first": "2026-08-17T13:41:46+02:00",
+      "last": "2026-08-17T13:41:46+02:00",
+      "sample": "audit: type=1400 audit(1786966906.420:6163): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-drawio\" name=\"/proc/7045/gid_map\" pid=7045 comm=\"electron\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/proc/7045/setgroups"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "electron"
+      ],
+      "first": "2026-08-17T13:41:46+02:00",
+      "last": "2026-08-17T13:41:46+02:00",
+      "sample": "audit: type=1400 audit(1786966906.420:6161): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-drawio\" name=\"/proc/7045/setgroups\" pid=7045 comm=\"electron\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/proc/7045/uid_map"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "electron"
+      ],
+      "first": "2026-08-17T13:41:46+02:00",
+      "last": "2026-08-17T13:41:46+02:00",
+      "sample": "audit: type=1400 audit(1786966906.420:6164): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-drawio\" name=\"/proc/7045/uid_map\" pid=7045 comm=\"electron\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/proc/7047/setgroups"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "electron"
+      ],
+      "first": "2026-08-17T13:41:46+02:00",
+      "last": "2026-08-17T13:41:46+02:00",
+      "sample": "audit: type=1400 audit(1786966906.426:6166): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-drawio\" name=\"/proc/7047/setgroups\" pid=7047 comm=\"electron\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-drawio",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/proc/7047/uid_map"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "electron"
+      ],
+      "first": "2026-08-17T13:41:46+02:00",
+      "last": "2026-08-17T13:41:46+02:00",
+      "sample": "audit: type=1400 audit(1786966906.426:6168): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-drawio\" name=\"/proc/7047/uid_map\" pid=7047 comm=\"electron\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    }
+  ]
+}

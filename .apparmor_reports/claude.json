@@ -1,0 +1,341 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-claude-code"
+  ],
+  "summary": {
+    "events": 23,
+    "denied": 0,
+    "allowed": 23,
+    "groups": 13,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-claude-code": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/wpk1g5ywknazjp1dcxwhpdy1cjvp81v6-hm_gitconfig"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 7,
+      "commands": [
+        "git"
+      ],
+      "first": "2026-08-17T13:54:22+02:00",
+      "last": "2026-08-17T13:54:22+02:00",
+      "sample": "audit: type=1400 audit(1786967662.002:302517): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-claude-code\" name=\"/nix/store/wpk1g5ywknazjp1dcxwhpdy1cjvp81v6-hm_gitconfig\" pid=16359 comm=\"git\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        "bash",
+        "xdg-mime"
+      ],
+      "first": "2026-08-17T13:54:40+02:00",
+      "last": "2026-08-17T13:54:44+02:00",
+      "sample": "audit: type=1400 audit(1786967680.322:302650): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-claude-code\" name=\"/dev/tty\" pid=16543 comm=\"xdg-mime\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        ".claude-unwrapp"
+      ],
+      "first": "2026-08-17T13:55:02+02:00",
+      "last": "2026-08-17T13:55:02+02:00",
+      "sample": "audit: type=1400 audit(1786967702.958:302783): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-claude-code\" name=\"/dev/tty\" pid=16345 comm=\".claude-unwrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/pts/2"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".claude-unwrapp"
+      ],
+      "first": "2026-08-17T13:54:21+02:00",
+      "last": "2026-08-17T13:54:21+02:00",
+      "sample": "audit: type=1400 audit(1786967661.889:302516): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-claude-code\" name=\"/dev/pts/2\" pid=16345 comm=\".claude-unwrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "file_inherit"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/pts/2"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "env"
+      ],
+      "first": "2026-08-17T13:54:44+02:00",
+      "last": "2026-08-17T13:54:44+02:00",
+      "sample": "audit: type=1400 audit(1786967684.102:302654): apparmor=\"ALLOWED\" operation=\"file_inherit\" class=\"file\" profile=\"local-claude-code//null-/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils\" name=\"/dev/pts/2\" pid=16595 comm=\"env\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "file_inherit"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/pts/2"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "env"
+      ],
+      "first": "2026-08-17T13:54:44+02:00",
+      "last": "2026-08-17T13:54:44+02:00",
+      "sample": "audit: type=1400 audit(1786967684.102:302655): apparmor=\"ALLOWED\" operation=\"file_inherit\" class=\"file\" profile=\"local-claude-code\" name=\"/dev/pts/2\" pid=16595 comm=\"env\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "env"
+      ],
+      "first": "2026-08-17T13:54:44+02:00",
+      "last": "2026-08-17T13:54:44+02:00",
+      "sample": "audit: type=1400 audit(1786967684.102:302657): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-claude-code//null-/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2\" pid=16595 comm=\"env\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/ipjgnwb15kqn0wmnfszgcim7q2qv37s7-etc-os-release"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "Bun Pool 2"
+      ],
+      "first": "2026-08-17T13:54:22+02:00",
+      "last": "2026-08-17T13:54:22+02:00",
+      "sample": "audit: type=1400 audit(1786967662.019:302520): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-claude-code\" name=\"/nix/store/ipjgnwb15kqn0wmnfszgcim7q2qv37s7-etc-os-release\" pid=16345 comm=42756E20506F6F6C2032 requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "exec"
+      ],
+      "requested": "x",
+      "denied": "x",
+      "targets": {
+        "name": "/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils"
+      },
+      "details": {
+        "owner_match": "no",
+        "target": "local-claude-code//null-/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "bash"
+      ],
+      "first": "2026-08-17T13:54:44+02:00",
+      "last": "2026-08-17T13:54:44+02:00",
+      "sample": "audit: type=1400 audit(1786967684.102:302652): apparmor=\"ALLOWED\" operation=\"exec\" class=\"file\" profile=\"local-claude-code\" name=\"/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils\" pid=16595 comm=\"bash\" requested_mask=\"x\" denied_mask=\"x\" fsuid=1000 ouid=0 target=\"local-claude-code//null-/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "env"
+      ],
+      "first": "2026-08-17T13:54:44+02:00",
+      "last": "2026-08-17T13:54:44+02:00",
+      "sample": "audit: type=1400 audit(1786967684.102:302656): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-claude-code//null-/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils\" name=\"/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils\" pid=16595 comm=\"env\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/l0c9s0y8mspasl4dg91d9kqhsigqnl75-attr-2.6.0/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "env"
+      ],
+      "first": "2026-08-17T13:54:44+02:00",
+      "last": "2026-08-17T13:54:44+02:00",
+      "sample": "audit: type=1400 audit(1786967684.102:302659): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-claude-code//null-/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils\" name=\"/nix/store/l0c9s0y8mspasl4dg91d9kqhsigqnl75-attr-2.6.0/lib/\" pid=16595 comm=\"env\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/m5k7r6fqvjqzwl6p0wpsrgfvrvhb93bz-hm_gitattributes"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "git"
+      ],
+      "first": "2026-08-17T13:54:22+02:00",
+      "last": "2026-08-17T13:54:22+02:00",
+      "sample": "audit: type=1400 audit(1786967662.065:302525): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-claude-code\" name=\"/nix/store/m5k7r6fqvjqzwl6p0wpsrgfvrvhb93bz-hm_gitattributes\" pid=16363 comm=\"git\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-claude-code",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/njhz1f5xr4hgniy9bbb9g5k2llgsmycv-acl-2.4.0/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "env"
+      ],
+      "first": "2026-08-17T13:54:44+02:00",
+      "last": "2026-08-17T13:54:44+02:00",
+      "sample": "audit: type=1400 audit(1786967684.102:302658): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-claude-code//null-/nix/store/kl3gf8ld3xp638ss3k178r38qn9ywahn-coreutils-full-9.11/bin/coreutils\" name=\"/nix/store/njhz1f5xr4hgniy9bbb9g5k2llgsmycv-acl-2.4.0/lib/\" pid=16595 comm=\"env\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}

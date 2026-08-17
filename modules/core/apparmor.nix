@@ -1,6 +1,5 @@
 {
   config,
-  host ? null,
   lib,
   pkgs,
   username ? null,
@@ -8,41 +7,621 @@
 }:
 let
   cfg = config.security.localAppArmor;
-  stateType = lib.types.enum [
+  inherit (lib) mkOption types;
+
+  stateType = types.enum [
     "disable"
     "complain"
     "enforce"
   ];
 
-  homeDirectory = "/home/${username}";
-  syncthingRoot = lib.removeSuffix "/" config.services.syncthing.dataDir;
-  syncthingRoots = [ syncthingRoot ] ++ lib.optional (host == "desktop") "/srv/syncthing";
+  serviceCapabilityType = types.enum [
+    "network"
+    "system-bus"
+    "terminal"
+  ];
 
-  softmakerOffice = pkgs.softmaker-office-nx.override {
-    officeVersion = {
-      version = "1502";
-      edition = "";
-      hash = "sha256-24CnmZ5lnx7+NvZxiAgib0uYCfUQuUgRuVW+K6AeB3U=";
+  serviceType = types.submodule (
+    { name, ... }:
+    {
+      options = {
+        enable = lib.mkEnableOption "the local-${name} AppArmor service profile" // {
+          default = true;
+        };
+        unit = mkOption {
+          type = types.str;
+          default = name;
+          description = "systemd service receiving the generated AppArmor attachment.";
+        };
+        stagedState = mkOption {
+          type = stateType;
+          default = "complain";
+          description = "State used for this service while the global mode is staged.";
+        };
+        packageRoots = mkOption {
+          type = types.listOf types.package;
+          default = [ ];
+          description = "Package closures granted read and mmap access.";
+        };
+        executionPackages = mkOption {
+          type = types.listOf types.package;
+          default = [ ];
+          description = "Direct package outputs whose commands the service may execute.";
+        };
+        capabilities = mkOption {
+          type = types.listOf serviceCapabilityType;
+          default = [ ];
+          description = "Composable host capabilities granted to the service.";
+        };
+        readOnlyPaths = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "Exact AppArmor path expressions granted read access.";
+        };
+        readWritePaths = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "Exact AppArmor path expressions granted read/write/lock access.";
+        };
+        extraRules = mkOption {
+          type = types.lines;
+          default = "";
+          description = "Audited service rules not represented by typed fields.";
+        };
+        extraRulesRationale = mkOption {
+          type = types.str;
+          default = "";
+          description = "Required rationale when extraRules is non-empty.";
+        };
+      };
+    }
+  );
+
+  inventoryType = types.submodule {
+    options = {
+      kind = mkOption {
+        type = types.enum [
+          "application"
+          "service"
+        ];
+      };
+      status = mkOption {
+        type = types.enum [
+          "candidate"
+          "exempt"
+        ];
+      };
+      target = mkOption { type = types.str; };
+      rationale = mkOption { type = types.str; };
     };
   };
 
-  homePackages =
-    if
-      username != null
-      && lib.hasAttrByPath [
-        "home-manager"
-        "users"
-        username
-        "home"
-        "packages"
-      ] config
-    then
-      config.home-manager.users.${username}.home.packages
+  hasHomeManagerUser =
+    username != null
+    && lib.hasAttrByPath [
+      "home-manager"
+      "users"
+      username
+    ] config;
+  homeConfig = if hasHomeManagerUser then config.home-manager.users.${username} else null;
+  homeDirectory =
+    if homeConfig != null then
+      homeConfig.home.homeDirectory
+    else if username != null && lib.hasAttrByPath [ "users" "users" username "home" ] config then
+      config.users.users.${username}.home
+    else
+      null;
+
+  applicationRegistry =
+    if homeConfig == null then
+      { }
+    else
+      lib.filterAttrs (_: app: app.enable) homeConfig.localAppArmor.applications;
+  developerPackages = if homeConfig == null then [ ] else homeConfig.localAppArmor.developerPackages;
+  configuredSessionReadPackages =
+    if homeConfig == null then [ ] else homeConfig.localAppArmor.sessionReadPackages;
+  homeInventory = if homeConfig == null then { } else homeConfig.localAppArmor.inventory;
+  serviceRegistry = lib.filterAttrs (_: service: service.enable) cfg.services;
+
+  profileNameFor = name: "local-${name}";
+  appProfileNames = map profileNameFor (builtins.attrNames applicationRegistry);
+  serviceProfileNames = map profileNameFor (builtins.attrNames serviceRegistry);
+  managedProfileNames = serviceProfileNames ++ appProfileNames;
+  applicationAttachments = lib.mapAttrsToList (
+    _: app: "${app.package}/${app.executable}"
+  ) applicationRegistry;
+  serviceUnits = map (service: service.unit) (builtins.attrValues serviceRegistry);
+
+  stateFor =
+    name: stagedState:
+    cfg.profileOverrides.${name} or (if cfg.mode == "staged" then stagedState else cfg.mode);
+
+  attrPackage = path: lib.attrByPath path null config;
+  homeAttrPackage = path: if homeConfig == null then null else lib.attrByPath path null homeConfig;
+  optionalPackage = package: lib.optional (package != null && lib.isDerivation package) package;
+  packagesAt = paths: builtins.concatMap (path: optionalPackage (attrPackage path)) paths;
+  homePackagesAt = paths: builtins.concatMap (path: optionalPackage (homeAttrPackage path)) paths;
+
+  dconfReadRoots =
+    if lib.hasAttrByPath [ "programs" "dconf" "packages" ] config then
+      config.programs.dconf.packages
     else
       [ ];
-  codexDesktopPackages = builtins.filter (
-    package: lib.hasPrefix "codex-desktop-" (lib.getName package)
-  ) homePackages;
+  sessionPackageReadRoots = lib.unique (
+    configuredSessionReadPackages
+    ++ config.fonts.packages
+    ++ dconfReadRoots
+    ++ packagesAt [
+      [
+        "hardware"
+        "graphics"
+        "package"
+      ]
+      [
+        "hardware"
+        "graphics"
+        "package32"
+      ]
+    ]
+    ++ lib.attrByPath [ "hardware" "graphics" "extraPackages" ] [ ] config
+    ++ lib.attrByPath [ "hardware" "graphics" "extraPackages32" ] [ ] config
+    ++ lib.attrByPath [ "xdg" "portal" "configPackages" ] [ ] config
+    ++ lib.attrByPath [ "xdg" "portal" "extraPortals" ] [ ] config
+    ++ homePackagesAt [
+      [
+        "gtk"
+        "theme"
+        "package"
+      ]
+      [
+        "gtk"
+        "iconTheme"
+        "package"
+      ]
+      [
+        "gtk"
+        "cursorTheme"
+        "package"
+      ]
+      [
+        "home"
+        "pointerCursor"
+        "package"
+      ]
+      [
+        "stylix"
+        "cursor"
+        "package"
+      ]
+      [
+        "stylix"
+        "icons"
+        "package"
+      ]
+      [
+        "stylix"
+        "fonts"
+        "serif"
+        "package"
+      ]
+      [
+        "stylix"
+        "fonts"
+        "sansSerif"
+        "package"
+      ]
+      [
+        "stylix"
+        "fonts"
+        "monospace"
+        "package"
+      ]
+      [
+        "stylix"
+        "fonts"
+        "emoji"
+        "package"
+      ]
+    ]
+    ++ [ pkgs.gtk4 ]
+  );
+
+  etcReadRoots = map (name: config.environment.etc.${name}.source) (
+    builtins.filter (name: lib.hasAttrByPath [ "environment" "etc" name "source" ] config) [
+      "lsb-release"
+      "os-release"
+    ]
+  );
+  userEnvironmentReadRoots = lib.optional (
+    username != null
+    && lib.hasAttrByPath [
+      "environment"
+      "etc"
+      "profiles/per-user/${username}"
+      "source"
+    ] config
+  ) config.environment.etc."profiles/per-user/${username}".source;
+
+  standardReadRules = path: ''
+    ${path} r,
+    ${path}/etc/** r,
+    ${path}/share/** mr,
+    ${path}/lib/**.so* mr,
+    ${path}/lib64/**.so* mr,
+    ${path}/lib/** r,
+    ${path}/lib64/** r,
+  '';
+  sourceReadRules = path: ''
+    ${path}{,/**} r,
+  '';
+  profileDataReadRules = path: ''
+    ${path}/share/{hunspell,mime}/{,**} r,
+  '';
+  sessionReadRules = pkgs.writeText "apparmor-local-session-read-only" ''
+    ${lib.concatMapStrings standardReadRules sessionPackageReadRoots}
+    ${lib.concatMapStrings sourceReadRules etcReadRoots}
+    ${lib.concatMapStrings profileDataReadRules ([ config.system.path ] ++ userEnvironmentReadRoots)}
+
+    /nix/store/*-dconf-db r,
+    /nix/store/*-fc-cache/** r,
+    /nix/store/*-fontconfig-conf/etc/fonts/{,**} r,
+    /nix/store/*-gvfs-*/lib/gio/modules/{,**} mr,
+    /nix/store/** r,
+  '';
+
+  closureReadRules =
+    name: roots:
+    pkgs.apparmorRulesFromClosure {
+      inherit name;
+      baseRules = [
+        "$path r"
+        "$path/etc/** r"
+        "$path/share/** mr"
+        "$path/lib/**.so* mr"
+        "$path/lib64/**.so* mr"
+        "$path/lib/** r"
+        "$path/lib64/** r"
+      ];
+    } roots;
+
+  directExecutionRules = path: ''
+    ${path}/bin/** ixr,
+    ${path}/lib/** ixr,
+    ${path}/lib64/** ixr,
+    ${path}/libexec/** ixr,
+    ${path}/opt/** ixr,
+    ${path}/share/** ixr,
+  '';
+
+  hasCapability = app: capability: lib.elem capability app.capabilities;
+  sensitiveAccess = app: group: lib.elem group app.sensitiveAccess;
+  quotePath = path: ''"${lib.replaceStrings [ "\\" "\"" ] [ "\\\\" "\\\"" ] path}"'';
+
+  sensitiveGroups = {
+    sops = ''
+      audit deny owner @{HOME}/.config/sops/age/keys.txt rwklm,
+      audit deny owner @{HOME}/.config/sops-nix/secrets{,/**} rwklm,
+      audit deny owner /run/user/[0-9]*/secrets.d/{,/**} rwklm,
+      audit deny /run/secrets/{,/**} rwklm,
+    '';
+    gpg-private = ''
+      audit deny owner @{HOME}/.gnupg/private-keys-v1.d/{,**} rwklm,
+      audit deny owner @{HOME}/.gnupg/secring.gpg rwklm,
+    '';
+    gpg-agent = ''
+      audit deny owner @{HOME}/.gnupg/S.gpg-agent{,.*} rwklm,
+    '';
+    password-store = ''
+      audit deny owner @{HOME}/.password-store/{,**} rwklm,
+      audit deny owner @{HOME}/.local/share/password-store/{,**} rwklm,
+    '';
+    ssh-identities = ''
+      audit deny owner @{HOME}/.ssh/id_* rwklm,
+      audit deny owner @{HOME}/.ssh/*.{key,p12,pem,pfx} rwklm,
+    '';
+    ssh-config = ''
+      audit deny owner @{HOME}/.ssh/config.secrets rwklm,
+    '';
+    ssh-control = ''
+      audit deny owner @{HOME}/.ssh/{cm,sockets}/{,**} rwklm,
+    '';
+    mail-auth = ''
+      audit deny owner @{HOME}/.config/aerc/accounts.conf{,.d/**} rwklm,
+    '';
+    credential-broker = ''
+      audit deny owner @{run}/user/[0-9]*/keyring/{,**} rwklm,
+      audit deny dbus send bus=session peer=(name=org.freedesktop.secrets),
+      audit deny dbus receive bus=session peer=(name=org.freedesktop.secrets),
+    '';
+    hardware-credentials = ''
+      audit deny owner @{HOME}/.config/Yubico/u2f_keys rwklm,
+    '';
+  };
+  secretDenialsFor =
+    app:
+    lib.concatMapStrings
+      (group: lib.optionalString (!(sensitiveAccess app group)) sensitiveGroups.${group})
+      [
+        "sops"
+        "gpg-private"
+        "gpg-agent"
+        "password-store"
+        "ssh-identities"
+        "ssh-config"
+        "ssh-control"
+        "mail-auth"
+        "credential-broker"
+        "hardware-credentials"
+      ];
+
+  sensitiveAllowsFor = app: ''
+    ${lib.optionalString (sensitiveAccess app "sops") ''
+      owner @{HOME}/.config/sops/age/keys.txt r,
+      owner @{HOME}/.config/sops-nix/secrets{,/**} r,
+      owner /run/user/[0-9]*/secrets.d/{,/**} r,
+      /run/secrets/{,/**} r,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "gpg-private") ''
+      owner @{HOME}/.gnupg/private-keys-v1.d/{,**} r,
+      owner @{HOME}/.gnupg/secring.gpg r,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "ssh-identities") ''
+      owner @{HOME}/.ssh/id_* r,
+      owner @{HOME}/.ssh/*.{key,p12,pem,pfx} r,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "ssh-config") ''
+      owner @{HOME}/.ssh/config.secrets r,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "ssh-control") ''
+      owner @{HOME}/.ssh/{cm,sockets}/{,**} rwk,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "gpg-agent") ''
+      owner @{HOME}/.gnupg/S.gpg-agent{,.*} rw,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "password-store") ''
+      owner @{HOME}/.password-store/{,**} rwkl,
+      owner @{HOME}/.local/share/password-store/{,**} rwkl,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "mail-auth") ''
+      owner @{HOME}/.config/aerc/accounts.conf{,.d/**} r,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "credential-broker") ''
+      owner @{run}/user/[0-9]*/keyring/{,**} rwkl,
+    ''}
+    ${lib.optionalString (sensitiveAccess app "hardware-credentials") ''
+      owner @{HOME}/.config/Yubico/u2f_keys r,
+    ''}
+  '';
+
+  applicationCapabilityRules = app: ''
+    ${lib.optionalString (hasCapability app "desktop") ''
+      include <abstractions/fonts>
+      include <abstractions/X>
+      include <abstractions/wayland>
+      include <abstractions/dconf>
+      include <abstractions/gtk>
+      include <abstractions/gnome>
+      include <abstractions/dbus-session-strict>
+    ''}
+    ${lib.optionalString (hasCapability app "portal") ''
+      include <abstractions/xdg-desktop>
+      dbus send bus=session peer=(name=org.freedesktop.portal.Desktop),
+      dbus receive bus=session peer=(name=org.freedesktop.portal.Desktop),
+    ''}
+    ${lib.optionalString (hasCapability app "session-bus") ''
+      include <abstractions/dbus-session>
+    ''}
+    ${lib.optionalString (hasCapability app "system-bus") ''
+      /run/dbus/system_bus_socket rw,
+      dbus bus=system,
+    ''}
+    ${lib.optionalString (hasCapability app "network") ''
+      include <abstractions/nameservice>
+      include <abstractions/ssl_certs>
+    ''}
+    ${lib.optionalString (hasCapability app "audio") ''
+      include <abstractions/audio>
+    ''}
+    ${lib.optionalString (hasCapability app "camera") ''
+      /dev/video[0-9]* rw,
+    ''}
+    ${lib.optionalString (hasCapability app "gpu") ''
+      include <abstractions/opengl>
+      /dev/dri/{,**} rw,
+    ''}
+    ${lib.optionalString (hasCapability app "shared-memory") ''
+      owner /dev/shm/{,**} rwkl,
+    ''}
+    ${lib.optionalString (hasCapability app "terminal") ''
+      /dev/tty rw,
+      owner /dev/pts/[0-9]* rw,
+    ''}
+    ${lib.optionalString (hasCapability app "runtime-introspection") ''
+      /proc/[0-9]*/{cgroup,mountinfo,stat} r,
+      /proc/stat r,
+      /proc/version r,
+    ''}
+    ${lib.optionalString (hasCapability app "credential-broker") ''
+      include <abstractions/dbus-session-strict>
+      dbus send bus=session peer=(name=org.freedesktop.secrets),
+      dbus receive bus=session peer=(name=org.freedesktop.secrets),
+    ''}
+  '';
+
+  applicationHomeRules = app: ''
+    owner @{HOME}/ r,
+    ${
+      if hasCapability app "full-home" then
+        ''
+          owner @{HOME}/** rwkl,
+        ''
+      else
+        ''
+          include <abstractions/user-write>
+          include <abstractions/user-download>
+        ''
+    }
+    ${lib.concatMapStrings (path: ''
+      owner ${quotePath "@{HOME}/${path}/{,**}"} rwkl,
+    '') app.homePaths}
+    ${lib.optionalString (hasCapability app "user-files") ''
+      owner @{HOME}/[^.]*/{,**} rwkl,
+    ''}
+    ${lib.optionalString (hasCapability app "developer-exec") ''
+      ptrace,
+      owner @{HOME}/** ix,
+      owner /tmp/** ix,
+      owner /var/tmp/** ix,
+    ''}
+  '';
+
+  wrapperExecutionPackages = [
+    pkgs.bash
+    pkgs.coreutils
+  ];
+
+  applicationPolicy =
+    name: app:
+    let
+      profileName = profileNameFor name;
+      state = stateFor profileName "complain";
+      attachment = "${app.package}/${app.executable}";
+      executionPackages = lib.unique (
+        [ app.package ]
+        ++ wrapperExecutionPackages
+        ++ app.executionPackages
+        ++ lib.optionals (hasCapability app "developer-exec") developerPackages
+      );
+      closureRoots = lib.unique ([ app.package ] ++ app.extraClosureRoots ++ executionPackages);
+      closureRules = closureReadRules profileName closureRoots;
+      commonRules = pkgs.writeText "apparmor-${profileName}-common" ''
+        include <abstractions/base>
+        include <abstractions/nameservice-strict>
+
+        owner /tmp/{,**} rwkl,
+        owner /var/tmp/{,**} rwkl,
+
+        include "${sessionReadRules}"
+        include "${closureRules}"
+
+        ${lib.concatMapStrings directExecutionRules executionPackages}
+        ${lib.concatMapStringsSep "\n" (path: "${path} ixr,") app.extraExecutables}
+        ${applicationCapabilityRules app}
+        ${applicationHomeRules app}
+        ${sensitiveAllowsFor app}
+        ${app.extraRules}
+        ${lib.optionalString (state == "enforce") (secretDenialsFor app)}
+      '';
+      namespaceTransitions = lib.concatMapStringsSep "\n" (
+        path: "priority=100 ${path} Cx -> namespace-bootstrap,"
+      ) app.namespaceExecutables;
+      namespaceProfile = lib.optionalString (app.namespaceExecutables != [ ]) ''
+        profile namespace-bootstrap flags=(attach_disconnected,mediate_deleted) {
+          include "${commonRules}"
+          userns,
+          ${app.namespaceRules}
+        }
+      '';
+      parentUserns = lib.optionalString (
+        hasCapability app "userns" && app.namespaceExecutables == [ ]
+      ) "userns,";
+    in
+    {
+      inherit state;
+      profile = ''
+        abi <abi/4.0>,
+        include <tunables/global>
+
+        profile ${profileName} ${attachment} flags=(attach_disconnected,mediate_deleted) {
+          include "${commonRules}"
+          ${namespaceTransitions}
+          ${parentUserns}
+          ${namespaceProfile}
+        }
+      '';
+    };
+
+  serviceCapabilityRules = service: ''
+    ${lib.optionalString (lib.elem "network" service.capabilities) ''
+      include <abstractions/nameservice>
+      include <abstractions/ssl_certs>
+    ''}
+    ${lib.optionalString (lib.elem "system-bus" service.capabilities) ''
+      /run/dbus/system_bus_socket rw,
+      dbus bus=system,
+    ''}
+    ${lib.optionalString (lib.elem "terminal" service.capabilities) ''
+      /dev/tty rw,
+    ''}
+  '';
+
+  servicePolicy =
+    name: service:
+    let
+      profileName = profileNameFor name;
+      state = stateFor profileName service.stagedState;
+      executionPackages = lib.unique (wrapperExecutionPackages ++ service.executionPackages);
+      closureRoots = lib.unique (service.packageRoots ++ executionPackages);
+      closureRules = closureReadRules profileName closureRoots;
+    in
+    {
+      inherit state;
+      profile = ''
+        abi <abi/4.0>,
+        include <tunables/global>
+
+        profile ${profileName} flags=(attach_disconnected,mediate_deleted) {
+          include <abstractions/base>
+          include <abstractions/nameservice-strict>
+          include "${closureRules}"
+
+          ${lib.concatMapStrings directExecutionRules executionPackages}
+          ${serviceCapabilityRules service}
+          ${lib.concatMapStringsSep "\n" (path: "${quotePath path} r,") service.readOnlyPaths}
+          ${lib.concatMapStringsSep "\n" (path: "${quotePath path} rwkl,") service.readWritePaths}
+          owner /tmp/{,**} rwkl,
+          ${service.extraRules}
+        }
+      '';
+    };
+
+  applicationPolicies = lib.mapAttrs' (
+    name: app: lib.nameValuePair (profileNameFor name) (applicationPolicy name app)
+  ) applicationRegistry;
+  servicePolicies = lib.mapAttrs' (
+    name: service: lib.nameValuePair (profileNameFor name) (servicePolicy name service)
+  ) serviceRegistry;
+
+  serviceAttachments = lib.mapAttrs' (
+    name: service:
+    let
+      profileName = profileNameFor name;
+      enabled = stateFor profileName service.stagedState != "disable";
+    in
+    lib.nameValuePair service.unit {
+      after = lib.optional enabled "apparmor.service";
+      requires = lib.optional enabled "apparmor.service";
+      serviceConfig.AppArmorProfile = lib.mkIf enabled profileName;
+    }
+  ) serviceRegistry;
+
+  validRelativePath =
+    path: path != "" && !(lib.hasPrefix "/" path) && !(lib.elem ".." (lib.splitString "/" path));
+  appAssertions = lib.mapAttrsToList (name: app: {
+    assertion =
+      validRelativePath app.executable
+      && lib.all validRelativePath app.homePaths
+      && lib.all (path: lib.hasPrefix "${builtins.storeDir}/" path) app.extraExecutables
+      && lib.all (path: lib.hasPrefix "${builtins.storeDir}/" path) app.namespaceExecutables
+      && (hasCapability app "credential-broker" == sensitiveAccess app "credential-broker")
+      && (app.extraRules == "" || app.extraRulesRationale != "")
+      && (app.namespaceExecutables == [ ] || app.namespaceRules != "");
+    message = "Invalid or unexplained AppArmor application descriptor: ${name}";
+  }) applicationRegistry;
+  serviceAssertions = lib.mapAttrsToList (name: service: {
+    assertion = service.extraRules == "" || service.extraRulesRationale != "";
+    message = "AppArmor service ${name} has extraRules without a rationale.";
+  }) serviceRegistry;
 
   apparmorReport = pkgs.writeShellApplication {
     name = "apparmor-report";
@@ -55,389 +634,11 @@ let
       exec python3 ${./apparmor_report.py} "$@"
     '';
   };
-
-  appProfiles = [
-    {
-      name = "file-roller";
-      package = pkgs.file-roller;
-      executable = "file-roller";
-    }
-    {
-      name = "evince";
-      package = pkgs.evince;
-      executable = "evince";
-    }
-    {
-      name = "mpv";
-      package = pkgs.mpv;
-      executable = "mpv";
-    }
-    {
-      name = "pqiv";
-      package = pkgs.pqiv;
-      executable = "pqiv";
-    }
-    {
-      name = "inkscape";
-      package = pkgs.inkscape;
-      executable = "inkscape";
-    }
-    {
-      name = "drawio";
-      package = pkgs.drawio;
-      executable = "drawio";
-      userns = true;
-    }
-    {
-      name = "zotero";
-      package = pkgs.zotero;
-      executable = "zotero";
-      userns = true;
-    }
-    {
-      name = "logseq";
-      package = pkgs.logseq-appimage;
-      executable = "logseq-appimage";
-      userns = true;
-    }
-    {
-      name = "textmaker";
-      package = softmakerOffice;
-      executable = "softmaker-office-nx-textmaker";
-    }
-    {
-      name = "planmaker";
-      package = softmakerOffice;
-      executable = "softmaker-office-nx-planmaker";
-    }
-    {
-      name = "presentations";
-      package = softmakerOffice;
-      executable = "softmaker-office-nx-presentations";
-    }
-    {
-      name = "brave";
-      package = pkgs.brave;
-      executable = "brave";
-      userns = true;
-    }
-    {
-      name = "glide";
-      package = pkgs.flake.glide-browser;
-      executable = "glide";
-      userns = true;
-    }
-    # {
-    #   name = "helium";
-    #   package = pkgs.flake.helium;
-    #   executable = "helium";
-    #   userns = true;
-    # }
-    {
-      name = "mullvad-browser";
-      package = pkgs.mullvad-browser;
-      executable = "mullvad-browser";
-      userns = true;
-    }
-    # {
-    #   name = "orion";
-    #   package = pkgs.flake.orion-browser;
-    #   executable = "orion-browser";
-    #   userns = true;
-    # }
-    {
-      name = "vivaldi";
-      package = pkgs.vivaldi;
-      executable = "vivaldi";
-      userns = true;
-    }
-    {
-      name = "thunderbird";
-      package = pkgs.thunderbird;
-      executable = "thunderbird";
-      userns = true;
-    }
-    {
-      name = "protonmail-bridge";
-      package = pkgs.protonmail-bridge;
-      executable = "protonmail-bridge";
-    }
-    {
-      name = "proton-pass";
-      package = pkgs.proton-pass;
-      executable = "proton-pass";
-      userns = true;
-    }
-    {
-      name = "proton-pass-cli";
-      package = pkgs.proton-pass-cli;
-      executable = "pass-cli";
-    }
-    {
-      name = "proton-vpn";
-      package = pkgs.proton-vpn;
-      executable = "protonvpn-app";
-    }
-    {
-      name = "qbittorrent";
-      package = pkgs.qbittorrent;
-      executable = "qbittorrent";
-    }
-    {
-      name = "motrix";
-      package = pkgs.motrix-next;
-      executable = "motrix-next";
-      userns = true;
-    }
-    {
-      name = "deezer";
-      package = pkgs.deezer-enhanced;
-      executable = "deezer-enhanced";
-      userns = true;
-    }
-    {
-      name = "codex-cli";
-      package = pkgs.flake.codex-cli;
-      executable = "codex";
-      developer = true;
-    }
-    {
-      name = "claude-code";
-      package = pkgs.flake.claude-code;
-      executable = "claude";
-      developer = true;
-    }
-    # {
-    #   name = "antigravity-cli";
-    #   package = pkgs.flake.antigravity-cli;
-    #   executable = "agy";
-    #   developer = true;
-    # }
-    # {
-    #   name = "antigravity-ide";
-    #   package = pkgs.flake.antigravity-ide;
-    #   executable = "antigravity-ide";
-    #   developer = true;
-    #   userns = true;
-    # }
-    # {
-    #   name = "zed";
-    #   package = pkgs.zed-editor;
-    #   executable = "zeditor";
-    #   developer = true;
-    #   userns = true;
-    # }
-  ]
-  ++ lib.optionals (codexDesktopPackages != [ ]) [
-    {
-      name = "codex-desktop";
-      package = builtins.head codexDesktopPackages;
-      executable = "codex-desktop";
-      developer = true;
-      userns = true;
-    }
-  ];
-
-  serviceProfileNames = [
-    "local-apply-secret-dns"
-    "local-syncthing"
-  ];
-  appProfileNames = map (app: "local-${app.name}") appProfiles;
-  managedProfileNames = serviceProfileNames ++ appProfileNames;
-
-  stateFor =
-    name:
-    cfg.profileOverrides.${name} or (
-      if cfg.mode == "staged" then
-        if name == "local-apply-secret-dns" then "enforce" else "complain"
-      else
-        cfg.mode
-    );
-
-  secretDenials = ''
-    audit deny owner @{HOME}/.config/sops/age/keys.txt rwklm,
-    audit deny owner @{HOME}/.config/sops-nix/secrets{,/**} rwklm,
-    audit deny owner @{HOME}/.gnupg/private-keys-v1.d/{,**} rwklm,
-    audit deny owner @{HOME}/.gnupg/secring.gpg rwklm,
-    audit deny owner @{HOME}/.password-store/{,**} rwklm,
-    audit deny owner @{HOME}/.local/share/password-store/{,**} rwklm,
-    audit deny owner @{HOME}/.ssh/id_{dsa,ecdsa,ed25519,rsa} rwklm,
-    audit deny owner @{HOME}/.ssh/*.{key,p12,pem,pfx} rwklm,
-    audit deny owner @{HOME}/.config/Yubico/u2f_keys rwklm,
-    audit deny owner /run/user/[0-9]*/secrets.d/{,**} rwklm,
-    audit deny /run/secrets/{,**} rwklm,
-  '';
-
-  sharedApplicationRules = ''
-    include <abstractions/base>
-    include <abstractions/nameservice>
-    include <abstractions/ssl_certs>
-    include <abstractions/fonts>
-    include <abstractions/audio>
-    include <abstractions/X>
-    include <abstractions/wayland>
-    include <abstractions/dconf>
-    include <abstractions/xdg-desktop>
-    include <abstractions/opengl>
-
-    network,
-    dbus,
-    signal,
-    unix,
-
-    /etc/{,**} r,
-    /proc/{,**} r,
-    /sys/{,**} r,
-    /dev/dri/{,**} rw,
-    /dev/snd/{,**} rw,
-    /dev/video[0-9]* rw,
-    /dev/shm/{,**} rwkl,
-    owner /tmp/{,**} rwkl,
-    owner /var/tmp/{,**} rwkl,
-    owner /run/user/[0-9]*/{,**} rwkl,
-    owner @{HOME}/ r,
-    owner @{HOME}/** rwkl,
-  '';
-
-  developerTools = with pkgs; [
-    bash
-    coreutils
-    findutils
-    gnugrep
-    gnused
-    gawk
-    git
-    jujutsu
-    nix
-    openssh_hpn
-    seahorse
-    ripgrep
-    fd
-    gcc
-    gnumake
-    cmake
-    python3
-    nodejs
-    uv
-    gh
-    helix
-    neovim
-  ];
-
-  applicationPolicy =
-    app:
-    let
-      profileName = "local-${app.name}";
-      state = stateFor profileName;
-      executable = "${app.package}/bin/${app.executable}";
-      closureRoots = [ app.package ] ++ lib.optionals (app.developer or false) developerTools;
-      closureRules = pkgs.apparmorRulesFromClosure {
-        name = profileName;
-        additionalRules = [ "$path/bin/** ixr" ];
-      } closureRoots;
-    in
-    {
-      name = profileName;
-      value = {
-        inherit state;
-        profile = ''
-          abi <abi/4.0>,
-          include <tunables/global>
-
-          profile ${profileName} ${executable} flags=(attach_disconnected,mediate_deleted) {
-            ${sharedApplicationRules}
-            include "${closureRules}"
-            ${lib.optionalString (app.userns or false) "userns,"}
-            ${lib.optionalString (app.developer or false) ''
-              ptrace,
-              owner @{HOME}/** ix,
-              owner /tmp/** ix,
-              owner /var/tmp/** ix,
-            ''}
-            ${lib.optionalString (state == "enforce" && !(app.developer or false)) secretDenials}
-          }
-        '';
-      };
-    };
-
-  syncthingPathRules = lib.concatMapStringsSep "\n" (path: ''
-    ${path}/ r,
-    ${path}/** rwkl,
-  '') syncthingRoots;
-  syncthingPolicy = {
-    state = stateFor "local-syncthing";
-    profile = ''
-      abi <abi/4.0>,
-      include <tunables/global>
-
-      profile local-syncthing flags=(attach_disconnected,mediate_deleted) {
-        include <abstractions/base>
-        include <abstractions/nameservice>
-        include <abstractions/ssl_certs>
-        include "${
-          pkgs.apparmorRulesFromClosure {
-            name = "local-syncthing";
-            additionalRules = [ "$path/bin/** ixr" ];
-          } pkgs.syncthing
-        }"
-
-        network,
-        signal,
-        unix,
-        /etc/{,**} r,
-        /proc/{,**} r,
-        /sys/{,**} r,
-        /run/{,**} r,
-        /run/syncthing/{,**} rwkl,
-        owner /tmp/{,**} rwkl,
-        ${homeDirectory}/ r,
-        ${syncthingPathRules}
-      }
-    '';
-  };
-  dnsPolicy = {
-    state = stateFor "local-apply-secret-dns";
-    profile = ''
-      abi <abi/4.0>,
-      include <tunables/global>
-
-      profile local-apply-secret-dns flags=(attach_disconnected,mediate_deleted) {
-        include <abstractions/base>
-        include <abstractions/nameservice>
-        include "${
-          pkgs.apparmorRulesFromClosure
-            {
-              name = "local-apply-secret-dns";
-              additionalRules = [ "$path/bin/** ixr" ];
-            }
-            [
-              pkgs.bash
-              pkgs.coreutils
-              pkgs.gnused
-              pkgs.systemd
-            ]
-        }"
-
-        signal,
-        unix,
-        dbus,
-        capability chown,
-        /dev/tty rw,
-        /nix/store/*-unit-script-apply-secret-dns-start/bin/apply-secret-dns-start rix,
-        /run/secrets/dns/{,**} r,
-        /run/systemd/resolve/{,**} rw,
-        /run/systemd/resolved.conf.d/ rw,
-        /run/systemd/resolved.conf.d/** rw,
-        /run/systemd/private rw,
-        /run/dbus/system_bus_socket rw,
-      }
-    '';
-  };
 in
 {
   options.security.localAppArmor = {
-    mode = lib.mkOption {
-      type = lib.types.enum [
+    mode = mkOption {
+      type = types.enum [
         "staged"
         "disable"
         "complain"
@@ -445,15 +646,27 @@ in
       ];
       default = "staged";
       description = ''
-        Default state for the locally managed AppArmor profiles. Staged mode
-        enforces the DNS helper and loads every other profile in complain mode.
+        Default state for locally managed AppArmor profiles. Staged mode uses
+        each service descriptor's staged state and keeps applications in complain mode.
       '';
     };
 
-    profileOverrides = lib.mkOption {
-      type = lib.types.attrsOf stateType;
+    profileOverrides = mkOption {
+      type = types.attrsOf stateType;
       default = { };
       description = "Per-profile state overrides for locally managed AppArmor policies.";
+    };
+
+    services = mkOption {
+      type = types.attrsOf serviceType;
+      default = { };
+      description = "Services registered for locally generated AppArmor profiles.";
+    };
+
+    inventory = mkOption {
+      type = types.attrsOf inventoryType;
+      default = { };
+      description = "Audited service candidates and explicit confinement exemptions.";
     };
   };
 
@@ -468,44 +681,56 @@ in
           Managed profiles: ${lib.concatStringsSep ", " managedProfileNames}
         '';
       }
-    ];
+      {
+        assertion = applicationRegistry == { } || homeDirectory != null;
+        message = "Local AppArmor applications require a concrete Home Manager home directory.";
+      }
+      {
+        assertion =
+          homeConfig == null
+          || lib.all (app: lib.elem app.package homeConfig.home.packages) (
+            builtins.attrValues applicationRegistry
+          );
+        message = "Every local AppArmor application package must be installed by Home Manager.";
+      }
+      {
+        assertion =
+          builtins.length applicationAttachments == builtins.length (lib.unique applicationAttachments);
+        message = "Local AppArmor application attachments must be unique.";
+      }
+      {
+        assertion = builtins.length serviceUnits == builtins.length (lib.unique serviceUnits);
+        message = "Local AppArmor service unit attachments must be unique.";
+      }
+      {
+        assertion =
+          lib.intersectLists (builtins.attrNames applicationRegistry) (builtins.attrNames serviceRegistry)
+          == [ ];
+        message = "Local AppArmor application and service profile names must not overlap.";
+      }
+      {
+        assertion =
+          lib.intersectLists (builtins.attrNames applicationRegistry) (builtins.attrNames homeInventory)
+          == [ ];
+        message = "A local AppArmor workload cannot be both protected and inventoried as unconfined.";
+      }
+      {
+        assertion =
+          lib.intersectLists (builtins.attrNames serviceRegistry) (builtins.attrNames cfg.inventory) == [ ];
+        message = "A local AppArmor service cannot be both protected and inventoried as unconfined.";
+      }
+    ]
+    ++ appAssertions
+    ++ serviceAssertions;
 
     security.apparmor = {
       enable = true;
       enableCache = false;
       killUnconfinedConfinables = false;
-      policies = builtins.listToAttrs (map applicationPolicy appProfiles) // {
-        local-syncthing = syncthingPolicy;
-        local-apply-secret-dns = dnsPolicy;
-      };
+      policies = applicationPolicies // servicePolicies;
     };
 
     environment.systemPackages = [ apparmorReport ];
-
-    systemd.services.syncthing = {
-      after = lib.optional (stateFor "local-syncthing" != "disable") "apparmor.service";
-      requires = lib.optional (stateFor "local-syncthing" != "disable") "apparmor.service";
-      serviceConfig = {
-        AppArmorProfile = lib.mkIf (stateFor "local-syncthing" != "disable") "local-syncthing";
-        ProtectHome = "read-only";
-        ProtectSystem = "strict";
-        ReadWritePaths = syncthingRoots;
-        RestrictAddressFamilies = [
-          "AF_UNIX"
-          "AF_INET"
-          "AF_INET6"
-        ];
-        SystemCallArchitectures = "native";
-        UMask = "0077";
-      };
-    };
-
-    systemd.services.apply-secret-dns = {
-      after = lib.optional (stateFor "local-apply-secret-dns" != "disable") "apparmor.service";
-      requires = lib.optional (stateFor "local-apply-secret-dns" != "disable") "apparmor.service";
-      serviceConfig.AppArmorProfile = lib.mkIf (
-        stateFor "local-apply-secret-dns" != "disable"
-      ) "local-apply-secret-dns";
-    };
+    systemd.services = serviceAttachments;
   };
 }

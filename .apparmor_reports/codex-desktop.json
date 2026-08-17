@@ -1,0 +1,1425 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-codex-desktop"
+  ],
+  "summary": {
+    "events": 80,
+    "denied": 0,
+    "allowed": 80,
+    "groups": 58,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-codex-desktop": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/proc/16851/stat"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 6,
+      "commands": [
+        "ChatGPT"
+      ],
+      "first": "2026-08-17T13:55:24+02:00",
+      "last": "2026-08-17T13:55:39+02:00",
+      "sample": "audit: type=1400 audit(1786967724.852:327084): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/proc/16851/stat\" pid=16851 comm=\"ChatGPT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/proc/stat"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 5,
+      "commands": [
+        "ChatGPT"
+      ],
+      "first": "2026-08-17T13:55:24+02:00",
+      "last": "2026-08-17T13:55:39+02:00",
+      "sample": "audit: type=1400 audit(1786967724.852:327087): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/proc/stat\" pid=16851 comm=\"ChatGPT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 3,
+      "commands": [
+        "tokio-rt-worker"
+      ],
+      "first": "2026-08-17T13:55:55+02:00",
+      "last": "2026-08-17T13:55:55+02:00",
+      "sample": "audit: type=1400 audit(1786967755.188:426029): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/resources/codex\" name=\"/home/clementpoiret/\" pid=17076 comm=\"tokio-rt-worker\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.codex/config.toml"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 3,
+      "commands": [
+        "tokio-rt-worker"
+      ],
+      "first": "2026-08-17T13:55:55+02:00",
+      "last": "2026-08-17T13:55:55+02:00",
+      "sample": "audit: type=1400 audit(1786967755.185:426026): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/resources/codex\" name=\"/home/clementpoiret/.codex/config.toml\" pid=17076 comm=\"tokio-rt-worker\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/BrowserMetrics/"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 3,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:24+02:00",
+      "last": "2026-08-17T13:55:24+02:00",
+      "sample": "audit: type=1400 audit(1786967724.852:327090): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/BrowserMetrics/\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/proc/17322/stat"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 3,
+      "commands": [
+        "ChatGPT"
+      ],
+      "first": "2026-08-17T13:55:30+02:00",
+      "last": "2026-08-17T13:55:30+02:00",
+      "sample": "audit: type=1400 audit(1786967729.855:375027): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/proc/17322/stat\" pid=16851 comm=\"ChatGPT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.codex/.tmp/bundled-marketplaces/openai-bundled.staging-1ec6cce6-49c5-4df2-8b9b-bf5c4dc8402c/plugins/browser/node_modules/abstract-level/test/hooks/"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "libuv-worker"
+      ],
+      "first": "2026-08-17T13:55:30+02:00",
+      "last": "2026-08-17T13:55:30+02:00",
+      "sample": "audit: type=1400 audit(1786967729.855:375032): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.codex/.tmp/bundled-marketplaces/openai-bundled.staging-1ec6cce6-49c5-4df2-8b9b-bf5c4dc8402c/plugins/browser/node_modules/abstract-level/test/hooks/\" pid=16851 comm=\"libuv-worker\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "rename_dest"
+      ],
+      "requested": "wc",
+      "denied": "wc",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/extensions_crx_cache/metadata.json"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.858:406016): apparmor=\"ALLOWED\" operation=\"rename_dest\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/extensions_crx_cache/metadata.json\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"wc\" denied_mask=\"wc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/rz0l4pdbazivfk0iz6mz8asjyyl30p2z-readline-8.3p3/lib/libhistory.so.8.3"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "start.sh"
+      ],
+      "first": "2026-08-17T13:55:19+02:00",
+      "last": "2026-08-17T13:55:19+02:00",
+      "sample": "audit: type=1400 audit(1786967719.725:302794): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh\" name=\"/nix/store/rz0l4pdbazivfk0iz6mz8asjyyl30p2z-readline-8.3p3/lib/libhistory.so.8.3\" pid=16828 comm=\"start.sh\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/rz0l4pdbazivfk0iz6mz8asjyyl30p2z-readline-8.3p3/lib/libreadline.so.8.3"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "start.sh"
+      ],
+      "first": "2026-08-17T13:55:19+02:00",
+      "last": "2026-08-17T13:55:19+02:00",
+      "sample": "audit: type=1400 audit(1786967719.722:302791): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh\" name=\"/nix/store/rz0l4pdbazivfk0iz6mz8asjyyl30p2z-readline-8.3p3/lib/libreadline.so.8.3\" pid=16828 comm=\"start.sh\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr",
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/proc/version"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "tokio-rt-worker"
+      ],
+      "first": "2026-08-17T13:55:55+02:00",
+      "last": "2026-08-17T13:55:55+02:00",
+      "sample": "audit: type=1400 audit(1786967755.188:426033): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/resources/codex\" name=\"/proc/version\" pid=17076 comm=\"tokio-rt-worker\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.4ZvbxW"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.962:406019): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.4ZvbxW\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.4ZvbxW"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.962:406020): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.4ZvbxW\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.6b7Dpw"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.088:416778): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.6b7Dpw\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.6b7Dpw"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.088:416779): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.6b7Dpw\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.6b7Dpw"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.088:416780): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.6b7Dpw\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.6b7Dpw"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.088:416781): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.6b7Dpw\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.6b7Dpw"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.088:416782): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.6b7Dpw\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.M35NkP"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.095:419249): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.M35NkP\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.M35NkP"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.095:419250): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.M35NkP\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.M35NkP"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.095:419251): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.M35NkP\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.M35NkP"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.095:419252): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.M35NkP\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.M35NkP"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.095:419253): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.M35NkP\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ZJeNN2"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.378:419254): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ZJeNN2\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ZJeNN2"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.378:419255): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ZJeNN2\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ZJeNN2"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.378:419256): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ZJeNN2\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ZJeNN2"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.378:419257): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ZJeNN2\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ZJeNN2"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:50+02:00",
+      "last": "2026-08-17T13:55:50+02:00",
+      "sample": "audit: type=1400 audit(1786967750.382:419258): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ZJeNN2\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.e8MJVm"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.098:416783): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.e8MJVm\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.e8MJVm"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.098:416784): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.e8MJVm\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.e8MJVm"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.098:416785): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.e8MJVm\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.e8MJVm"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.098:416786): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.e8MJVm\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.e8MJVm"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:45+02:00",
+      "last": "2026-08-17T13:55:45+02:00",
+      "sample": "audit: type=1400 audit(1786967745.098:416787): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.e8MJVm\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ilIulL"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:39+02:00",
+      "last": "2026-08-17T13:55:39+02:00",
+      "sample": "audit: type=1400 audit(1786967739.885:413633): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ilIulL\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ilIulL"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:39+02:00",
+      "last": "2026-08-17T13:55:39+02:00",
+      "sample": "audit: type=1400 audit(1786967739.885:413634): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ilIulL\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ilIulL"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:39+02:00",
+      "last": "2026-08-17T13:55:39+02:00",
+      "sample": "audit: type=1400 audit(1786967739.885:413635): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ilIulL\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ilIulL"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:39+02:00",
+      "last": "2026-08-17T13:55:39+02:00",
+      "sample": "audit: type=1400 audit(1786967739.885:413636): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ilIulL\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.ilIulL"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:55:39+02:00",
+      "last": "2026-08-17T13:55:39+02:00",
+      "sample": "audit: type=1400 audit(1786967739.885:413637): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/dev/shm/.org.chromium.Chromium.ilIulL\" pid=16941 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "codex-desktop"
+      ],
+      "first": "2026-08-17T13:55:19+02:00",
+      "last": "2026-08-17T13:55:19+02:00",
+      "sample": "audit: type=1400 audit(1786967719.718:302786): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop\" name=\"/dev/tty\" pid=16828 comm=\"codex-desktop\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.codex/"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "tokio-rt-worker"
+      ],
+      "first": "2026-08-17T13:55:55+02:00",
+      "last": "2026-08-17T13:55:55+02:00",
+      "sample": "audit: type=1400 audit(1786967755.188:426031): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/resources/codex\" name=\"/home/clementpoiret/.codex/\" pid=17076 comm=\"tokio-rt-worker\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.codex/.tmp/bundled-marketplaces/openai-bundled.staging-1ec6cce6-49c5-4df2-8b9b-bf5c4dc8402c/plugins/browser/node_modules/abstract-level/test/hooks/newsub.js"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "libuv-worker"
+      ],
+      "first": "2026-08-17T13:55:30+02:00",
+      "last": "2026-08-17T13:55:30+02:00",
+      "sample": "audit: type=1400 audit(1786967729.855:375036): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.codex/.tmp/bundled-marketplaces/openai-bundled.staging-1ec6cce6-49c5-4df2-8b9b-bf5c4dc8402c/plugins/browser/node_modules/abstract-level/test/hooks/newsub.js\" pid=16851 comm=\"libuv-worker\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "chmod"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/home/clementpoiret/.codex/.tmp/bundled-marketplaces/openai-bundled.staging-1ec6cce6-49c5-4df2-8b9b-bf5c4dc8402c/plugins/chrome/node_modules/abstract-level/test/get-sync-test.js"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "libuv-worker"
+      ],
+      "first": "2026-08-17T13:55:30+02:00",
+      "last": "2026-08-17T13:55:30+02:00",
+      "sample": "audit: type=1400 audit(1786967729.855:375033): apparmor=\"ALLOWED\" operation=\"chmod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.codex/.tmp/bundled-marketplaces/openai-bundled.staging-1ec6cce6-49c5-4df2-8b9b-bf5c4dc8402c/plugins/chrome/node_modules/abstract-level/test/get-sync-test.js\" pid=16851 comm=\"libuv-worker\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.codex/.tmp/bundled-marketplaces/openai-bundled.staging-1ec6cce6-49c5-4df2-8b9b-bf5c4dc8402c/plugins/chrome/node_modules/abstract-level/test/get-test.js"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "libuv-worker"
+      ],
+      "first": "2026-08-17T13:55:30+02:00",
+      "last": "2026-08-17T13:55:30+02:00",
+      "sample": "audit: type=1400 audit(1786967729.855:375035): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.codex/.tmp/bundled-marketplaces/openai-bundled.staging-1ec6cce6-49c5-4df2-8b9b-bf5c4dc8402c/plugins/chrome/node_modules/abstract-level/test/get-test.js\" pid=16851 comm=\"libuv-worker\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.codex/plugins/cache/openai-bundled/visualize/"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "tokio-rt-worker"
+      ],
+      "first": "2026-08-17T13:55:55+02:00",
+      "last": "2026-08-17T13:55:55+02:00",
+      "sample": "audit: type=1400 audit(1786967755.188:426035): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/resources/codex\" name=\"/home/clementpoiret/.codex/plugins/cache/openai-bundled/visualize/\" pid=17076 comm=\"tokio-rt-worker\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/BrowserMetrics/BrowserMetrics-6A82F6A8-41D3.pma"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:24+02:00",
+      "last": "2026-08-17T13:55:24+02:00",
+      "sample": "audit: type=1400 audit(1786967724.852:327093): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/BrowserMetrics/BrowserMetrics-6A82F6A8-41D3.pma\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.DsDOOx"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.858:406013): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.DsDOOx\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.DsDOOx"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.858:406014): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.DsDOOx\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "rename_src"
+      ],
+      "requested": "wrd",
+      "denied": "wrd",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.DsDOOx"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.862:406017): apparmor=\"ALLOWED\" operation=\"rename_src\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.DsDOOx\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"wrd\" denied_mask=\"wrd\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.QmAkpA"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.858:406011): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.QmAkpA\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.QmAkpA"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.858:406012): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.QmAkpA\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "rename_src"
+      ],
+      "requested": "wrd",
+      "denied": "wrd",
+      "targets": {
+        "name": "/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.QmAkpA"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:55:34+02:00",
+      "last": "2026-08-17T13:55:34+02:00",
+      "sample": "audit: type=1400 audit(1786967734.858:406015): apparmor=\"ALLOWED\" operation=\"rename_src\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" name=\"/home/clementpoiret/.config/Codex/extensions_crx_cache/.org.chromium.Chromium.QmAkpA\" pid=16851 comm=\"ThreadPoolForeg\" requested_mask=\"wrd\" denied_mask=\"wrd\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/3d6jlqvsnq8p2ix98j3qkb4i6wsk3ak1-bash-interactive-5.3p9/bin/bash"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "start.sh"
+      ],
+      "first": "2026-08-17T13:55:19+02:00",
+      "last": "2026-08-17T13:55:19+02:00",
+      "sample": "audit: type=1400 audit(1786967719.722:302788): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh\" name=\"/nix/store/3d6jlqvsnq8p2ix98j3qkb4i6wsk3ak1-bash-interactive-5.3p9/bin/bash\" pid=16828 comm=\"start.sh\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/avld9cdn23zab2ssl30h2r6444rqh6ms-glibc-2.42-67/lib/ld-linux-x86-64.so.2"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "start.sh"
+      ],
+      "first": "2026-08-17T13:55:19+02:00",
+      "last": "2026-08-17T13:55:19+02:00",
+      "sample": "audit: type=1400 audit(1786967719.722:302789): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh\" name=\"/nix/store/avld9cdn23zab2ssl30h2r6444rqh6ms-glibc-2.42-67/lib/ld-linux-x86-64.so.2\" pid=16828 comm=\"start.sh\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "exec"
+      ],
+      "requested": "x",
+      "denied": "x",
+      "targets": {
+        "name": "/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh"
+      },
+      "details": {
+        "owner_match": "no",
+        "target": "local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "codex-desktop"
+      ],
+      "first": "2026-08-17T13:55:19+02:00",
+      "last": "2026-08-17T13:55:19+02:00",
+      "sample": "audit: type=1400 audit(1786967719.718:302787): apparmor=\"ALLOWED\" operation=\"exec\" class=\"file\" profile=\"local-codex-desktop\" name=\"/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh\" pid=16828 comm=\"codex-desktop\" requested_mask=\"x\" denied_mask=\"x\" fsuid=1000 ouid=0 target=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/pywf74sckm0lynsmn7ir588j9f5zchd9-ncurses-6.6/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "start.sh"
+      ],
+      "first": "2026-08-17T13:55:19+02:00",
+      "last": "2026-08-17T13:55:19+02:00",
+      "sample": "audit: type=1400 audit(1786967719.722:302790): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh\" name=\"/nix/store/pywf74sckm0lynsmn7ir588j9f5zchd9-ncurses-6.6/lib/\" pid=16828 comm=\"start.sh\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "rm",
+      "denied": "rm",
+      "targets": {
+        "name": "/nix/store/rz0l4pdbazivfk0iz6mz8asjyyl30p2z-readline-8.3p3/lib/libreadline.so.8.3"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "start.sh"
+      ],
+      "first": "2026-08-17T13:55:19+02:00",
+      "last": "2026-08-17T13:55:19+02:00",
+      "sample": "audit: type=1400 audit(1786967719.722:302793): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh\" name=\"/nix/store/rz0l4pdbazivfk0iz6mz8asjyyl30p2z-readline-8.3p3/lib/libreadline.so.8.3\" pid=16828 comm=\"start.sh\" requested_mask=\"rm\" denied_mask=\"rm\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "ptrace",
+      "operations": [
+        "ptrace"
+      ],
+      "requested": "read",
+      "denied": "read",
+      "targets": {
+        "peer": "local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT"
+      },
+      "details": {},
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ChatGPT"
+      ],
+      "first": "2026-08-17T13:55:30+02:00",
+      "last": "2026-08-17T13:55:30+02:00",
+      "sample": "audit: type=1400 audit(1786967729.855:375030): apparmor=\"ALLOWED\" operation=\"ptrace\" class=\"ptrace\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" pid=16851 comm=\"ChatGPT\" requested_mask=\"read\" denied_mask=\"read\" peer=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-desktop",
+      "class": "ptrace",
+      "operations": [
+        "ptrace"
+      ],
+      "requested": "readby",
+      "denied": "readby",
+      "targets": {
+        "peer": "local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT"
+      },
+      "details": {},
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ChatGPT"
+      ],
+      "first": "2026-08-17T13:55:30+02:00",
+      "last": "2026-08-17T13:55:30+02:00",
+      "sample": "audit: type=1400 audit(1786967729.855:375031): apparmor=\"ALLOWED\" operation=\"ptrace\" class=\"ptrace\" profile=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\" pid=16851 comm=\"ChatGPT\" requested_mask=\"readby\" denied_mask=\"readby\" peer=\"local-codex-desktop//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/start.sh//null-/nix/store/ca2rmaijwdpsnbl8463s9mhxqvgpyv34-codex-desktop-appshots-node-repl-reaper-remote-control-ui-remote-mobile-control-26.810.52044/opt/codex-desktop/ChatGPT\""
+    }
+  ]
+}

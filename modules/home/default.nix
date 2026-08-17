@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./apparmor.nix
     ./bat.nix # better cat command
     ./btop.nix # resouces monitor
     ./chtsh.nix

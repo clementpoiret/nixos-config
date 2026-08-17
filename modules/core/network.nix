@@ -9,6 +9,12 @@
 let
   dnsSecretName = "dns/${host}";
   nameservers = hostFacts.network.nameservers or [ ];
+  dnsServiceEnabled = builtins.hasAttr dnsSecretName config.sops.secrets;
+  dnsTools = with pkgs; [
+    coreutils
+    gnused
+    systemd
+  ];
 in
 {
   networking = {
@@ -102,7 +108,26 @@ in
     "d /run/systemd/resolved.conf.d 0755 root root -"
   ];
 
-  systemd.services.apply-secret-dns = lib.mkIf (builtins.hasAttr dnsSecretName config.sops.secrets) {
+  security.localAppArmor.services.apply-secret-dns = lib.mkIf dnsServiceEnabled {
+    unit = "apply-secret-dns";
+    stagedState = "enforce";
+    packageRoots = [ pkgs.bash ] ++ dnsTools;
+    executionPackages = [ pkgs.bash ] ++ dnsTools;
+    capabilities = [ "system-bus" ];
+    readOnlyPaths = [ config.sops.secrets.${dnsSecretName}.path ];
+    readWritePaths = [
+      "/run/systemd/resolve/{,**}"
+      "/run/systemd/resolved.conf.d/{,**}"
+      "/run/systemd/private"
+    ];
+    extraRules = ''
+      capability chown,
+      /nix/store/*-unit-script-apply-secret-dns-start/bin/apply-secret-dns-start rix,
+    '';
+    extraRulesRationale = "The generated oneshot script changes resolved drop-in ownership before reloading the unit.";
+  };
+
+  systemd.services.apply-secret-dns = lib.mkIf dnsServiceEnabled {
     description = "Apply sops-managed DNS settings to systemd-resolved";
     after = [
       "sops-nix.service"
@@ -110,11 +135,7 @@ in
     ];
     wants = [ "systemd-resolved.service" ];
     wantedBy = [ "multi-user.target" ];
-    path = with pkgs; [
-      coreutils
-      gnused
-      systemd
-    ];
+    path = dnsTools;
     serviceConfig = {
       Type = "oneshot";
       UMask = "0077";

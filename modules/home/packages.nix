@@ -1,12 +1,56 @@
 {
+  config,
   inputs,
   lib,
   pkgs,
   ...
 }:
-# let
-#   codexCli = inputs.codex-cli.packages.${pkgs.stdenv.hostPlatform.system}.default;
-# in
+let
+  softmakerOffice = pkgs.softmaker-office-nx.override {
+    officeVersion = {
+      version = "1502";
+      edition = "";
+      hash = "sha256-24CnmZ5lnx7+NvZxiAgib0uYCfUQuUgRuVW+K6AeB3U=";
+    };
+  };
+
+  desktopCapabilities = [
+    "desktop"
+    "portal"
+    "session-bus"
+  ];
+  documentDesktopCapabilities = desktopCapabilities ++ [ "user-files" ];
+  acceleratedDesktopCapabilities = desktopCapabilities ++ [ "gpu" ];
+  acceleratedDocumentCapabilities = acceleratedDesktopCapabilities ++ [ "user-files" ];
+  electronCapabilities = acceleratedDesktopCapabilities ++ [
+    "network"
+    "runtime-introspection"
+    "shared-memory"
+    "userns"
+  ];
+  electronDocumentCapabilities = electronCapabilities ++ [ "user-files" ];
+  browserCapabilities = electronCapabilities ++ [
+    "audio"
+    "camera"
+    "credential-broker"
+    "user-files"
+  ];
+  archiveExecutionPackages = with pkgs; [
+    bzip2
+    cpio
+    gnutar
+    gzip
+    lz4
+    unzip
+    xz
+  ];
+
+  codexDesktopPackages = builtins.filter (
+    package: lib.hasPrefix "codex-desktop-" (lib.getName package)
+  ) config.home.packages;
+  codexDesktopPackage =
+    if builtins.length codexDesktopPackages == 1 then builtins.head codexDesktopPackages else null;
+in
 {
   imports = [
     inputs.codex-desktop-linux.homeManagerModules.default
@@ -162,13 +206,7 @@
       pdftk # PDF document manipulation toolkit
       poppler # PDF rendering library (CLI tools)
       # softmaker-office-nx # Office suite
-      (pkgs.softmaker-office-nx.override {
-        officeVersion = {
-          version = "1502";
-          edition = "";
-          hash = "sha256-24CnmZ5lnx7+NvZxiAgib0uYCfUQuUgRuVW+K6AeB3U=";
-        };
-      })
+      softmakerOffice
       tdf # Terminal PDF reader
       zotero # Reference management
 
@@ -228,6 +266,405 @@
       "node-repl-reaper"
     ];
     # cliPackage = pkgs.flake.codex-cli;
+  };
+
+  assertions = [
+    {
+      assertion = builtins.length codexDesktopPackages == 1;
+      message = ''
+        programs.codexDesktopLinux must install exactly one codex-desktop package;
+        found ${toString (builtins.length codexDesktopPackages)} candidates.
+      '';
+    }
+  ];
+
+  localAppArmor = {
+    applications = {
+      file-roller = {
+        package = pkgs.file-roller;
+        capabilities = documentDesktopCapabilities;
+        extraClosureRoots = archiveExecutionPackages;
+        executionPackages = archiveExecutionPackages;
+        homePaths = [ ".config/file-roller" ];
+      };
+      evince = {
+        package = pkgs.evince;
+        capabilities = acceleratedDocumentCapabilities;
+        homePaths = [ ".config/evince" ];
+      };
+      mpv = {
+        package = pkgs.mpv;
+        capabilities = acceleratedDocumentCapabilities ++ [
+          "audio"
+          "network"
+        ];
+        homePaths = [
+          ".cache/mpv"
+          ".config/mpv"
+        ];
+      };
+      pqiv = {
+        package = pkgs.pqiv;
+        capabilities = acceleratedDocumentCapabilities;
+        homePaths = [ ".config/pqiv" ];
+      };
+      inkscape = {
+        package = pkgs.inkscape;
+        capabilities = acceleratedDocumentCapabilities;
+        homePaths = [
+          ".cache/inkscape"
+          ".config/inkscape"
+        ];
+      };
+      drawio = {
+        package = pkgs.drawio;
+        capabilities = electronDocumentCapabilities;
+        executionPackages = [ pkgs.electron ];
+        namespaceExecutables = [ "${pkgs.electron}/bin/electron" ];
+        namespaceRules = ''
+          capability sys_admin,
+          capability sys_ptrace,
+          owner /proc/[0-9]*/{gid_map,setgroups,uid_map} w,
+        '';
+        homePaths = [
+          ".cache/drawio"
+          ".config/draw.io"
+          ".config/drawio"
+        ];
+      };
+      zotero = {
+        package = pkgs.zotero;
+        executable = "bin/zotero";
+        capabilities = acceleratedDocumentCapabilities ++ [
+          "network"
+          "runtime-introspection"
+          "shared-memory"
+          "userns"
+        ];
+        homePaths = [
+          ".cache/zotero"
+          ".zotero"
+        ];
+      };
+      logseq = {
+        package = pkgs.logseq-appimage;
+        executable = "bin/logseq-appimage";
+        capabilities = electronDocumentCapabilities;
+        extraExecutables = [ "/nix/store/*-${pkgs.logseq-appimage.name}-bwrap" ];
+        homePaths = [
+          ".config/Logseq"
+          ".pki/nssdb"
+          "logseq"
+        ];
+      };
+      textmaker = {
+        package = softmakerOffice;
+        executable = "bin/softmaker-office-nx-textmaker";
+        capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
+        homePaths = [ "SoftMaker" ];
+      };
+      planmaker = {
+        package = softmakerOffice;
+        executable = "bin/softmaker-office-nx-planmaker";
+        capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
+        homePaths = [ "SoftMaker" ];
+      };
+      presentations = {
+        package = softmakerOffice;
+        executable = "bin/softmaker-office-nx-presentations";
+        capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
+        homePaths = [ "SoftMaker" ];
+      };
+      brave = {
+        package = pkgs.brave;
+        capabilities = browserCapabilities;
+        homePaths = [
+          ".cache/BraveSoftware"
+          ".config/BraveSoftware"
+        ];
+        sensitiveAccess = [ "credential-broker" ];
+      };
+      glide = {
+        package = pkgs.flake.glide-browser;
+        executable = "bin/glide";
+        capabilities = browserCapabilities;
+        homePaths = [
+          ".cache/glide"
+          ".config/glide"
+        ];
+        sensitiveAccess = [ "credential-broker" ];
+      };
+      mullvad-browser = {
+        package = pkgs.mullvad-browser;
+        executable = "bin/mullvad-browser";
+        capabilities = browserCapabilities;
+        homePaths = [
+          ".cache/mullvad"
+          ".mullvad"
+        ];
+        sensitiveAccess = [ "credential-broker" ];
+      };
+      vivaldi = {
+        package = pkgs.vivaldi;
+        capabilities = browserCapabilities;
+        homePaths = [
+          ".cache/vivaldi"
+          ".config/vivaldi"
+        ];
+        sensitiveAccess = [ "credential-broker" ];
+      };
+      thunderbird = {
+        package = pkgs.thunderbird;
+        capabilities = acceleratedDocumentCapabilities ++ [
+          "audio"
+          "network"
+          "runtime-introspection"
+          "shared-memory"
+          "userns"
+        ];
+        homePaths = [
+          ".cache/thunderbird"
+          ".thunderbird"
+        ];
+      };
+      protonmail-bridge = {
+        package = pkgs.protonmail-bridge;
+        executable = "bin/protonmail-bridge";
+        capabilities = acceleratedDesktopCapabilities ++ [
+          "credential-broker"
+          "network"
+        ];
+        homePaths = [
+          ".cache/protonmail"
+          ".config/protonmail"
+        ];
+        sensitiveAccess = [ "credential-broker" ];
+      };
+      proton-pass = {
+        package = pkgs.proton-pass;
+        executable = "bin/proton-pass";
+        capabilities = electronCapabilities ++ [ "credential-broker" ];
+        executionPackages = [ pkgs.electron ];
+        homePaths = [
+          ".cache/Proton Pass"
+          ".config/Proton Pass"
+        ];
+        sensitiveAccess = [ "credential-broker" ];
+      };
+      proton-pass-cli = {
+        package = pkgs.proton-pass-cli;
+        executable = "bin/pass-cli";
+        capabilities = [
+          "credential-broker"
+          "network"
+          "terminal"
+        ];
+        homePaths = [ ".config/proton-pass-cli" ];
+        sensitiveAccess = [ "credential-broker" ];
+      };
+      proton-vpn = {
+        package = pkgs.proton-vpn;
+        executable = "bin/protonvpn-app";
+        capabilities = acceleratedDesktopCapabilities ++ [
+          "network"
+          "system-bus"
+        ];
+        homePaths = [
+          ".cache/Proton/VPN"
+          ".config/Proton/VPN"
+        ];
+      };
+      qbittorrent = {
+        package = pkgs.qbittorrent;
+        capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
+        homePaths = [
+          ".cache/qBittorrent"
+          ".config/qBittorrent"
+          ".local/share/qBittorrent"
+        ];
+      };
+      motrix = {
+        package = pkgs.motrix-next;
+        executable = "bin/motrix-next";
+        capabilities = electronDocumentCapabilities;
+        extraClosureRoots = [ pkgs.glibc.bin ];
+        extraExecutables = [ "${pkgs.glibc.bin}/bin/getconf" ];
+        homePaths = [
+          ".cache/Motrix"
+          ".config/Motrix"
+          ".config/motrix"
+        ];
+      };
+      deezer = {
+        package = pkgs.deezer-enhanced;
+        executable = "bin/deezer-enhanced";
+        capabilities = electronCapabilities ++ [ "audio" ];
+        homePaths = [ ".config/deezer-enhanced" ];
+      };
+      codex-cli = {
+        package = pkgs.flake.codex-cli;
+        executable = "bin/codex";
+        capabilities = [
+          "developer-exec"
+          "full-home"
+          "network"
+          "terminal"
+          "userns"
+        ];
+        namespaceExecutables = [ "${pkgs.flake.codex-cli}/bin/.codex-wrapped" ];
+        namespaceRules = ''
+          capability setpcap,
+          capability sys_admin,
+          capability sys_ptrace,
+        '';
+        sensitiveAccess = [
+          "gpg-agent"
+          "ssh-config"
+          "ssh-control"
+          "ssh-identities"
+        ];
+      };
+      claude-code = {
+        package = pkgs.flake.claude-code;
+        executable = "bin/claude";
+        capabilities = [
+          "developer-exec"
+          "full-home"
+          "network"
+          "terminal"
+        ];
+        sensitiveAccess = [
+          "gpg-agent"
+          "ssh-config"
+          "ssh-control"
+          "ssh-identities"
+        ];
+      };
+    }
+    // lib.optionalAttrs (codexDesktopPackage != null) {
+      codex-desktop = {
+        package = codexDesktopPackage;
+        executable = "bin/codex-desktop";
+        capabilities = electronCapabilities ++ [
+          "audio"
+          "developer-exec"
+          "full-home"
+          "terminal"
+        ];
+        homePaths = [
+          ".codex"
+          ".config/Codex"
+        ];
+        sensitiveAccess = [
+          "gpg-agent"
+          "ssh-config"
+          "ssh-control"
+          "ssh-identities"
+        ];
+      };
+    };
+
+    developerPackages = with pkgs; [
+      bash
+      coreutils
+      coreutils-full
+      findutils
+      gnugrep
+      gnused
+      gawk
+      git
+      jujutsu
+      nix
+      openssh_hpn
+      ripgrep
+      fd
+      gcc
+      gnumake
+      cmake
+      python3
+      nodejs
+      uv
+      gh
+      stable.helix
+      neovim
+      ast-grep
+      entr
+      file
+      fzf
+      nixfmt
+      rustfmt
+      shfmt
+      zig
+      typst
+      typstyle
+      tinymist
+      typst-live
+      ltex-ls-plus
+      marksman
+      nixd
+      ruff
+      ty
+      glab
+      hub
+      fluxcd
+      k9s
+      kubernetes-helm
+      kubectl
+      opentofu
+      terraform
+      terraform-ls
+    ];
+
+    inventory = {
+      easyeffects = {
+        kind = "application";
+        status = "candidate";
+        target = "easyeffects";
+        rationale = "Audio graph and PipeWire integration need a dedicated complain-mode workload trace.";
+      };
+      guvcview = {
+        kind = "application";
+        status = "candidate";
+        target = "guvcview";
+        rationale = "Camera, USB, audio, and codec access need a dedicated device profile.";
+      };
+      junction = {
+        kind = "application";
+        status = "candidate";
+        target = "junction";
+        rationale = "URL dispatch and portal interactions require a representative workload trace.";
+      };
+      pavucontrol = {
+        kind = "application";
+        status = "candidate";
+        target = "pavucontrol";
+        rationale = "PipeWire and PulseAudio control interfaces need a dedicated capability review.";
+      };
+      via = {
+        kind = "application";
+        status = "candidate";
+        target = "via";
+        rationale = "Raw HID and Electron permissions need a hardware-backed workload trace.";
+      };
+      yubioath = {
+        kind = "application";
+        status = "candidate";
+        target = "yubioath-flutter";
+        rationale = "Smart-card, USB, and credential access need a dedicated threat model.";
+      };
+      broad-launchers = {
+        kind = "application";
+        status = "exempt";
+        target = "shells, terminals, Nautilus, editors, and agent launchers";
+        rationale = "They intentionally launch arbitrary user-selected commands and require a separate launcher model.";
+      };
+      privileged-admin = {
+        kind = "application";
+        status = "exempt";
+        target = "GParted and hardware/virtualization administration tools";
+        rationale = "Privilege transitions and device ownership require dedicated profiles and enforced VM tests.";
+      };
+    };
   };
 
   systemd.user.services.codex-remote-control.Install.WantedBy = lib.mkForce [ ];

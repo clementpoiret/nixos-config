@@ -41,6 +41,7 @@
     localAppArmor = {
       mode = "staged";
     };
+
     rtkit.enable = true;
 
     # Preserve the isolation primitives required by Nix, browsers, Flatpak,

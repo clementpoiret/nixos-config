@@ -1,0 +1,291 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-codex-cli"
+  ],
+  "summary": {
+    "events": 86,
+    "denied": 0,
+    "allowed": 86,
+    "groups": 11,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-codex-cli": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/ipjgnwb15kqn0wmnfszgcim7q2qv37s7-etc-os-release"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 29,
+      "commands": [
+        "codex-main",
+        "tokio-rt-worker"
+      ],
+      "first": "2026-08-17T13:52:36+02:00",
+      "last": "2026-08-17T13:53:29+02:00",
+      "sample": "audit: type=1400 audit(1786967556.392:300591): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-cli\" name=\"/nix/store/ipjgnwb15kqn0wmnfszgcim7q2qv37s7-etc-os-release\" pid=15204 comm=\"codex-main\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 17,
+      "commands": [
+        "codex-main",
+        "jj"
+      ],
+      "first": "2026-08-17T13:52:36+02:00",
+      "last": "2026-08-17T13:53:37+02:00",
+      "sample": "audit: type=1400 audit(1786967556.466:300594): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-cli\" name=\"/dev/tty\" pid=15204 comm=\"codex-main\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "cap",
+      "operations": [
+        "capable"
+      ],
+      "requested": null,
+      "denied": null,
+      "targets": {},
+      "details": {
+        "capability": "8",
+        "capname": "setpcap"
+      },
+      "null_profile": false,
+      "count": 15,
+      "commands": [
+        "bwrap"
+      ],
+      "first": "2026-08-17T13:53:01+02:00",
+      "last": "2026-08-17T13:53:15+02:00",
+      "sample": "audit: type=1400 audit(1786967581.942:301098): apparmor=\"ALLOWED\" operation=\"capable\" class=\"cap\" profile=\"local-codex-cli\" pid=15634 comm=\"bwrap\" capability=8  capname=\"setpcap\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/wpk1g5ywknazjp1dcxwhpdy1cjvp81v6-hm_gitconfig"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 8,
+      "commands": [
+        "git",
+        "jj"
+      ],
+      "first": "2026-08-17T13:52:55+02:00",
+      "last": "2026-08-17T13:53:29+02:00",
+      "sample": "audit: type=1400 audit(1786967575.352:300965): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-cli\" name=\"/nix/store/wpk1g5ywknazjp1dcxwhpdy1cjvp81v6-hm_gitconfig\" pid=15532 comm=\"git\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 4,
+      "commands": [
+        ".codex-wrapped",
+        "bash",
+        "codex"
+      ],
+      "first": "2026-08-17T13:52:36+02:00",
+      "last": "2026-08-17T13:53:29+02:00",
+      "sample": "audit: type=1400 audit(1786967556.382:300589): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-cli\" name=\"/dev/tty\" pid=15204 comm=\"codex\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "cap",
+      "operations": [
+        "capable"
+      ],
+      "requested": null,
+      "denied": null,
+      "targets": {},
+      "details": {
+        "capability": "21",
+        "capname": "sys_admin"
+      },
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        "bwrap"
+      ],
+      "first": "2026-08-17T13:53:01+02:00",
+      "last": "2026-08-17T13:53:15+02:00",
+      "sample": "audit: type=1400 audit(1786967581.942:301096): apparmor=\"ALLOWED\" operation=\"capable\" class=\"cap\" profile=\"local-codex-cli\" pid=15632 comm=\"bwrap\" capability=21  capname=\"sys_admin\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "cap",
+      "operations": [
+        "capable"
+      ],
+      "requested": null,
+      "denied": null,
+      "targets": {},
+      "details": {
+        "capability": "19",
+        "capname": "sys_ptrace"
+      },
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        "bwrap"
+      ],
+      "first": "2026-08-17T13:53:01+02:00",
+      "last": "2026-08-17T13:53:15+02:00",
+      "sample": "audit: type=1400 audit(1786967581.942:301097): apparmor=\"ALLOWED\" operation=\"capable\" class=\"cap\" profile=\"local-codex-cli\" pid=15632 comm=\"bwrap\" capability=19  capname=\"sys_ptrace\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "namespace",
+      "operations": [
+        "userns_create"
+      ],
+      "requested": "userns_create",
+      "denied": "userns_create",
+      "targets": {
+        "execpath": "/nix/store/h3x19wnvzbz712khsxrcx8xidl3pxvrx-bubblewrap-0.11.2/bin/bwrap"
+      },
+      "details": {},
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        "bwrap"
+      ],
+      "first": "2026-08-17T13:53:01+02:00",
+      "last": "2026-08-17T13:53:15+02:00",
+      "sample": "audit: type=1400 audit(1786967581.942:301095): apparmor=\"ALLOWED\" operation=\"userns_create\" class=\"namespace\" profile=\"local-codex-cli\" pid=15632 comm=\"bwrap\" requested=\"userns_create\" denied=\"userns_create\" execpath=\"/nix/store/h3x19wnvzbz712khsxrcx8xidl3pxvrx-bubblewrap-0.11.2/bin/bwrap\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/yjfyfyi7vz37fc2l5b5bvcw0janwgaxw-ghostty-1.3.1-terminfo/share/terminfo/x/xterm-ghostty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 2,
+      "commands": [
+        "tput"
+      ],
+      "first": "2026-08-17T13:53:33+02:00",
+      "last": "2026-08-17T13:53:33+02:00",
+      "sample": "audit: type=1400 audit(1786967613.452:302487): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-cli\" name=\"/nix/store/yjfyfyi7vz37fc2l5b5bvcw0janwgaxw-ghostty-1.3.1-terminfo/share/terminfo/x/xterm-ghostty\" pid=15889 comm=\"tput\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/6y3i5ms2fy2xah3h7w6mz6bm4i78w68l-hm_homeclementpoiret.gnupggpg.conf"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "gpg"
+      ],
+      "first": "2026-08-17T13:53:29+02:00",
+      "last": "2026-08-17T13:53:29+02:00",
+      "sample": "audit: type=1400 audit(1786967609.209:302485): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-cli\" name=\"/nix/store/6y3i5ms2fy2xah3h7w6mz6bm4i78w68l-hm_homeclementpoiret.gnupggpg.conf\" pid=15835 comm=\"gpg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-codex-cli",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/h50czas4c8i6pa1765dnlsbijnksj78a-jujutsu-config"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "jj"
+      ],
+      "first": "2026-08-17T13:53:29+02:00",
+      "last": "2026-08-17T13:53:29+02:00",
+      "sample": "audit: type=1400 audit(1786967609.172:302483): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-codex-cli\" name=\"/nix/store/h50czas4c8i6pa1765dnlsbijnksj78a-jujutsu-config\" pid=15815 comm=\"jj\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}

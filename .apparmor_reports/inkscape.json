@@ -1,0 +1,435 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-inkscape"
+  ],
+  "summary": {
+    "events": 22,
+    "denied": 0,
+    "allowed": 22,
+    "groups": 17,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-inkscape": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/357hajyjw78vjv2478vwwn8zgmkqg6nr-user-environment/share/hunspell/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 3,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:45+02:00",
+      "last": "2026-08-17T13:40:45+02:00",
+      "sample": "audit: type=1400 audit(1786966845.470:5578): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/357hajyjw78vjv2478vwwn8zgmkqg6nr-user-environment/share/hunspell/\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/2zqw9q1cd4viw0f0ya858hifv8sjdfb9-system-path/share/hunspell/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 2,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:45+02:00",
+      "last": "2026-08-17T13:40:45+02:00",
+      "sample": "audit: type=1400 audit(1786966845.470:5579): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/2zqw9q1cd4viw0f0ya858hifv8sjdfb9-system-path/share/hunspell/\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/ix7jj113bcgsq1x6g64d2x72jlnfp55k-nerd-fonts-noto-3.5.0/share/fonts/truetype/NerdFonts/Noto/NotoSansNerdFont-Italic.ttf"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 2,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:44+02:00",
+      "last": "2026-08-17T13:40:44+02:00",
+      "sample": "audit: type=1400 audit(1786966844.716:5575): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/ix7jj113bcgsq1x6g64d2x72jlnfp55k-nerd-fonts-noto-3.5.0/share/fonts/truetype/NerdFonts/Noto/NotoSansNerdFont-Italic.ttf\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/ix7jj113bcgsq1x6g64d2x72jlnfp55k-nerd-fonts-noto-3.5.0/share/fonts/truetype/NerdFonts/Noto/NotoSansNerdFont-SemiBold.ttf"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 2,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:51+02:00",
+      "last": "2026-08-17T13:40:51+02:00",
+      "sample": "audit: type=1400 audit(1786966851.500:6152): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/ix7jj113bcgsq1x6g64d2x72jlnfp55k-nerd-fonts-noto-3.5.0/share/fonts/truetype/NerdFonts/Noto/NotoSansNerdFont-SemiBold.ttf\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/2zqw9q1cd4viw0f0ya858hifv8sjdfb9-system-path/share/mime/mime.cache"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "pool-0"
+      ],
+      "first": "2026-08-17T13:40:44+02:00",
+      "last": "2026-08-17T13:40:44+02:00",
+      "sample": "audit: type=1400 audit(1786966844.440:5574): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/2zqw9q1cd4viw0f0ya858hifv8sjdfb9-system-path/share/mime/mime.cache\" pid=6589 comm=\"pool-0\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/357hajyjw78vjv2478vwwn8zgmkqg6nr-user-environment/share/mime/mime.cache"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "pool-0"
+      ],
+      "first": "2026-08-17T13:40:44+02:00",
+      "last": "2026-08-17T13:40:44+02:00",
+      "sample": "audit: type=1400 audit(1786966844.436:5573): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/357hajyjw78vjv2478vwwn8zgmkqg6nr-user-environment/share/mime/mime.cache\" pid=6589 comm=\"pool-0\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/cpgm66vz9jbq4k1d1r9rpnajbijlfhrs-dconf-db"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4856): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/cpgm66vz9jbq4k1d1r9rpnajbijlfhrs-dconf-db\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/hdfnb110myv6c1mx1d61y0d8w3c5d0ig-hm_hmfontconfigdefaultfonts.xml"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4860): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/hdfnb110myv6c1mx1d61y0d8w3c5d0ig-hm_hmfontconfigdefaultfonts.xml\" pid=6589 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/ix7jj113bcgsq1x6g64d2x72jlnfp55k-nerd-fonts-noto-3.5.0/share/fonts/truetype/NerdFonts/Noto/NotoSansNerdFont-Medium.ttf"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:45+02:00",
+      "last": "2026-08-17T13:40:45+02:00",
+      "sample": "audit: type=1400 audit(1786966845.383:5577): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/ix7jj113bcgsq1x6g64d2x72jlnfp55k-nerd-fonts-noto-3.5.0/share/fonts/truetype/NerdFonts/Noto/NotoSansNerdFont-Medium.ttf\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/l9z9qvvs7lv3scipb1a65qqvw1qf2mh0-fontconfig-conf/etc/fonts/conf.d/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4851): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/l9z9qvvs7lv3scipb1a65qqvw1qf2mh0-fontconfig-conf/etc/fonts/conf.d/\" pid=6589 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/m2by1wag2jhijhg5xchyphpxwdfv8y6a-gvfs-1.60.2/lib/gio/modules/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4853): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/m2by1wag2jhijhg5xchyphpxwdfv8y6a-gvfs-1.60.2/lib/gio/modules/\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/m2by1wag2jhijhg5xchyphpxwdfv8y6a-gvfs-1.60.2/lib/gio/modules/giomodule.cache"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4854): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/m2by1wag2jhijhg5xchyphpxwdfv8y6a-gvfs-1.60.2/lib/gio/modules/giomodule.cache\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/mili2yqnsn5sgvyw474fq3kngz51zj1w-gtk4-4.22.4/share/gsettings-schemas/gtk4-4.22.4/glib-2.0/schemas/gschemas.compiled"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4852): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/mili2yqnsn5sgvyw474fq3kngz51zj1w-gtk4-4.22.4/share/gsettings-schemas/gtk4-4.22.4/glib-2.0/schemas/gschemas.compiled\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/nlirzb1df6yrjzx6s8v097i8vl67z9x9-user/etc/dconf/profile/user"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".inkscape-wrapp"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4855): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/nlirzb1df6yrjzx6s8v097i8vl67z9x9-user/etc/dconf/profile/user\" pid=6589 comm=\".inkscape-wrapp\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/qmhf7bglj4ar870p04wwy0pqlkfpmvq1-twemoji-color-font-15.1.0/etc/fonts/conf.d/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4858): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/qmhf7bglj4ar870p04wwy0pqlkfpmvq1-twemoji-color-font-15.1.0/etc/fonts/conf.d/\" pid=6589 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/qmhf7bglj4ar870p04wwy0pqlkfpmvq1-twemoji-color-font-15.1.0/etc/fonts/conf.d/46-twemoji-color.conf"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4859): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/qmhf7bglj4ar870p04wwy0pqlkfpmvq1-twemoji-color-font-15.1.0/etc/fonts/conf.d/46-twemoji-color.conf\" pid=6589 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-inkscape",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/qni2k2cnhg3w074fz8b4lysbmng9d769-hm_hmfontconfigfonts.xml"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:40:33+02:00",
+      "last": "2026-08-17T13:40:33+02:00",
+      "sample": "audit: type=1400 audit(1786966833.422:4857): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-inkscape\" name=\"/nix/store/qni2k2cnhg3w074fz8b4lysbmng9d769-hm_hmfontconfigfonts.xml\" pid=6589 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}

@@ -219,11 +219,12 @@
           host = "laptop";
           extraModules = [
             nixos-hardware.nixosModules.framework-16-7040-amd
-            {
+            ({ lib, ... }: {
               security.localAppArmor = {
-                inherit mode profileOverrides;
+                mode = lib.mkForce mode;
+                inherit profileOverrides;
               };
-            }
+            })
           ];
         };
 
@@ -471,9 +472,15 @@
             stagedStates = states appArmorTestHosts.staged;
             complainPolicies = appArmorTestHosts.complain.config.security.apparmor.policies;
             enforcePolicies = appArmorTestHosts.enforce.config.security.apparmor.policies;
+            bravePolicy = complainPolicies.local-brave.profile;
+            codexPolicy = complainPolicies.local-codex-cli.profile;
+            drawioPolicy = complainPolicies.local-drawio.profile;
             disabledSyncthingService = appArmorTestHosts.disable.config.systemd.services.syncthing;
             overrideSyncthingService = appArmorTestHosts.override.config.systemd.services.syncthing;
             laptopConfig = self.nixosConfigurations.laptop.config;
+            laptopPkgs = self.nixosConfigurations.laptop.pkgs;
+            laptopHomeAppArmor = laptopConfig.home-manager.users.${username}.localAppArmor;
+            laptopServiceRegistry = laptopConfig.security.localAppArmor.services;
             dnsService = self.nixosConfigurations.laptop.config.systemd.services.apply-secret-dns;
             desktopSyncthingPaths =
               self.nixosConfigurations.desktop.config.systemd.services.syncthing.serviceConfig.ReadWritePaths;
@@ -492,12 +499,30 @@
             );
           assert (states appArmorTestHosts.override).local-syncthing == "enforce";
           assert overrideSyncthingService.serviceConfig.AppArmorProfile == "local-syncthing";
-          assert
-            !(pkgs-unstable.lib.hasInfix "audit deny owner @{HOME}/.ssh/" complainPolicies.local-brave.profile);
-          assert pkgs-unstable.lib.hasInfix "audit deny owner @{HOME}/.ssh/"
-            enforcePolicies.local-brave.profile;
-          assert
-            !(pkgs-unstable.lib.hasInfix "audit deny owner @{HOME}/.ssh/" enforcePolicies.local-codex-cli.profile);
+          assert bravePolicy != enforcePolicies.local-brave.profile;
+          assert laptopHomeAppArmor.applications.brave.package == laptopPkgs.brave;
+          assert builtins.elem "network" laptopHomeAppArmor.applications.brave.capabilities;
+          assert builtins.elem "credential-broker" laptopHomeAppArmor.applications.brave.sensitiveAccess;
+          assert builtins.elem "developer-exec" laptopHomeAppArmor.applications.codex-cli.capabilities;
+          assert builtins.elem "ssh-identities" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
+          assert builtins.elem laptopPkgs.stable.helix laptopHomeAppArmor.developerPackages;
+          assert laptopServiceRegistry.syncthing.packageRoots == [ laptopConfig.services.syncthing.package ];
+          assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
+          assert builtins.hasAttr "broad-launchers" laptopHomeAppArmor.inventory;
+          assert builtins.hasAttr "network-control-plane" laptopConfig.security.localAppArmor.inventory;
+          assert pkgs-unstable.lib.hasInfix "/bin/brave flags=(attach_disconnected,mediate_deleted)"
+            bravePolicy;
+          assert pkgs-unstable.lib.hasInfix "Cx -> namespace-bootstrap" codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "capability setpcap," codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "capability sys_admin," codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "capability sys_ptrace," codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "Cx -> namespace-bootstrap" drawioPolicy;
+          assert pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" drawioPolicy;
+          assert pkgs-unstable.lib.hasInfix "capability sys_admin," drawioPolicy;
+          assert pkgs-unstable.lib.hasInfix "capability sys_ptrace," drawioPolicy;
+          assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/{gid_map,setgroups,uid_map} w," drawioPolicy;
+          assert !(pkgs-unstable.lib.hasInfix "/nix/store/** ix" bravePolicy);
           assert laptopConfig.programs.ssh.enableAskPassword;
           assert laptopConfig.environment.variables.SSH_ASKPASS == laptopConfig.programs.ssh.askPassword;
           assert dnsService.serviceConfig.UMask == "0077";
@@ -547,6 +572,7 @@
             profileDirectories = map (
               configuration: configuration.config.environment.etc."apparmor.d".source
             ) configurations;
+            enforceProfileDirectory = appArmorTestHosts.enforce.config.environment.etc."apparmor.d".source;
             includeDirectories = pkgs-unstable.lib.unique (
               builtins.concatMap (
                 configuration:
@@ -556,15 +582,89 @@
             includeArguments = pkgs-unstable.lib.concatMapStringsSep " " (
               directory: "--Include ${pkgs-unstable.lib.escapeShellArg directory}"
             ) includeDirectories;
+            executablePatterns = pkgs-unstable.lib.unique (
+              builtins.concatMap (
+                configuration:
+                builtins.concatMap (app: app.extraExecutables ++ app.namespaceExecutables) (
+                  builtins.attrValues (
+                    pkgs-unstable.lib.filterAttrs (
+                      _: app: app.enable
+                    ) configuration.config.home-manager.users.${username}.localAppArmor.applications
+                  )
+                )
+              ) configurations
+            );
           in
           pkgs-unstable.runCommand "apparmor-policy-parser"
             {
               nativeBuildInputs = [ pkgs-unstable.apparmor-parser ];
             }
             ''
+              while IFS= read -r executable_pattern; do
+                [ -n "$executable_pattern" ] || continue
+                executable_matched=false
+                for executable_match in $executable_pattern; do
+                  [ -e "$executable_match" ] || continue
+                  executable_matched=true
+                  if [ ! -x "$executable_match" ]; then
+                    echo "AppArmor executable match is not executable: $executable_match" >&2
+                    exit 1
+                  fi
+                done
+                if [ "$executable_matched" != true ]; then
+                  echo "AppArmor executable pattern has no match: $executable_pattern" >&2
+                  exit 1
+                fi
+              done <<'EXECUTABLE_PATTERNS'
+              ${pkgs-unstable.lib.concatStringsSep "\n" executablePatterns}
+              EXECUTABLE_PATTERNS
+
               for profile_directory in ${
                 pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg profileDirectories
               }; do
+                brave_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-brave-common\)"/\1/p' "$profile_directory/local-brave")"
+                test -r "$brave_common"
+                session_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-session-read-only\)"/\1/p' "$brave_common")"
+                test -r "$session_rules"
+                grep -F '/share/** mr,' "$session_rules"
+                if awk '$NF ~ /^[a-z]+,$/ && $NF ~ /[wxkl]/ { bad=1 } END { exit !bad }' "$session_rules"; then
+                  echo "read-only session rules unexpectedly grant write or execution" >&2
+                  exit 1
+                fi
+
+                closure_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-closure-rules-local-brave\)"/\1/p' "$brave_common")"
+                test -r "$closure_rules"
+                if grep -F ' ixr,' "$closure_rules"; then
+                  echo "read-only application closure unexpectedly grants execution" >&2
+                  exit 1
+                fi
+
+                grep -F '${self.nixosConfigurations.laptop.pkgs.brave}/bin/** ixr,' "$brave_common"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.brave}/opt/** ixr,' "$brave_common"
+
+                file_roller_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-file-roller-common\)"/\1/p' "$profile_directory/local-file-roller")"
+                grep -F '${pkgs-unstable.unzip}/bin/** ixr,' "$file_roller_common"
+
+                motrix_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-motrix-common\)"/\1/p' "$profile_directory/local-motrix")"
+                grep -F '${pkgs-unstable.glibc.bin}/bin/getconf ixr,' "$motrix_common"
+
+                logseq_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-logseq-common\)"/\1/p' "$profile_directory/local-logseq")"
+                grep -F '/nix/store/*-${self.nixosConfigurations.laptop.pkgs.logseq-appimage.name}-bwrap ixr,' "$logseq_common"
+
+                pqiv_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-pqiv-common\)"/\1/p' "$profile_directory/local-pqiv")"
+                if grep -F 'owner @{HOME}/** rwkl,' "$pqiv_common" \
+                  || grep -F '/proc/{,**}' "$pqiv_common" \
+                  || grep -F '/run/user/[0-9]*/{,**}' "$pqiv_common" \
+                  || grep -F 'include <abstractions/nameservice>' "$pqiv_common" \
+                  || grep -F 'include <abstractions/audio>' "$pqiv_common" \
+                  || grep -F '/dev/video[0-9]* rw,' "$pqiv_common"; then
+                  echo "minimal desktop capability set leaked broad host access" >&2
+                  exit 1
+                fi
+
+                grep -F 'Cx -> namespace-bootstrap,' "$profile_directory/local-drawio"
+                grep -F 'profile namespace-bootstrap' "$profile_directory/local-drawio"
+
                 for policy in "$profile_directory"/local-*; do
                   attachment="$(sed -n 's/^[[:space:]]*profile local-[^[:space:]]* \([^[:space:]]*\) flags=.*/\1/p' "$policy")"
                   if [ -n "$attachment" ]; then
@@ -574,6 +674,23 @@
                     --Include "$profile_directory" ${includeArguments} "$policy"
                 done
               done
+
+              enforce_brave_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-brave-common\)"/\1/p' ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-brave)"
+              grep -F 'audit deny owner @{HOME}/.ssh/id_* rwklm,' "$enforce_brave_common"
+              grep -F 'audit deny owner @{HOME}/.ssh/config.secrets rwklm,' "$enforce_brave_common"
+              grep -F 'audit deny owner @{HOME}/.ssh/{cm,sockets}/{,**} rwklm,' "$enforce_brave_common"
+              grep -F 'dbus send bus=session peer=(name=org.freedesktop.secrets),' "$enforce_brave_common"
+              if grep -F 'audit deny dbus send bus=session peer=(name=org.freedesktop.secrets),' "$enforce_brave_common"; then
+                echo "explicit Brave credential-broker access was overridden by a deny" >&2
+                exit 1
+              fi
+
+              enforce_codex_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-codex-cli-common\)"/\1/p' ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-codex-cli | head -n 1)"
+              grep -F 'owner @{HOME}/.ssh/id_* r,' "$enforce_codex_common"
+              if grep -F 'audit deny owner @{HOME}/.ssh/id_* rwklm,' "$enforce_codex_common"; then
+                echo "explicit Codex SSH identity access was overridden by a deny" >&2
+                exit 1
+              fi
               touch "$out"
             '';
 

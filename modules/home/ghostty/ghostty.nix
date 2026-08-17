@@ -1,5 +1,7 @@
 { inputs, pkgs, ... }:
 {
+  localAppArmor.sessionReadPackages = [ pkgs.ghostty-host ];
+
   programs.ghostty = {
     enable = true;
     enableFishIntegration = true;

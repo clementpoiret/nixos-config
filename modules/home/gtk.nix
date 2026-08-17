@@ -1,26 +1,21 @@
 { pkgs, ... }:
-{
-  fonts.fontconfig.enable = true;
-  home.packages = with pkgs; [
-    # nerd fonts
+let
+  fontPackages = with pkgs; [
     nerd-fonts.fira-code
     nerd-fonts.hack
     nerd-fonts.jetbrains-mono
     nerd-fonts.monaspace
     nerd-fonts.noto
     nerd-fonts.symbols-only
-
-    # others
     stix-two
     xits-math
-    # hack-font
-    # noto-fonts-color-emoji
-    # noto-fonts
-
-    # source-sans
-    # source-sans-pro
     twemoji-color-font
   ];
+in
+{
+  fonts.fontconfig.enable = true;
+  home.packages = fontPackages;
+  localAppArmor.sessionReadPackages = fontPackages;
 
   gtk = {
     enable = true;

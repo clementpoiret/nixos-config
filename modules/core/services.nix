@@ -1,4 +1,16 @@
-{ pkgs, username, ... }:
+{
+  config,
+  host,
+  lib,
+  pkgs,
+  username,
+  ...
+}:
+let
+  homeDirectory = config.users.users.${username}.home;
+  syncthingRoot = lib.removeSuffix "/" config.services.syncthing.dataDir;
+  syncthingRoots = [ syncthingRoot ] ++ lib.optional (host == "desktop") "/srv/syncthing";
+in
 {
   services = {
     gvfs.enable = true;
@@ -39,5 +51,69 @@
     user = username;
     dataDir = "/home/${username}/Sync/";
     openDefaultPorts = false;
+  };
+
+  security.localAppArmor = {
+    services.syncthing = {
+      unit = "syncthing";
+      packageRoots = [ config.services.syncthing.package ];
+      executionPackages = [ config.services.syncthing.package ];
+      capabilities = [ "network" ];
+      readOnlyPaths = [
+        "${homeDirectory}/"
+        "/proc/[0-9]*/cgroup"
+        "/proc/[0-9]*/mountinfo"
+        "/proc/sys/net/core/somaxconn"
+      ];
+      readWritePaths =
+        builtins.concatMap (path: [
+          "${path}/"
+          "${path}/**"
+        ]) syncthingRoots
+        ++ [
+          "/run/syncthing/"
+          "/run/syncthing/**"
+        ];
+    };
+
+    inventory = {
+      network-control-plane = {
+        kind = "service";
+        status = "exempt";
+        target = "NetworkManager, resolved, chrony, OpenSSH, and Tailscale";
+        rationale = "Network control-plane daemons require individual protocol and privilege threat models.";
+      };
+      virtualization = {
+        kind = "service";
+        status = "exempt";
+        target = "libvirt and Podman";
+        rationale = "Container and VM launchers intentionally construct dynamic namespaces, devices, and child policies.";
+      };
+      desktop-session = {
+        kind = "service";
+        status = "exempt";
+        target = "greetd, D-Bus, portals, keyrings, PipeWire, Bluetooth, and PCSC";
+        rationale = "Session brokers mediate other applications and need dedicated peer-aware policies.";
+      };
+      host-management = {
+        kind = "service";
+        status = "exempt";
+        target = "hardware, firmware, GPU, scheduler, and performance daemons";
+        rationale = "Their privileged device and sysfs surfaces require host-specific enforced tests.";
+      };
+    };
+  };
+
+  systemd.services.syncthing.serviceConfig = {
+    ProtectHome = "read-only";
+    ProtectSystem = "strict";
+    ReadWritePaths = syncthingRoots;
+    RestrictAddressFamilies = [
+      "AF_UNIX"
+      "AF_INET"
+      "AF_INET6"
+    ];
+    SystemCallArchitectures = "native";
+    UMask = "0077";
   };
 }

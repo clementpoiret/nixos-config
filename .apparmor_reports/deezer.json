@@ -1,0 +1,1012 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-deezer"
+  ],
+  "summary": {
+    "events": 49,
+    "denied": 0,
+    "allowed": 49,
+    "groups": 41,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-deezer": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/c6e72fb75ee290dc_0"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 8,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:45+02:00",
+      "last": "2026-08-17T13:51:45+02:00",
+      "sample": "audit: type=1400 audit(1786967505.499:297837): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/c6e72fb75ee290dc_0\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/61115ea68f8c0cf2_0"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 2,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.493:295494): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/61115ea68f8c0cf2_0\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "file_receive"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.8uzosz"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_IOThread"
+      ],
+      "first": "2026-08-17T13:51:45+02:00",
+      "last": "2026-08-17T13:51:45+02:00",
+      "sample": "audit: type=1400 audit(1786967505.499:297839): apparmor=\"ALLOWED\" operation=\"file_receive\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.8uzosz\" pid=14167 comm=\"Chrome_IOThread\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.AZ8zfo"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220117): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.AZ8zfo\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.AZ8zfo"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220118): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.AZ8zfo\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.AZ8zfo"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220119): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.AZ8zfo\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.AZ8zfo"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220120): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.AZ8zfo\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.AZ8zfo"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.489:220121): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.AZ8zfo\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.XzxZwv"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:45+02:00",
+      "last": "2026-08-17T13:51:45+02:00",
+      "sample": "audit: type=1400 audit(1786967505.529:297846): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.XzxZwv\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.Z9EbfH"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.496:295501): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.Z9EbfH\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.Z9EbfH"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.496:295502): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.Z9EbfH\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.Z9EbfH"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.496:295503): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.Z9EbfH\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.mxQZni"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.493:295496): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.mxQZni\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.mxQZni"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.493:295497): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.mxQZni\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.mxQZni"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.493:295498): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.mxQZni\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.mxQZni"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.493:295499): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.mxQZni\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/dev/shm/.org.chromium.Chromium.mxQZni"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "Chrome_ChildIOT"
+      ],
+      "first": "2026-08-17T13:51:40+02:00",
+      "last": "2026-08-17T13:51:40+02:00",
+      "sample": "audit: type=1400 audit(1786967500.493:295500): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/dev/shm/.org.chromium.Chromium.mxQZni\" pid=14632 comm=\"Chrome_ChildIOT\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wr",
+      "denied": "wr",
+      "targets": {
+        "name": "/dev/tty"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "deezer-enhanced"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.939:196968): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-deezer\" name=\"/dev/tty\" pid=14167 comm=\"deezer-enhanced\" requested_mask=\"wr\" denied_mask=\"wr\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "mknod"
+      ],
+      "requested": "c",
+      "denied": "c",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/.org.chromium.Chromium.lZbuFc"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:51+02:00",
+      "last": "2026-08-17T13:51:51+02:00",
+      "sample": "audit: type=1400 audit(1786967511.493:300254): apparmor=\"ALLOWED\" operation=\"mknod\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/.org.chromium.Chromium.lZbuFc\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"c\" denied_mask=\"c\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "wrc",
+      "denied": "wrc",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/.org.chromium.Chromium.lZbuFc"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:51+02:00",
+      "last": "2026-08-17T13:51:51+02:00",
+      "sample": "audit: type=1400 audit(1786967511.493:300255): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/.org.chromium.Chromium.lZbuFc\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"wrc\" denied_mask=\"wrc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "rename_src"
+      ],
+      "requested": "wrd",
+      "denied": "wrd",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/.org.chromium.Chromium.lZbuFc"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:51+02:00",
+      "last": "2026-08-17T13:51:51+02:00",
+      "sample": "audit: type=1400 audit(1786967511.496:300256): apparmor=\"ALLOWED\" operation=\"rename_src\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/.org.chromium.Chromium.lZbuFc\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"wrd\" denied_mask=\"wrd\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "rename_src"
+      ],
+      "requested": "wrd",
+      "denied": "wrd",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/e62d0eaadf049565_0"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220112): apparmor=\"ALLOWED\" operation=\"rename_src\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/e62d0eaadf049565_0\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"wrd\" denied_mask=\"wrd\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "rename_dest"
+      ],
+      "requested": "wc",
+      "denied": "wc",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/todelete_e62d0eaadf049565_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220113): apparmor=\"ALLOWED\" operation=\"rename_dest\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/todelete_e62d0eaadf049565_0_1\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"wc\" denied_mask=\"wc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "truncate"
+      ],
+      "requested": "w",
+      "denied": "w",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/todelete_e62d0eaadf049565_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220114): apparmor=\"ALLOWED\" operation=\"truncate\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/todelete_e62d0eaadf049565_0_1\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"w\" denied_mask=\"w\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/todelete_e62d0eaadf049565_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220115): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/todelete_e62d0eaadf049565_0_1\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/todelete_e62d0eaadf049565_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:35+02:00",
+      "last": "2026-08-17T13:51:35+02:00",
+      "sample": "audit: type=1400 audit(1786967495.486:220116): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/home/clementpoiret/.config/deezer-enhanced/Cache/Cache_Data/todelete_e62d0eaadf049565_0_1\" pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "rename_dest"
+      ],
+      "requested": "wc",
+      "denied": "wc",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Network Persistent State"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:51+02:00",
+      "last": "2026-08-17T13:51:51+02:00",
+      "sample": "audit: type=1400 audit(1786967511.496:300257): apparmor=\"ALLOWED\" operation=\"rename_dest\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=2F686F6D652F636C656D656E74706F697265742F2E636F6E6669672F6465657A65722D656E68616E6365642F4E6574776F726B2050657273697374656E74205374617465 pid=14632 comm=\"ThreadPoolForeg\" requested_mask=\"wc\" denied_mask=\"wc\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Service Worker/CacheStorage/bdcdac69ed4f2178c8dabcd9d214e820b1fb268b/9de45751-0070-47cc-95ff-58534114bec9/todelete_879e1f615a6c12a6_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:52+02:00",
+      "last": "2026-08-17T13:51:52+02:00",
+      "sample": "audit: type=1400 audit(1786967512.093:300258): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=2F686F6D652F636C656D656E74706F697265742F2E636F6E6669672F6465657A65722D656E68616E6365642F5365727669636520576F726B65722F436163686553746F726167652F626463646163363965643466323137386338646162636439643231346538323062316662323638622F39646534353735312D303037302D343763632D393566662D3538353334313134626563392F746F64656C6574655F383739653166363135613663313261365F305F31 pid=14167 comm=\"ThreadPoolForeg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Service Worker/CacheStorage/bdcdac69ed4f2178c8dabcd9d214e820b1fb268b/9de45751-0070-47cc-95ff-58534114bec9/todelete_879e1f615a6c12a6_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:52+02:00",
+      "last": "2026-08-17T13:51:52+02:00",
+      "sample": "audit: type=1400 audit(1786967512.093:300260): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=2F686F6D652F636C656D656E74706F697265742F2E636F6E6669672F6465657A65722D656E68616E6365642F5365727669636520576F726B65722F436163686553746F726167652F626463646163363965643466323137386338646162636439643231346538323062316662323638622F39646534353735312D303037302D343763632D393566662D3538353334313134626563392F746F64656C6574655F383739653166363135613663313261365F305F31 pid=14167 comm=\"ThreadPoolForeg\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Service Worker/CacheStorage/bdcdac69ed4f2178c8dabcd9d214e820b1fb268b/9de45751-0070-47cc-95ff-58534114bec9/todelete_e17e0cb2c46265e6_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:52+02:00",
+      "last": "2026-08-17T13:51:52+02:00",
+      "sample": "audit: type=1400 audit(1786967512.093:300259): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=2F686F6D652F636C656D656E74706F697265742F2E636F6E6669672F6465657A65722D656E68616E6365642F5365727669636520576F726B65722F436163686553746F726167652F626463646163363965643466323137386338646162636439643231346538323062316662323638622F39646534353735312D303037302D343763632D393566662D3538353334313134626563392F746F64656C6574655F653137653063623263343632363565365F305F31 pid=14167 comm=\"ThreadPoolForeg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "unlink"
+      ],
+      "requested": "d",
+      "denied": "d",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Service Worker/CacheStorage/bdcdac69ed4f2178c8dabcd9d214e820b1fb268b/9de45751-0070-47cc-95ff-58534114bec9/todelete_e17e0cb2c46265e6_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:52+02:00",
+      "last": "2026-08-17T13:51:52+02:00",
+      "sample": "audit: type=1400 audit(1786967512.093:300262): apparmor=\"ALLOWED\" operation=\"unlink\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=2F686F6D652F636C656D656E74706F697265742F2E636F6E6669672F6465657A65722D656E68616E6365642F5365727669636520576F726B65722F436163686553746F726167652F626463646163363965643466323137386338646162636439643231346538323062316662323638622F39646534353735312D303037302D343763632D393566662D3538353334313134626563392F746F64656C6574655F653137653063623263343632363565365F305F31 pid=14167 comm=\"ThreadPoolForeg\" requested_mask=\"d\" denied_mask=\"d\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/home/clementpoiret/.config/deezer-enhanced/Service Worker/CacheStorage/bdcdac69ed4f2178c8dabcd9d214e820b1fb268b/9de45751-0070-47cc-95ff-58534114bec9/todelete_e691d1af826d76b4_0_1"
+      },
+      "details": {
+        "owner_match": "yes"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        "ThreadPoolForeg"
+      ],
+      "first": "2026-08-17T13:51:52+02:00",
+      "last": "2026-08-17T13:51:52+02:00",
+      "sample": "audit: type=1400 audit(1786967512.093:300261): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=2F686F6D652F636C656D656E74706F697265742F2E636F6E6669672F6465657A65722D656E68616E6365642F5365727669636520576F726B65722F436163686553746F726167652F626463646163363965643466323137386338646162636439643231346538323062316662323638622F39646534353735312D303037302D343763632D393566662D3538353334313134626563392F746F64656C6574655F653639316431616638323664373662345F305F31 pid=14167 comm=\"ThreadPoolForeg\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=1000"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".deezer-enhance"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.953:196971): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/nix/store/0d8g8n0a11v6f5m2h416ajyxmnkwc3md-glibc-2.42-67/lib/ld-linux-x86-64.so.2\" pid=14167 comm=\".deezer-enhance\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/62qx8cgv8h24cq4vgh5ipyflwg1naykl-libx11-1.8.13/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".deezer-enhance"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.953:196972): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/nix/store/62qx8cgv8h24cq4vgh5ipyflwg1naykl-libx11-1.8.13/lib/\" pid=14167 comm=\".deezer-enhance\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/acrnf5y878q0s118klx9a47di53nrngd-libxfixes-6.0.2/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".deezer-enhance"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.953:196976): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/nix/store/acrnf5y878q0s118klx9a47di53nrngd-libxfixes-6.0.2/lib/\" pid=14167 comm=\".deezer-enhance\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/ahaa4jwd3bkyz6xcqkpyww548wj5x9c6-libxrandr-1.5.5/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".deezer-enhance"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.953:196977): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/nix/store/ahaa4jwd3bkyz6xcqkpyww548wj5x9c6-libxrandr-1.5.5/lib/\" pid=14167 comm=\".deezer-enhance\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/crlxplavrrasrjgcmf1wlaw2z8d41a77-libxcomposite-0.4.7/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".deezer-enhance"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.953:196973): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/nix/store/crlxplavrrasrjgcmf1wlaw2z8d41a77-libxcomposite-0.4.7/lib/\" pid=14167 comm=\".deezer-enhance\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "exec"
+      ],
+      "requested": "x",
+      "denied": "x",
+      "targets": {
+        "name": "/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced"
+      },
+      "details": {
+        "owner_match": "no",
+        "target": "local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "deezer-enhanced"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.949:196969): apparmor=\"ALLOWED\" operation=\"exec\" class=\"file\" profile=\"local-deezer\" name=\"/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" pid=14167 comm=\"deezer-enhanced\" requested_mask=\"x\" denied_mask=\"x\" fsuid=1000 ouid=0 target=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\""
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "file_mmap"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".deezer-enhance"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.949:196970): apparmor=\"ALLOWED\" operation=\"file_mmap\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" pid=14167 comm=\".deezer-enhance\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/whs9idvicsc1zi5553xsb06795nzgi4g-libxext-1.3.7/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".deezer-enhance"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.953:196975): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/nix/store/whs9idvicsc1zi5553xsb06795nzgi4g-libxext-1.3.7/lib/\" pid=14167 comm=\".deezer-enhance\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-deezer",
+      "class": "file",
+      "operations": [
+        "getattr"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/y1c9y15m30pp827zkmlaimd310yvx0m6-libxdamage-1.1.7/lib/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": true,
+      "count": 1,
+      "commands": [
+        ".deezer-enhance"
+      ],
+      "first": "2026-08-17T13:51:29+02:00",
+      "last": "2026-08-17T13:51:29+02:00",
+      "sample": "audit: type=1400 audit(1786967489.953:196974): apparmor=\"ALLOWED\" operation=\"getattr\" class=\"file\" profile=\"local-deezer//null-/nix/store/mvhg14ga2ypg5pyhq3lzw3sf9y0ww8yl-deezer-enhanced-1.5.1/lib/deezer-enhanced/deezer-enhanced\" name=\"/nix/store/y1c9y15m30pp827zkmlaimd310yvx0m6-libxdamage-1.1.7/lib/\" pid=14167 comm=\".deezer-enhance\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}

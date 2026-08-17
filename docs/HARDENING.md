@@ -107,9 +107,11 @@ Do not apply a broad module blacklist without first inventorying `lsmod`,
 
 ## AppArmor policy
 
-`modules/core/apparmor.nix` owns the local policy and exposes two settings. The
-complete mode reference, testing commands, policy-editing recipes, and rollback
-procedure are in [APPARMOR.md](APPARMOR.md).
+`modules/core/apparmor.nix` owns the policy generator. Applications register
+beside their Home Manager packages, while services register beside their NixOS
+units. The complete capability model, mode reference, testing commands,
+policy-editing recipes, and rollback procedure are in
+[APPARMOR.md](APPARMOR.md).
 
 A typical configuration is:
 
@@ -138,26 +140,27 @@ The application inventory covers:
 
 - untrusted files and documents: File Roller, Evince, mpv, pqiv, Inkscape,
   Draw.io, Zotero, Logseq, and the three SoftMaker applications;
-- browsers and network clients: Brave, Glide, Helium, Mullvad Browser, Orion,
-  Vivaldi, Thunderbird, Proton Mail Bridge, Proton Pass and its CLI, Proton
-  VPN, qBittorrent, Motrix, and Deezer;
-- development tools: Codex Desktop and CLI, Claude Code, Antigravity CLI and
-  IDE, and Zed.
+- browsers and network clients: Brave, Glide, Mullvad Browser, Vivaldi,
+  Thunderbird, Proton Mail Bridge, Proton Pass and its CLI, Proton VPN,
+  qBittorrent, Motrix, and Deezer;
+- development tools: Codex Desktop and CLI, and Claude Code.
 
-Application attachments use their exact Nix store executables, and inherited
-children receive rules generated from the package closure. Development-agent
-profiles additionally receive a bounded closure of installed compilers,
-interpreters, editors, Nix/VCS, and shell tools so repository work remains
-possible. Their home/repository execution and authentication access is an
-intentional compatibility exception.
+Application attachments use their exact Nix store executables. Transitive
+package closures receive only read and library-mapping permissions; execution
+is limited to direct package outputs and explicitly registered helper packages
+or paths. Applications opt into typed desktop, IPC, network, device,
+namespace, terminal, and home capabilities. Development-agent profiles receive
+the explicitly classified installed tool set and home/repository execution so
+repository work remains possible.
 
-When a non-development application is enforced, explicit exclusions protect
-SOPS/age keys and decrypted user secrets, SSH private-key patterns, GPG private
-keys, the U2F mapping, and common password-store locations. Those explicit
-`deny` rules are deliberately emitted only for enforced profiles: AppArmor
-applies explicit denies even when a profile is otherwise in complain mode.
-Therefore complain mode is for learning compatibility, and the credential
-boundary becomes active at promotion.
+When an application is enforced, explicit exclusions protect SOPS/age keys and
+decrypted secrets, SSH identities/config/control sockets, GPG private keys and
+agent sockets, mail authentication, Secret Service/keyring channels, the U2F
+mapping, and common password-store locations. Credential groups remain denied
+unless the individual application explicitly registers access; being a
+development tool is not a blanket exception. These `deny` rules are emitted
+only for enforced profiles because AppArmor applies explicit denies even in
+complain mode. The credential boundary therefore becomes active at promotion.
 
 Syncthing is always configured at `/home/clementpoiret/Sync`. On the desktop,
 both that logical path and `/srv/syncthing` are authorized because `~/Sync` is
@@ -167,11 +170,15 @@ roots writable. The DNS helper has a narrow enforced profile, an explicit
 `CAP_CHOWN` ceiling, and atomically installs a `0600` drop-in owned by
 `systemd-resolve`.
 
-Shells, terminal emulators, Nautilus, Neovim, Helix, GPG/SSH agents, Podman,
-libvirt, sshd, and Tailscale are intentionally not attached to these local
-profiles. Profiling broad interactive launchers would either transitively
-confine unrelated work or require a policy so permissive that the label would
-be misleading. Existing service sandboxing and subsystem controls still apply.
+The checked inventories explicitly leave broad launchers and privileged
+administrators unconfined, and defer network control-plane, virtualization,
+desktop-session broker, and host-management services to workload-specific
+threat models. This covers shells, terminals, file managers, editors, agents,
+NetworkManager/resolved/chrony/sshd/Tailscale, Podman/libvirt, greetd/D-Bus/
+portals/keyrings/PipeWire/Bluetooth/PCSC, and hardware or GPU management
+daemons. Generic profiles for those classes would either transitively confine
+unrelated work or require misleadingly broad authority. Existing systemd
+sandboxing and subsystem controls still apply.
 
 ### Promotion workflow
 
@@ -189,7 +196,8 @@ nix build .#checks.x86_64-linux.apparmor-vm
 Set a single override to `enforce`, rebuild both hosts, and repeat the workload
 and journal review. Use `complain` to continue learning or `disable` to unload a
 problem profile; do not add broad `/nix/store/**` execution rules to silence
-denials. Exact package closures keep store access bounded across upgrades.
+denials. Immutable-store compatibility reads remain non-executable, while
+direct execution manifests keep package upgrades reviewable.
 
 ## Deployment and recovery
 

@@ -24,7 +24,53 @@ pkgs.testers.runNixOSTest {
         mode = "disable";
         profileOverrides = {
           local-apply-secret-dns = "enforce";
-          local-syncthing = "complain";
+          local-policy-fixture = "enforce";
+          local-syncthing = "enforce";
+        };
+        services = {
+          apply-secret-dns = {
+            unit = "apply-secret-dns";
+            stagedState = "enforce";
+            packageRoots = with pkgs; [
+              bash
+              coreutils
+            ];
+            executionPackages = with pkgs; [
+              bash
+              coreutils
+            ];
+            readOnlyPaths = [ "/run/secrets/dns/test" ];
+            readWritePaths = [ "/run/systemd/resolved.conf.d/{,**}" ];
+            extraRules = ''
+              capability chown,
+              /nix/store/*-unit-script-apply-secret-dns-start/bin/apply-secret-dns-start rix,
+            '';
+            extraRulesRationale = "The test service changes ownership of an atomic resolved drop-in.";
+          };
+          policy-fixture = {
+            unit = "apparmor-policy-fixture";
+            packageRoots = [ pkgs.coreutils ];
+            executionPackages = [ pkgs.coreutils ];
+            readWritePaths = [ "/var/lib/apparmor-fixture/{,**}" ];
+          };
+          syncthing = {
+            unit = "syncthing";
+            packageRoots = [ pkgs.syncthing ];
+            executionPackages = [ pkgs.syncthing ];
+            capabilities = [ "network" ];
+            readOnlyPaths = [
+              "/home/test/"
+              "/proc/[0-9]*/cgroup"
+              "/proc/[0-9]*/mountinfo"
+              "/proc/sys/net/core/somaxconn"
+            ];
+            readWritePaths = [
+              "/home/test/Sync/"
+              "/home/test/Sync/**"
+              "/run/syncthing/"
+              "/run/syncthing/**"
+            ];
+          };
         };
       };
 
@@ -39,7 +85,14 @@ pkgs.testers.runNixOSTest {
       systemd.tmpfiles.rules = [
         "d /run/systemd/resolved.conf.d 0755 root root -"
         "d /home/test/Sync 0700 test users -"
+        "d /var/lib/apparmor-fixture 0700 root root -"
       ];
+
+      systemd.services.apparmor-policy-fixture = {
+        description = "Load and exercise the generic local AppArmor service profile";
+        serviceConfig.Type = "oneshot";
+        script = "true";
+      };
 
       systemd.services.apply-secret-dns = {
         description = "Exercise the confined DNS writer";
@@ -82,17 +135,36 @@ pkgs.testers.runNixOSTest {
 
     with subtest("only the selected profiles are loaded"):
         machine.succeed("test -e /etc/apparmor.d/local-apply-secret-dns")
+        machine.succeed("test -e /etc/apparmor.d/local-policy-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-syncthing")
         machine.fail("test -e /etc/apparmor.d/local-brave")
 
-    with subtest("the DNS profile enforces its home-directory boundary"):
+    with subtest("the generic service profile permits only declared data and executables"):
         machine.succeed("install -o test -g users -m 0600 /dev/null /home/test/private")
+        machine.succeed(
+            "aa-exec -p local-policy-fixture -- ${pkgs.bash}/bin/bash -c "
+            "'exec ${pkgs.coreutils}/bin/touch /var/lib/apparmor-fixture/allowed'"
+        )
+        machine.fail(
+            "aa-exec -p local-policy-fixture -- ${pkgs.bash}/bin/bash -c "
+            "'exec ${pkgs.coreutils}/bin/touch /home/test/forbidden'"
+        )
+        machine.fail(
+            "aa-exec -p local-policy-fixture -- ${pkgs.bash}/bin/bash -c "
+            "'exec ${pkgs.findutils}/bin/find /var/lib/apparmor-fixture'"
+        )
+
+    with subtest("the DNS profile enforces exact secret and home boundaries"):
         machine.fail(
             "aa-exec -p local-apply-secret-dns -- ${pkgs.coreutils}/bin/cat /home/test/private"
         )
+        machine.succeed("install -d -m 0755 /run/secrets/dns")
+        machine.succeed("printf '9.9.9.9\\n' > /run/secrets/dns/sibling")
+        machine.fail(
+            "aa-exec -p local-apply-secret-dns -- ${pkgs.coreutils}/bin/cat /run/secrets/dns/sibling"
+        )
 
     with subtest("the DNS writer produces an atomic private resolved drop-in"):
-        machine.succeed("install -d -m 0755 /run/secrets/dns")
         machine.succeed("printf '1.1.1.1\\n' > /run/secrets/dns/test")
         machine.succeed("systemctl start apply-secret-dns.service")
         machine.succeed(
@@ -102,13 +174,14 @@ pkgs.testers.runNixOSTest {
             "test $(stat -c %U:%G /run/systemd/resolved.conf.d/90-sops-dns.conf) = systemd-resolve:systemd-resolve"
         )
 
-    with subtest("Syncthing runs under the named complain-mode profile"):
+    with subtest("Syncthing runs under its enforced profile"):
         machine.wait_for_unit("syncthing.service")
         machine.wait_until_succeeds("systemctl is-active --quiet syncthing.service")
         machine.succeed(
             "pid=$(systemctl show --property MainPID --value syncthing.service); "
-            "grep -Fx 'local-syncthing (complain)' /proc/$pid/attr/current"
+            "grep -Fx 'local-syncthing (enforce)' /proc/$pid/attr/current"
         )
         machine.succeed("test -d /home/test/Sync/.config/syncthing")
+        machine.fail("journalctl -k --grep 'profile=\\\"local-syncthing\\\"'")
   '';
 }

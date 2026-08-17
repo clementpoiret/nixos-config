@@ -1,0 +1,291 @@
+{
+  "source": "kernel journal, boot 0",
+  "profile_patterns": [
+    "local-evince"
+  ],
+  "summary": {
+    "events": 11,
+    "denied": 0,
+    "allowed": 11,
+    "groups": 11,
+    "profiles": 1
+  },
+  "current_profile_modes": {
+    "local-evince": "complain"
+  },
+  "profile_status_error": null,
+  "apparmor_service": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "Result": "success"
+  },
+  "service_issues": [],
+  "service_status_error": null,
+  "kernel_issues": [],
+  "findings": [
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/cpgm66vz9jbq4k1d1r9rpnajbijlfhrs-dconf-db"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".evince-wrapped"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2918): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/cpgm66vz9jbq4k1d1r9rpnajbijlfhrs-dconf-db\" pid=5871 comm=\".evince-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/hdfnb110myv6c1mx1d61y0d8w3c5d0ig-hm_hmfontconfigdefaultfonts.xml"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2914): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/hdfnb110myv6c1mx1d61y0d8w3c5d0ig-hm_hmfontconfigdefaultfonts.xml\" pid=5871 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/l9z9qvvs7lv3scipb1a65qqvw1qf2mh0-fontconfig-conf/etc/fonts/conf.d/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.765:2910): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/l9z9qvvs7lv3scipb1a65qqvw1qf2mh0-fontconfig-conf/etc/fonts/conf.d/\" pid=5871 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/m2by1wag2jhijhg5xchyphpxwdfv8y6a-gvfs-1.60.2/lib/gio/modules/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".evince-wrapped"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2915): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/m2by1wag2jhijhg5xchyphpxwdfv8y6a-gvfs-1.60.2/lib/gio/modules/\" pid=5871 comm=\".evince-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/m2by1wag2jhijhg5xchyphpxwdfv8y6a-gvfs-1.60.2/lib/gio/modules/giomodule.cache"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".evince-wrapped"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2916): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/m2by1wag2jhijhg5xchyphpxwdfv8y6a-gvfs-1.60.2/lib/gio/modules/giomodule.cache\" pid=5871 comm=\".evince-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/nlirzb1df6yrjzx6s8v097i8vl67z9x9-user/etc/dconf/profile/user"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".evince-wrapped"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2917): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/nlirzb1df6yrjzx6s8v097i8vl67z9x9-user/etc/dconf/profile/user\" pid=5871 comm=\".evince-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/qmhf7bglj4ar870p04wwy0pqlkfpmvq1-twemoji-color-font-15.1.0/etc/fonts/conf.d/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2912): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/qmhf7bglj4ar870p04wwy0pqlkfpmvq1-twemoji-color-font-15.1.0/etc/fonts/conf.d/\" pid=5871 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/qmhf7bglj4ar870p04wwy0pqlkfpmvq1-twemoji-color-font-15.1.0/etc/fonts/conf.d/46-twemoji-color.conf"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2913): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/qmhf7bglj4ar870p04wwy0pqlkfpmvq1-twemoji-color-font-15.1.0/etc/fonts/conf.d/46-twemoji-color.conf\" pid=5871 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/qni2k2cnhg3w074fz8b4lysbmng9d769-hm_hmfontconfigfonts.xml"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        "[pango] fontcon"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2911): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/qni2k2cnhg3w074fz8b4lysbmng9d769-hm_hmfontconfigfonts.xml\" pid=5871 comm=5B70616E676F5D20666F6E74636F6E requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/yrrx3lqiy731aar358lhz24lpgziyhzm-rose-pine-cursor-1.1.0/share/icons/BreezeX-RosePine-Linux/cursors/"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".evince-wrapped"
+      ],
+      "first": "2026-08-17T13:38:37+02:00",
+      "last": "2026-08-17T13:38:37+02:00",
+      "sample": "audit: type=1400 audit(1786966717.768:2919): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/yrrx3lqiy731aar358lhz24lpgziyhzm-rose-pine-cursor-1.1.0/share/icons/BreezeX-RosePine-Linux/cursors/\" pid=5871 comm=\".evince-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    },
+    {
+      "result": "ALLOWED",
+      "profile": "local-evince",
+      "class": "file",
+      "operations": [
+        "open"
+      ],
+      "requested": "r",
+      "denied": "r",
+      "targets": {
+        "name": "/nix/store/zl8cvd300996xp8klz4120mdlqa907b5-rose-pine-icon-theme-unstable-2022-09-01/share/icons/rose-pine/symbolic/actions/pan-down-symbolic.svg"
+      },
+      "details": {
+        "owner_match": "no"
+      },
+      "null_profile": false,
+      "count": 1,
+      "commands": [
+        ".evince-wrapped"
+      ],
+      "first": "2026-08-17T13:38:45+02:00",
+      "last": "2026-08-17T13:38:45+02:00",
+      "sample": "audit: type=1400 audit(1786966725.462:4560): apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"local-evince\" name=\"/nix/store/zl8cvd300996xp8klz4120mdlqa907b5-rose-pine-icon-theme-unstable-2022-09-01/share/icons/rose-pine/symbolic/actions/pan-down-symbolic.svg\" pid=5871 comm=\".evince-wrapped\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0"
+    }
+  ]
+}
