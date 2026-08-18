@@ -506,7 +506,6 @@
           assert builtins.elem "credential-broker" laptopHomeAppArmor.applications.brave.sensitiveAccess;
           assert builtins.elem "developer-exec" laptopHomeAppArmor.applications.codex-cli.capabilities;
           assert builtins.elem "ssh-identities" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
-          assert builtins.elem laptopPkgs.stable.helix laptopHomeAppArmor.developerPackages;
           assert laptopServiceRegistry.syncthing.packageRoots == [ laptopConfig.services.syncthing.package ];
           assert builtins.elem "runtime-introspection" laptopServiceRegistry.syncthing.capabilities;
           assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
@@ -515,6 +514,11 @@
           assert builtins.elem ".config/enchant" laptopHomeAppArmor.applications.inkscape.homePaths;
           assert builtins.elem ".local/share/com.motrix.next"
             laptopHomeAppArmor.applications.motrix.homePaths;
+          assert builtins.elem laptopPkgs.webkitgtk_4_1
+            laptopHomeAppArmor.applications.motrix.executionPackages;
+          assert builtins.elem ".logseq" laptopHomeAppArmor.applications.logseq.homePaths;
+          assert builtins.elem ".local/share/protonmail"
+            laptopHomeAppArmor.applications.protonmail-bridge.homePaths;
           assert builtins.elem laptopPkgs.electron.unwrapped
             laptopHomeAppArmor.applications.drawio.executionPackages;
           assert builtins.elem laptopPkgs.electron.unwrapped
@@ -530,7 +534,9 @@
           assert pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" codexPolicy;
           assert pkgs-unstable.lib.hasInfix "capability setpcap," codexPolicy;
           assert pkgs-unstable.lib.hasInfix "capability sys_admin," codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "capability sys_chroot," codexPolicy;
           assert pkgs-unstable.lib.hasInfix "capability sys_ptrace," codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "priority=50 /nix/store/** Pix," codexPolicy;
           assert pkgs-unstable.lib.hasInfix "Cx -> namespace-bootstrap" drawioPolicy;
           assert pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" drawioPolicy;
           assert pkgs-unstable.lib.hasInfix "capability sys_admin," drawioPolicy;
@@ -540,6 +546,7 @@
           assert pkgs-unstable.lib.hasInfix "capability net_admin," logseqPolicy;
           assert pkgs-unstable.lib.hasInfix "mount," logseqPolicy;
           assert !(pkgs-unstable.lib.hasInfix "/nix/store/** ix" bravePolicy);
+          assert !(pkgs-unstable.lib.hasInfix "/nix/store/** mr" bravePolicy);
           assert laptopConfig.programs.ssh.enableAskPassword;
           assert laptopConfig.environment.variables.SSH_ASKPASS == laptopConfig.programs.ssh.askPassword;
           assert dnsService.serviceConfig.UMask == "0077";
@@ -630,6 +637,7 @@
             desktopApplicationNames = applicationNamesWith "desktop";
             networkApplicationNames = applicationNamesWith "network";
             usernsApplicationNames = applicationNamesWith "userns";
+            developerApplicationNames = applicationNamesWith "developer-exec";
             nonTerminalApplicationNames = applicationNamesWithout "terminal";
           in
           pkgs-unstable.runCommand "apparmor-policy-parser"
@@ -663,14 +671,16 @@
                 test -r "$brave_common"
                 session_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-session-read-only\)"/\1/p' "$brave_common")"
                 test -r "$session_rules"
-                grep -F '/share/** mr,' "$session_rules"
-                grep -F '${self.nixosConfigurations.laptop.config.services.gvfs.package}/lib/**.so* mr,' "$session_rules"
-                grep -F '${self.nixosConfigurations.laptop.pkgs.libsForQt5.qt5ct}/lib/**.so* mr,' "$session_rules"
-                grep -F '${self.nixosConfigurations.laptop.pkgs.libsForQt5.qtstyleplugin-kvantum}/lib/**.so* mr,' "$session_rules"
-                grep -F '${self.nixosConfigurations.laptop.pkgs.qt6Packages.qt6ct}/lib/**.so* mr,' "$session_rules"
-                grep -F '${self.nixosConfigurations.laptop.pkgs.qt6Packages.qtstyleplugin-kvantum}/lib/**.so* mr,' "$session_rules"
-                grep -F '${self.nixosConfigurations.laptop.pkgs.libXxf86vm}/lib/**.so* mr,' "$session_rules"
-                if awk '$NF ~ /^[a-z]+,$/ && $NF ~ /[wxkl]/ { bad=1 } END { exit !bad }' "$session_rules"; then
+                session_closure_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-closure-rules-local-session-read-only\)"/\1/p' "$session_rules")"
+                test -r "$session_closure_rules"
+                grep -F '/share/** mr,' "$session_closure_rules"
+                grep -F '${self.nixosConfigurations.laptop.config.services.gvfs.package}/lib/**.so* mr,' "$session_closure_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.libsForQt5.qt5ct}/lib/**.so* mr,' "$session_closure_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.libsForQt5.qtstyleplugin-kvantum}/lib/**.so* mr,' "$session_closure_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.qt6Packages.qt6ct}/lib/**.so* mr,' "$session_closure_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.qt6Packages.qtstyleplugin-kvantum}/lib/**.so* mr,' "$session_closure_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.libXxf86vm}/lib/**.so* mr,' "$session_closure_rules"
+                if awk '$NF ~ /^[a-z]+,$/ && $NF ~ /[wxkl]/ { bad=1 } END { exit !bad }' "$session_rules" "$session_closure_rules"; then
                   echo "read-only session rules unexpectedly grant write or execution" >&2
                   exit 1
                 fi
@@ -681,6 +691,7 @@
                   echo "read-only application closure unexpectedly grants execution" >&2
                   exit 1
                 fi
+                grep -F '/**.node mr,' "$closure_rules"
 
                 grep -F '${self.nixosConfigurations.laptop.pkgs.brave}/bin/** ixr,' "$brave_common"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.brave}/opt/** ixr,' "$brave_common"
@@ -692,6 +703,7 @@
                   app_profile="$profile_directory/local-$app_name"
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
                   grep -F '${self.nixosConfigurations.laptop.pkgs.coreutils-full}/bin/** ixr,' "$app_common"
+                  grep -F '${self.nixosConfigurations.laptop.pkgs.glibc.bin}/bin/** ixr,' "$app_common"
                 done
 
                 for app_name in ${
@@ -701,9 +713,18 @@
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
                   grep -F '/ r,' "$app_common"
                   grep -F '/etc/ r,' "$app_common"
-                  grep -F 'owner /proc/[0-9]*/{cgroup,cmdline,mountinfo,stat,statm,smaps} r,' "$app_common"
+                  grep -F 'deny /etc/opt/{,**} w,' "$app_common"
+                  grep -F '/proc/[0-9]*/{cgroup,stat} r,' "$app_common"
+                  grep -F 'owner /proc/[0-9]*/{cmdline,mountinfo,statm,smaps,smaps_rollup} r,' "$app_common"
+                  grep -F 'owner /proc/[0-9]*/task/[0-9]*/{stat,status} r,' "$app_common"
+                  grep -F '/proc/pressure/{cpu,io,memory} r,' "$app_common"
+                  grep -F '/sys/fs/cgroup/**/{cpu.max,memory.high,memory.max} r,' "$app_common"
+                  grep -F 'deny owner /proc/[0-9]*/clear_refs w,' "$app_common"
                   grep -F '/sys/devices/system/cpu/{kernel_max,present} r,' "$app_common"
                   grep -F 'owner /run/user/[0-9]*/wayland-proxy-* rw,' "$app_common"
+                  grep -F '${self.nixosConfigurations.laptop.pkgs.xdg-utils}/bin/** ixr,' "$app_common"
+                  grep -F '${self.nixosConfigurations.laptop.pkgs.gnugrep}/bin/** ixr,' "$app_common"
+                  grep -F '${self.nixosConfigurations.laptop.pkgs.dbus}/bin/** ixr,' "$app_common"
                 done
 
                 for app_name in ${
@@ -725,8 +746,23 @@
                   fi
                   grep -F 'capability setpcap,' "$userns_rules"
                   grep -F 'capability sys_admin,' "$userns_rules"
+                  grep -F 'capability sys_chroot,' "$userns_rules"
                   grep -F 'capability sys_ptrace,' "$userns_rules"
                   grep -F 'owner /proc/[0-9]*/{gid_map,setgroups,uid_map} rw,' "$userns_rules"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg developerApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F '/nix/store/** mr,' "$app_common"
+                  grep -F '/nix/store/** ixr,' "$app_common"
+                  grep -F 'owner @{HOME}/** m,' "$app_common"
+                  grep -F 'owner /tmp/** m,' "$app_common"
+                  grep -F 'owner /var/tmp/** m,' "$app_common"
+                  grep -F 'owner /dev/shm/{,**} rwkl,' "$app_common"
+                  grep -F 'priority=50 /nix/store/** Pix,' "$app_profile"
                 done
 
                 for app_name in ${
@@ -743,20 +779,25 @@
                 grep -F '${pkgs-unstable.unzip}/bin/** ixr,' "$file_roller_common"
 
                 motrix_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-motrix-common\)"/\1/p' "$profile_directory/local-motrix" | head -n 1)"
-                grep -F '${pkgs-unstable.glibc.bin}/bin/getconf ixr,' "$motrix_common"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.webkitgtk_4_1}/libexec/** ixr,' "$motrix_common"
                 grep -F 'owner "@{HOME}/.local/share/com.motrix.next/{,**}" rwkl,' "$motrix_common"
 
                 logseq_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-logseq-common\)"/\1/p' "$profile_directory/local-logseq" | head -n 1)"
                 grep -F '/nix/store/*-${self.nixosConfigurations.laptop.pkgs.logseq-appimage.name}-bwrap ixr,' "$logseq_common"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/** ixr,' "$logseq_common"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/logseq ixr,' "$logseq_common"
+                grep -F 'owner "@{HOME}/.logseq/{,**}" rwkl,' "$logseq_common"
                 grep -F 'priority=100 ${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/bwrap Cx -> namespace-bootstrap,' "$profile_directory/local-logseq"
+                grep -F '/newroot/{,**} rwkl,' "$profile_directory/local-logseq"
 
                 inkscape_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-inkscape-common\)"/\1/p' "$profile_directory/local-inkscape" | head -n 1)"
                 grep -F 'owner "@{HOME}/.config/enchant/{,**}" rwkl,' "$inkscape_common"
 
                 proton_pass_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-proton-pass-common\)"/\1/p' "$profile_directory/local-proton-pass" | head -n 1)"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.electron.unwrapped}/libexec/** ixr,' "$proton_pass_common"
+
+                protonmail_bridge_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-protonmail-bridge-common\)"/\1/p' "$profile_directory/local-protonmail-bridge" | head -n 1)"
+                grep -F 'owner "@{HOME}/.local/share/protonmail/{,**}" rwkl,' "$protonmail_bridge_common"
 
                 thunderbird_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-thunderbird-common\)"/\1/p' "$profile_directory/local-thunderbird" | head -n 1)"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest ixr,' "$thunderbird_common"
@@ -767,6 +808,7 @@
                 grep -F '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-apply-secret-dns"
                 grep -F '/run/secrets.d/[0-9]*/dns/' "$profile_directory/local-apply-secret-dns"
                 grep -F '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-syncthing"
+                grep -F 'owner /proc/[0-9]*/stat r,' "$profile_directory/local-syncthing"
                 grep -F '/sys/fs/cgroup/**/cpu.max r,' "$profile_directory/local-syncthing"
                 grep -F 'network netlink dgram,' "$profile_directory/local-syncthing"
 

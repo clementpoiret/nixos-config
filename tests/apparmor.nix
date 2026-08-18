@@ -51,6 +51,7 @@ pkgs.testers.runNixOSTest {
             unit = "apparmor-policy-fixture";
             packageRoots = [ pkgs.coreutils ];
             executionPackages = [ pkgs.coreutils ];
+            capabilities = [ "runtime-introspection" ];
             readWritePaths = [ "/var/lib/apparmor-fixture/{,**}" ];
           };
           syncthing = {
@@ -150,6 +151,9 @@ pkgs.testers.runNixOSTest {
         machine.fail(
             "aa-exec -p local-policy-fixture -- ${pkgs.bash}/bin/bash -c "
             "'exec ${pkgs.findutils}/bin/find /var/lib/apparmor-fixture'"
+        )
+        machine.succeed(
+            "aa-exec -p local-policy-fixture -- ${pkgs.coreutils}/bin/stat /proc/self/stat"
         )
 
     with subtest("the DNS profile enforces exact secret and home boundaries"):

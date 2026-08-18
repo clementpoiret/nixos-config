@@ -158,12 +158,6 @@ in
       description = "Applications registered for locally generated AppArmor profiles.";
     };
 
-    developerPackages = mkOption {
-      type = types.listOf types.package;
-      default = [ ];
-      description = "Configured developer package outputs executable by developer-capable profiles.";
-    };
-
     sessionReadPackages = mkOption {
       type = types.listOf types.package;
       default = [ ];

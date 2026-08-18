@@ -148,10 +148,13 @@ The application inventory covers:
 Application attachments use their exact Nix store executables. Transitive
 package closures receive only read and library-mapping permissions; execution
 is limited to direct package outputs and explicitly registered helper packages
-or paths. Applications opt into typed desktop, IPC, network, device,
-namespace, terminal, and home capabilities. Development-agent profiles receive
-the explicitly classified installed tool set and home/repository execution so
-repository work remains possible.
+or paths for ordinary profiles. Applications opt into typed desktop, IPC,
+network, device, namespace, terminal, and home capabilities. Development-agent
+profiles deliberately allow inherited execution and executable mappings across
+the immutable store, home, and temporary build trees. This supports `uv`,
+Python native extensions, Go, Rust, and ephemeral Nix environments without a
+stale tool manifest; known managed applications still transition into their
+own loaded profiles.
 
 Shared desktop compatibility rules cover bounded runtime metadata and the
 configured GTK/Qt/GVFS plugin set for every GUI profile. Network and user
@@ -200,9 +203,10 @@ nix build .#checks.x86_64-linux.apparmor-vm
 
 Set a single override to `enforce`, rebuild both hosts, and repeat the workload
 and journal review. Use `complain` to continue learning or `disable` to unload a
-problem profile; do not add broad `/nix/store/**` execution rules to silence
-denials. Immutable-store compatibility reads remain non-executable, while
-direct execution manifests keep package upgrades reviewable.
+problem profile; do not add broad `/nix/store/**` execution rules to ordinary
+profiles to silence denials. Immutable-store compatibility reads remain
+non-executable outside the explicit `developer-exec` capability, while direct
+execution manifests keep ordinary package upgrades reviewable.
 
 ## Deployment and recovery
 

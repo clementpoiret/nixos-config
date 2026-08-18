@@ -118,7 +118,6 @@ let
       { }
     else
       lib.filterAttrs (_: app: app.enable) homeConfig.localAppArmor.applications;
-  developerPackages = if homeConfig == null then [ ] else homeConfig.localAppArmor.developerPackages;
   configuredSessionReadPackages =
     if homeConfig == null then [ ] else homeConfig.localAppArmor.sessionReadPackages;
   homeInventory = if homeConfig == null then { } else homeConfig.localAppArmor.inventory;
@@ -257,23 +256,28 @@ let
     ] config
   ) config.environment.etc."profiles/per-user/${username}".source;
 
-  standardReadRules = path: ''
-    ${path} r,
-    ${path}/etc/** r,
-    ${path}/share/** mr,
-    ${path}/lib/**.so* mr,
-    ${path}/lib64/**.so* mr,
-    ${path}/lib/** r,
-    ${path}/lib64/** r,
-  '';
+  readOnlyClosureBaseRules = [
+    "$path r"
+    "$path/etc/** r"
+    "$path/share/** mr"
+    "$path/**.node mr"
+    "$path/lib/**.so* mr"
+    "$path/lib64/**.so* mr"
+    "$path/lib/** r"
+    "$path/lib64/** r"
+  ];
   sourceReadRules = path: ''
     ${path}{,/**} r,
   '';
   profileDataReadRules = path: ''
     ${path}/share/{hunspell,mime}/{,**} r,
   '';
+  sessionClosureRules = pkgs.apparmorRulesFromClosure {
+    name = "local-session-read-only";
+    baseRules = readOnlyClosureBaseRules;
+  } sessionPackageReadRoots;
   sessionReadRules = pkgs.writeText "apparmor-local-session-read-only" ''
-    ${lib.concatMapStrings standardReadRules sessionPackageReadRoots}
+    include "${sessionClosureRules}"
     ${lib.concatMapStrings sourceReadRules etcReadRoots}
     ${lib.concatMapStrings profileDataReadRules ([ config.system.path ] ++ userEnvironmentReadRoots)}
 
@@ -287,15 +291,7 @@ let
     name: roots:
     pkgs.apparmorRulesFromClosure {
       inherit name;
-      baseRules = [
-        "$path r"
-        "$path/etc/** r"
-        "$path/share/** mr"
-        "$path/lib/**.so* mr"
-        "$path/lib64/**.so* mr"
-        "$path/lib/** r"
-        "$path/lib64/** r"
-      ];
+      baseRules = readOnlyClosureBaseRules;
     } roots;
 
   directExecutionRules = path: ''
@@ -309,27 +305,39 @@ let
 
   hasCapability = app: capability: lib.elem capability app.capabilities;
   needsRuntimeIntrospection =
-    app: hasCapability app "desktop" || hasCapability app "runtime-introspection";
+    app:
+    hasCapability app "desktop"
+    || hasCapability app "developer-exec"
+    || hasCapability app "runtime-introspection";
   sensitiveAccess = app: group: lib.elem group app.sensitiveAccess;
   quotePath = path: ''"${lib.replaceStrings [ "\\" "\"" ] [ "\\\\" "\\\"" ] path}"'';
 
   runtimeIntrospectionRules = ''
     /proc/ r,
-    owner /proc/[0-9]*/{cgroup,cmdline,mountinfo,stat,statm,smaps} r,
-    owner /proc/[0-9]*/task/[0-9]*/stat r,
+    /proc/[0-9]*/{cgroup,stat} r,
+    owner /proc/[0-9]*/{cmdline,mountinfo,statm,smaps,smaps_rollup} r,
+    owner /proc/[0-9]*/task/ r,
+    owner /proc/[0-9]*/task/[0-9]*/{stat,status} r,
     /proc/stat r,
     /proc/version r,
+    /proc/pressure/{cpu,io,memory} r,
     /proc/sys/fs/inotify/max_user_watches r,
+    /proc/sys/kernel/{arch,yama/ptrace_scope} r,
     /sys/block/ r,
-    /sys/bus/pci/devices/ r,
+    /sys/bus/ r,
+    /sys/bus/*/devices/ r,
+    /sys/devices/**/uevent r,
+    /sys/devices/**/{descriptors,manufacturer,product} r,
     /sys/devices/system/node/ r,
     /sys/devices/system/cpu/{kernel_max,present} r,
     /sys/devices/system/cpu/cpu[0-9]*/cache/index[0-9]*/size r,
     /sys/devices/system/cpu/cpu[0-9]*/cpufreq/cpuinfo_max_freq r,
+    /sys/devices/system/cpu/cpu[0-9]*/microcode/version r,
     /sys/devices/system/cpu/cpu[0-9]*/topology/core_cpus_list r,
-    /sys/devices/system/cpu/cpufreq/policy[0-9]*/cpuinfo_max_freq r,
+    /sys/devices/system/cpu/cpufreq/policy[0-9]*/{cpuinfo_max_freq,scaling_cur_freq} r,
     /sys/devices/virtual/dmi/id/product_name r,
-    owner /sys/fs/cgroup/**/cpu.max r,
+    /sys/fs/cgroup/**/{cpu.max,memory.high,memory.max} r,
+    deny owner /proc/[0-9]*/clear_refs w,
     deny owner /proc/[0-9]*/oom_score_adj w,
   '';
 
@@ -337,6 +345,7 @@ let
     userns,
     capability setpcap,
     capability sys_admin,
+    capability sys_chroot,
     capability sys_ptrace,
     /proc/sys/kernel/{overflowgid,overflowuid} r,
     /proc/sys/kernel/seccomp/actions_avail r,
@@ -347,6 +356,7 @@ let
 
   serviceRuntimeIntrospectionRules = ''
     /proc/[0-9]*/{cgroup,mountinfo} r,
+    owner /proc/[0-9]*/stat r,
     /proc/sys/net/core/somaxconn r,
     /sys/fs/cgroup/**/cpu.max r,
   '';
@@ -458,6 +468,7 @@ let
       include <abstractions/dbus-session-strict>
       / r,
       /etc/ r,
+      deny /etc/opt/{,**} w,
       owner /run/user/[0-9]*/wayland-proxy-* rw,
     ''}
     ${lib.optionalString (hasCapability app "portal") ''
@@ -487,7 +498,7 @@ let
       include <abstractions/opengl>
       /dev/dri/{,**} rw,
     ''}
-    ${lib.optionalString (hasCapability app "shared-memory") ''
+    ${lib.optionalString (hasCapability app "shared-memory" || hasCapability app "developer-exec") ''
       owner /dev/shm/{,**} rwkl,
     ''}
     ${
@@ -531,8 +542,13 @@ let
     ''}
     ${lib.optionalString (hasCapability app "developer-exec") ''
       ptrace,
+      /nix/store/** mr,
+      /nix/store/** ixr,
+      owner @{HOME}/** m,
       owner @{HOME}/** ix,
+      owner /tmp/** m,
       owner /tmp/** ix,
+      owner /var/tmp/** m,
       owner /var/tmp/** ix,
     ''}
   '';
@@ -540,8 +556,14 @@ let
   baseWrapperExecutionPackages = [
     pkgs.bash
     pkgs.coreutils
+    pkgs.glibc.bin
   ];
   applicationWrapperExecutionPackages = baseWrapperExecutionPackages ++ [ pkgs.coreutils-full ];
+  desktopExecutionPackages = [
+    pkgs.dbus
+    pkgs.gnugrep
+    pkgs.xdg-utils
+  ];
 
   applicationPolicy =
     name: app:
@@ -553,7 +575,7 @@ let
         [ app.package ]
         ++ applicationWrapperExecutionPackages
         ++ app.executionPackages
-        ++ lib.optionals (hasCapability app "developer-exec") developerPackages
+        ++ lib.optionals (hasCapability app "desktop") desktopExecutionPackages
       );
       closureRoots = lib.unique ([ app.package ] ++ app.extraClosureRoots ++ executionPackages);
       closureRules = closureReadRules profileName closureRoots;
@@ -597,6 +619,7 @@ let
 
         profile ${profileName} ${attachment} flags=(attach_disconnected,mediate_deleted) {
           include "${commonRules}"
+          ${lib.optionalString (hasCapability app "developer-exec") "priority=50 /nix/store/** Pix,"}
           ${namespaceTransitions}
           ${namespaceProfile}
         }

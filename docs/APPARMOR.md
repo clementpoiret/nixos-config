@@ -46,13 +46,17 @@ All applications receive only the common baseline:
 - owner access to temporary files;
 - read-only access to the immutable Nix store and declared session assets;
 - read and library-mapping access to declared package closures;
-- inherited execution for the application's direct package output, Bash, coreutils/coreutils-full wrapper helpers, and
-  explicitly declared helper outputs;
+- inherited execution for the application's direct package output, Bash, glibc/coreutils wrapper helpers, desktop
+  discovery helpers where applicable, and explicitly declared helper outputs;
 - ordinary user-write and download locations plus declared application state.
 
-The broad `/nix/store/** r` rule is intentionally read-only. Transitive closure members do not receive execution
-permission. This prevents an application's large runtime closure from becoming an implicit command allow-list while
-still letting programs discover immutable configuration and data added by future packages.
+The broad `/nix/store/** r` rule is intentionally read-only for ordinary profiles. Transitive closure members do not
+receive execution permission. This prevents an application's large runtime closure from becoming an implicit command
+allow-list while still letting programs discover immutable configuration and data added by future packages.
+`developer-exec` is the explicit exception: it grants inherited execution and executable mappings throughout the Nix
+store, home, and temporary build trees so `uv`, Python virtual environments and native extensions, Go binaries, Rust
+build scripts/proc macros, and ephemeral `nix shell` tools work without a manually maintained package list. Launching a
+separately managed application uses a higher-priority transition into that application's own profile when it is loaded.
 
 Applications opt into typed capabilities only when needed:
 
@@ -68,10 +72,10 @@ declared. Direct sandbox runtimes receive the same namespace gate in their attac
 `namespaceRules` require a rationale, making exceptional policy visible during review.
 
 The `desktop` capability carries the shared compatibility surface used by GTK, Qt, Chromium/Electron, and Gecko:
-read-only root-directory discovery, bounded process/CPU/device metadata, per-user Wayland proxy creation, and the
-configured GVFS, Qt theme, Kvantum, and X11 plugin libraries. `network` includes netlink datagram discovery in addition
-to ordinary name service and TLS data. Optional terminal and OOM-priority probes are explicitly denied without audit
-noise unless the matching capability grants them.
+read-only root-directory discovery, bounded process/CPU/device/cgroup metadata, per-user Wayland proxy creation, common
+desktop discovery helpers, and the configured GVFS, Qt theme, Kvantum, and X11 plugin closures. `network` includes
+netlink datagram discovery in addition to ordinary name service and TLS data. Optional Chromium memory-reclamation,
+immutable `/etc/opt` writes, terminal access, and OOM-priority changes are explicitly denied without audit noise.
 
 Enforced applications deny undeclared access to these sensitive groups:
 
@@ -167,9 +171,10 @@ localAppArmor.applications.example = {
 };
 ```
 
-Do not add broad `/nix/store/** ix`, `/proc/**`, `/run/user/**`, `/dev/**`, home-directory, D-Bus, Unix-socket, signal,
-or network rules to the common baseline. Add the relevant capability or exact workload rule. If a profile is not yet
-supportable, put the package in `localAppArmor.inventory` with a specific candidate or exemption rationale.
+Do not add broad `/nix/store/** ix` outside `developer-exec`, `/proc/**`, `/run/user/**`, `/dev/**`, home-directory,
+D-Bus, Unix-socket, signal, or network rules to the common baseline. Add the relevant capability or exact workload rule.
+If a profile is not yet supportable, put the package in `localAppArmor.inventory` with a specific candidate or exemption
+rationale.
 
 `user-files` grants recursive access only below non-hidden top-level home directories, so document-oriented applications
 can handle future project and sync folders without exposing dotfile credentials. Desktop applications inherit the
@@ -225,8 +230,9 @@ nix flake check --no-update-lock-file
 
 The mode matrix verifies states, overrides, exact package registration, namespace transitions, credential exceptions,
 and systemd attachments. The parser check parses every desktop, laptop, and all-enforced policy, verifies capability
-rules across every relevant registered profile, and confirms that closure/session rules do not grant implicit
-execution. The VM enforces a generic service fixture, the exact DNS-secret boundary, and a running Syncthing service.
+rules across every relevant registered profile, and confirms that ordinary closure/session rules do not grant implicit
+execution. The VM enforces a generic service fixture including runtime metadata, the exact DNS-secret boundary, and a
+running Syncthing service.
 
 The parser may warn that its kernel interface or cache is unavailable in the Nix build sandbox. That warning is expected
 when the command succeeds; it uses `--skip-kernel-load` to validate syntax and includes without changing the running

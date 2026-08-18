@@ -367,6 +367,7 @@ in
           remount,
           umount,
           pivot_root,
+          /newroot/{,**} rwkl,
         '';
         namespaceRulesRationale = "Logseq's AppImage launcher builds its FHS environment with bubblewrap.";
         extraRules = ''
@@ -374,6 +375,7 @@ in
         '';
         extraRulesRationale = "Logseq maps Electron libraries from the root of its extracted AppImage.";
         homePaths = [
+          ".logseq"
           ".config/Logseq"
           ".pki/nssdb"
           "logseq"
@@ -459,6 +461,7 @@ in
         homePaths = [
           ".cache/protonmail"
           ".config/protonmail"
+          ".local/share/protonmail"
         ];
         sensitiveAccess = [ "credential-broker" ];
       };
@@ -513,8 +516,7 @@ in
         package = pkgs.motrix-next;
         executable = "bin/motrix-next";
         capabilities = electronDocumentCapabilities;
-        extraClosureRoots = [ pkgs.glibc.bin ];
-        extraExecutables = [ "${pkgs.glibc.bin}/bin/getconf" ];
+        executionPackages = [ pkgs.webkitgtk_4_1 ];
         homePaths = [
           ".cache/Motrix"
           ".config/Motrix"
@@ -585,57 +587,6 @@ in
         ];
       };
     };
-
-    developerPackages = with pkgs; [
-      bash
-      coreutils
-      coreutils-full
-      findutils
-      gnugrep
-      gnused
-      gawk
-      git
-      jujutsu
-      nix
-      openssh_hpn
-      ripgrep
-      fd
-      gcc
-      gnumake
-      cmake
-      python3
-      nodejs
-      uv
-      gh
-      stable.helix
-      neovim
-      ast-grep
-      entr
-      file
-      fzf
-      nixfmt
-      rustfmt
-      shfmt
-      zig
-      typst
-      typstyle
-      tinymist
-      typst-live
-      ltex-ls-plus
-      marksman
-      nixd
-      ruff
-      ty
-      glab
-      hub
-      fluxcd
-      k9s
-      kubernetes-helm
-      kubectl
-      opentofu
-      terraform
-      terraform-ls
-    ];
 
     inventory = {
       easyeffects = {
