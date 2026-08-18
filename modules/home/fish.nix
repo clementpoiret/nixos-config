@@ -192,6 +192,17 @@
   programs.atuin = {
     enable = true;
     settings = {
+      search_mode = "daemon-fuzzy";
+
+      daemon = {
+        enabled = true;
+        autostart = true;
+      };
+
+      ai = {
+        enabled = true;
+      };
+
       store-failed = false;
     };
     enableFishIntegration = true;
