@@ -194,7 +194,7 @@
     settings = {
       store-failed = false;
     };
-    enableFishIntegration = false;
+    enableFishIntegration = true;
   };
   programs.broot = {
     enable = true;
