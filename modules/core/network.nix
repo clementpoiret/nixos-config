@@ -114,7 +114,10 @@ in
     packageRoots = [ pkgs.bash ] ++ dnsTools;
     executionPackages = [ pkgs.bash ] ++ dnsTools;
     capabilities = [ "system-bus" ];
-    readOnlyPaths = [ config.sops.secrets.${dnsSecretName}.path ];
+    readOnlyPaths = [
+      config.sops.secrets.${dnsSecretName}.path
+      "/run/secrets.d/[0-9]*/${dnsSecretName}"
+    ];
     readWritePaths = [
       "/run/systemd/resolve/{,**}"
       "/run/systemd/resolved.conf.d/{,**}"

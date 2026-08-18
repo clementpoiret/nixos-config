@@ -17,6 +17,7 @@ let
 
   serviceCapabilityType = types.enum [
     "network"
+    "runtime-introspection"
     "system-bus"
     "terminal"
   ];
@@ -167,6 +168,13 @@ let
     ++ lib.attrByPath [ "hardware" "graphics" "extraPackages32" ] [ ] config
     ++ lib.attrByPath [ "xdg" "portal" "configPackages" ] [ ] config
     ++ lib.attrByPath [ "xdg" "portal" "extraPortals" ] [ ] config
+    ++ packagesAt [
+      [
+        "services"
+        "gvfs"
+        "package"
+      ]
+    ]
     ++ homePackagesAt [
       [
         "gtk"
@@ -223,7 +231,14 @@ let
         "package"
       ]
     ]
-    ++ [ pkgs.gtk4 ]
+    ++ [
+      pkgs.gtk4
+      pkgs.libXxf86vm
+      pkgs.libsForQt5.qt5ct
+      pkgs.libsForQt5.qtstyleplugin-kvantum
+      pkgs.qt6Packages.qt6ct
+      pkgs.qt6Packages.qtstyleplugin-kvantum
+    ]
   );
 
   etcReadRoots = map (name: config.environment.etc.${name}.source) (
@@ -265,7 +280,6 @@ let
     /nix/store/*-dconf-db r,
     /nix/store/*-fc-cache/** r,
     /nix/store/*-fontconfig-conf/etc/fonts/{,**} r,
-    /nix/store/*-gvfs-*/lib/gio/modules/{,**} mr,
     /nix/store/** r,
   '';
 
@@ -294,8 +308,48 @@ let
   '';
 
   hasCapability = app: capability: lib.elem capability app.capabilities;
+  needsRuntimeIntrospection =
+    app: hasCapability app "desktop" || hasCapability app "runtime-introspection";
   sensitiveAccess = app: group: lib.elem group app.sensitiveAccess;
   quotePath = path: ''"${lib.replaceStrings [ "\\" "\"" ] [ "\\\\" "\\\"" ] path}"'';
+
+  runtimeIntrospectionRules = ''
+    /proc/ r,
+    owner /proc/[0-9]*/{cgroup,cmdline,mountinfo,stat,statm,smaps} r,
+    owner /proc/[0-9]*/task/[0-9]*/stat r,
+    /proc/stat r,
+    /proc/version r,
+    /proc/sys/fs/inotify/max_user_watches r,
+    /sys/block/ r,
+    /sys/bus/pci/devices/ r,
+    /sys/devices/system/node/ r,
+    /sys/devices/system/cpu/{kernel_max,present} r,
+    /sys/devices/system/cpu/cpu[0-9]*/cache/index[0-9]*/size r,
+    /sys/devices/system/cpu/cpu[0-9]*/cpufreq/cpuinfo_max_freq r,
+    /sys/devices/system/cpu/cpu[0-9]*/topology/core_cpus_list r,
+    /sys/devices/system/cpu/cpufreq/policy[0-9]*/cpuinfo_max_freq r,
+    /sys/devices/virtual/dmi/id/product_name r,
+    owner /sys/fs/cgroup/**/cpu.max r,
+    deny owner /proc/[0-9]*/oom_score_adj w,
+  '';
+
+  userNamespaceRules = ''
+    userns,
+    capability setpcap,
+    capability sys_admin,
+    capability sys_ptrace,
+    /proc/sys/kernel/{overflowgid,overflowuid} r,
+    /proc/sys/kernel/seccomp/actions_avail r,
+    /proc/sys/user/max_user_namespaces r,
+    owner /proc/[0-9]*/fd/{,**} rw,
+    owner /proc/[0-9]*/{gid_map,setgroups,uid_map} rw,
+  '';
+
+  serviceRuntimeIntrospectionRules = ''
+    /proc/[0-9]*/{cgroup,mountinfo} r,
+    /proc/sys/net/core/somaxconn r,
+    /sys/fs/cgroup/**/cpu.max r,
+  '';
 
   sensitiveGroups = {
     sops = ''
@@ -402,6 +456,9 @@ let
       include <abstractions/gtk>
       include <abstractions/gnome>
       include <abstractions/dbus-session-strict>
+      / r,
+      /etc/ r,
+      owner /run/user/[0-9]*/wayland-proxy-* rw,
     ''}
     ${lib.optionalString (hasCapability app "portal") ''
       include <abstractions/xdg-desktop>
@@ -418,6 +475,7 @@ let
     ${lib.optionalString (hasCapability app "network") ''
       include <abstractions/nameservice>
       include <abstractions/ssl_certs>
+      network netlink dgram,
     ''}
     ${lib.optionalString (hasCapability app "audio") ''
       include <abstractions/audio>
@@ -432,15 +490,19 @@ let
     ${lib.optionalString (hasCapability app "shared-memory") ''
       owner /dev/shm/{,**} rwkl,
     ''}
-    ${lib.optionalString (hasCapability app "terminal") ''
-      /dev/tty rw,
-      owner /dev/pts/[0-9]* rw,
-    ''}
-    ${lib.optionalString (hasCapability app "runtime-introspection") ''
-      /proc/[0-9]*/{cgroup,mountinfo,stat} r,
-      /proc/stat r,
-      /proc/version r,
-    ''}
+    ${
+      if hasCapability app "terminal" then
+        ''
+          /dev/tty rw,
+          owner /dev/pts/[0-9]* rw,
+        ''
+      else
+        ''
+          deny /dev/tty rw,
+          deny owner /dev/pts/[0-9]* rw,
+        ''
+    }
+    ${lib.optionalString (needsRuntimeIntrospection app) runtimeIntrospectionRules}
     ${lib.optionalString (hasCapability app "credential-broker") ''
       include <abstractions/dbus-session-strict>
       dbus send bus=session peer=(name=org.freedesktop.secrets),
@@ -475,10 +537,11 @@ let
     ''}
   '';
 
-  wrapperExecutionPackages = [
+  baseWrapperExecutionPackages = [
     pkgs.bash
     pkgs.coreutils
   ];
+  applicationWrapperExecutionPackages = baseWrapperExecutionPackages ++ [ pkgs.coreutils-full ];
 
   applicationPolicy =
     name: app:
@@ -488,7 +551,7 @@ let
       attachment = "${app.package}/${app.executable}";
       executionPackages = lib.unique (
         [ app.package ]
-        ++ wrapperExecutionPackages
+        ++ applicationWrapperExecutionPackages
         ++ app.executionPackages
         ++ lib.optionals (hasCapability app "developer-exec") developerPackages
       );
@@ -510,6 +573,9 @@ let
         ${applicationHomeRules app}
         ${sensitiveAllowsFor app}
         ${app.extraRules}
+        ${lib.optionalString (
+          hasCapability app "userns" && app.namespaceExecutables == [ ]
+        ) userNamespaceRules}
         ${lib.optionalString (state == "enforce") (secretDenialsFor app)}
       '';
       namespaceTransitions = lib.concatMapStringsSep "\n" (
@@ -518,13 +584,10 @@ let
       namespaceProfile = lib.optionalString (app.namespaceExecutables != [ ]) ''
         profile namespace-bootstrap flags=(attach_disconnected,mediate_deleted) {
           include "${commonRules}"
-          userns,
+          ${userNamespaceRules}
           ${app.namespaceRules}
         }
       '';
-      parentUserns = lib.optionalString (
-        hasCapability app "userns" && app.namespaceExecutables == [ ]
-      ) "userns,";
     in
     {
       inherit state;
@@ -535,7 +598,6 @@ let
         profile ${profileName} ${attachment} flags=(attach_disconnected,mediate_deleted) {
           include "${commonRules}"
           ${namespaceTransitions}
-          ${parentUserns}
           ${namespaceProfile}
         }
       '';
@@ -545,14 +607,23 @@ let
     ${lib.optionalString (lib.elem "network" service.capabilities) ''
       include <abstractions/nameservice>
       include <abstractions/ssl_certs>
+      network netlink dgram,
     ''}
+    ${lib.optionalString (lib.elem "runtime-introspection" service.capabilities) serviceRuntimeIntrospectionRules}
     ${lib.optionalString (lib.elem "system-bus" service.capabilities) ''
       /run/dbus/system_bus_socket rw,
       dbus bus=system,
     ''}
-    ${lib.optionalString (lib.elem "terminal" service.capabilities) ''
-      /dev/tty rw,
-    ''}
+    ${
+      if lib.elem "terminal" service.capabilities then
+        ''
+          /dev/tty rw,
+        ''
+      else
+        ''
+          deny /dev/tty rw,
+        ''
+    }
   '';
 
   servicePolicy =
@@ -560,7 +631,7 @@ let
     let
       profileName = profileNameFor name;
       state = stateFor profileName service.stagedState;
-      executionPackages = lib.unique (wrapperExecutionPackages ++ service.executionPackages);
+      executionPackages = lib.unique (baseWrapperExecutionPackages ++ service.executionPackages);
       closureRoots = lib.unique (service.packageRoots ++ executionPackages);
       closureRules = closureReadRules profileName closureRoots;
     in
@@ -575,6 +646,7 @@ let
           include <abstractions/nameservice-strict>
           include "${closureRules}"
 
+          /nix/store/*-etc-nsswitch.conf r,
           ${lib.concatMapStrings directExecutionRules executionPackages}
           ${serviceCapabilityRules service}
           ${lib.concatMapStringsSep "\n" (path: "${quotePath path} r,") service.readOnlyPaths}
@@ -614,8 +686,9 @@ let
       && lib.all (path: lib.hasPrefix "${builtins.storeDir}/" path) app.extraExecutables
       && lib.all (path: lib.hasPrefix "${builtins.storeDir}/" path) app.namespaceExecutables
       && (hasCapability app "credential-broker" == sensitiveAccess app "credential-broker")
-      && (app.extraRules == "" || app.extraRulesRationale != "")
-      && (app.namespaceExecutables == [ ] || app.namespaceRules != "");
+      && (app.namespaceExecutables == [ ] || hasCapability app "userns")
+      && (app.namespaceRules == "" || app.namespaceRulesRationale != "")
+      && (app.extraRules == "" || app.extraRulesRationale != "");
     message = "Invalid or unexplained AppArmor application descriptor: ${name}";
   }) applicationRegistry;
   serviceAssertions = lib.mapAttrsToList (name: service: {

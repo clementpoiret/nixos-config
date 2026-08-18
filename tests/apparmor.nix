@@ -57,13 +57,11 @@ pkgs.testers.runNixOSTest {
             unit = "syncthing";
             packageRoots = [ pkgs.syncthing ];
             executionPackages = [ pkgs.syncthing ];
-            capabilities = [ "network" ];
-            readOnlyPaths = [
-              "/home/test/"
-              "/proc/[0-9]*/cgroup"
-              "/proc/[0-9]*/mountinfo"
-              "/proc/sys/net/core/somaxconn"
+            capabilities = [
+              "network"
+              "runtime-introspection"
             ];
+            readOnlyPaths = [ "/home/test/" ];
             readWritePaths = [
               "/home/test/Sync/"
               "/home/test/Sync/**"

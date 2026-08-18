@@ -46,8 +46,8 @@ All applications receive only the common baseline:
 - owner access to temporary files;
 - read-only access to the immutable Nix store and declared session assets;
 - read and library-mapping access to declared package closures;
-- inherited execution for the application's direct package output, Bash, coreutils, and explicitly declared helper
-  outputs;
+- inherited execution for the application's direct package output, Bash, coreutils/coreutils-full wrapper helpers, and
+  explicitly declared helper outputs;
 - ordinary user-write and download locations plus declared application state.
 
 The broad `/nix/store/** r` rule is intentionally read-only. Transitive closure members do not receive execution
@@ -63,8 +63,15 @@ credential-broker, userns, developer-exec, full-home
 ```
 
 Namespace helpers use an exact `Cx` transition to a named child profile. Namespace capabilities such as `sys_admin`,
-`sys_ptrace`, or `setpcap` belong to that child instead of the attached parent. Raw `extraRules` and `namespaceRules`
-require a rationale, making exceptional policy visible during review.
+`sys_ptrace`, or `setpcap` are generated from the `userns` capability and belong to that child when an exact helper is
+declared. Direct sandbox runtimes receive the same namespace gate in their attached profile. Raw `extraRules` and
+`namespaceRules` require a rationale, making exceptional policy visible during review.
+
+The `desktop` capability carries the shared compatibility surface used by GTK, Qt, Chromium/Electron, and Gecko:
+read-only root-directory discovery, bounded process/CPU/device metadata, per-user Wayland proxy creation, and the
+configured GVFS, Qt theme, Kvantum, and X11 plugin libraries. `network` includes netlink datagram discovery in addition
+to ordinary name service and TLS data. Optional terminal and OOM-priority probes are explicitly denied without audit
+noise unless the matching capability grants them.
 
 Enforced applications deny undeclared access to these sensitive groups:
 
@@ -79,8 +86,10 @@ explicitly. The current Codex and Claude profiles explicitly use SSH identities/
 agent; they still do not receive SOPS keys, password stores, GPG private key files, or unrelated mail credentials.
 
 Service profiles use the same read-only closure/direct-execution split, then add exact read-only paths, read-write
-paths, and typed service capabilities. Systemd sandboxing remains an independent layer: a path allowed by AppArmor can
-still be hidden or read-only under `ProtectSystem`, `ProtectHome`, or `ReadWritePaths`.
+paths, and typed service capabilities. Their baseline also permits the generated NixOS NSS configuration;
+`runtime-introspection` grants bounded process/network limits and cgroup CPU metadata. Systemd sandboxing remains an
+independent layer: a path allowed by AppArmor can still be hidden or read-only under `ProtectSystem`, `ProtectHome`, or
+`ReadWritePaths`.
 
 ## Registry ownership
 
@@ -163,9 +172,9 @@ or network rules to the common baseline. Add the relevant capability or exact wo
 supportable, put the package in `localAppArmor.inventory` with a specific candidate or exemption rationale.
 
 `user-files` grants recursive access only below non-hidden top-level home directories, so document-oriented applications
-can handle future project and sync folders without exposing dotfile credentials. `runtime-introspection` allows only
-low-sensitivity cgroup, mount, and process-stat metadata used by Chromium/Electron, Gecko, and similar runtimes; it is
-not a general `/proc` grant.
+can handle future project and sync folders without exposing dotfile credentials. Desktop applications inherit the
+bounded runtime metadata they commonly need; the explicit `runtime-introspection` capability provides the same model to
+non-desktop workloads. Neither is a general `/proc` or `/sys` grant.
 
 ## Add or change a service
 
@@ -177,7 +186,10 @@ security.localAppArmor.services.example = {
   stagedState = "complain";
   packageRoots = [ config.services.example.package ];
   executionPackages = [ config.services.example.package ];
-  capabilities = [ "network" ];
+  capabilities = [
+    "network"
+    "runtime-introspection"
+  ];
   readOnlyPaths = [ "/etc/example/config" ];
   readWritePaths = [
     "/var/lib/example/"
@@ -212,9 +224,9 @@ nix flake check --no-update-lock-file
 ```
 
 The mode matrix verifies states, overrides, exact package registration, namespace transitions, credential exceptions,
-and systemd attachments. The parser check parses every desktop, laptop, and all-enforced policy and verifies that
-closure/session rules do not grant implicit execution. The VM enforces a generic service fixture, the exact DNS-secret
-boundary, and a running Syncthing service.
+and systemd attachments. The parser check parses every desktop, laptop, and all-enforced policy, verifies capability
+rules across every relevant registered profile, and confirms that closure/session rules do not grant implicit
+execution. The VM enforces a generic service fixture, the exact DNS-secret boundary, and a running Syncthing service.
 
 The parser may warn that its kernel interface or cache is unavailable in the Nix build sandbox. That warning is expected
 when the command succeeds; it uses `--skip-kernel-load` to validate syntax and includes without changing the running

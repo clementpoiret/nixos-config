@@ -95,6 +95,12 @@ let
           description = "Audited capability and process-map rules limited to the namespace child.";
         };
 
+        namespaceRulesRationale = mkOption {
+          type = types.str;
+          default = "";
+          description = "Required rationale when namespaceRules is non-empty.";
+        };
+
         sensitiveAccess = mkOption {
           type = types.listOf sensitiveAccessType;
           default = [ ];

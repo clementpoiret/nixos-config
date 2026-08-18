@@ -24,7 +24,6 @@ let
   acceleratedDocumentCapabilities = acceleratedDesktopCapabilities ++ [ "user-files" ];
   electronCapabilities = acceleratedDesktopCapabilities ++ [
     "network"
-    "runtime-introspection"
     "shared-memory"
     "userns"
   ];
@@ -43,6 +42,10 @@ let
     lz4
     unzip
     xz
+  ];
+  electronExecutionPackages = [
+    pkgs.electron
+    pkgs.electron.unwrapped
   ];
 
   codexDesktopPackages = builtins.filter (
@@ -313,19 +316,15 @@ in
         capabilities = acceleratedDocumentCapabilities;
         homePaths = [
           ".cache/inkscape"
+          ".config/enchant"
           ".config/inkscape"
         ];
       };
       drawio = {
         package = pkgs.drawio;
         capabilities = electronDocumentCapabilities;
-        executionPackages = [ pkgs.electron ];
+        executionPackages = electronExecutionPackages;
         namespaceExecutables = [ "${pkgs.electron}/bin/electron" ];
-        namespaceRules = ''
-          capability sys_admin,
-          capability sys_ptrace,
-          owner /proc/[0-9]*/{gid_map,setgroups,uid_map} w,
-        '';
         homePaths = [
           ".cache/drawio"
           ".config/draw.io"
@@ -337,7 +336,6 @@ in
         executable = "bin/zotero";
         capabilities = acceleratedDocumentCapabilities ++ [
           "network"
-          "runtime-introspection"
           "shared-memory"
           "userns"
         ];
@@ -350,7 +348,31 @@ in
         package = pkgs.logseq-appimage;
         executable = "bin/logseq-appimage";
         capabilities = electronDocumentCapabilities;
-        extraExecutables = [ "/nix/store/*-${pkgs.logseq-appimage.name}-bwrap" ];
+        executionPackages = [ pkgs.bubblewrap ];
+        extraExecutables = [
+          "/nix/store/*-${pkgs.logseq-appimage.name}-bwrap"
+          "/nix/store/*-${pkgs.logseq-appimage.name}-init"
+          "/nix/store/*-appimage-exec.sh/bin/appimage-exec.sh"
+          "/nix/store/*-container-init"
+          "${pkgs.logseq-appimage.appimageContents}/AppRun"
+          "${pkgs.logseq-appimage.appimageContents}/chrome-sandbox"
+          "${pkgs.logseq-appimage.appimageContents}/chrome_crashpad_handler"
+          "${pkgs.logseq-appimage.appimageContents}/logseq"
+        ];
+        namespaceExecutables = [ "${pkgs.bubblewrap}/bin/bwrap" ];
+        namespaceRules = ''
+          capability net_admin,
+          network netlink raw,
+          mount,
+          remount,
+          umount,
+          pivot_root,
+        '';
+        namespaceRulesRationale = "Logseq's AppImage launcher builds its FHS environment with bubblewrap.";
+        extraRules = ''
+          ${pkgs.logseq-appimage.appimageContents}/*.so* mr,
+        '';
+        extraRulesRationale = "Logseq maps Electron libraries from the root of its extracted AppImage.";
         homePaths = [
           ".config/Logseq"
           ".pki/nssdb"
@@ -418,10 +440,10 @@ in
         capabilities = acceleratedDocumentCapabilities ++ [
           "audio"
           "network"
-          "runtime-introspection"
           "shared-memory"
           "userns"
         ];
+        extraExecutables = [ "${pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest" ];
         homePaths = [
           ".cache/thunderbird"
           ".thunderbird"
@@ -444,7 +466,7 @@ in
         package = pkgs.proton-pass;
         executable = "bin/proton-pass";
         capabilities = electronCapabilities ++ [ "credential-broker" ];
-        executionPackages = [ pkgs.electron ];
+        executionPackages = electronExecutionPackages;
         homePaths = [
           ".cache/Proton Pass"
           ".config/Proton Pass"
@@ -482,6 +504,10 @@ in
           ".config/qBittorrent"
           ".local/share/qBittorrent"
         ];
+        extraRules = ''
+          deny ptrace read peer=unconfined,
+        '';
+        extraRulesRationale = "qBittorrent's optional host-process inspection is intentionally unavailable.";
       };
       motrix = {
         package = pkgs.motrix-next;
@@ -493,6 +519,7 @@ in
           ".cache/Motrix"
           ".config/Motrix"
           ".config/motrix"
+          ".local/share/com.motrix.next"
         ];
       };
       deezer = {
@@ -512,11 +539,6 @@ in
           "userns"
         ];
         namespaceExecutables = [ "${pkgs.flake.codex-cli}/bin/.codex-wrapped" ];
-        namespaceRules = ''
-          capability setpcap,
-          capability sys_admin,
-          capability sys_ptrace,
-        '';
         sensitiveAccess = [
           "gpg-agent"
           "ssh-config"

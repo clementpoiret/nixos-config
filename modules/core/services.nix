@@ -58,13 +58,11 @@ in
       unit = "syncthing";
       packageRoots = [ config.services.syncthing.package ];
       executionPackages = [ config.services.syncthing.package ];
-      capabilities = [ "network" ];
-      readOnlyPaths = [
-        "${homeDirectory}/"
-        "/proc/[0-9]*/cgroup"
-        "/proc/[0-9]*/mountinfo"
-        "/proc/sys/net/core/somaxconn"
+      capabilities = [
+        "network"
+        "runtime-introspection"
       ];
+      readOnlyPaths = [ "${homeDirectory}/" ];
       readWritePaths =
         builtins.concatMap (path: [
           "${path}/"

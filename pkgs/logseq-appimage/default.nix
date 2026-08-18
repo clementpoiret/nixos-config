@@ -22,6 +22,8 @@ in
 appimageTools.wrapType2 {
   inherit pname version src;
 
+  passthru = { inherit appimageContents; };
+
   nativeBuildInputs = [
     asar
     makeWrapper

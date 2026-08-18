@@ -153,6 +153,11 @@ namespace, terminal, and home capabilities. Development-agent profiles receive
 the explicitly classified installed tool set and home/repository execution so
 repository work remains possible.
 
+Shared desktop compatibility rules cover bounded runtime metadata and the
+configured GTK/Qt/GVFS plugin set for every GUI profile. Network and user
+namespace rules are likewise emitted from capabilities, while workload-specific
+state paths and sandbox launchers remain explicit registrations.
+
 When an application is enforced, explicit exclusions protect SOPS/age keys and
 decrypted secrets, SSH identities/config/control sockets, GPG private keys and
 agent sockets, mail authentication, Secret Service/keyring channels, the U2F

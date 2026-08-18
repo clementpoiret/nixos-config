@@ -475,6 +475,7 @@
             bravePolicy = complainPolicies.local-brave.profile;
             codexPolicy = complainPolicies.local-codex-cli.profile;
             drawioPolicy = complainPolicies.local-drawio.profile;
+            logseqPolicy = complainPolicies.local-logseq.profile;
             disabledSyncthingService = appArmorTestHosts.disable.config.systemd.services.syncthing;
             overrideSyncthingService = appArmorTestHosts.override.config.systemd.services.syncthing;
             laptopConfig = self.nixosConfigurations.laptop.config;
@@ -507,7 +508,20 @@
           assert builtins.elem "ssh-identities" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
           assert builtins.elem laptopPkgs.stable.helix laptopHomeAppArmor.developerPackages;
           assert laptopServiceRegistry.syncthing.packageRoots == [ laptopConfig.services.syncthing.package ];
+          assert builtins.elem "runtime-introspection" laptopServiceRegistry.syncthing.capabilities;
           assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
+          assert builtins.elem "/run/secrets.d/[0-9]*/dns/laptop"
+            laptopServiceRegistry.apply-secret-dns.readOnlyPaths;
+          assert builtins.elem ".config/enchant" laptopHomeAppArmor.applications.inkscape.homePaths;
+          assert builtins.elem ".local/share/com.motrix.next"
+            laptopHomeAppArmor.applications.motrix.homePaths;
+          assert builtins.elem laptopPkgs.electron.unwrapped
+            laptopHomeAppArmor.applications.drawio.executionPackages;
+          assert builtins.elem laptopPkgs.electron.unwrapped
+            laptopHomeAppArmor.applications.proton-pass.executionPackages;
+          assert laptopHomeAppArmor.applications.drawio.namespaceRules == "";
+          assert laptopHomeAppArmor.applications.codex-cli.namespaceRules == "";
+          assert pkgs-unstable.lib.isDerivation laptopPkgs.logseq-appimage.appimageContents;
           assert builtins.hasAttr "broad-launchers" laptopHomeAppArmor.inventory;
           assert builtins.hasAttr "network-control-plane" laptopConfig.security.localAppArmor.inventory;
           assert pkgs-unstable.lib.hasInfix "/bin/brave flags=(attach_disconnected,mediate_deleted)"
@@ -521,7 +535,10 @@
           assert pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" drawioPolicy;
           assert pkgs-unstable.lib.hasInfix "capability sys_admin," drawioPolicy;
           assert pkgs-unstable.lib.hasInfix "capability sys_ptrace," drawioPolicy;
-          assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/{gid_map,setgroups,uid_map} w," drawioPolicy;
+          assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/{gid_map,setgroups,uid_map} rw," drawioPolicy;
+          assert pkgs-unstable.lib.hasInfix "Cx -> namespace-bootstrap" logseqPolicy;
+          assert pkgs-unstable.lib.hasInfix "capability net_admin," logseqPolicy;
+          assert pkgs-unstable.lib.hasInfix "mount," logseqPolicy;
           assert !(pkgs-unstable.lib.hasInfix "/nix/store/** ix" bravePolicy);
           assert laptopConfig.programs.ssh.enableAskPassword;
           assert laptopConfig.environment.variables.SSH_ASKPASS == laptopConfig.programs.ssh.askPassword;
@@ -594,6 +611,26 @@
                 )
               ) configurations
             );
+            laptopApplications = pkgs-unstable.lib.filterAttrs (
+              _: app: app.enable
+            ) self.nixosConfigurations.laptop.config.home-manager.users.${username}.localAppArmor.applications;
+            applicationNames = builtins.attrNames laptopApplications;
+            applicationNamesWith =
+              capability:
+              builtins.attrNames (
+                pkgs-unstable.lib.filterAttrs (_: app: builtins.elem capability app.capabilities) laptopApplications
+              );
+            applicationNamesWithout =
+              capability:
+              builtins.attrNames (
+                pkgs-unstable.lib.filterAttrs (
+                  _: app: !(builtins.elem capability app.capabilities)
+                ) laptopApplications
+              );
+            desktopApplicationNames = applicationNamesWith "desktop";
+            networkApplicationNames = applicationNamesWith "network";
+            usernsApplicationNames = applicationNamesWith "userns";
+            nonTerminalApplicationNames = applicationNamesWithout "terminal";
           in
           pkgs-unstable.runCommand "apparmor-policy-parser"
             {
@@ -627,6 +664,12 @@
                 session_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-session-read-only\)"/\1/p' "$brave_common")"
                 test -r "$session_rules"
                 grep -F '/share/** mr,' "$session_rules"
+                grep -F '${self.nixosConfigurations.laptop.config.services.gvfs.package}/lib/**.so* mr,' "$session_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.libsForQt5.qt5ct}/lib/**.so* mr,' "$session_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.libsForQt5.qtstyleplugin-kvantum}/lib/**.so* mr,' "$session_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.qt6Packages.qt6ct}/lib/**.so* mr,' "$session_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.qt6Packages.qtstyleplugin-kvantum}/lib/**.so* mr,' "$session_rules"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.libXxf86vm}/lib/**.so* mr,' "$session_rules"
                 if awk '$NF ~ /^[a-z]+,$/ && $NF ~ /[wxkl]/ { bad=1 } END { exit !bad }' "$session_rules"; then
                   echo "read-only session rules unexpectedly grant write or execution" >&2
                   exit 1
@@ -641,15 +684,91 @@
 
                 grep -F '${self.nixosConfigurations.laptop.pkgs.brave}/bin/** ixr,' "$brave_common"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.brave}/opt/** ixr,' "$brave_common"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.coreutils-full}/bin/** ixr,' "$brave_common"
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg applicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F '${self.nixosConfigurations.laptop.pkgs.coreutils-full}/bin/** ixr,' "$app_common"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg desktopApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F '/ r,' "$app_common"
+                  grep -F '/etc/ r,' "$app_common"
+                  grep -F 'owner /proc/[0-9]*/{cgroup,cmdline,mountinfo,stat,statm,smaps} r,' "$app_common"
+                  grep -F '/sys/devices/system/cpu/{kernel_max,present} r,' "$app_common"
+                  grep -F 'owner /run/user/[0-9]*/wayland-proxy-* rw,' "$app_common"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg networkApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F 'network netlink dgram,' "$app_common"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg usernsApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  userns_rules="$app_common"
+                  if grep -Fq 'profile namespace-bootstrap' "$app_profile"; then
+                    userns_rules="$app_profile"
+                  fi
+                  grep -F 'capability setpcap,' "$userns_rules"
+                  grep -F 'capability sys_admin,' "$userns_rules"
+                  grep -F 'capability sys_ptrace,' "$userns_rules"
+                  grep -F 'owner /proc/[0-9]*/{gid_map,setgroups,uid_map} rw,' "$userns_rules"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg
+                    nonTerminalApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F 'deny /dev/tty rw,' "$app_common"
+                  grep -F 'deny owner /dev/pts/[0-9]* rw,' "$app_common"
+                done
 
                 file_roller_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-file-roller-common\)"/\1/p' "$profile_directory/local-file-roller")"
                 grep -F '${pkgs-unstable.unzip}/bin/** ixr,' "$file_roller_common"
 
-                motrix_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-motrix-common\)"/\1/p' "$profile_directory/local-motrix")"
+                motrix_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-motrix-common\)"/\1/p' "$profile_directory/local-motrix" | head -n 1)"
                 grep -F '${pkgs-unstable.glibc.bin}/bin/getconf ixr,' "$motrix_common"
+                grep -F 'owner "@{HOME}/.local/share/com.motrix.next/{,**}" rwkl,' "$motrix_common"
 
-                logseq_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-logseq-common\)"/\1/p' "$profile_directory/local-logseq")"
+                logseq_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-logseq-common\)"/\1/p' "$profile_directory/local-logseq" | head -n 1)"
                 grep -F '/nix/store/*-${self.nixosConfigurations.laptop.pkgs.logseq-appimage.name}-bwrap ixr,' "$logseq_common"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/** ixr,' "$logseq_common"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/logseq ixr,' "$logseq_common"
+                grep -F 'priority=100 ${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/bwrap Cx -> namespace-bootstrap,' "$profile_directory/local-logseq"
+
+                inkscape_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-inkscape-common\)"/\1/p' "$profile_directory/local-inkscape" | head -n 1)"
+                grep -F 'owner "@{HOME}/.config/enchant/{,**}" rwkl,' "$inkscape_common"
+
+                proton_pass_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-proton-pass-common\)"/\1/p' "$profile_directory/local-proton-pass" | head -n 1)"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.electron.unwrapped}/libexec/** ixr,' "$proton_pass_common"
+
+                thunderbird_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-thunderbird-common\)"/\1/p' "$profile_directory/local-thunderbird" | head -n 1)"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest ixr,' "$thunderbird_common"
+
+                qbittorrent_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-qbittorrent-common\)"/\1/p' "$profile_directory/local-qbittorrent" | head -n 1)"
+                grep -F 'deny ptrace read peer=unconfined,' "$qbittorrent_common"
+
+                grep -F '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-apply-secret-dns"
+                grep -F '/run/secrets.d/[0-9]*/dns/' "$profile_directory/local-apply-secret-dns"
+                grep -F '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-syncthing"
+                grep -F '/sys/fs/cgroup/**/cpu.max r,' "$profile_directory/local-syncthing"
+                grep -F 'network netlink dgram,' "$profile_directory/local-syncthing"
 
                 pqiv_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-pqiv-common\)"/\1/p' "$profile_directory/local-pqiv")"
                 if grep -F 'owner @{HOME}/** rwkl,' "$pqiv_common" \
