@@ -118,9 +118,17 @@ A typical configuration is:
 ```nix
 security.localAppArmor = {
   mode = "staged";
+  debug = {
+    enable = true;
+    path = "~/nixos-config/.apparmor_reports";
+  };
   profileOverrides.local-syncthing = "enforce";
 };
 ```
+
+The debug timer writes a private cumulative JSON report every 30 minutes and keeps one archive per boot. It covers all
+AppArmor profiles so failures outside the locally generated set are visible during hardening work; see
+[APPARMOR.md](APPARMOR.md#automatic-debug-reports) for output layout, manual triggering, and retention details.
 
 The complete modes are active configuration, not commented examples:
 

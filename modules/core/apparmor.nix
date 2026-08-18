@@ -112,6 +112,22 @@ let
       config.users.users.${username}.home
     else
       null;
+  configuredDebugPath = cfg.debug.path;
+  untrimmedDebugPath =
+    if lib.hasPrefix "~/" configuredDebugPath then
+      "${
+        if homeDirectory == null then "/var/empty" else homeDirectory
+      }/${lib.removePrefix "~/" configuredDebugPath}"
+    else
+      configuredDebugPath;
+  debugPath =
+    if untrimmedDebugPath == "/" then untrimmedDebugPath else lib.removeSuffix "/" untrimmedDebugPath;
+  debugUser = if username == null then "root" else username;
+  debugGroup =
+    if username != null && lib.hasAttrByPath [ "users" "users" username "group" ] config then
+      config.users.users.${username}.group
+    else
+      "root";
 
   applicationRegistry =
     if homeConfig == null then
@@ -730,6 +746,60 @@ let
       exec python3 ${./apparmor_report.py} "$@"
     '';
   };
+  apparmorDebugReportWriter = pkgs.writeShellApplication {
+    name = "apparmor-debug-report-writer";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      if [[ $# -ne 2 ]]; then
+        echo "usage: apparmor-debug-report-writer OUTPUT_DIRECTORY BOOT_ID" >&2
+        exit 2
+      fi
+
+      output_directory="$1"
+      boot_id="$2"
+      archive_directory="$output_directory/boots"
+      archive_temporary="$(mktemp "$archive_directory/.report-$boot_id.XXXXXX")"
+      latest_temporary="$(mktemp "$output_directory/.logs.json.XXXXXX")"
+      cleanup() {
+        rm -f "$archive_temporary" "$latest_temporary"
+      }
+      trap cleanup EXIT
+
+      tee "$archive_temporary" > "$latest_temporary"
+
+      mv -fT "$archive_temporary" "$archive_directory/$boot_id.json"
+      archive_temporary=""
+      mv -fT "$latest_temporary" "$output_directory/logs.json"
+      latest_temporary=""
+    '';
+  };
+  apparmorDebugReport = pkgs.writeShellApplication {
+    name = "apparmor-debug-report";
+    runtimeInputs = [
+      apparmorReport
+      pkgs.coreutils
+      pkgs.util-linux
+    ];
+    text = ''
+      output_directory=${lib.escapeShellArg debugPath}
+      report_user="${debugUser}"
+      report_group="${debugGroup}"
+      boot_id="$(< /proc/sys/kernel/random/boot_id)"
+
+      if [[ ! "$boot_id" =~ ^[0-9a-f-]{36}$ ]]; then
+        echo "apparmor-debug-report: invalid boot ID: $boot_id" >&2
+        exit 1
+      fi
+
+      report_temporary="$(mktemp /run/apparmor-debug-report/report.XXXXXX)"
+      trap 'rm -f "$report_temporary"' EXIT
+
+      apparmor-report --profile '*' --json > "$report_temporary"
+      setpriv --reuid "$report_user" --regid "$report_group" --init-groups -- \
+        ${apparmorDebugReportWriter}/bin/apparmor-debug-report-writer \
+        "$output_directory" "$boot_id" < "$report_temporary"
+    '';
+  };
 in
 {
   options.security.localAppArmor = {
@@ -751,6 +821,20 @@ in
       type = types.attrsOf stateType;
       default = { };
       description = "Per-profile state overrides for locally managed AppArmor policies.";
+    };
+
+    debug = {
+      enable = lib.mkEnableOption "periodic AppArmor debug report collection";
+
+      path = mkOption {
+        type = types.str;
+        default = "~/.apparmor_reports";
+        example = "~/nixos-config/.apparmor_reports";
+        description = ''
+          Directory receiving the latest AppArmor report and per-boot archives.
+          Absolute paths and paths beginning with ~/ are supported.
+        '';
+      };
     };
 
     services = mkOption {
@@ -780,6 +864,24 @@ in
       {
         assertion = applicationRegistry == { } || homeDirectory != null;
         message = "Local AppArmor applications require a concrete Home Manager home directory.";
+      }
+      {
+        assertion = !cfg.debug.enable || (username != null && homeDirectory != null);
+        message = "Local AppArmor debug reporting requires a configured primary user and home directory.";
+      }
+      {
+        assertion =
+          !cfg.debug.enable
+          || (
+            lib.hasPrefix "/" debugPath
+            && debugPath != "/"
+            && debugPath != builtins.storeDir
+            && !(lib.hasPrefix "${builtins.storeDir}/" debugPath)
+          );
+        message = ''
+          security.localAppArmor.debug.path must be an absolute path or begin with ~/;
+          the filesystem root and Nix store are not valid report directories.
+        '';
       }
       {
         assertion =
@@ -827,6 +929,63 @@ in
     };
 
     environment.systemPackages = [ apparmorReport ];
-    systemd.services = serviceAttachments;
+    systemd.services =
+      serviceAttachments
+      // lib.optionalAttrs cfg.debug.enable {
+        apparmor-debug-report = {
+          description = "Generate the periodic AppArmor debug report";
+          after = [
+            "apparmor.service"
+            "systemd-journald.service"
+          ];
+          wants = [ "apparmor.service" ];
+          unitConfig.RequiresMountsFor = [ debugPath ];
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "${apparmorDebugReport}/bin/apparmor-debug-report";
+            UMask = "0077";
+            RuntimeDirectory = "apparmor-debug-report";
+            RuntimeDirectoryMode = "0700";
+            NoNewPrivileges = true;
+            PrivateDevices = true;
+            PrivateNetwork = true;
+            PrivateTmp = true;
+            ProtectControlGroups = true;
+            ProtectHome = "read-only";
+            ProtectHostname = true;
+            ProtectKernelModules = true;
+            ProtectKernelTunables = true;
+            ProtectSystem = "strict";
+            ReadWritePaths = [ debugPath ];
+            RestrictAddressFamilies = [ "AF_UNIX" ];
+            RestrictNamespaces = true;
+            RestrictRealtime = true;
+            RestrictSUIDSGID = true;
+            SystemCallArchitectures = "native";
+          };
+        };
+      };
+
+    systemd.timers.apparmor-debug-report = lib.mkIf cfg.debug.enable {
+      description = "Generate an AppArmor debug report every 30 minutes";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "*:0/30";
+        Persistent = true;
+      };
+    };
+
+    systemd.tmpfiles.settings."10-apparmor-debug-report" = lib.mkIf cfg.debug.enable {
+      ${debugPath}.d = {
+        mode = "0700";
+        user = debugUser;
+        group = debugGroup;
+      };
+      "${debugPath}/boots".d = {
+        mode = "0700";
+        user = debugUser;
+        group = debugGroup;
+      };
+    };
   };
 }

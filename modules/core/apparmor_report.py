@@ -388,7 +388,7 @@ def current_profile_modes(patterns: list[str]) -> tuple[dict[str, str], str | No
     if aa_status is None:
         return {}, "aa-status is not available"
     process = subprocess.run(
-        [aa_status, "--json", "--filter.profiles=^local-"],
+        [aa_status, "--json"],
         capture_output=True,
         text=True,
         check=False,

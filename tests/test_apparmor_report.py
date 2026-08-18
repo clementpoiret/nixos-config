@@ -6,6 +6,7 @@ import os
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 SOURCE = Path(
     os.environ.get(
@@ -95,6 +96,13 @@ class AppArmorReportTest(unittest.TestCase):
                 ["local-*"],
             )
         )
+        self.assertIsNone(
+            apparmor_report.parse_policy_event(
+                'apparmor="STATUS" operation="profile_replace" '
+                'profile="unconfined" name="local-brave"',
+                ["*"],
+            )
+        )
 
     def test_keeps_local_kernel_errors(self) -> None:
         issue = apparmor_report.parse_kernel_issue(
@@ -132,6 +140,31 @@ class AppArmorReportTest(unittest.TestCase):
         self.assertEqual(
             modes,
             {"local-brave": "complain", "local-syncthing": "enforce"},
+        )
+
+    def test_current_profile_modes_applies_globs_without_hardcoded_filter(self) -> None:
+        process = mock.Mock(
+            returncode=0,
+            stdout='{"profiles":{"local-brave":"complain","upstream":"enforce"}}',
+            stderr="",
+        )
+        with (
+            mock.patch.object(
+                apparmor_report.shutil, "which", return_value="/bin/aa-status"
+            ),
+            mock.patch.object(
+                apparmor_report.subprocess, "run", return_value=process
+            ) as run,
+        ):
+            modes, error = apparmor_report.current_profile_modes(["*"])
+
+        self.assertIsNone(error)
+        self.assertEqual(modes, {"local-brave": "complain", "upstream": "enforce"})
+        run.assert_called_once_with(
+            ["/bin/aa-status", "--json"],
+            capture_output=True,
+            text=True,
+            check=False,
         )
 
 

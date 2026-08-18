@@ -281,6 +281,36 @@ errors. `DENIED` entries were blocked; `ALLOWED` entries are complain-mode obser
 means an executable transition is unresolved and must be fixed before promotion. Do not allow optional telemetry,
 probing, or unrelated filesystem discovery merely because it appeared in a report.
 
+## Automatic debug reports
+
+Enable periodic collection when learning or promoting policies:
+
+```nix
+security.localAppArmor.debug = {
+  enable = true;
+  path = "~/nixos-config/.apparmor_reports";
+};
+```
+
+The path is an output directory; it may be absolute or begin with `~/`, which resolves against the configured primary
+user's home. Every 30 minutes, `apparmor-debug-report.timer` atomically updates `logs.json` with a cumulative report for
+the current boot and `boots/<boot-id>.json` with that boot's latest snapshot. The automated report passes `--profile
+'*'`, so it includes problem signals from every AppArmor profile while continuing to omit routine successful
+load/replace/remove records. Manual `apparmor-report` invocations still default to `local-*`.
+
+The report contains raw sample paths and process details. Its directories are mode `0700`, its JSON files are mode
+`0600`, and all are owned by the configured user. Generate a report immediately or inspect scheduling and failures with:
+
+```bash
+run0 -- systemctl start apparmor-debug-report.service
+systemctl status apparmor-debug-report.timer
+run0 -- journalctl -u apparmor-debug-report.service
+```
+
+Per-boot archives are intentionally retained until manually removed. Disabling debug collection removes the service and
+timer but does not delete existing reports. An unclean shutdown can leave the final interval only in the persistent
+journal; journal rotation and rate limiting also bound what any later report can recover.
+
 Do not run `aa-logprof` directly against `/etc/apparmor.d`: active files are generated from immutable Nix store paths.
 Use suggestions only as research, then add the narrow declarative rule to the owning module and rerun the checks.
 

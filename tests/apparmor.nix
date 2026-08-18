@@ -22,6 +22,10 @@ pkgs.testers.runNixOSTest {
 
       security.localAppArmor = {
         mode = "disable";
+        debug = {
+          enable = true;
+          path = "~/.apparmor_reports";
+        };
         profileOverrides = {
           local-apply-secret-dns = "enforce";
           local-policy-fixture = "enforce";
@@ -154,6 +158,25 @@ pkgs.testers.runNixOSTest {
         )
         machine.succeed(
             "aa-exec -p local-policy-fixture -- ${pkgs.coreutils}/bin/stat /proc/self/stat"
+        )
+
+    with subtest("the automated debug report is private, valid, and archived by boot"):
+        machine.succeed("systemctl start apparmor-debug-report.service")
+        machine.succeed("systemctl is-active --quiet apparmor-debug-report.timer")
+        machine.succeed(
+            "${pkgs.jq}/bin/jq -e '(.profile_patterns == [\"*\"]) and (.summary.denied >= 1)' "
+            "/home/test/.apparmor_reports/logs.json"
+        )
+        machine.succeed(
+            "boot_id=$(cat /proc/sys/kernel/random/boot_id); "
+            "cmp /home/test/.apparmor_reports/logs.json "
+            "/home/test/.apparmor_reports/boots/$boot_id.json"
+        )
+        machine.succeed(
+            "test $(stat -c %a:%U:%G /home/test/.apparmor_reports) = 700:test:users"
+        )
+        machine.succeed(
+            "test $(stat -c %a:%U:%G /home/test/.apparmor_reports/logs.json) = 600:test:users"
         )
 
     with subtest("the DNS profile enforces exact secret and home boundaries"):

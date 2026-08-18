@@ -40,6 +40,10 @@
   security = {
     localAppArmor = {
       mode = "staged";
+      debug = {
+        enable = true;
+        path = "~/nixos-config/.apparmor_reports";
+      };
     };
 
     rtkit.enable = true;

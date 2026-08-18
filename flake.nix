@@ -482,6 +482,8 @@
             laptopPkgs = self.nixosConfigurations.laptop.pkgs;
             laptopHomeAppArmor = laptopConfig.home-manager.users.${username}.localAppArmor;
             laptopServiceRegistry = laptopConfig.security.localAppArmor.services;
+            appArmorDebugService = laptopConfig.systemd.services.apparmor-debug-report;
+            appArmorDebugTimer = laptopConfig.systemd.timers.apparmor-debug-report;
             dnsService = self.nixosConfigurations.laptop.config.systemd.services.apply-secret-dns;
             desktopSyncthingPaths =
               self.nixosConfigurations.desktop.config.systemd.services.syncthing.serviceConfig.ReadWritePaths;
@@ -509,6 +511,18 @@
           assert laptopServiceRegistry.syncthing.packageRoots == [ laptopConfig.services.syncthing.package ];
           assert builtins.elem "runtime-introspection" laptopServiceRegistry.syncthing.capabilities;
           assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
+          assert laptopConfig.security.localAppArmor.debug.enable;
+          assert laptopConfig.security.localAppArmor.debug.path == "~/nixos-config/.apparmor_reports";
+          assert
+            appArmorDebugService.unitConfig.RequiresMountsFor == [
+              "/home/${username}/nixos-config/.apparmor_reports"
+            ];
+          assert
+            appArmorDebugService.serviceConfig.ReadWritePaths == [
+              "/home/${username}/nixos-config/.apparmor_reports"
+            ];
+          assert appArmorDebugTimer.timerConfig.OnCalendar == "*:0/30";
+          assert appArmorDebugTimer.timerConfig.Persistent;
           assert builtins.elem "/run/secrets.d/[0-9]*/dns/laptop"
             laptopServiceRegistry.apply-secret-dns.readOnlyPaths;
           assert builtins.elem ".config/enchant" laptopHomeAppArmor.applications.inkscape.homePaths;
@@ -581,8 +595,11 @@
 
               printf '%s\n' \
                 'apparmor="ALLOWED" operation="open" class="file" profile="local-test" name="/tmp/test" requested_mask="r" denied_mask="r"' \
-                | apparmor-report --input - --json > report.json
+                'apparmor="DENIED" operation="open" class="file" profile="upstream-test" name="/tmp/test" requested_mask="r" denied_mask="r"' \
+                | apparmor-report --input - --profile '*' --json > report.json
               grep -F '"profile": "local-test"' report.json
+              grep -F '"profile": "upstream-test"' report.json
+              grep -F '"profile_patterns": [' report.json
               touch "$out"
             '';
 
