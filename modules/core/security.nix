@@ -42,7 +42,7 @@
       mode = "staged";
       debug = {
         enable = true;
-        path = "~/nixos-config/.apparmor_reports";
+        path = "~/.local/state/apparmor-reports";
       };
     };
 

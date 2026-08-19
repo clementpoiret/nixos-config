@@ -113,7 +113,7 @@ in
     stagedState = "enforce";
     packageRoots = [ pkgs.bash ] ++ dnsTools;
     executionPackages = [ pkgs.bash ] ++ dnsTools;
-    capabilities = [ "system-bus" ];
+    systemBusPeers = [ "org.freedesktop.systemd1" ];
     readOnlyPaths = [
       config.sops.secrets.${dnsSecretName}.path
       "/run/secrets.d/[0-9]*/${dnsSecretName}"

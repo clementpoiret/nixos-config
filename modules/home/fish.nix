@@ -20,6 +20,7 @@
 
       # nix
       cdnix = "cd ~/nixos-config";
+      cdnix-agent = "cd ~/nixos-config-writable";
       ns = "nom-shell --run fish";
       nix-shell = "nix-shell --run fish";
       nix-switch = "nh os switch";

@@ -8,14 +8,12 @@ let
     "credential-broker"
     "desktop"
     "developer-exec"
-    "full-home"
     "gpu"
     "network"
     "portal"
     "runtime-introspection"
     "session-bus"
     "shared-memory"
-    "system-bus"
     "terminal"
     "userns"
     "user-files"
@@ -27,6 +25,7 @@ let
     "gpg-private"
     "hardware-credentials"
     "mail-auth"
+    "nixos-config-writable"
     "password-store"
     "sops"
     "ssh-config"
@@ -83,28 +82,40 @@ let
           description = "Exact executable paths or AppArmor path patterns outside direct package outputs.";
         };
 
-        namespaceExecutables = mkOption {
+        profileReentryExecutables = mkOption {
           type = types.listOf types.str;
           default = [ ];
-          description = "Executables transitioned into the restricted namespace child profile.";
+          description = "Executables that re-enter the same profile with a scrubbed environment.";
         };
 
-        namespaceRules = mkOption {
+        userNamespaceRules = mkOption {
           type = types.lines;
           default = "";
-          description = "Audited capability and process-map rules limited to the namespace child.";
+          description = "Audited namespace rules added to the application's main profile.";
         };
 
-        namespaceRulesRationale = mkOption {
+        userNamespaceRulesRationale = mkOption {
           type = types.str;
           default = "";
-          description = "Required rationale when namespaceRules is non-empty.";
+          description = "Required rationale when userNamespaceRules is non-empty.";
+        };
+
+        systemBusPeers = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "Well-known system D-Bus peer names available for sending and receiving.";
         };
 
         sensitiveAccess = mkOption {
           type = types.listOf sensitiveAccessType;
           default = [ ];
           description = "Sensitive resource groups explicitly available to this application.";
+        };
+
+        elevatedAccessRationale = mkOption {
+          type = types.str;
+          default = "";
+          description = "Required rationale for developer execution or sensitive resource access.";
         };
 
         extraRules = mkOption {

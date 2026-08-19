@@ -120,7 +120,7 @@ security.localAppArmor = {
   mode = "staged";
   debug = {
     enable = true;
-    path = "~/nixos-config/.apparmor_reports";
+    path = "~/.local/state/apparmor-reports";
   };
   profileOverrides.local-syncthing = "enforce";
 };
@@ -157,9 +157,9 @@ Application attachments use their exact Nix store executables. Transitive
 package closures receive only read and library-mapping permissions; execution
 is limited to direct package outputs and explicitly registered helper packages
 or paths for ordinary profiles. Applications opt into typed desktop, IPC,
-network, device, namespace, terminal, and home capabilities. Development-agent
+network, device, namespace, terminal, and user-file capabilities. Development-agent
 profiles deliberately allow inherited execution and executable mappings across
-the immutable store, home, and temporary build trees. This supports `uv`,
+the immutable store, non-hidden project trees, and temporary build trees. This supports `uv`,
 Python native extensions, Go, Rust, and ephemeral Nix environments without a
 stale tool manifest; known managed applications still transition into their
 own loaded profiles.
@@ -169,14 +169,15 @@ configured GTK/Qt/GVFS plugin set for every GUI profile. Network and user
 namespace rules are likewise emitted from capabilities, while workload-specific
 state paths and sandbox launchers remain explicit registrations.
 
-When an application is enforced, explicit exclusions protect SOPS/age keys and
+Mode-aware decisions protect SOPS/age keys and
 decrypted secrets, SSH identities/config/control sockets, GPG private keys and
 agent sockets, mail authentication, Secret Service/keyring channels, the U2F
 mapping, and common password-store locations. Credential groups remain denied
 unless the individual application explicitly registers access; being a
-development tool is not a blanket exception. These `deny` rules are emitted
-only for enforced profiles because AppArmor applies explicit denies even in
-complain mode. The credential boundary therefore becomes active at promotion.
+development tool is not a blanket exception. Complain profiles omit these
+explicit denies; enforced profiles add and VM-test them. The same boundary
+protects `~/nixos-config`, while the agent profiles alone receive the separately
+reviewed `~/nixos-config-writable` tree.
 
 Syncthing is always configured at `/home/clementpoiret/Sync`. On the desktop,
 both that logical path and `/srv/syncthing` are authorized because `~/Sync` is

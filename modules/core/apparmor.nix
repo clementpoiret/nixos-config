@@ -18,7 +18,6 @@ let
   serviceCapabilityType = types.enum [
     "network"
     "runtime-introspection"
-    "system-bus"
     "terminal"
   ];
 
@@ -53,6 +52,11 @@ let
           type = types.listOf serviceCapabilityType;
           default = [ ];
           description = "Composable host capabilities granted to the service.";
+        };
+        systemBusPeers = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "Well-known system D-Bus peer names available for sending and receiving.";
         };
         readOnlyPaths = mkOption {
           type = types.listOf types.str;
@@ -152,8 +156,21 @@ let
     name: stagedState:
     cfg.profileOverrides.${name} or (if cfg.mode == "staged" then stagedState else cfg.mode);
 
-  attrPackage = path: lib.attrByPath path null config;
-  homeAttrPackage = path: if homeConfig == null then null else lib.attrByPath path null homeConfig;
+  attrPackage =
+    path:
+    let
+      evaluated = builtins.tryEval (lib.attrByPath path null config);
+    in
+    if evaluated.success then evaluated.value else null;
+  homeAttrPackage =
+    path:
+    if homeConfig == null then
+      null
+    else
+      let
+        evaluated = builtins.tryEval (lib.attrByPath path null homeConfig);
+      in
+      if evaluated.success then evaluated.value else null;
   optionalPackage = package: lib.optional (package != null && lib.isDerivation package) package;
   packagesAt = paths: builtins.concatMap (path: optionalPackage (attrPackage path)) paths;
   homePackagesAt = paths: builtins.concatMap (path: optionalPackage (homeAttrPackage path)) paths;
@@ -327,6 +344,12 @@ let
     || hasCapability app "runtime-introspection";
   sensitiveAccess = app: group: lib.elem group app.sensitiveAccess;
   quotePath = path: ''"${lib.replaceStrings [ "\\" "\"" ] [ "\\\\" "\\\"" ] path}"'';
+  systemBusRulesFor =
+    peers:
+    lib.optionalString (peers != [ ]) ''
+      include <abstractions/dbus-strict>
+      ${lib.concatMapStringsSep "\n" (peer: "dbus (send, receive) bus=system peer=(name=${peer}),") peers}
+    '';
 
   runtimeIntrospectionRules = ''
     /proc/ r,
@@ -379,60 +402,67 @@ let
 
   sensitiveGroups = {
     sops = ''
-      audit deny owner @{HOME}/.config/sops/age/keys.txt rwklm,
-      audit deny owner @{HOME}/.config/sops-nix/secrets{,/**} rwklm,
-      audit deny owner /run/user/[0-9]*/secrets.d/{,/**} rwklm,
+      audit deny @{HOME}/.config/sops/age/keys.txt rwklm,
+      audit deny @{HOME}/.config/sops-nix/secrets{,/**} rwklm,
+      audit deny /run/user/[0-9]*/secrets.d/{,/**} rwklm,
       audit deny /run/secrets/{,/**} rwklm,
+      audit deny /run/secrets.d/{,**} rwklm,
     '';
     gpg-private = ''
-      audit deny owner @{HOME}/.gnupg/private-keys-v1.d/{,**} rwklm,
-      audit deny owner @{HOME}/.gnupg/secring.gpg rwklm,
+      audit deny @{HOME}/.gnupg/private-keys-v1.d/{,**} rwklm,
+      audit deny @{HOME}/.gnupg/secring.gpg rwklm,
     '';
     gpg-agent = ''
-      audit deny owner @{HOME}/.gnupg/S.gpg-agent{,.*} rwklm,
+      audit deny @{HOME}/.gnupg/S.gpg-agent{,.*} rwklm,
     '';
     password-store = ''
-      audit deny owner @{HOME}/.password-store/{,**} rwklm,
-      audit deny owner @{HOME}/.local/share/password-store/{,**} rwklm,
+      audit deny @{HOME}/.password-store/{,**} rwklm,
+      audit deny @{HOME}/.local/share/password-store/{,**} rwklm,
     '';
     ssh-identities = ''
-      audit deny owner @{HOME}/.ssh/id_* rwklm,
-      audit deny owner @{HOME}/.ssh/*.{key,p12,pem,pfx} rwklm,
+      audit deny @{HOME}/.ssh/id_* rwklm,
+      audit deny @{HOME}/.ssh/*.{key,p12,pem,pfx} rwklm,
     '';
     ssh-config = ''
-      audit deny owner @{HOME}/.ssh/config.secrets rwklm,
+      audit deny @{HOME}/.ssh/config.secrets rwklm,
     '';
     ssh-control = ''
-      audit deny owner @{HOME}/.ssh/{cm,sockets}/{,**} rwklm,
+      audit deny @{HOME}/.ssh/{cm,sockets}/{,**} rwklm,
     '';
     mail-auth = ''
-      audit deny owner @{HOME}/.config/aerc/accounts.conf{,.d/**} rwklm,
+      audit deny @{HOME}/.config/aerc/accounts.conf{,.d/**} rwklm,
     '';
     credential-broker = ''
-      audit deny owner @{run}/user/[0-9]*/keyring/{,**} rwklm,
+      audit deny @{run}/user/[0-9]*/keyring/{,**} rwklm,
       audit deny dbus send bus=session peer=(name=org.freedesktop.secrets),
       audit deny dbus receive bus=session peer=(name=org.freedesktop.secrets),
     '';
     hardware-credentials = ''
-      audit deny owner @{HOME}/.config/Yubico/u2f_keys rwklm,
+      audit deny @{HOME}/.config/Yubico/u2f_keys rwklm,
+    '';
+    nixos-config-writable = ''
+      audit deny @{HOME}/nixos-config-writable/{,**} wklm,
     '';
   };
-  secretDenialsFor =
-    app:
-    lib.concatMapStrings
-      (group: lib.optionalString (!(sensitiveAccess app group)) sensitiveGroups.${group})
-      [
-        "sops"
-        "gpg-private"
-        "gpg-agent"
-        "password-store"
-        "ssh-identities"
-        "ssh-config"
-        "ssh-control"
-        "mail-auth"
-        "credential-broker"
-        "hardware-credentials"
-      ];
+  sensitiveRulesFor =
+    state: app:
+    lib.optionalString (state == "enforce") (
+      lib.concatMapStrings
+        (group: lib.optionalString (!(sensitiveAccess app group)) sensitiveGroups.${group})
+        [
+          "sops"
+          "gpg-private"
+          "gpg-agent"
+          "password-store"
+          "ssh-identities"
+          "ssh-config"
+          "ssh-control"
+          "mail-auth"
+          "credential-broker"
+          "hardware-credentials"
+          "nixos-config-writable"
+        ]
+    );
 
   sensitiveAllowsFor = app: ''
     ${lib.optionalString (sensitiveAccess app "sops") ''
@@ -440,6 +470,7 @@ let
       owner @{HOME}/.config/sops-nix/secrets{,/**} r,
       owner /run/user/[0-9]*/secrets.d/{,/**} r,
       /run/secrets/{,/**} r,
+      /run/secrets.d/[0-9]*/{,**} r,
     ''}
     ${lib.optionalString (sensitiveAccess app "gpg-private") ''
       owner @{HOME}/.gnupg/private-keys-v1.d/{,**} r,
@@ -471,7 +502,61 @@ let
     ${lib.optionalString (sensitiveAccess app "hardware-credentials") ''
       owner @{HOME}/.config/Yubico/u2f_keys r,
     ''}
+    ${lib.optionalString (sensitiveAccess app "nixos-config-writable") ''
+      owner @{HOME}/nixos-config-writable/{,**} rwkl,
+    ''}
   '';
+
+  sensitiveHomeRoots = {
+    sops = [
+      ".config/sops"
+      ".config/sops-nix"
+    ];
+    gpg-private = [ ".gnupg" ];
+    gpg-agent = [ ".gnupg" ];
+    password-store = [
+      ".password-store"
+      ".local/share/password-store"
+    ];
+    ssh-identities = [ ".ssh" ];
+    ssh-config = [ ".ssh" ];
+    ssh-control = [ ".ssh" ];
+    mail-auth = [ ".config/aerc" ];
+    hardware-credentials = [ ".config/Yubico" ];
+    nixos-config-writable = [ "nixos-config-writable" ];
+  };
+  pathsOverlap =
+    left: right: left == right || lib.hasPrefix "${left}/" right || lib.hasPrefix "${right}/" left;
+  homePathHasUndeclaredSensitiveAccess =
+    app: path:
+    lib.any (
+      group:
+      !(sensitiveAccess app group) && lib.any (root: pathsOverlap path root) sensitiveHomeRoots.${group}
+    ) (builtins.attrNames sensitiveHomeRoots);
+  allowedHomePathsFor =
+    app:
+    lib.filter (
+      path: !(lib.hasPrefix "nixos-config" path) && !(homePathHasUndeclaredSensitiveAccess app path)
+    ) app.homePaths;
+
+  reservedUserFilesPrefix = "nixos";
+  reservedUserFilesCharacters = lib.stringToCharacters reservedUserFilesPrefix;
+  escapeCharacterClass = character: if character == "-" then "\\-" else character;
+  userFilesRules = lib.concatStrings (
+    lib.imap0 (
+      index: excludedCharacter:
+      let
+        prefix = lib.concatStrings (lib.take index reservedUserFilesCharacters);
+        excludedCharacters = lib.optionalString (index == 0) "." + escapeCharacterClass excludedCharacter;
+      in
+      lib.optionalString (prefix != "") ''
+        owner @{HOME}/${prefix}/{,**} rwkl,
+      ''
+      + ''
+        owner @{HOME}/${prefix}[^${excludedCharacters}]*/{,**} rwkl,
+      ''
+    ) reservedUserFilesCharacters
+  );
 
   applicationCapabilityRules = app: ''
     ${lib.optionalString (hasCapability app "desktop") ''
@@ -495,10 +580,7 @@ let
     ${lib.optionalString (hasCapability app "session-bus") ''
       include <abstractions/dbus-session>
     ''}
-    ${lib.optionalString (hasCapability app "system-bus") ''
-      /run/dbus/system_bus_socket rw,
-      dbus bus=system,
-    ''}
+    ${systemBusRulesFor app.systemBusPeers}
     ${lib.optionalString (hasCapability app "network") ''
       include <abstractions/nameservice>
       include <abstractions/ssl_certs>
@@ -539,25 +621,14 @@ let
 
   applicationHomeRules = app: ''
     owner @{HOME}/ r,
-    ${
-      if hasCapability app "full-home" then
-        ''
-          owner @{HOME}/** rwkl,
-        ''
-      else
-        ''
-          include <abstractions/user-write>
-          include <abstractions/user-download>
-        ''
-    }
+    include <abstractions/user-write>
+    include <abstractions/user-download>
     ${lib.concatMapStrings (path: ''
       owner ${quotePath "@{HOME}/${path}/{,**}"} rwkl,
-    '') app.homePaths}
-    ${lib.optionalString (hasCapability app "user-files") ''
-      owner @{HOME}/[^.]*/{,**} rwkl,
-    ''}
+    '') (allowedHomePathsFor app)}
+    ${lib.optionalString (hasCapability app "user-files") userFilesRules}
     ${lib.optionalString (hasCapability app "developer-exec") ''
-      ptrace,
+      ptrace (read, trace) peer=@{profile_name},
       /nix/store/** mr,
       /nix/store/** ixr,
       owner @{HOME}/** m,
@@ -594,7 +665,12 @@ let
         ++ lib.optionals (hasCapability app "desktop") desktopExecutionPackages
       );
       closureRoots = lib.unique ([ app.package ] ++ app.extraClosureRoots ++ executionPackages);
-      closureRules = closureReadRules profileName closureRoots;
+      closureRules = lib.optionalString (!(hasCapability app "developer-exec")) (
+        closureReadRules profileName closureRoots
+      );
+      protectedConfigurationRules = lib.optionalString (state == "enforce") ''
+        audit deny @{HOME}/nixos-config/{,**} wklm,
+      '';
       commonRules = pkgs.writeText "apparmor-${profileName}-common" ''
         include <abstractions/base>
         include <abstractions/nameservice-strict>
@@ -603,29 +679,23 @@ let
         owner /var/tmp/{,**} rwkl,
 
         include "${sessionReadRules}"
-        include "${closureRules}"
+        ${lib.optionalString (closureRules != "") ''include "${closureRules}"''}
 
         ${lib.concatMapStrings directExecutionRules executionPackages}
         ${lib.concatMapStringsSep "\n" (path: "${path} ixr,") app.extraExecutables}
         ${applicationCapabilityRules app}
         ${applicationHomeRules app}
         ${sensitiveAllowsFor app}
+        ${protectedConfigurationRules}
+        ${sensitiveRulesFor state app}
         ${app.extraRules}
-        ${lib.optionalString (
-          hasCapability app "userns" && app.namespaceExecutables == [ ]
-        ) userNamespaceRules}
-        ${lib.optionalString (state == "enforce") (secretDenialsFor app)}
+        ${lib.optionalString (hasCapability app "userns") userNamespaceRules}
+        ${app.userNamespaceRules}
+        ${lib.optionalString (hasCapability app "developer-exec") "priority=50 /nix/store/** Pix,"}
       '';
-      namespaceTransitions = lib.concatMapStringsSep "\n" (
-        path: "priority=100 ${path} Cx -> namespace-bootstrap,"
-      ) app.namespaceExecutables;
-      namespaceProfile = lib.optionalString (app.namespaceExecutables != [ ]) ''
-        profile namespace-bootstrap flags=(attach_disconnected,mediate_deleted) {
-          include "${commonRules}"
-          ${userNamespaceRules}
-          ${app.namespaceRules}
-        }
-      '';
+      profileReentryTransitions = lib.concatMapStringsSep "\n" (
+        path: "priority=100 ${path} Px -> ${profileName},"
+      ) app.profileReentryExecutables;
     in
     {
       inherit state;
@@ -635,9 +705,7 @@ let
 
         profile ${profileName} ${attachment} flags=(attach_disconnected,mediate_deleted) {
           include "${commonRules}"
-          ${lib.optionalString (hasCapability app "developer-exec") "priority=50 /nix/store/** Pix,"}
-          ${namespaceTransitions}
-          ${namespaceProfile}
+          ${profileReentryTransitions}
         }
       '';
     };
@@ -649,10 +717,7 @@ let
       network netlink dgram,
     ''}
     ${lib.optionalString (lib.elem "runtime-introspection" service.capabilities) serviceRuntimeIntrospectionRules}
-    ${lib.optionalString (lib.elem "system-bus" service.capabilities) ''
-      /run/dbus/system_bus_socket rw,
-      dbus bus=system,
-    ''}
+    ${systemBusRulesFor service.systemBusPeers}
     ${
       if lib.elem "terminal" service.capabilities then
         ''
@@ -718,20 +783,42 @@ let
 
   validRelativePath =
     path: path != "" && !(lib.hasPrefix "/" path) && !(lib.elem ".." (lib.splitString "/" path));
+  validHomePath =
+    path:
+    validRelativePath path
+    && lib.all (metacharacter: !(lib.hasInfix metacharacter path)) [
+      "*"
+      "?"
+      "["
+      "]"
+      "{"
+      "}"
+    ];
+  validSystemBusPeer =
+    peer:
+    builtins.stringLength peer <= 255
+    && builtins.match "[A-Za-z_][A-Za-z0-9_-]*(\\.[A-Za-z_][A-Za-z0-9_-]*)+" peer != null;
   appAssertions = lib.mapAttrsToList (name: app: {
     assertion =
       validRelativePath app.executable
-      && lib.all validRelativePath app.homePaths
+      && lib.all validHomePath app.homePaths
       && lib.all (path: lib.hasPrefix "${builtins.storeDir}/" path) app.extraExecutables
-      && lib.all (path: lib.hasPrefix "${builtins.storeDir}/" path) app.namespaceExecutables
+      && lib.all (path: lib.hasPrefix "${builtins.storeDir}/" path) app.profileReentryExecutables
+      && lib.all validSystemBusPeer app.systemBusPeers
       && (hasCapability app "credential-broker" == sensitiveAccess app "credential-broker")
-      && (app.namespaceExecutables == [ ] || hasCapability app "userns")
-      && (app.namespaceRules == "" || app.namespaceRulesRationale != "")
+      && (app.profileReentryExecutables == [ ] || hasCapability app "userns")
+      && (app.userNamespaceRules == "" || app.userNamespaceRulesRationale != "")
+      && (
+        (!(hasCapability app "developer-exec") && app.sensitiveAccess == [ ])
+        || app.elevatedAccessRationale != ""
+      )
       && (app.extraRules == "" || app.extraRulesRationale != "");
     message = "Invalid or unexplained AppArmor application descriptor: ${name}";
   }) applicationRegistry;
   serviceAssertions = lib.mapAttrsToList (name: service: {
-    assertion = service.extraRules == "" || service.extraRulesRationale != "";
+    assertion =
+      lib.all validSystemBusPeer service.systemBusPeers
+      && (service.extraRules == "" || service.extraRulesRationale != "");
     message = "AppArmor service ${name} has extraRules without a rationale.";
   }) serviceRegistry;
 
@@ -758,6 +845,7 @@ let
       output_directory="$1"
       boot_id="$2"
       archive_directory="$output_directory/boots"
+      install -d -m 0700 "$output_directory" "$archive_directory"
       archive_temporary="$(mktemp "$archive_directory/.report-$boot_id.XXXXXX")"
       latest_temporary="$(mktemp "$output_directory/.logs.json.XXXXXX")"
       cleanup() {
@@ -778,6 +866,7 @@ let
     runtimeInputs = [
       apparmorReport
       pkgs.coreutils
+      pkgs.systemd
       pkgs.util-linux
     ];
     text = ''
@@ -794,6 +883,7 @@ let
       report_temporary="$(mktemp /run/apparmor-debug-report/report.XXXXXX)"
       trap 'rm -f "$report_temporary"' EXIT
 
+      systemd-tmpfiles --create --prefix="$output_directory"
       apparmor-report --profile '*' --json > "$report_temporary"
       setpriv --reuid "$report_user" --regid "$report_group" --init-groups -- \
         ${apparmorDebugReportWriter}/bin/apparmor-debug-report-writer \
@@ -828,8 +918,8 @@ in
 
       path = mkOption {
         type = types.str;
-        default = "~/.apparmor_reports";
-        example = "~/nixos-config/.apparmor_reports";
+        default = "~/.local/state/apparmor-reports";
+        example = "~/.local/state/apparmor-reports";
         description = ''
           Directory receiving the latest AppArmor report and per-boot archives.
           Absolute paths and paths beginning with ~/ are supported.
@@ -975,17 +1065,33 @@ in
       };
     };
 
-    systemd.tmpfiles.settings."10-apparmor-debug-report" = lib.mkIf cfg.debug.enable {
-      ${debugPath}.d = {
-        mode = "0700";
-        user = debugUser;
-        group = debugGroup;
-      };
-      "${debugPath}/boots".d = {
-        mode = "0700";
-        user = debugUser;
-        group = debugGroup;
-      };
-    };
+    systemd.tmpfiles.settings."10-apparmor-debug-report" = lib.mkIf cfg.debug.enable (
+      lib.optionalAttrs
+        (homeDirectory != null && lib.hasPrefix "${homeDirectory}/.local/state/" debugPath)
+        {
+          "${homeDirectory}/.local".d = {
+            mode = "0700";
+            user = debugUser;
+            group = debugGroup;
+          };
+          "${homeDirectory}/.local/state".d = {
+            mode = "0700";
+            user = debugUser;
+            group = debugGroup;
+          };
+        }
+      // {
+        ${debugPath}.d = {
+          mode = "0700";
+          user = debugUser;
+          group = debugGroup;
+        };
+        "${debugPath}/boots".d = {
+          mode = "0700";
+          user = debugUser;
+          group = debugGroup;
+        };
+      }
+    );
   };
 }

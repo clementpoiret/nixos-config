@@ -30,6 +30,17 @@ let
   );
 
   manage-dns = pkgs.writeScriptBin "manage-dns" (builtins.readFile ./scripts/manage-dns.sh);
+  nixos-config-agent = pkgs.writeShellApplication {
+    name = "nixos-config-agent";
+    runtimeInputs = [
+      pkgs.git
+      pkgs.jujutsu
+      pkgs.python3
+    ];
+    text = ''
+      exec python3 ${./nixos_config_agent.py} "$@"
+    '';
+  };
 in
 {
   home.packages = [
@@ -57,5 +68,6 @@ in
     cycle-fan-strategy
 
     manage-dns
+    nixos-config-agent
   ];
 }

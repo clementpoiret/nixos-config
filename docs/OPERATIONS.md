@@ -2,6 +2,31 @@
 
 ## Daily Workflow
 
+The active system continues to build from the protected `~/nixos-config` clone. Give coding agents
+`~/nixos-config-writable` instead, then promote exactly one reviewed Jujutsu change:
+
+```bash
+# One-time setup, run from an unconfined terminal after protected @ is an empty change.
+nixos-config-agent init
+
+cd ~/nixos-config-writable
+jj describe -m 'fix(apparmor): describe the reviewed change'
+
+# Review the displayed full Git diff and type the full commit ID when prompted.
+nixos-config-agent promote
+```
+
+`init` refuses an existing destination and clones the exact protected baseline. `promote` requires an interactive,
+unconfined terminal; an empty protected working change; one non-empty, conflict-free candidate whose sole parent is that
+baseline; and a Conventional Commit description. It fetches the exact candidate through a local handoff bookmark,
+displays its full diff, requires the complete commit ID, and rechecks both repositories before changing the protected
+clone. A rejection or stale baseline leaves the protected working tree unchanged. Success leaves an empty working
+change in both clones. `nh` and the rebuild aliases intentionally continue to reference `~/nixos-config`.
+
+The review gate becomes an AppArmor security boundary only after the relevant agent profile is enforced. In staged or
+complain mode, AppArmor intentionally permits policy violations, so the separate clone is a workflow safeguard rather
+than an OS-level write barrier. Do not promote an agent profile until its enforced workflow passes the documented tests.
+
 ```bash
 nix develop
 nix fmt

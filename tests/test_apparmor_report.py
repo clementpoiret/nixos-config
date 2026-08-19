@@ -81,6 +81,26 @@ class AppArmorReportTest(unittest.TestCase):
         self.assertEqual(findings[0].operations, {"getattr", "open"})
         self.assertEqual(findings[0].commands, {"brave", "worker"})
 
+    def test_parses_and_prioritizes_explicit_audit_records(self) -> None:
+        audit_event = apparmor_report.parse_policy_event(
+            'apparmor="AUDIT" operation="open" class="file" profile="local-codex-cli" '
+            'name="/home/test/nixos-config/flake.nix" requested_mask="w" denied_mask="w"',
+            ["local-*"],
+        )
+        allowed_event = apparmor_report.parse_policy_event(
+            'apparmor="ALLOWED" operation="open" class="file" profile="local-codex-cli" '
+            'name="/tmp/example" requested_mask="r" denied_mask="r"',
+            ["local-*"],
+        )
+
+        self.assertIsNotNone(audit_event)
+        assert audit_event is not None
+        self.assertEqual(audit_event.result, "AUDIT")
+        findings = apparmor_report.aggregate(
+            event for event in (allowed_event, audit_event) if event is not None
+        )
+        self.assertEqual([finding.result for finding in findings], ["AUDIT", "ALLOWED"])
+
     def test_filters_unmanaged_profiles_and_normal_status_records(self) -> None:
         self.assertIsNone(
             apparmor_report.parse_policy_event(

@@ -324,7 +324,7 @@ in
         package = pkgs.drawio;
         capabilities = electronDocumentCapabilities;
         executionPackages = electronExecutionPackages;
-        namespaceExecutables = [ "${pkgs.electron}/bin/electron" ];
+        profileReentryExecutables = [ "${pkgs.electron}/bin/electron" ];
         homePaths = [
           ".cache/drawio"
           ".config/draw.io"
@@ -359,8 +359,8 @@ in
           "${pkgs.logseq-appimage.appimageContents}/chrome_crashpad_handler"
           "${pkgs.logseq-appimage.appimageContents}/logseq"
         ];
-        namespaceExecutables = [ "${pkgs.bubblewrap}/bin/bwrap" ];
-        namespaceRules = ''
+        profileReentryExecutables = [ "${pkgs.bubblewrap}/bin/bwrap" ];
+        userNamespaceRules = ''
           capability net_admin,
           network netlink raw,
           mount,
@@ -369,7 +369,7 @@ in
           pivot_root,
           /newroot/{,**} rwkl,
         '';
-        namespaceRulesRationale = "Logseq's AppImage launcher builds its FHS environment with bubblewrap.";
+        userNamespaceRulesRationale = "Logseq's AppImage launcher builds its FHS environment with bubblewrap.";
         extraRules = ''
           ${pkgs.logseq-appimage.appimageContents}/*.so* mr,
         '';
@@ -407,6 +407,7 @@ in
           ".config/BraveSoftware"
         ];
         sensitiveAccess = [ "credential-broker" ];
+        elevatedAccessRationale = "Brave uses the desktop secret-service broker for user-approved credentials.";
       };
       glide = {
         package = pkgs.flake.glide-browser;
@@ -417,6 +418,7 @@ in
           ".config/glide"
         ];
         sensitiveAccess = [ "credential-broker" ];
+        elevatedAccessRationale = "Glide uses the desktop secret-service broker for user-approved credentials.";
       };
       mullvad-browser = {
         package = pkgs.mullvad-browser;
@@ -427,6 +429,7 @@ in
           ".mullvad"
         ];
         sensitiveAccess = [ "credential-broker" ];
+        elevatedAccessRationale = "Mullvad Browser uses the desktop secret-service broker for user-approved credentials.";
       };
       vivaldi = {
         package = pkgs.vivaldi;
@@ -436,6 +439,7 @@ in
           ".config/vivaldi"
         ];
         sensitiveAccess = [ "credential-broker" ];
+        elevatedAccessRationale = "Vivaldi uses the desktop secret-service broker for user-approved credentials.";
       };
       thunderbird = {
         package = pkgs.thunderbird;
@@ -464,6 +468,7 @@ in
           ".local/share/protonmail"
         ];
         sensitiveAccess = [ "credential-broker" ];
+        elevatedAccessRationale = "Proton Mail Bridge stores its authentication material through the secret-service broker.";
       };
       proton-pass = {
         package = pkgs.proton-pass;
@@ -475,6 +480,7 @@ in
           ".config/Proton Pass"
         ];
         sensitiveAccess = [ "credential-broker" ];
+        elevatedAccessRationale = "Proton Pass stores its authentication material through the secret-service broker.";
       };
       proton-pass-cli = {
         package = pkgs.proton-pass-cli;
@@ -486,13 +492,17 @@ in
         ];
         homePaths = [ ".config/proton-pass-cli" ];
         sensitiveAccess = [ "credential-broker" ];
+        elevatedAccessRationale = "Proton Pass CLI stores its authentication material through the secret-service broker.";
       };
       proton-vpn = {
         package = pkgs.proton-vpn;
         executable = "bin/protonvpn-app";
         capabilities = acceleratedDesktopCapabilities ++ [
           "network"
-          "system-bus"
+        ];
+        systemBusPeers = [
+          "org.freedesktop.NetworkManager"
+          "org.freedesktop.login1"
         ];
         homePaths = [
           ".cache/Proton/VPN"
@@ -535,34 +545,40 @@ in
         executable = "bin/codex";
         capabilities = [
           "developer-exec"
-          "full-home"
           "network"
           "terminal"
+          "user-files"
           "userns"
         ];
-        namespaceExecutables = [ "${pkgs.flake.codex-cli}/bin/.codex-wrapped" ];
+        profileReentryExecutables = [ "${pkgs.flake.codex-cli}/bin/.codex-wrapped" ];
+        homePaths = [ ".codex" ];
         sensitiveAccess = [
           "gpg-agent"
+          "nixos-config-writable"
           "ssh-config"
           "ssh-control"
           "ssh-identities"
         ];
+        elevatedAccessRationale = "Codex needs developer execution, its state, reviewed source trees, and the configured SSH/GPG brokers.";
       };
       claude-code = {
         package = pkgs.flake.claude-code;
         executable = "bin/claude";
         capabilities = [
           "developer-exec"
-          "full-home"
           "network"
           "terminal"
+          "user-files"
         ];
+        homePaths = [ ".claude" ];
         sensitiveAccess = [
           "gpg-agent"
+          "nixos-config-writable"
           "ssh-config"
           "ssh-control"
           "ssh-identities"
         ];
+        elevatedAccessRationale = "Claude Code needs developer execution, its state, reviewed source trees, and the configured SSH/GPG brokers.";
       };
     }
     // lib.optionalAttrs (codexDesktopPackage != null) {
@@ -572,19 +588,22 @@ in
         capabilities = electronCapabilities ++ [
           "audio"
           "developer-exec"
-          "full-home"
           "terminal"
+          "user-files"
         ];
         homePaths = [
           ".codex"
           ".config/Codex"
+          ".config/codex-desktop"
         ];
         sensitiveAccess = [
           "gpg-agent"
+          "nixos-config-writable"
           "ssh-config"
           "ssh-control"
           "ssh-identities"
         ];
+        elevatedAccessRationale = "Codex Desktop needs developer execution, its state, reviewed source trees, and the configured SSH/GPG brokers.";
       };
     };
 

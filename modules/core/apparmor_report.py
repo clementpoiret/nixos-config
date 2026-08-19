@@ -206,7 +206,7 @@ def parse_policy_event(line: str, patterns: list[str]) -> PolicyEvent | None:
         return None
     fields = parse_fields(message)
     result = fields.get("apparmor", "")
-    if result not in {"ALLOWED", "DENIED"}:
+    if result not in {"ALLOWED", "AUDIT", "DENIED"}:
         return None
 
     full_profile = fields.get("profile", "")
@@ -289,7 +289,7 @@ def sorted_findings(grouped: dict[tuple[object, ...], Finding]) -> list[Finding]
     return sorted(
         grouped.values(),
         key=lambda item: (
-            0 if item.result == "DENIED" else 1,
+            {"DENIED": 0, "AUDIT": 1, "ALLOWED": 2}.get(item.result, 3),
             item.profile,
             -item.count,
             item.event_class,
@@ -335,7 +335,7 @@ def journal_lines(args: argparse.Namespace) -> Iterator[str]:
         args.boot,
         "_TRANSPORT=kernel",
         "--grep",
-        'apparmor="(ALLOWED|DENIED|ERROR)"',
+        'apparmor="(ALLOWED|AUDIT|DENIED|ERROR)"',
     ]
     if args.since:
         command.extend(("--since", args.since))
@@ -502,6 +502,7 @@ def render_text(report: dict[str, object], findings: list[Finding]) -> None:
     print(
         "Events: "
         f"{summary['events']} total; {summary['denied']} blocked; "
+        f"{summary['audited']} explicit audit observations; "
         f"{summary['allowed']} complain observations; {summary['groups']} grouped findings"
     )
 
@@ -542,9 +543,10 @@ def render_text(report: dict[str, object], findings: list[Finding]) -> None:
 
     headings = {
         "DENIED": "Blocked accesses (enforce-mode decisions or explicit deny rules)",
+        "AUDIT": "Explicitly audited allowed accesses",
         "ALLOWED": "Complain-mode observations (would be blocked in enforce mode)",
     }
-    for result in ("DENIED", "ALLOWED"):
+    for result in ("DENIED", "AUDIT", "ALLOWED"):
         selected = [finding for finding in findings if finding.result == result]
         print(f"\n{headings[result]}:")
         if not selected:
@@ -575,7 +577,7 @@ def render_text(report: dict[str, object], findings: list[Finding]) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Group AppArmor DENIED and complain-mode ALLOWED records for declaratively managed local profiles."
+            "Group AppArmor DENIED, AUDIT, and complain-mode ALLOWED records for declaratively managed local profiles."
         )
     )
     parser.add_argument(
@@ -652,6 +654,7 @@ def main(argv: list[str] | None = None) -> int:
         "summary": {
             "events": counts.total(),
             "denied": counts["DENIED"],
+            "audited": counts["AUDIT"],
             "allowed": counts["ALLOWED"],
             "groups": len(findings),
             "profiles": len(event_profiles),

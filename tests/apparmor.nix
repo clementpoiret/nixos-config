@@ -1,11 +1,14 @@
-{ pkgs }:
+{ home-manager, pkgs }:
 pkgs.testers.runNixOSTest {
   name = "local-apparmor";
 
   nodes.machine =
     { ... }:
     {
-      imports = [ ../modules/core/apparmor.nix ];
+      imports = [
+        ../modules/core/apparmor.nix
+        home-manager.nixosModules.home-manager
+      ];
 
       _module.args = {
         host = "laptop";
@@ -13,6 +16,10 @@ pkgs.testers.runNixOSTest {
       };
 
       system.stateVersion = "26.05";
+      hardware.graphics = {
+        package = pkgs.mesa;
+        package32 = pkgs.pkgsi686Linux.mesa;
+      };
 
       users.users.test = {
         isNormalUser = true;
@@ -24,10 +31,12 @@ pkgs.testers.runNixOSTest {
         mode = "disable";
         debug = {
           enable = true;
-          path = "~/.apparmor_reports";
+          path = "~/.local/state/apparmor-reports";
         };
         profileOverrides = {
+          local-audit-fixture = "complain";
           local-apply-secret-dns = "enforce";
+          local-enforce-fixture = "enforce";
           local-policy-fixture = "enforce";
           local-syncthing = "enforce";
         };
@@ -38,13 +47,19 @@ pkgs.testers.runNixOSTest {
             packageRoots = with pkgs; [
               bash
               coreutils
+              systemd
             ];
             executionPackages = with pkgs; [
               bash
               coreutils
+              systemd
             ];
+            systemBusPeers = [ "org.freedesktop.systemd1" ];
             readOnlyPaths = [ "/run/secrets/dns/test" ];
-            readWritePaths = [ "/run/systemd/resolved.conf.d/{,**}" ];
+            readWritePaths = [
+              "/run/systemd/private"
+              "/run/systemd/resolved.conf.d/{,**}"
+            ];
             extraRules = ''
               capability chown,
               /nix/store/*-unit-script-apply-secret-dns-start/bin/apply-secret-dns-start rix,
@@ -73,6 +88,38 @@ pkgs.testers.runNixOSTest {
               "/run/syncthing/"
               "/run/syncthing/**"
             ];
+          };
+        };
+      };
+
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
+        users.test = {
+          imports = [ ../modules/home/apparmor.nix ];
+          home = {
+            stateVersion = "26.05";
+            packages = [ pkgs.coreutils ];
+          };
+          localAppArmor.applications = {
+            audit-fixture = {
+              package = pkgs.coreutils;
+              executable = "bin/touch";
+              capabilities = [ "user-files" ];
+              homePaths = [
+                ".config/sops/age"
+                "Documents"
+              ];
+            };
+            enforce-fixture = {
+              package = pkgs.coreutils;
+              executable = "bin/mkdir";
+              capabilities = [ "user-files" ];
+              homePaths = [
+                ".config/sops/age"
+                "Documents"
+              ];
+            };
           };
         };
       };
@@ -127,6 +174,7 @@ pkgs.testers.runNixOSTest {
           chown systemd-resolve:systemd-resolve "$temporary"
           mv -f "$temporary" "$output"
           trap - EXIT
+          systemctl reload-or-restart systemd-resolved.service
         '';
       };
     };
@@ -135,9 +183,12 @@ pkgs.testers.runNixOSTest {
     machine.start()
     machine.wait_for_unit("multi-user.target")
     machine.wait_for_unit("apparmor.service")
+    machine.succeed("test $(systemctl show -P Result home-manager-test.service) = success")
 
     with subtest("only the selected profiles are loaded"):
         machine.succeed("test -e /etc/apparmor.d/local-apply-secret-dns")
+        machine.succeed("test -e /etc/apparmor.d/local-audit-fixture")
+        machine.succeed("test -e /etc/apparmor.d/local-enforce-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-policy-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-syncthing")
         machine.fail("test -e /etc/apparmor.d/local-brave")
@@ -165,20 +216,67 @@ pkgs.testers.runNixOSTest {
         machine.succeed("systemctl is-active --quiet apparmor-debug-report.timer")
         machine.succeed(
             "${pkgs.jq}/bin/jq -e '(.profile_patterns == [\"*\"]) and (.summary.denied >= 1)' "
-            "/home/test/.apparmor_reports/logs.json"
+            "/home/test/.local/state/apparmor-reports/logs.json"
         )
         machine.succeed(
             "boot_id=$(cat /proc/sys/kernel/random/boot_id); "
-            "cmp /home/test/.apparmor_reports/logs.json "
-            "/home/test/.apparmor_reports/boots/$boot_id.json"
+            "cmp /home/test/.local/state/apparmor-reports/logs.json "
+            "/home/test/.local/state/apparmor-reports/boots/$boot_id.json"
         )
         machine.succeed(
-            "test $(stat -c %a:%U:%G /home/test/.apparmor_reports) = 700:test:users"
+            "test $(stat -c %a:%U:%G /home/test/.local/state/apparmor-reports) = 700:test:users"
         )
         machine.succeed(
-            "test $(stat -c %a:%U:%G /home/test/.apparmor_reports/logs.json) = 600:test:users"
+            "test $(stat -c %a:%U:%G /home/test/.local/state/apparmor-reports/logs.json) = 600:test:users"
         )
 
+    with subtest("complain mode permits while enforce mode blocks sensitive and protected writes"):
+        machine.succeed(
+            "aa-status --json | ${pkgs.jq}/bin/jq -e "
+            "'.profiles[\"local-audit-fixture\"] == \"complain\" and "
+            ".profiles[\"local-enforce-fixture\"] == \"enforce\"'"
+        )
+        machine.succeed(
+            "install -d -o test -g users -m 0700 "
+            "/home/test/.config/sops/age /home/test/Documents /home/test/nixos-config"
+        )
+        machine.succeed(
+            "install -o test -g users -m 0600 /dev/null "
+            "/home/test/.config/sops/age/keys.txt"
+        )
+        machine.succeed(
+            "install -o test -g users -m 0600 /dev/null "
+            "/home/test/nixos-config/complain-permitted"
+        )
+        machine.succeed(
+            "install -o test -g users -m 0600 /dev/null "
+            "/home/test/nixos-config/enforced"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-audit-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/home/test/.config/sops/age/keys.txt'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-enforce-fixture -- ${pkgs.coreutils}/bin/truncate -s 2 "
+            "/home/test/.config/sops/age/keys.txt'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-audit-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/home/test/nixos-config/complain-permitted'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-enforce-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/home/test/nixos-config/enforced'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-enforce-fixture -- ${pkgs.coreutils}/bin/touch "
+            "/home/test/Documents/allowed'"
+        )
     with subtest("the DNS profile enforces exact secret and home boundaries"):
         machine.fail(
             "aa-exec -p local-apply-secret-dns -- ${pkgs.coreutils}/bin/cat /home/test/private"

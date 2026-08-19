@@ -99,6 +99,12 @@ in
         target = "hardware, firmware, GPU, scheduler, and performance daemons";
         rationale = "Their privileged device and sysfs surfaces require host-specific enforced tests.";
       };
+      apparmor-debug-report = {
+        kind = "service";
+        status = "exempt";
+        target = "apparmor-debug-report.service";
+        rationale = "The hardened root collector must read kernel audit records before dropping privileges for report writes.";
+      };
     };
   };
 
