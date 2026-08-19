@@ -259,6 +259,17 @@
             })
           ];
         };
+        hostDiagnosticsWithoutDeveloper = mkHost {
+          host = "laptop";
+          extraModules = [
+            nixos-hardware.nixosModules.framework-16-7040-amd
+            ({ lib, ... }: {
+              home-manager.users.${username}.localAppArmor.applications.brave.capabilities = lib.mkAfter [
+                "host-diagnostics"
+              ];
+            })
+          ];
+        };
       };
     in
     {
@@ -489,14 +500,17 @@
             states =
               hostConfig:
               pkgs-unstable.lib.mapAttrs (_: policy: policy.state) hostConfig.config.security.apparmor.policies;
+            workloadStates = hostConfig: removeAttrs (states hostConfig) [ "bwrap" ];
             allStatesAre =
               expected: hostConfig:
-              builtins.all (state: state == expected) (builtins.attrValues (states hostConfig));
+              builtins.all (state: state == expected) (builtins.attrValues (workloadStates hostConfig));
             stagedStates = states appArmorTestHosts.staged;
             complainPolicies = appArmorTestHosts.complain.config.security.apparmor.policies;
             enforcePolicies = appArmorTestHosts.enforce.config.security.apparmor.policies;
+            bwrapPolicy = complainPolicies.bwrap.profile;
             bravePolicy = complainPolicies.local-brave.profile;
             codexPolicy = complainPolicies.local-codex-cli.profile;
+            claudePolicy = complainPolicies.local-claude-code.profile;
             drawioPolicy = complainPolicies.local-drawio.profile;
             logseqPolicy = complainPolicies.local-logseq.profile;
             disabledSyncthingService = appArmorTestHosts.disable.config.systemd.services.syncthing;
@@ -504,6 +518,9 @@
             laptopConfig = self.nixosConfigurations.laptop.config;
             laptopPkgs = self.nixosConfigurations.laptop.pkgs;
             laptopHomeAppArmor = laptopConfig.home-manager.users.${username}.localAppArmor;
+            claudeManagedSettings =
+              builtins.fromJSON
+                laptopConfig.environment.etc."claude-code/managed-settings.d/20-sandbox.json".text;
             laptopServiceRegistry = laptopConfig.security.localAppArmor.services;
             appArmorDebugService = laptopConfig.systemd.services.apparmor-debug-report;
             appArmorDebugTimer = laptopConfig.systemd.timers.apparmor-debug-report;
@@ -514,10 +531,13 @@
           assert allStatesAre "disable" appArmorTestHosts.disable;
           assert allStatesAre "complain" appArmorTestHosts.complain;
           assert allStatesAre "enforce" appArmorTestHosts.enforce;
-          assert stagedStates.local-apply-secret-dns == "enforce";
-          assert builtins.all (name: name == "local-apply-secret-dns" || stagedStates.${name} == "complain") (
-            builtins.attrNames stagedStates
+          assert builtins.all (hostConfig: (states hostConfig).bwrap == "enforce") (
+            builtins.attrValues appArmorTestHosts
           );
+          assert stagedStates.local-apply-secret-dns == "enforce";
+          assert builtins.all (
+            name: name == "bwrap" || name == "local-apply-secret-dns" || stagedStates.${name} == "complain"
+          ) (builtins.attrNames stagedStates);
           assert !(disabledSyncthingService.serviceConfig ? AppArmorProfile);
           assert
             !(
@@ -532,10 +552,17 @@
           assert
             !(builtins.tryEval invalidAppArmorTestHosts.missingRationale.config.system.build.toplevel.drvPath)
             .success;
+          assert
+            !(builtins.tryEval invalidAppArmorTestHosts.hostDiagnosticsWithoutDeveloper.config.system.build.toplevel.drvPath)
+            .success;
           assert laptopHomeAppArmor.applications.brave.package == laptopPkgs.brave;
           assert builtins.elem "network" laptopHomeAppArmor.applications.brave.capabilities;
           assert builtins.elem "credential-broker" laptopHomeAppArmor.applications.brave.sensitiveAccess;
           assert builtins.elem "developer-exec" laptopHomeAppArmor.applications.codex-cli.capabilities;
+          assert builtins.elem "bubblewrap" laptopHomeAppArmor.applications.codex-cli.capabilities;
+          assert builtins.elem "bubblewrap" laptopHomeAppArmor.applications.claude-code.capabilities;
+          assert builtins.elem "host-diagnostics" laptopHomeAppArmor.applications.codex-cli.capabilities;
+          assert builtins.elem "host-diagnostics" laptopHomeAppArmor.applications.claude-code.capabilities;
           assert builtins.elem "ssh-identities" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
           assert builtins.elem "nixos-config-writable"
             laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
@@ -572,19 +599,34 @@
             laptopHomeAppArmor.applications.proton-pass.executionPackages;
           assert laptopHomeAppArmor.applications.drawio.userNamespaceRules == "";
           assert laptopHomeAppArmor.applications.codex-cli.userNamespaceRules == "";
+          assert !(builtins.elem "userns" laptopHomeAppArmor.applications.codex-cli.capabilities);
+          assert laptopHomeAppArmor.applications.codex-cli.profileReentryExecutables == [ ];
+          assert laptopHomeAppArmor.applications.codex-cli.bubblewrapPackage == laptopPkgs.stable.bubblewrap;
+          assert
+            laptopHomeAppArmor.applications.claude-code.bubblewrapPackage == laptopPkgs.stable.bubblewrap;
+          assert laptopHomeAppArmor.applications.logseq.executionPackages == [ ];
+          assert laptopHomeAppArmor.applications.logseq.profileReentryExecutables == [ ];
           assert pkgs-unstable.lib.isDerivation laptopPkgs.logseq-appimage.appimageContents;
+          assert pkgs-unstable.lib.isDerivation laptopPkgs.logseq-appimage.fhsEnv;
           assert builtins.hasAttr "broad-launchers" laptopHomeAppArmor.inventory;
           assert builtins.hasAttr "network-control-plane" laptopConfig.security.localAppArmor.inventory;
           assert builtins.hasAttr "apparmor-debug-report" laptopConfig.security.localAppArmor.inventory;
           assert pkgs-unstable.lib.hasInfix "/bin/brave flags=(attach_disconnected,mediate_deleted)"
             bravePolicy;
-          assert pkgs-unstable.lib.hasInfix "Px -> local-codex-cli" codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> bwrap" codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> bwrap" claudePolicy;
+          assert pkgs-unstable.lib.hasInfix "apparmor-bwrap-userns-restrict" bwrapPolicy;
           assert !(pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" codexPolicy);
           assert pkgs-unstable.lib.hasInfix "Px -> local-drawio" drawioPolicy;
           assert !(pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" drawioPolicy);
-          assert pkgs-unstable.lib.hasInfix "Px -> local-logseq" logseqPolicy;
+          assert !(pkgs-unstable.lib.hasInfix "Px -> local-logseq" logseqPolicy);
+          assert !(pkgs-unstable.lib.hasInfix "pivot_root" logseqPolicy);
+          assert !(pkgs-unstable.lib.hasInfix "/newroot" logseqPolicy);
           assert !(pkgs-unstable.lib.hasInfix "/nix/store/** ix" bravePolicy);
           assert !(pkgs-unstable.lib.hasInfix "/nix/store/** mr" bravePolicy);
+          assert claudeManagedSettings.sandbox.enabled;
+          assert claudeManagedSettings.sandbox.failIfUnavailable;
+          assert !(claudeManagedSettings.sandbox.allowUnsandboxedCommands);
           assert laptopConfig.programs.ssh.enableAskPassword;
           assert laptopConfig.environment.variables.SSH_ASKPASS == laptopConfig.programs.ssh.askPassword;
           assert dnsService.serviceConfig.UMask == "0077";
@@ -626,6 +668,38 @@
               grep -F '"profile": "upstream-test"' report.json
               grep -F '"profile_patterns": [' report.json
               grep -F '"audited": 1' report.json
+              touch "$out"
+            '';
+
+        apparmor-application-smoke =
+          let
+            laptopPkgs = self.nixosConfigurations.laptop.pkgs;
+          in
+          pkgs-unstable.runCommand "apparmor-application-smoke"
+            {
+              nativeBuildInputs = [
+                pkgs-unstable.binutils
+                pkgs-unstable.strace
+              ];
+            }
+            ''
+              export HOME="$TMPDIR/home"
+              mkdir -p "$HOME"
+              cd "$TMPDIR"
+
+              logseq_result="$(ELECTRON_RUN_AS_NODE=1 ${laptopPkgs.logseq-appimage}/bin/logseq-appimage -e 'process.stdout.write("logseq-direct-runtime")')"
+              test "$logseq_result" = "logseq-direct-runtime"
+              ${laptopPkgs.logseq-appimage}/bin/logseq --help >/dev/null
+              strace -f -e trace=execve -o "$TMPDIR/codex-execve.log" \
+                ${laptopPkgs.flake.codex-cli}/bin/codex sandbox -- ${pkgs-unstable.coreutils}/bin/true
+              grep -F '"${laptopPkgs.stable.bubblewrap}/bin/bwrap"' "$TMPDIR/codex-execve.log"
+              if grep -F -- 'use_legacy_landlock' ${laptopPkgs.flake.codex-cli}/bin/codex; then
+                echo "Codex wrapper still forces deprecated Landlock" >&2
+                exit 1
+              fi
+              strings ${laptopPkgs.flake.claude-code}/bin/.claude-wrapped \
+                | grep -F '${laptopPkgs.stable.bubblewrap}/bin'
+
               touch "$out"
             '';
 
@@ -696,7 +770,9 @@
             desktopApplicationNames = applicationNamesWith "desktop";
             networkApplicationNames = applicationNamesWith "network";
             usernsApplicationNames = applicationNamesWith "userns";
+            bubblewrapApplicationNames = applicationNamesWith "bubblewrap";
             developerApplicationNames = applicationNamesWith "developer-exec";
+            hostDiagnosticApplicationNames = applicationNamesWith "host-diagnostics";
             nonTerminalApplicationNames = applicationNamesWithout "terminal";
           in
           pkgs-unstable.runCommand "apparmor-policy-parser"
@@ -726,6 +802,17 @@
               for profile_directory in ${
                 pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg profileDirectories
               }; do
+                bwrap_policy="$profile_directory/bwrap"
+                bwrap_profile="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-bwrap-userns-restrict\)"/\1/p' "$bwrap_policy")"
+                test -r "$bwrap_profile"
+                grep -F 'profile bwrap ${self.nixosConfigurations.laptop.pkgs.stable.bubblewrap}/bin/bwrap flags=(attach_disconnected,mediate_deleted)' "$bwrap_profile"
+                grep -F 'allow userns,' "$bwrap_profile"
+                grep -F 'allow mount,' "$bwrap_profile"
+                grep -F 'allow pivot_root,' "$bwrap_profile"
+                grep -F 'allow pix /** -> &bwrap//&unpriv_bwrap,' "$bwrap_profile"
+                grep -F 'profile unpriv_bwrap flags=(attach_disconnected,mediate_deleted)' "$bwrap_profile"
+                grep -F 'audit deny capability,' "$bwrap_profile"
+
                 brave_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-brave-common\)"/\1/p' "$profile_directory/local-brave")"
                 test -r "$brave_common"
                 session_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-session-read-only\)"/\1/p' "$brave_common")"
@@ -780,8 +867,11 @@
                   grep -F '/sys/fs/cgroup/**/{cpu.max,memory.high,memory.max} r,' "$app_common"
                   grep -F 'deny owner /proc/[0-9]*/clear_refs w,' "$app_common"
                   grep -F '/sys/devices/system/cpu/{kernel_max,present} r,' "$app_common"
+                  grep -F '/sys/devices/pci[0-9a-fA-F]*/**/class r,' "$app_common"
+                  grep -F '/sys/devices/system/cpu/cpu[0-9]*/topology/{core_cpus,core_cpus_list} r,' "$app_common"
                   grep -F 'owner /run/user/[0-9]*/wayland-proxy-* rw,' "$app_common"
                   grep -F '${self.nixosConfigurations.laptop.pkgs.xdg-utils}/bin/** ixr,' "$app_common"
+                  grep -F '${self.nixosConfigurations.laptop.pkgs.gawk}/bin/** ixr,' "$app_common"
                   grep -F '${self.nixosConfigurations.laptop.pkgs.gnugrep}/bin/** ixr,' "$app_common"
                   grep -F '${self.nixosConfigurations.laptop.pkgs.dbus}/bin/** ixr,' "$app_common"
                 done
@@ -792,6 +882,21 @@
                   app_profile="$profile_directory/local-$app_name"
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
                   grep -F 'network netlink dgram,' "$app_common"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg
+                    bubblewrapApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F 'priority=100 ${self.nixosConfigurations.laptop.pkgs.stable.bubblewrap}/bin/bwrap Px -> bwrap,' "$app_profile"
+                  if grep -F 'allow mount,' "$app_common" \
+                    || grep -F 'allow pivot_root,' "$app_common" \
+                    || grep -F 'capability sys_admin,' "$app_common"; then
+                    echo "Bubblewrap setup privileges leaked into local-$app_name" >&2
+                    exit 1
+                  fi
                 done
 
                 for app_name in ${
@@ -817,6 +922,9 @@
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
                   grep -F '/nix/store/** mr,' "$app_common"
                   grep -F '/nix/store/** ixr,' "$app_common"
+                  grep -F '/nix/store/ r,' "$app_common"
+                  grep -F '/nix/var/log/nix/ r,' "$app_common"
+                  grep -F '/nix/var/log/nix/drvs/{,**} r,' "$app_common"
                   grep -F 'owner @{HOME}/** m,' "$app_common"
                   grep -F 'owner /tmp/** m,' "$app_common"
                   grep -F 'owner /var/tmp/** m,' "$app_common"
@@ -827,6 +935,24 @@
                     echo "developer profile unexpectedly includes a redundant closure" >&2
                     exit 1
                   fi
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg
+                    hostDiagnosticApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F '/etc/machine-id r,' "$app_common"
+                  grep -F '/proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,statm,status} r,' "$app_common"
+                  grep -F '/proc/[0-9]*/task/[0-9]*/{comm,stat,status} r,' "$app_common"
+                  grep -F '/proc/bus/pci/devices r,' "$app_common"
+                  grep -F '/proc/modules r,' "$app_common"
+                  grep -F '/proc/sys/vm/{mmap_min_addr,nr_hugepages} r,' "$app_common"
+                  grep -F '/run/log/journal/{,**} r,' "$app_common"
+                  grep -F '/sys/kernel/security/apparmor/features/{,**} r,' "$app_common"
+                  grep -F '/sys/kernel/security/apparmor/profiles r,' "$app_common"
+                  grep -F '/var/log/journal/{,**} r,' "$app_common"
                 done
 
                 for app_name in ${
@@ -842,17 +968,27 @@
                 file_roller_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-file-roller-common\)"/\1/p' "$profile_directory/local-file-roller")"
                 grep -F '${pkgs-unstable.unzip}/bin/** ixr,' "$file_roller_common"
 
+                grep -F 'owner @{HOME}/.config/BraveSoftware/Brave-Browser/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so mr,' "$brave_common"
+
+                evince_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-evince-common\)"/\1/p' "$profile_directory/local-evince" | head -n 1)"
+                grep -F 'owner @{HOME}/.local/share/gvfs-metadata/{,**} r,' "$evince_common"
+
                 motrix_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-motrix-common\)"/\1/p' "$profile_directory/local-motrix" | head -n 1)"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.webkitgtk_4_1}/libexec/** ixr,' "$motrix_common"
                 grep -F 'owner "@{HOME}/.local/share/com.motrix.next/{,**}" rwkl,' "$motrix_common"
 
                 logseq_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-logseq-common\)"/\1/p' "$profile_directory/local-logseq" | head -n 1)"
-                grep -F '/nix/store/*-${self.nixosConfigurations.laptop.pkgs.logseq-appimage.name}-bwrap ixr,' "$logseq_common"
-                grep -F '${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/** ixr,' "$logseq_common"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/AppRun ixr,' "$logseq_common"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/logseq ixr,' "$logseq_common"
                 grep -F 'owner "@{HOME}/.logseq/{,**}" rwkl,' "$logseq_common"
-                grep -F 'priority=100 ${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/bwrap Px -> local-logseq,' "$profile_directory/local-logseq"
-                grep -F '/newroot/{,**} rwkl,' "$logseq_common"
+                if grep -F '${self.nixosConfigurations.laptop.pkgs.bubblewrap}' "$logseq_common" \
+                  || grep -F 'mount,' "$logseq_common" \
+                  || grep -F 'pivot_root' "$logseq_common" \
+                  || grep -F '/newroot' "$logseq_common" \
+                  || grep -F 'Px -> local-logseq' "$profile_directory/local-logseq"; then
+                  echo "Logseq unexpectedly retains its FHS bubblewrap sandbox rules" >&2
+                  exit 1
+                fi
 
                 inkscape_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-inkscape-common\)"/\1/p' "$profile_directory/local-inkscape" | head -n 1)"
                 grep -F 'owner "@{HOME}/.config/enchant/{,**}" rwkl,' "$inkscape_common"
@@ -866,6 +1002,9 @@
                 thunderbird_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-thunderbird-common\)"/\1/p' "$profile_directory/local-thunderbird" | head -n 1)"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest ixr,' "$thunderbird_common"
 
+                claude_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-claude-code-common\)"/\1/p' "$profile_directory/local-claude-code" | head -n 1)"
+                grep -F 'owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,' "$claude_common"
+
                 qbittorrent_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-qbittorrent-common\)"/\1/p' "$profile_directory/local-qbittorrent" | head -n 1)"
                 grep -F 'deny ptrace read peer=unconfined,' "$qbittorrent_common"
 
@@ -874,7 +1013,8 @@
                 grep -F 'include <abstractions/dbus-strict>' "$profile_directory/local-apply-secret-dns"
                 grep -F 'dbus (send, receive) bus=system peer=(name=org.freedesktop.systemd1),' "$profile_directory/local-apply-secret-dns"
                 grep -F '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-syncthing"
-                grep -F 'owner /proc/[0-9]*/stat r,' "$profile_directory/local-syncthing"
+                grep -F 'owner /proc/[0-9]*/{stat,statm} r,' "$profile_directory/local-syncthing"
+                grep -F '/nix/store/*-etc-os-release r,' "$profile_directory/local-syncthing"
                 grep -F '/sys/fs/cgroup/**/cpu.max r,' "$profile_directory/local-syncthing"
                 grep -F 'network netlink dgram,' "$profile_directory/local-syncthing"
 
@@ -903,7 +1043,7 @@
                   exit 1
                 fi
 
-                for policy in "$profile_directory"/local-*; do
+                for policy in "$profile_directory"/bwrap "$profile_directory"/local-*; do
                   attachment="$(sed -n 's/^[[:space:]]*profile local-[^[:space:]]* \([^[:space:]]*\) flags=.*/\1/p' "$policy")"
                   if [ -n "$attachment" ]; then
                     test -x "$attachment"

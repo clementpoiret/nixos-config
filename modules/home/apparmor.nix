@@ -4,11 +4,13 @@ let
 
   capabilityType = types.enum [
     "audio"
+    "bubblewrap"
     "camera"
     "credential-broker"
     "desktop"
     "developer-exec"
     "gpu"
+    "host-diagnostics"
     "network"
     "portal"
     "runtime-introspection"
@@ -56,6 +58,12 @@ let
           type = types.listOf capabilityType;
           default = [ ];
           description = "Composable host capabilities granted to the application.";
+        };
+
+        bubblewrapPackage = mkOption {
+          type = types.nullOr types.package;
+          default = null;
+          description = "Exact Bubblewrap package used by this application's command sandbox.";
         };
 
         homePaths = mkOption {

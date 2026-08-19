@@ -36,6 +36,7 @@ pkgs.testers.runNixOSTest {
         profileOverrides = {
           local-audit-fixture = "complain";
           local-apply-secret-dns = "enforce";
+          local-bwrap-fixture = "enforce";
           local-enforce-fixture = "enforce";
           local-policy-fixture = "enforce";
           local-syncthing = "enforce";
@@ -110,6 +111,12 @@ pkgs.testers.runNixOSTest {
                 ".config/sops/age"
                 "Documents"
               ];
+            };
+            bwrap-fixture = {
+              package = pkgs.coreutils;
+              executable = "bin/env";
+              capabilities = [ "bubblewrap" ];
+              bubblewrapPackage = pkgs.bubblewrap;
             };
             enforce-fixture = {
               package = pkgs.coreutils;
@@ -188,10 +195,26 @@ pkgs.testers.runNixOSTest {
     with subtest("only the selected profiles are loaded"):
         machine.succeed("test -e /etc/apparmor.d/local-apply-secret-dns")
         machine.succeed("test -e /etc/apparmor.d/local-audit-fixture")
+        machine.succeed("test -e /etc/apparmor.d/bwrap")
+        machine.succeed("test -e /etc/apparmor.d/local-bwrap-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-enforce-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-policy-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-syncthing")
         machine.fail("test -e /etc/apparmor.d/local-brave")
+
+    with subtest("Bubblewrap is always enforced and brokers namespace setup"):
+        machine.succeed(
+            "aa-status --json | ${pkgs.jq}/bin/jq -e "
+            "'.profiles[\"bwrap\"] == \"enforce\" and "
+            ".profiles[\"unpriv_bwrap\"] == \"enforce\" and "
+            ".profiles[\"local-bwrap-fixture\"] == \"enforce\"'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-bwrap-fixture -- ${pkgs.bash}/bin/bash -c "
+            "\"exec ${pkgs.bubblewrap}/bin/bwrap --ro-bind / / --dev /dev --proc /proc "
+            "--unshare-user --unshare-pid --die-with-parent ${pkgs.coreutils}/bin/true\"'"
+        )
 
     with subtest("the generic service profile permits only declared data and executables"):
         machine.succeed("install -o test -g users -m 0600 /dev/null /home/test/private")

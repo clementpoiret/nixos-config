@@ -24,6 +24,10 @@ protected-tree denies are added in enforce mode. They are deliberately absent in
 kernel did not emit useful observations for explicit audited denies there, so the VM test exercises both the permitted
 complain behavior and the real enforced boundary before a profile is promoted.
 
+The shared `bwrap` compatibility broker is infrastructure rather than a workload profile. It remains enforced whenever
+an enabled application declares the `bubblewrap` capability, including when local workload mode is `disable`, and is
+therefore intentionally unavailable through `profileOverrides`.
+
 Override one workload without changing the global mode:
 
 ```nix
@@ -65,7 +69,7 @@ Applications opt into typed capabilities only when needed:
 ```text
 desktop, portal, session-bus, network, audio, camera, gpu,
 shared-memory, terminal, runtime-introspection, user-files,
-credential-broker, userns, developer-exec
+credential-broker, userns, bubblewrap, developer-exec, host-diagnostics
 ```
 
 Namespace capabilities such as `sys_admin`, `sys_ptrace`, and `setpcap` are generated in the application's main profile
@@ -73,6 +77,13 @@ from the `userns` capability. Exact `profileReentryExecutables` use `Px` to re-e
 environment; they do not create a child profile that could be mistaken for a privilege boundary. Raw `extraRules` and
 `userNamespaceRules` require a rationale. `systemBusPeers` grants only send/receive traffic to listed well-known peers
 through the strict system-bus abstraction.
+
+Logseq launches its extracted AppImage payload directly against an immutable Nix-built FHS library tree. It does not
+receive Bubblewrap execution, mount, pivot-root, runtime `ldconfig`, or `/newroot` permissions. Codex CLI and Claude Code
+instead transition only their exact Nix-provided Bubblewrap executable into the always-enforced upstream
+`bwrap-userns-restrict` profile. Namespace and mount setup privileges stay in that broker; its `unpriv_bwrap` stacked
+child strips capabilities from sandboxed commands. Claude's managed settings also require its command sandbox, reject
+unsandboxed commands, and fail closed if the backend is unavailable.
 
 The `desktop` capability carries the shared compatibility surface used by GTK, Qt, Chromium/Electron, and Gecko:
 read-only root-directory discovery, bounded process/CPU/device/cgroup metadata, per-user Wayland proxy creation, common
@@ -93,6 +104,11 @@ explicitly. The current Codex and Claude profiles explicitly use SSH identities/
 agent. They also receive `~/nixos-config-writable`, but `~/nixos-config` remains a protected promotion target. They still
 do not receive SOPS keys, password stores, GPG private key files, or unrelated mail credentials. Every descriptor with
 `developer-exec` or any `sensitiveAccess` must include an `elevatedAccessRationale`.
+
+`host-diagnostics` is restricted to `developer-exec` profiles. It grants read-only system journals, AppArmor
+feature/profile metadata, bounded cross-process status and command metadata, and selected kernel, PCI, and module
+metadata. It does not grant process environments, memory, foreign file descriptors, kernel log access, or credential
+paths. Unix ownership and ACL checks continue to apply.
 
 All profiles allow owner-controlled `/tmp` and `/var/tmp` trees for compatibility. These shared directories remain a
 same-UID cross-application exchange channel; use private runtime directories or application state for data that should
@@ -157,7 +173,9 @@ descendants, including names containing spaces. AppArmor glob metacharacters (`*
 
 Use the narrow typed field that matches the requirement:
 
-- `capabilities` for IPC, network, device, namespace, terminal, or non-hidden user project trees;
+- `capabilities` for IPC, network, device, namespace, Bubblewrap, terminal, diagnostics, or non-hidden user project
+  trees;
+- `bubblewrapPackage` for the exact shared Bubblewrap derivation used by a `bubblewrap` capability;
 - `extraClosureRoots` for helper package data and libraries;
 - `executionPackages` for commands in a helper package's direct output;
 - `extraExecutables` for one exact executable or AppArmor path expression;
@@ -192,7 +210,8 @@ can handle future project and sync folders without exposing dotfile credentials.
 the agent-only `~/nixos-config-writable` tree are reserved from that broad grant; enforce mode adds explicit
 denies for them. Desktop applications inherit the
 bounded runtime metadata they commonly need; the explicit `runtime-introspection` capability provides the same model to
-non-desktop workloads. Neither is a general `/proc` or `/sys` grant.
+non-desktop workloads. Neither is a general `/proc` or `/sys` grant; broader read-only agent diagnostics require the
+separate `host-diagnostics` capability.
 
 ## Add or change a service
 

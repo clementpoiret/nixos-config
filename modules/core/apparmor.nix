@@ -337,6 +337,28 @@ let
   '';
 
   hasCapability = app: capability: lib.elem capability app.capabilities;
+  bubblewrapApplications = lib.filterAttrs (
+    _: app: hasCapability app "bubblewrap"
+  ) applicationRegistry;
+  bubblewrapPackages = lib.unique (
+    builtins.filter (package: package != null) (
+      map (app: app.bubblewrapPackage) (builtins.attrValues bubblewrapApplications)
+    )
+  );
+  bubblewrapPackage =
+    if builtins.length bubblewrapPackages == 1 then builtins.head bubblewrapPackages else null;
+  bubblewrapProfile =
+    if bubblewrapPackage == null then
+      null
+    else
+      pkgs.runCommand "apparmor-bwrap-userns-restrict" { } ''
+        substitute \
+          ${pkgs.apparmor-profiles}/share/apparmor/extra-profiles/bwrap-userns-restrict \
+          "$out" \
+          --replace-fail /usr/bin/bwrap ${bubblewrapPackage}/bin/bwrap
+      '';
+  claudeSandboxEnabled =
+    applicationRegistry ? claude-code && hasCapability applicationRegistry.claude-code "bubblewrap";
   needsRuntimeIntrospection =
     app:
     hasCapability app "desktop"
@@ -367,17 +389,38 @@ let
     /sys/bus/*/devices/ r,
     /sys/devices/**/uevent r,
     /sys/devices/**/{descriptors,manufacturer,product} r,
+    /sys/devices/pci[0-9a-fA-F]*/**/class r,
     /sys/devices/system/node/ r,
     /sys/devices/system/cpu/{kernel_max,present} r,
     /sys/devices/system/cpu/cpu[0-9]*/cache/index[0-9]*/size r,
     /sys/devices/system/cpu/cpu[0-9]*/cpufreq/cpuinfo_max_freq r,
     /sys/devices/system/cpu/cpu[0-9]*/microcode/version r,
-    /sys/devices/system/cpu/cpu[0-9]*/topology/core_cpus_list r,
+    /sys/devices/system/cpu/cpu[0-9]*/topology/{core_cpus,core_cpus_list} r,
     /sys/devices/system/cpu/cpufreq/policy[0-9]*/{cpuinfo_max_freq,scaling_cur_freq} r,
     /sys/devices/virtual/dmi/id/product_name r,
     /sys/fs/cgroup/**/{cpu.max,memory.high,memory.max} r,
     deny owner /proc/[0-9]*/clear_refs w,
     deny owner /proc/[0-9]*/oom_score_adj w,
+  '';
+
+  hostDiagnosticsRules = ''
+    /etc/machine-id r,
+    /proc/[0-9]*/ r,
+    /proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,statm,status} r,
+    /proc/[0-9]*/task/ r,
+    /proc/[0-9]*/task/[0-9]*/ r,
+    /proc/[0-9]*/task/[0-9]*/{comm,stat,status} r,
+    /proc/bus/pci/ r,
+    /proc/bus/pci/devices r,
+    /proc/modules r,
+    /proc/sys/kernel/{osrelease,pid_max,unprivileged_userns_clone} r,
+    /proc/sys/user/max_user_namespaces r,
+    /proc/sys/vm/{mmap_min_addr,nr_hugepages} r,
+    /run/log/journal/{,**} r,
+    /sys/kernel/security/apparmor/ r,
+    /sys/kernel/security/apparmor/features/{,**} r,
+    /sys/kernel/security/apparmor/profiles r,
+    /var/log/journal/{,**} r,
   '';
 
   userNamespaceRules = ''
@@ -395,8 +438,9 @@ let
 
   serviceRuntimeIntrospectionRules = ''
     /proc/[0-9]*/{cgroup,mountinfo} r,
-    owner /proc/[0-9]*/stat r,
+    owner /proc/[0-9]*/{stat,statm} r,
     /proc/sys/net/core/somaxconn r,
+    /nix/store/*-etc-os-release r,
     /sys/fs/cgroup/**/cpu.max r,
   '';
 
@@ -612,6 +656,7 @@ let
         ''
     }
     ${lib.optionalString (needsRuntimeIntrospection app) runtimeIntrospectionRules}
+    ${lib.optionalString (hasCapability app "host-diagnostics") hostDiagnosticsRules}
     ${lib.optionalString (hasCapability app "credential-broker") ''
       include <abstractions/dbus-session-strict>
       dbus send bus=session peer=(name=org.freedesktop.secrets),
@@ -629,8 +674,11 @@ let
     ${lib.optionalString (hasCapability app "user-files") userFilesRules}
     ${lib.optionalString (hasCapability app "developer-exec") ''
       ptrace (read, trace) peer=@{profile_name},
+      /nix/store/ r,
       /nix/store/** mr,
       /nix/store/** ixr,
+      /nix/var/log/nix/ r,
+      /nix/var/log/nix/drvs/{,**} r,
       owner @{HOME}/** m,
       owner @{HOME}/** ix,
       owner /tmp/** m,
@@ -648,6 +696,7 @@ let
   applicationWrapperExecutionPackages = baseWrapperExecutionPackages ++ [ pkgs.coreutils-full ];
   desktopExecutionPackages = [
     pkgs.dbus
+    pkgs.gawk
     pkgs.gnugrep
     pkgs.xdg-utils
   ];
@@ -664,7 +713,12 @@ let
         ++ app.executionPackages
         ++ lib.optionals (hasCapability app "desktop") desktopExecutionPackages
       );
-      closureRoots = lib.unique ([ app.package ] ++ app.extraClosureRoots ++ executionPackages);
+      closureRoots = lib.unique (
+        [ app.package ]
+        ++ app.extraClosureRoots
+        ++ executionPackages
+        ++ lib.optional (app.bubblewrapPackage != null) app.bubblewrapPackage
+      );
       closureRules = lib.optionalString (!(hasCapability app "developer-exec")) (
         closureReadRules profileName closureRoots
       );
@@ -696,6 +750,9 @@ let
       profileReentryTransitions = lib.concatMapStringsSep "\n" (
         path: "priority=100 ${path} Px -> ${profileName},"
       ) app.profileReentryExecutables;
+      bubblewrapTransition = lib.optionalString (
+        hasCapability app "bubblewrap" && app.bubblewrapPackage != null
+      ) "priority=100 ${app.bubblewrapPackage}/bin/bwrap Px -> bwrap,";
     in
     {
       inherit state;
@@ -706,6 +763,7 @@ let
         profile ${profileName} ${attachment} flags=(attach_disconnected,mediate_deleted) {
           include "${commonRules}"
           ${profileReentryTransitions}
+          ${bubblewrapTransition}
         }
       '';
     };
@@ -767,6 +825,14 @@ let
   servicePolicies = lib.mapAttrs' (
     name: service: lib.nameValuePair (profileNameFor name) (servicePolicy name service)
   ) serviceRegistry;
+  bubblewrapPolicies = lib.optionalAttrs (bubblewrapProfile != null) {
+    bwrap = {
+      state = "enforce";
+      profile = ''
+        include "${bubblewrapProfile}"
+      '';
+    };
+  };
 
   serviceAttachments = lib.mapAttrs' (
     name: service:
@@ -806,6 +872,8 @@ let
       && lib.all (path: lib.hasPrefix "${builtins.storeDir}/" path) app.profileReentryExecutables
       && lib.all validSystemBusPeer app.systemBusPeers
       && (hasCapability app "credential-broker" == sensitiveAccess app "credential-broker")
+      && (hasCapability app "bubblewrap" == (app.bubblewrapPackage != null))
+      && (!hasCapability app "host-diagnostics" || hasCapability app "developer-exec")
       && (app.profileReentryExecutables == [ ] || hasCapability app "userns")
       && (app.userNamespaceRules == "" || app.userNamespaceRulesRationale != "")
       && (
@@ -956,6 +1024,10 @@ in
         message = "Local AppArmor applications require a concrete Home Manager home directory.";
       }
       {
+        assertion = builtins.length bubblewrapPackages <= 1;
+        message = "All local AppArmor Bubblewrap consumers must use the same exact Bubblewrap package.";
+      }
+      {
         assertion = !cfg.debug.enable || (username != null && homeDirectory != null);
         message = "Local AppArmor debug reporting requires a configured primary user and home directory.";
       }
@@ -1015,7 +1087,17 @@ in
       enable = true;
       enableCache = false;
       killUnconfinedConfinables = false;
-      policies = applicationPolicies // servicePolicies;
+      policies = applicationPolicies // servicePolicies // bubblewrapPolicies;
+    };
+
+    environment.etc = lib.optionalAttrs claudeSandboxEnabled {
+      "claude-code/managed-settings.d/20-sandbox.json".text = builtins.toJSON {
+        sandbox = {
+          enabled = true;
+          failIfUnavailable = true;
+          allowUnsandboxedCommands = false;
+        };
+      };
     };
 
     environment.systemPackages = [ apparmorReport ];

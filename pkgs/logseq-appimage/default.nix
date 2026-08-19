@@ -3,7 +3,11 @@
   fetchurl,
   appimageTools,
   asar,
+  bash,
   makeWrapper,
+  patchelf,
+  runCommand,
+  stdenv,
 }:
 
 let
@@ -17,19 +21,37 @@ let
 
   appimageContents = appimageTools.extract {
     inherit pname version src;
+    postExtract = ''
+      ${patchelf}/bin/patchelf --set-interpreter ${stdenv.cc.bintools.dynamicLinker} "$out/logseq"
+    '';
   };
+
+  # Reuse the AppImage FHS library closure without its bubblewrap launcher.
+  # The extracted Electron payload runs correctly against this immutable
+  # symlink tree and therefore does not need runtime mounts or ldconfig.
+  fhsEnv = (appimageTools.wrapType2 { inherit pname version src; }).fhsenv;
 in
-appimageTools.wrapType2 {
-  inherit pname version src;
+runCommand "${pname}-${version}"
+  {
+    nativeBuildInputs = [
+      asar
+      makeWrapper
+    ];
 
-  passthru = { inherit appimageContents; };
+    passthru = {
+      inherit appimageContents fhsEnv;
+    };
 
-  nativeBuildInputs = [
-    asar
-    makeWrapper
-  ];
-
-  extraInstallCommands = ''
+    meta = with lib; {
+      description = "A privacy-first, open-source platform for knowledge management and collaboration";
+      homepage = "https://logseq.com/";
+      license = licenses.agpl3Plus;
+      platforms = [ "x86_64-linux" ];
+      mainProgram = "logseq-appimage";
+    };
+  }
+  ''
+    install -d $out/bin
     install -m 444 -D ${appimageContents}/*.desktop $out/share/applications/${pname}.desktop
 
     # Forcefully overwrite the Exec and Icon lines to guarantee they match our Nix configuration.
@@ -53,20 +75,15 @@ appimageTools.wrapType2 {
       ${appimageContents}/resources/.agents/skills/logseq-cli/SKILL.md \
       $out/share/logseq/js/.agents/skills/logseq-cli/SKILL.md
 
-    # Keep Logseq's self-installed CLI launcher inside the AppImage FHS environment.
-    wrapProgram $out/bin/${pname} \
+    # Launch the extracted payload directly. The FHS library symlink tree is
+    # immutable and requires neither a mount namespace nor runtime ldconfig.
+    makeWrapper ${bash}/bin/bash $out/bin/${pname} \
+      --add-flags ${appimageContents}/AppRun \
+      --set APPDIR ${appimageContents} \
       --set APPIMAGE $out/bin/${pname} \
+      --prefix LD_LIBRARY_PATH : ${fhsEnv}/usr/lib64 \
       --run "if [ \"\$#\" -gt 0 ] && [ \"\$1\" = '${appimageContents}/resources/app.asar/js/logseq-cli.js' ]; then shift; set -- '$out/share/logseq/js/logseq-cli.js' \"\$@\"; fi"
     makeWrapper $out/bin/${pname} $out/bin/logseq \
       --set ELECTRON_RUN_AS_NODE 1 \
       --add-flags $out/share/logseq/js/logseq-cli.js
-  '';
-
-  meta = with lib; {
-    description = "A privacy-first, open-source platform for knowledge management and collaboration";
-    homepage = "https://logseq.com/";
-    license = licenses.agpl3Plus;
-    platforms = [ "x86_64-linux" ];
-    mainProgram = "logseq-appimage";
-  };
-}
+  ''

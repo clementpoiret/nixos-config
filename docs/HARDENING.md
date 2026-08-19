@@ -167,7 +167,14 @@ own loaded profiles.
 Shared desktop compatibility rules cover bounded runtime metadata and the
 configured GTK/Qt/GVFS plugin set for every GUI profile. Network and user
 namespace rules are likewise emitted from capabilities, while workload-specific
-state paths and sandbox launchers remain explicit registrations.
+state paths and sandbox launchers remain explicit registrations. Logseq runs its
+extracted payload against an immutable library tree without runtime mounts, while
+Codex CLI and Claude Code use an exact-path Bubblewrap transition. The shared,
+always-enforced upstream broker owns namespace and mount setup, then stacks an
+`unpriv_bwrap` child profile that strips capabilities from sandboxed commands.
+Claude additionally has a fail-closed managed sandbox policy. Development agents
+separately opt into read-only host diagnostics; journals and cross-process metadata
+are not part of the ordinary desktop or runtime-introspection baseline.
 
 Mode-aware decisions protect SOPS/age keys and
 decrypted secrets, SSH identities/config/control sockets, GPG private keys and

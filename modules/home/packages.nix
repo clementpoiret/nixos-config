@@ -293,6 +293,10 @@ in
       evince = {
         package = pkgs.evince;
         capabilities = acceleratedDocumentCapabilities;
+        extraRules = ''
+          owner @{HOME}/.local/share/gvfs-metadata/{,**} r,
+        '';
+        extraRulesRationale = "Evince reads GVFS metadata associated with opened documents.";
         homePaths = [ ".config/evince" ];
       };
       mpv = {
@@ -348,28 +352,12 @@ in
         package = pkgs.logseq-appimage;
         executable = "bin/logseq-appimage";
         capabilities = electronDocumentCapabilities;
-        executionPackages = [ pkgs.bubblewrap ];
         extraExecutables = [
-          "/nix/store/*-${pkgs.logseq-appimage.name}-bwrap"
-          "/nix/store/*-${pkgs.logseq-appimage.name}-init"
-          "/nix/store/*-appimage-exec.sh/bin/appimage-exec.sh"
-          "/nix/store/*-container-init"
           "${pkgs.logseq-appimage.appimageContents}/AppRun"
           "${pkgs.logseq-appimage.appimageContents}/chrome-sandbox"
           "${pkgs.logseq-appimage.appimageContents}/chrome_crashpad_handler"
           "${pkgs.logseq-appimage.appimageContents}/logseq"
         ];
-        profileReentryExecutables = [ "${pkgs.bubblewrap}/bin/bwrap" ];
-        userNamespaceRules = ''
-          capability net_admin,
-          network netlink raw,
-          mount,
-          remount,
-          umount,
-          pivot_root,
-          /newroot/{,**} rwkl,
-        '';
-        userNamespaceRulesRationale = "Logseq's AppImage launcher builds its FHS environment with bubblewrap.";
         extraRules = ''
           ${pkgs.logseq-appimage.appimageContents}/*.so* mr,
         '';
@@ -402,6 +390,10 @@ in
       brave = {
         package = pkgs.brave;
         capabilities = browserCapabilities;
+        extraRules = ''
+          owner @{HOME}/.config/BraveSoftware/Brave-Browser/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so mr,
+        '';
+        extraRulesRationale = "Brave maps its downloaded Widevine CDM for protected media playback.";
         homePaths = [
           ".cache/BraveSoftware"
           ".config/BraveSoftware"
@@ -544,13 +536,14 @@ in
         package = pkgs.flake.codex-cli;
         executable = "bin/codex";
         capabilities = [
+          "bubblewrap"
           "developer-exec"
+          "host-diagnostics"
           "network"
           "terminal"
           "user-files"
-          "userns"
         ];
-        profileReentryExecutables = [ "${pkgs.flake.codex-cli}/bin/.codex-wrapped" ];
+        bubblewrapPackage = pkgs.stable.bubblewrap;
         homePaths = [ ".codex" ];
         sensitiveAccess = [
           "gpg-agent"
@@ -565,12 +558,19 @@ in
         package = pkgs.flake.claude-code;
         executable = "bin/claude";
         capabilities = [
+          "bubblewrap"
           "developer-exec"
+          "host-diagnostics"
           "network"
           "terminal"
           "user-files"
         ];
+        bubblewrapPackage = pkgs.stable.bubblewrap;
         homePaths = [ ".claude" ];
+        extraRules = ''
+          owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,
+        '';
+        extraRulesRationale = "Claude Code creates per-session Unix sockets for its local network proxy.";
         sensitiveAccess = [
           "gpg-agent"
           "nixos-config-writable"
@@ -588,6 +588,7 @@ in
         capabilities = electronCapabilities ++ [
           "audio"
           "developer-exec"
+          "host-diagnostics"
           "terminal"
           "user-files"
         ];
