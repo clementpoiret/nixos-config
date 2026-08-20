@@ -63,13 +63,16 @@ allow-list while still letting programs discover immutable configuration and dat
 store, home, and temporary build trees so `uv`, Python virtual environments and native extensions, Go binaries, Rust
 build scripts/proc macros, and ephemeral `nix shell` tools work without a manually maintained package list. Launching a
 separately managed application uses a higher-priority transition into that application's own profile when it is loaded.
+Developer profiles also share read access to installed agent skills, the global Git ignore file and Keras settings;
+read/write access to Nix and uv caches; and bounded access to their own file-descriptor and thread-name metadata.
 
 Applications opt into typed capabilities only when needed:
 
 ```text
 desktop, portal, session-bus, network, audio, camera, gpu,
 shared-memory, terminal, runtime-introspection, user-files,
-credential-broker, userns, bubblewrap, developer-exec, host-diagnostics
+credential-broker, userns, bubblewrap, developer-exec, host-diagnostics,
+device-discovery
 ```
 
 Namespace capabilities such as `sys_admin`, `sys_ptrace`, and `setpcap` are generated in the application's main profile
@@ -88,8 +91,14 @@ unsandboxed commands, and fail closed if the backend is unavailable.
 The `desktop` capability carries the shared compatibility surface used by GTK, Qt, Chromium/Electron, and Gecko:
 read-only root-directory discovery, bounded process/CPU/device/cgroup metadata, per-user Wayland proxy creation, common
 desktop discovery helpers, and the configured GVFS, Qt theme, Kvantum, and X11 plugin closures. `network` includes
-netlink datagram discovery in addition to ordinary name service and TLS data. Optional Chromium memory-reclamation,
+netlink datagram discovery and the read-only socket backlog limit in addition to ordinary name service and TLS data.
+`device-discovery` provides browsers read-only enumeration of selected device, USB, disk UUID, class, and virtual-console
+metadata; `gpu` includes DRM directory discovery. Optional Chromium memory-reclamation,
 immutable `/etc/opt` writes, terminal access, and OOM-priority changes are explicitly denied without audit noise.
+
+Brave alone receives writable NSS database state and `/dev/hidraw[0-9]*` for direct FIDO/YubiKey access. The numeric raw
+HID rule can also expose other user-readable HID nodes, including keyboard firmware interfaces, so it is deliberately not
+part of the shared browser capability.
 
 Enforced applications deny undeclared access to these sensitive groups:
 
@@ -101,14 +110,16 @@ and keyring broker channels, Yubico U2F registrations, and the writable NixOS co
 
 Developer execution is not an automatic credential exemption. A developer tool must list each required sensitive group
 explicitly. The current Codex and Claude profiles explicitly use SSH identities/config/control sockets and the GPG
-agent. They also receive `~/nixos-config-writable`, but `~/nixos-config` remains a protected promotion target. They still
-do not receive SOPS keys, password stores, GPG private key files, or unrelated mail credentials. Every descriptor with
+agent. That GPG exception includes the public `common.conf` and mutable trust database, but not secret-key files. They
+also receive `~/nixos-config-writable`, but `~/nixos-config` remains a protected promotion target. They still do not
+receive SOPS keys, password stores, GPG private key files, or unrelated mail credentials. Every descriptor with
 `developer-exec` or any `sensitiveAccess` must include an `elevatedAccessRationale`.
 
 `host-diagnostics` is restricted to `developer-exec` profiles. It grants read-only system journals, AppArmor
 feature/profile metadata, bounded cross-process status and command metadata, and selected kernel, PCI, and module
-metadata. It does not grant process environments, memory, foreign file descriptors, kernel log access, or credential
-paths. Unix ownership and ACL checks continue to apply.
+metadata. When debug reporting is enabled, it also grants owner-read access to the configured AppArmor report tree. It
+does not grant process environments, memory, foreign file descriptors, kernel log access, or credential paths. Unix
+ownership and ACL checks continue to apply.
 
 All profiles allow owner-controlled `/tmp` and `/var/tmp` trees for compatibility. These shared directories remain a
 same-UID cross-application exchange channel; use private runtime directories or application state for data that should
@@ -268,7 +279,8 @@ The mode matrix verifies states, overrides, exact package registration, namespac
 and systemd attachments. The parser check parses every desktop, laptop, and all-enforced policy, verifies capability
 rules across every relevant registered profile, and confirms that ordinary closure/session rules do not grant implicit
 execution. The VM enforces a generic service fixture including runtime metadata, the exact DNS-secret boundary, and a
-running Syncthing service.
+running Syncthing service. It also exercises shared developer caches and metadata while retaining the GPG private-key
+and protected-configuration boundaries.
 
 The parser may warn that its kernel interface or cache is unavailable in the Nix build sandbox. That warning is expected
 when the command succeeds; it uses `--skip-kernel-load` to validate syntax and includes without changing the running

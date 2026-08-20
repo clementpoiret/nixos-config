@@ -379,6 +379,7 @@ let
     owner /proc/[0-9]*/{cmdline,mountinfo,statm,smaps,smaps_rollup} r,
     owner /proc/[0-9]*/task/ r,
     owner /proc/[0-9]*/task/[0-9]*/{stat,status} r,
+    owner /proc/[0-9]*/task/[0-9]*/comm rw,
     /proc/stat r,
     /proc/version r,
     /proc/pressure/{cpu,io,memory} r,
@@ -397,7 +398,7 @@ let
     /sys/devices/system/cpu/cpu[0-9]*/microcode/version r,
     /sys/devices/system/cpu/cpu[0-9]*/topology/{core_cpus,core_cpus_list} r,
     /sys/devices/system/cpu/cpufreq/policy[0-9]*/{cpuinfo_max_freq,scaling_cur_freq} r,
-    /sys/devices/virtual/dmi/id/product_name r,
+    /sys/devices/virtual/dmi/id/{product_name,product_sku,sys_vendor} r,
     /sys/fs/cgroup/**/{cpu.max,memory.high,memory.max} r,
     deny owner /proc/[0-9]*/clear_refs w,
     deny owner /proc/[0-9]*/oom_score_adj w,
@@ -413,14 +414,27 @@ let
     /proc/bus/pci/ r,
     /proc/bus/pci/devices r,
     /proc/modules r,
-    /proc/sys/kernel/{osrelease,pid_max,unprivileged_userns_clone} r,
+    /proc/sys/kernel/{osrelease,ostype,pid_max,unprivileged_userns_clone} r,
     /proc/sys/user/max_user_namespaces r,
     /proc/sys/vm/{mmap_min_addr,nr_hugepages} r,
     /run/log/journal/{,**} r,
+    /sys/devices/pci[0-9a-fA-F]*/**/vendor r,
     /sys/kernel/security/apparmor/ r,
     /sys/kernel/security/apparmor/features/{,**} r,
     /sys/kernel/security/apparmor/profiles r,
     /var/log/journal/{,**} r,
+    ${lib.optionalString cfg.debug.enable ''
+      owner ${quotePath "${debugPath}/{,**}"} r,
+    ''}
+  '';
+
+  deviceDiscoveryRules = ''
+    /dev/ r,
+    /dev/disk/by-uuid/ r,
+    /sys/class/ r,
+    /sys/class/{dma_heap,graphics,powercap,pwm,rc,thermal,usbmisc,vtconsole,wakeup}/ r,
+    /sys/devices/**/usb[0-9]*/**/{bConfigurationValue,busnum,devnum,interface,serial} r,
+    /sys/devices/virtual/tty/tty0/active r,
   '';
 
   userNamespaceRules = ''
@@ -432,6 +446,7 @@ let
     /proc/sys/kernel/{overflowgid,overflowuid} r,
     /proc/sys/kernel/seccomp/actions_avail r,
     /proc/sys/user/max_user_namespaces r,
+    /proc/[0-9]*/task/[0-9]*/status r,
     owner /proc/[0-9]*/fd/{,**} rw,
     owner /proc/[0-9]*/{gid_map,setgroups,uid_map} rw,
   '';
@@ -532,6 +547,8 @@ let
     ''}
     ${lib.optionalString (sensitiveAccess app "gpg-agent") ''
       owner @{HOME}/.gnupg/S.gpg-agent{,.*} rw,
+      owner @{HOME}/.gnupg/common.conf r,
+      owner @{HOME}/.gnupg/trustdb.gpg rw,
     ''}
     ${lib.optionalString (sensitiveAccess app "password-store") ''
       owner @{HOME}/.password-store/{,**} rwkl,
@@ -615,6 +632,7 @@ let
       /etc/ r,
       deny /etc/opt/{,**} w,
       owner /run/user/[0-9]*/wayland-proxy-* rw,
+      ${pkgs.glib.out}/libexec/gio-launch-desktop ixr,
     ''}
     ${lib.optionalString (hasCapability app "portal") ''
       include <abstractions/xdg-desktop>
@@ -629,6 +647,7 @@ let
       include <abstractions/nameservice>
       include <abstractions/ssl_certs>
       network netlink dgram,
+      /proc/sys/net/core/somaxconn r,
     ''}
     ${lib.optionalString (hasCapability app "audio") ''
       include <abstractions/audio>
@@ -639,7 +658,9 @@ let
     ${lib.optionalString (hasCapability app "gpu") ''
       include <abstractions/opengl>
       /dev/dri/{,**} rw,
+      /sys/devices/**/drm/ r,
     ''}
+    ${lib.optionalString (hasCapability app "device-discovery") deviceDiscoveryRules}
     ${lib.optionalString (hasCapability app "shared-memory" || hasCapability app "developer-exec") ''
       owner /dev/shm/{,**} rwkl,
     ''}
@@ -679,8 +700,14 @@ let
       /nix/store/** ixr,
       /nix/var/log/nix/ r,
       /nix/var/log/nix/drvs/{,**} r,
+      owner @{HOME}/.agents/skills/{,**} r,
+      owner @{HOME}/.cache/nix/{,**} rwkl,
+      owner @{HOME}/.cache/uv/{,**} rwkl,
+      owner @{HOME}/.config/git/ignore r,
+      owner @{HOME}/.keras/keras.json r,
       owner @{HOME}/** m,
       owner @{HOME}/** ix,
+      owner /proc/[0-9]*/fd/ r,
       owner /tmp/** m,
       owner /tmp/** ix,
       owner /var/tmp/** m,

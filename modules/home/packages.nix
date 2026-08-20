@@ -32,6 +32,7 @@ let
     "audio"
     "camera"
     "credential-broker"
+    "device-discovery"
     "user-files"
   ];
   archiveExecutionPackages = with pkgs; [
@@ -392,11 +393,13 @@ in
         capabilities = browserCapabilities;
         extraRules = ''
           owner @{HOME}/.config/BraveSoftware/Brave-Browser/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so mr,
+          /dev/hidraw[0-9]* rw,
         '';
-        extraRulesRationale = "Brave maps its downloaded Widevine CDM for protected media playback.";
+        extraRulesRationale = "Brave maps its downloaded Widevine CDM and directly accesses raw-HID FIDO authenticators such as YubiKeys.";
         homePaths = [
           ".cache/BraveSoftware"
           ".config/BraveSoftware"
+          ".pki/nssdb"
         ];
         sensitiveAccess = [ "credential-broker" ];
         elevatedAccessRationale = "Brave uses the desktop secret-service broker for user-approved credentials.";
@@ -441,7 +444,11 @@ in
           "shared-memory"
           "userns"
         ];
-        extraExecutables = [ "${pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest" ];
+        extraExecutables = [
+          "${pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest"
+          "${pkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender"
+          "${pkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest"
+        ];
         homePaths = [
           ".cache/thunderbird"
           ".thunderbird"

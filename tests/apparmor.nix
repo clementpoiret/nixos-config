@@ -34,6 +34,7 @@ pkgs.testers.runNixOSTest {
           path = "~/.local/state/apparmor-reports";
         };
         profileOverrides = {
+          local-agent-fixture = "enforce";
           local-audit-fixture = "complain";
           local-apply-secret-dns = "enforce";
           local-bwrap-fixture = "enforce";
@@ -63,6 +64,7 @@ pkgs.testers.runNixOSTest {
             ];
             extraRules = ''
               capability chown,
+              owner /proc/[0-9]*/stat r,
               /nix/store/*-unit-script-apply-secret-dns-start/bin/apply-secret-dns-start rix,
             '';
             extraRulesRationale = "The test service changes ownership of an atomic resolved drop-in.";
@@ -82,7 +84,11 @@ pkgs.testers.runNixOSTest {
               "network"
               "runtime-introspection"
             ];
-            readOnlyPaths = [ "/home/test/" ];
+            readOnlyPaths = [
+              "/home/test/"
+              "/proc/bus/pci/devices"
+              "/proc/modules"
+            ];
             readWritePaths = [
               "/home/test/Sync/"
               "/home/test/Sync/**"
@@ -103,6 +109,19 @@ pkgs.testers.runNixOSTest {
             packages = [ pkgs.coreutils ];
           };
           localAppArmor.applications = {
+            agent-fixture = {
+              package = pkgs.coreutils;
+              executable = "bin/cat";
+              capabilities = [
+                "developer-exec"
+                "host-diagnostics"
+              ];
+              sensitiveAccess = [
+                "gpg-agent"
+                "nixos-config-writable"
+              ];
+              elevatedAccessRationale = "The fixture verifies shared developer state and the intended credential boundaries.";
+            };
             audit-fixture = {
               package = pkgs.coreutils;
               executable = "bin/touch";
@@ -193,6 +212,7 @@ pkgs.testers.runNixOSTest {
     machine.succeed("test $(systemctl show -P Result home-manager-test.service) = success")
 
     with subtest("only the selected profiles are loaded"):
+        machine.succeed("test -e /etc/apparmor.d/local-agent-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-apply-secret-dns")
         machine.succeed("test -e /etc/apparmor.d/local-audit-fixture")
         machine.succeed("test -e /etc/apparmor.d/bwrap")
@@ -232,6 +252,70 @@ pkgs.testers.runNixOSTest {
         )
         machine.succeed(
             "aa-exec -p local-policy-fixture -- ${pkgs.coreutils}/bin/stat /proc/self/stat"
+        )
+
+    with subtest("the developer profile permits shared tooling state without exposing private keys or the protected clone"):
+        machine.succeed(
+            "install -d -o test -g users -m 0700 "
+            "/home/test/.agents/skills/example /home/test/.cache/nix /home/test/.cache/uv "
+            "/home/test/.config/git /home/test/.keras /home/test/.gnupg/private-keys-v1.d "
+            "/home/test/.local/state/apparmor-reports /home/test/nixos-config "
+            "/home/test/nixos-config-writable"
+        )
+        machine.succeed(
+            "touch "
+            "/home/test/.agents/skills/example/SKILL.md /home/test/.config/git/ignore "
+            "/home/test/.keras/keras.json /home/test/.gnupg/common.conf "
+            "/home/test/.gnupg/trustdb.gpg /home/test/.gnupg/private-keys-v1.d/private.key "
+            "/home/test/.local/state/apparmor-reports/logs.json"
+        )
+        machine.succeed(
+            "chown -R test:users /home/test/.agents /home/test/.cache /home/test/.config "
+            "/home/test/.keras /home/test/.gnupg /home/test/.local /home/test/nixos-config "
+            "/home/test/nixos-config-writable"
+        )
+        machine.succeed(
+            "chmod 0600 /home/test/.agents/skills/example/SKILL.md /home/test/.config/git/ignore "
+            "/home/test/.keras/keras.json /home/test/.gnupg/common.conf "
+            "/home/test/.gnupg/trustdb.gpg /home/test/.gnupg/private-keys-v1.d/private.key "
+            "/home/test/.local/state/apparmor-reports/logs.json"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/cat "
+            "/home/test/.agents/skills/example/SKILL.md /home/test/.config/git/ignore "
+            "/home/test/.keras/keras.json /home/test/.gnupg/common.conf "
+            "/home/test/.local/state/apparmor-reports/logs.json'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/touch "
+            "/home/test/.cache/nix/allowed /home/test/.cache/uv/allowed "
+            "/home/test/nixos-config-writable/allowed'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/home/test/.gnupg/trustdb.gpg'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/ls /proc/self/fd'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.bash}/bin/bash -c "
+            "\"printf agent-fixture > /proc/self/task/\\$\\$/comm\"'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/cat "
+            "/home/test/.gnupg/private-keys-v1.d/private.key'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/touch "
+            "/home/test/nixos-config/blocked'"
         )
 
     with subtest("the automated debug report is private, valid, and archived by boot"):
@@ -301,6 +385,9 @@ pkgs.testers.runNixOSTest {
             "/home/test/Documents/allowed'"
         )
     with subtest("the DNS profile enforces exact secret and home boundaries"):
+        machine.succeed(
+            "aa-exec -p local-apply-secret-dns -- ${pkgs.coreutils}/bin/cat /proc/self/stat"
+        )
         machine.fail(
             "aa-exec -p local-apply-secret-dns -- ${pkgs.coreutils}/bin/cat /home/test/private"
         )
@@ -321,6 +408,12 @@ pkgs.testers.runNixOSTest {
         )
 
     with subtest("Syncthing runs under its enforced profile"):
+        machine.succeed(
+            "aa-exec -p local-syncthing -- ${pkgs.coreutils}/bin/cat /proc/bus/pci/devices"
+        )
+        machine.succeed(
+            "aa-exec -p local-syncthing -- ${pkgs.coreutils}/bin/cat /proc/modules"
+        )
         machine.wait_for_unit("syncthing.service")
         machine.wait_until_succeeds("systemctl is-active --quiet syncthing.service")
         machine.succeed(

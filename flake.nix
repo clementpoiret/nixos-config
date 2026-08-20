@@ -557,7 +557,13 @@
             .success;
           assert laptopHomeAppArmor.applications.brave.package == laptopPkgs.brave;
           assert builtins.elem "network" laptopHomeAppArmor.applications.brave.capabilities;
+          assert builtins.elem "device-discovery" laptopHomeAppArmor.applications.brave.capabilities;
           assert builtins.elem "credential-broker" laptopHomeAppArmor.applications.brave.sensitiveAccess;
+          assert builtins.elem ".pki/nssdb" laptopHomeAppArmor.applications.brave.homePaths;
+          assert builtins.elem "${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender"
+            laptopHomeAppArmor.applications.thunderbird.extraExecutables;
+          assert builtins.elem "${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest"
+            laptopHomeAppArmor.applications.thunderbird.extraExecutables;
           assert builtins.elem "developer-exec" laptopHomeAppArmor.applications.codex-cli.capabilities;
           assert builtins.elem "bubblewrap" laptopHomeAppArmor.applications.codex-cli.capabilities;
           assert builtins.elem "bubblewrap" laptopHomeAppArmor.applications.claude-code.capabilities;
@@ -570,7 +576,11 @@
           assert laptopHomeAppArmor.applications.codex-cli.elevatedAccessRationale != "";
           assert laptopServiceRegistry.syncthing.packageRoots == [ laptopConfig.services.syncthing.package ];
           assert builtins.elem "runtime-introspection" laptopServiceRegistry.syncthing.capabilities;
+          assert builtins.elem "/proc/bus/pci/devices" laptopServiceRegistry.syncthing.readOnlyPaths;
+          assert builtins.elem "/proc/modules" laptopServiceRegistry.syncthing.readOnlyPaths;
           assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
+          assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/stat r,"
+            laptopServiceRegistry.apply-secret-dns.extraRules;
           assert laptopConfig.security.localAppArmor.debug.enable;
           assert laptopConfig.security.localAppArmor.debug.path == "~/.local/state/apparmor-reports";
           assert
@@ -768,6 +778,8 @@
                 ) laptopApplications
               );
             desktopApplicationNames = applicationNamesWith "desktop";
+            deviceDiscoveryApplicationNames = applicationNamesWith "device-discovery";
+            gpuApplicationNames = applicationNamesWith "gpu";
             networkApplicationNames = applicationNamesWith "network";
             usernsApplicationNames = applicationNamesWith "userns";
             bubblewrapApplicationNames = applicationNamesWith "bubblewrap";
@@ -863,17 +875,21 @@
                   grep -F '/proc/[0-9]*/{cgroup,stat} r,' "$app_common"
                   grep -F 'owner /proc/[0-9]*/{cmdline,mountinfo,statm,smaps,smaps_rollup} r,' "$app_common"
                   grep -F 'owner /proc/[0-9]*/task/[0-9]*/{stat,status} r,' "$app_common"
+                  grep -F 'owner /proc/[0-9]*/task/[0-9]*/comm rw,' "$app_common"
                   grep -F '/proc/pressure/{cpu,io,memory} r,' "$app_common"
                   grep -F '/sys/fs/cgroup/**/{cpu.max,memory.high,memory.max} r,' "$app_common"
                   grep -F 'deny owner /proc/[0-9]*/clear_refs w,' "$app_common"
                   grep -F '/sys/devices/system/cpu/{kernel_max,present} r,' "$app_common"
                   grep -F '/sys/devices/pci[0-9a-fA-F]*/**/class r,' "$app_common"
+                  grep -F '/sys/devices/virtual/dmi/id/{product_name,product_sku,sys_vendor} r,' "$app_common"
                   grep -F '/sys/devices/system/cpu/cpu[0-9]*/topology/{core_cpus,core_cpus_list} r,' "$app_common"
                   grep -F 'owner /run/user/[0-9]*/wayland-proxy-* rw,' "$app_common"
                   grep -F '${self.nixosConfigurations.laptop.pkgs.xdg-utils}/bin/** ixr,' "$app_common"
                   grep -F '${self.nixosConfigurations.laptop.pkgs.gawk}/bin/** ixr,' "$app_common"
                   grep -F '${self.nixosConfigurations.laptop.pkgs.gnugrep}/bin/** ixr,' "$app_common"
                   grep -F '${self.nixosConfigurations.laptop.pkgs.dbus}/bin/** ixr,' "$app_common"
+                  grep -F '${self.nixosConfigurations.laptop.pkgs.glib.out}/libexec/gio-launch-desktop ixr,' "$app_common"
+                  test -x '${self.nixosConfigurations.laptop.pkgs.glib.out}/libexec/gio-launch-desktop'
                 done
 
                 for app_name in ${
@@ -882,6 +898,29 @@
                   app_profile="$profile_directory/local-$app_name"
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
                   grep -F 'network netlink dgram,' "$app_common"
+                  grep -F '/proc/sys/net/core/somaxconn r,' "$app_common"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg gpuApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F '/sys/devices/**/drm/ r,' "$app_common"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg
+                    deviceDiscoveryApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F '/dev/ r,' "$app_common"
+                  grep -F '/dev/disk/by-uuid/ r,' "$app_common"
+                  grep -F '/sys/class/ r,' "$app_common"
+                  grep -F '/sys/class/{dma_heap,graphics,powercap,pwm,rc,thermal,usbmisc,vtconsole,wakeup}/ r,' "$app_common"
+                  grep -F '/sys/devices/**/usb[0-9]*/**/{bConfigurationValue,busnum,devnum,interface,serial} r,' "$app_common"
+                  grep -F '/sys/devices/virtual/tty/tty0/active r,' "$app_common"
                 done
 
                 for app_name in ${
@@ -908,6 +947,7 @@
                   grep -F 'capability sys_admin,' "$app_common"
                   grep -F 'capability sys_chroot,' "$app_common"
                   grep -F 'capability sys_ptrace,' "$app_common"
+                  grep -F '/proc/[0-9]*/task/[0-9]*/status r,' "$app_common"
                   grep -F 'owner /proc/[0-9]*/{gid_map,setgroups,uid_map} rw,' "$app_common"
                   if grep -Fq 'profile namespace-bootstrap' "$app_profile"; then
                     echo "user namespace rules escaped into a child profile" >&2
@@ -925,10 +965,16 @@
                   grep -F '/nix/store/ r,' "$app_common"
                   grep -F '/nix/var/log/nix/ r,' "$app_common"
                   grep -F '/nix/var/log/nix/drvs/{,**} r,' "$app_common"
+                  grep -F 'owner @{HOME}/.agents/skills/{,**} r,' "$app_common"
+                  grep -F 'owner @{HOME}/.cache/nix/{,**} rwkl,' "$app_common"
+                  grep -F 'owner @{HOME}/.cache/uv/{,**} rwkl,' "$app_common"
+                  grep -F 'owner @{HOME}/.config/git/ignore r,' "$app_common"
+                  grep -F 'owner @{HOME}/.keras/keras.json r,' "$app_common"
                   grep -F 'owner @{HOME}/** m,' "$app_common"
                   grep -F 'owner /tmp/** m,' "$app_common"
                   grep -F 'owner /var/tmp/** m,' "$app_common"
                   grep -F 'owner /dev/shm/{,**} rwkl,' "$app_common"
+                  grep -F 'owner /proc/[0-9]*/fd/ r,' "$app_common"
                   grep -F 'ptrace (read, trace) peer=@{profile_name},' "$app_common"
                   grep -F 'priority=50 /nix/store/** Pix,' "$app_common"
                   if grep -F 'apparmor-closure-rules-local-' "$app_common"; then
@@ -948,11 +994,14 @@
                   grep -F '/proc/[0-9]*/task/[0-9]*/{comm,stat,status} r,' "$app_common"
                   grep -F '/proc/bus/pci/devices r,' "$app_common"
                   grep -F '/proc/modules r,' "$app_common"
+                  grep -F '/proc/sys/kernel/{osrelease,ostype,pid_max,unprivileged_userns_clone} r,' "$app_common"
                   grep -F '/proc/sys/vm/{mmap_min_addr,nr_hugepages} r,' "$app_common"
                   grep -F '/run/log/journal/{,**} r,' "$app_common"
+                  grep -F '/sys/devices/pci[0-9a-fA-F]*/**/vendor r,' "$app_common"
                   grep -F '/sys/kernel/security/apparmor/features/{,**} r,' "$app_common"
                   grep -F '/sys/kernel/security/apparmor/profiles r,' "$app_common"
                   grep -F '/var/log/journal/{,**} r,' "$app_common"
+                  grep -F 'owner "/home/${username}/.local/state/apparmor-reports/{,**}" r,' "$app_common"
                 done
 
                 for app_name in ${
@@ -969,6 +1018,8 @@
                 grep -F '${pkgs-unstable.unzip}/bin/** ixr,' "$file_roller_common"
 
                 grep -F 'owner @{HOME}/.config/BraveSoftware/Brave-Browser/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so mr,' "$brave_common"
+                grep -F '/dev/hidraw[0-9]* rw,' "$brave_common"
+                grep -F 'owner "@{HOME}/.pki/nssdb/{,**}" rwkl,' "$brave_common"
 
                 evince_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-evince-common\)"/\1/p' "$profile_directory/local-evince" | head -n 1)"
                 grep -F 'owner @{HOME}/.local/share/gvfs-metadata/{,**} r,' "$evince_common"
@@ -1001,6 +1052,8 @@
 
                 thunderbird_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-thunderbird-common\)"/\1/p' "$profile_directory/local-thunderbird" | head -n 1)"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest ixr,' "$thunderbird_common"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender ixr,' "$thunderbird_common"
+                grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest ixr,' "$thunderbird_common"
 
                 claude_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-claude-code-common\)"/\1/p' "$profile_directory/local-claude-code" | head -n 1)"
                 grep -F 'owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,' "$claude_common"
@@ -1012,11 +1065,14 @@
                 grep -F '/run/secrets.d/[0-9]*/dns/' "$profile_directory/local-apply-secret-dns"
                 grep -F 'include <abstractions/dbus-strict>' "$profile_directory/local-apply-secret-dns"
                 grep -F 'dbus (send, receive) bus=system peer=(name=org.freedesktop.systemd1),' "$profile_directory/local-apply-secret-dns"
+                grep -F 'owner /proc/[0-9]*/stat r,' "$profile_directory/local-apply-secret-dns"
                 grep -F '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-syncthing"
                 grep -F 'owner /proc/[0-9]*/{stat,statm} r,' "$profile_directory/local-syncthing"
                 grep -F '/nix/store/*-etc-os-release r,' "$profile_directory/local-syncthing"
                 grep -F '/sys/fs/cgroup/**/cpu.max r,' "$profile_directory/local-syncthing"
                 grep -F 'network netlink dgram,' "$profile_directory/local-syncthing"
+                grep -F '"/proc/bus/pci/devices" r,' "$profile_directory/local-syncthing"
+                grep -F '"/proc/modules" r,' "$profile_directory/local-syncthing"
 
                 pqiv_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-pqiv-common\)"/\1/p' "$profile_directory/local-pqiv")"
                 if grep -F 'owner @{HOME}/** rwkl,' "$pqiv_common" \
@@ -1074,7 +1130,10 @@
 
               enforce_codex_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-codex-cli-common\)"/\1/p' ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-codex-cli | head -n 1)"
               grep -F 'owner @{HOME}/.ssh/id_* r,' "$enforce_codex_common"
+              grep -F 'owner @{HOME}/.gnupg/common.conf r,' "$enforce_codex_common"
+              grep -F 'owner @{HOME}/.gnupg/trustdb.gpg rw,' "$enforce_codex_common"
               grep -F 'owner @{HOME}/nixos-config-writable/{,**} rwkl,' "$enforce_codex_common"
+              grep -F 'audit deny @{HOME}/.gnupg/private-keys-v1.d/{,**} rwklm,' "$enforce_codex_common"
               if grep -F 'audit deny @{HOME}/.ssh/id_* rwklm,' "$enforce_codex_common"; then
                 echo "explicit Codex SSH identity access was overridden by a deny" >&2
                 exit 1

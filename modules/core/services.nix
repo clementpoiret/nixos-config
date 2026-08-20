@@ -62,7 +62,11 @@ in
         "network"
         "runtime-introspection"
       ];
-      readOnlyPaths = [ "${homeDirectory}/" ];
+      readOnlyPaths = [
+        "${homeDirectory}/"
+        "/proc/bus/pci/devices"
+        "/proc/modules"
+      ];
       readWritePaths =
         builtins.concatMap (path: [
           "${path}/"

@@ -9,6 +9,7 @@ let
     "credential-broker"
     "desktop"
     "developer-exec"
+    "device-discovery"
     "gpu"
     "host-diagnostics"
     "network"

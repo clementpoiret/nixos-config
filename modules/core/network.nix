@@ -125,9 +125,10 @@ in
     ];
     extraRules = ''
       capability chown,
+      owner /proc/[0-9]*/stat r,
       /nix/store/*-unit-script-apply-secret-dns-start/bin/apply-secret-dns-start rix,
     '';
-    extraRulesRationale = "The generated oneshot script changes resolved drop-in ownership before reloading the unit.";
+    extraRulesRationale = "The generated oneshot changes drop-in ownership, while systemctl reads its own process metadata before reloading resolved.";
   };
 
   systemd.services.apply-secret-dns = lib.mkIf dnsServiceEnabled {
