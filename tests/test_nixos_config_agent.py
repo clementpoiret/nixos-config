@@ -243,17 +243,30 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.assertEqual(self.revision(self.candidate, "parents(@)"), candidate_id)
 
     def test_display_diff_uses_the_configured_jj_pager(self) -> None:
-        with mock.patch.object(
-            nixos_config_agent.subprocess,
-            "run",
-            return_value=subprocess.CompletedProcess([], 0),
-        ) as run:
+        diff = subprocess.CompletedProcess(
+            [], 0, stdout="diff --git a/file b/file\n", stderr=""
+        )
+        review = subprocess.CompletedProcess([], 0)
+        with (
+            mock.patch.object(
+                nixos_config_agent,
+                "run_jj",
+                return_value='["delta", "--side-by-side"]',
+            ),
+            mock.patch.object(
+                nixos_config_agent.subprocess,
+                "run",
+                side_effect=(diff, review),
+            ) as run,
+        ):
             nixos_config_agent.display_diff(self.protected, "from-id", "to-id")
 
-        command = run.call_args.args[0]
-        self.assertEqual(command[:3], ["jj", "-R", str(self.protected)])
-        self.assertNotIn("--no-pager", command)
+        diff_call, pager_call = run.call_args_list
+        command = diff_call.args[0]
+        self.assertEqual(command[:3], ["jj", "--no-pager", "--color=never"])
         self.assertEqual(command[-5:], ["--git", "--from", "from-id", "--to", "to-id"])
+        self.assertEqual(pager_call.args[0], ["delta", "--side-by-side"])
+        self.assertEqual(pager_call.kwargs["input"], diff.stdout)
 
     def test_fetch_refreshes_both_clones_without_rebasing_working_copies(self) -> None:
         baseline = self.initialize()
@@ -345,6 +358,12 @@ class NixosConfigAgentTest(unittest.TestCase):
         remote_before = self.revision(self.protected, "main@origin")
         self.initialize()
         promoted = self.promote_candidate()
+        self.config.write_text(
+            self.config.read_text(encoding="utf-8").replace(
+                'signing.behavior = "drop"', 'signing.behavior = "own"'
+            ),
+            encoding="utf-8",
+        )
 
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "did not match"):
             nixos_config_agent.push(

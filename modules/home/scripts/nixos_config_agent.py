@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import re
+import shlex
 import subprocess
 import sys
 from collections.abc import Callable
@@ -117,22 +119,53 @@ def first_line(repo: Path, revision: str) -> str:
 
 def display_diff(repo: Path, from_revision: str, to_revision: str) -> None:
     """Display a review diff through the user's configured Jujutsu pager."""
-    process = subprocess.run(
-        [
-            "jj",
-            "-R",
-            str(repo),
+    diff = subprocess.run(
+        _command(
+            repo,
             "diff",
             "--git",
             "--from",
             from_revision,
             "--to",
             to_revision,
-        ],
+        ),
         check=False,
+        capture_output=True,
+        text=True,
     )
-    if process.returncode != 0:
-        raise WorkflowError("could not display the review diff")
+    if diff.returncode != 0:
+        detail = diff.stderr.strip()
+        raise WorkflowError(detail or "could not generate the review diff")
+
+    pager_value = run_jj(repo, "config", "get", "ui.pager").strip()
+    try:
+        pager = ast.literal_eval(pager_value)
+    except (SyntaxError, ValueError):
+        pager = pager_value
+    if isinstance(pager, str):
+        pager_command = shlex.split(pager)
+    elif isinstance(pager, list) and all(isinstance(item, str) for item in pager):
+        pager_command = pager
+    else:
+        raise WorkflowError("ui.pager must be a command string or a list of strings")
+    if not pager_command:
+        raise WorkflowError("ui.pager is empty")
+
+    try:
+        review = subprocess.run(
+            pager_command,
+            check=False,
+            input=diff.stdout,
+            text=True,
+        )
+    except OSError as error:
+        raise WorkflowError(
+            f"could not start the configured review pager: {error}"
+        ) from error
+    if review.returncode != 0:
+        raise WorkflowError(
+            f"configured review pager exited with status {review.returncode}"
+        )
 
 
 def protected_state(repo: Path) -> tuple[str, str]:
@@ -238,6 +271,16 @@ def configure_handoff_remote(protected: Path, candidate: Path) -> None:
             HANDOFF_REMOTE,
             str(candidate),
         )
+
+
+def forget_handoff_tracking(protected: Path) -> None:
+    run_jj(
+        protected,
+        "bookmark",
+        "forget",
+        "--include-remotes",
+        f"exact:{HANDOFF_BOOKMARK}",
+    )
 
 
 def configure_upstream_remote(protected: Path, candidate: Path) -> str:
@@ -418,6 +461,30 @@ def commit_fingerprint(repo: Path, revision: str) -> tuple[str, str]:
     )
 
 
+def revisions_are_logically_equivalent(repo: Path, first: str, second: str) -> bool:
+    if commit_fingerprint(repo, first) != commit_fingerprint(repo, second):
+        return False
+    first_parents = sorted(
+        revision_value(repo, parent, "change_id")
+        for parent in revision_ids(repo, f"parents({first})")
+    )
+    second_parents = sorted(
+        revision_value(repo, parent, "change_id")
+        for parent in revision_ids(repo, f"parents({second})")
+    )
+    if first_parents != second_parents:
+        return False
+    return not run_jj(
+        repo,
+        "diff",
+        "--summary",
+        "--from",
+        first,
+        "--to",
+        second,
+    ).strip()
+
+
 def require_ancestor(repo: Path, ancestor: str, descendant: str, detail: str) -> None:
     if not revision_ids(repo, f"({ancestor}) & ::({descendant})"):
         raise WorkflowError(detail)
@@ -474,7 +541,12 @@ def synchronize_candidate(
     if not is_empty(candidate) or has_conflicts(candidate):
         raise WorkflowError("candidate working-copy changed while synchronizing")
     parent_after_fetch = one_revision(candidate, "parents(@)", "candidate parent")
-    if parent_after_fetch not in (expected_old_baseline, target):
+    expected_parent = parent_after_fetch in (expected_old_baseline, target)
+    if not expected_parent and revisions_are_logically_equivalent(
+        candidate, parent_after_fetch, target
+    ):
+        expected_parent = True
+    if not expected_parent:
         raise WorkflowError("candidate parent changed while synchronizing")
     if parent_after_fetch != target:
         run_jj(candidate, "rebase", "-r", "@", "-d", target)
@@ -587,11 +659,11 @@ def push(
         f"({remote_main}..{baseline}) ~ signed()",
     )
     if unsigned:
-        # The local handoff remote makes promoted commits immutable by default. The
-        # validated GitHub-exclusive range is the only history this command rewrites.
+        # The handoff is no longer needed after promotion, and its remote bookmark
+        # would otherwise make the unpublished target immutable.
+        forget_handoff_tracking(protected)
         run_jj(
             protected,
-            "--ignore-immutable",
             "sign",
             "-r",
             f"({remote_main}..{baseline}) ~ signed()",
