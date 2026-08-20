@@ -719,6 +719,7 @@
               nativeBuildInputs = [
                 pkgs-unstable.git
                 pkgs-unstable.jujutsu
+                pkgs-unstable.openssh
                 pkgs-unstable.python3
               ];
             }

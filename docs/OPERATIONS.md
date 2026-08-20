@@ -3,25 +3,48 @@
 ## Daily Workflow
 
 The active system continues to build from the protected `~/nixos-config` clone. Give coding agents
-`~/nixos-config-writable` instead, then promote exactly one reviewed Jujutsu change:
+`~/nixos-config-writable` instead, then promote exactly one reviewed Jujutsu change. The protected
+clone's `origin` must point to GitHub:
 
 ```bash
 # One-time setup, run from an unconfined terminal after protected @ is an empty change.
 nixos-config-agent init
 
+# Refresh origin/main in both clones without rebasing work or moving local bookmarks.
+nixos-config-agent fetch
+
 cd ~/nixos-config-writable
 jj describe -m 'fix(apparmor): describe the reviewed change'
 
-# Review the displayed full Git diff and type the full commit ID when prompted.
+# Review the syntax-highlighted Delta diff and type the full commit ID when prompted.
 nixos-config-agent promote
+
+# After all intended changes are promoted, review, sign, and publish protected main.
+nixos-config-agent push
 ```
 
 `init` refuses an existing destination and clones the exact protected baseline. `promote` requires an interactive,
 unconfined terminal; an empty protected working change; one non-empty, conflict-free candidate whose sole parent is that
 baseline; and a Conventional Commit description. It fetches the exact candidate through a local handoff bookmark,
-displays its full diff, requires the complete commit ID, and rechecks both repositories before changing the protected
-clone. A rejection or stale baseline leaves the protected working tree unchanged. Success leaves an empty working
-change in both clones. `nh` and the rebuild aliases intentionally continue to reference `~/nixos-config`.
+displays its full Git diff through the configured Jujutsu pager (Delta), requires the complete commit ID, and rechecks
+both repositories before changing the protected clone. A rejection or stale baseline leaves the protected working tree
+unchanged. Success leaves an empty working change in both clones.
+
+`fetch` mirrors the protected clone's `origin` URL into the writable clone as `github`, then fetches `origin/main` in
+the protected clone and `github/main` in the writable clone. It preserves both working-copy positions and any local
+`main` bookmarks; it does not rebase active work. If GitHub and local `main` have diverged, reconcile them explicitly
+before publishing.
+
+`push` is an interactive, unconfined post-promotion operation. It refuses an active writable change, conflicts,
+divergent history, or any unpublished revision without a Conventional Commit subject. It signs only unsigned revisions
+between `main@origin` and the protected baseline, shows the complete revision list and cumulative Delta diff, advances
+local `main`, and runs an exact-bookmark dry run. The final prompt requires the full post-signing commit ID. A rejection
+or pre-push failure leaves GitHub unchanged, restores local `main`, and realigns the empty writable clone if signing
+rewrote commit IDs. After a successful GitHub push, it fetches `github/main`, rebases the writable empty change onto the
+published revision, and advances `agent-base` and `agent-handoff`. A failure during this last synchronization is reported
+as a partial success and does not roll back GitHub.
+
+`nh` and the rebuild aliases intentionally continue to reference `~/nixos-config`.
 
 The review gate becomes an AppArmor security boundary only after the relevant agent profile is enforced. In staged or
 complain mode, AppArmor intentionally permits policy violations, so the separate clone is a workflow safeguard rather

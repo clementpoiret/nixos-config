@@ -33,8 +33,11 @@ let
   nixos-config-agent = pkgs.writeShellApplication {
     name = "nixos-config-agent";
     runtimeInputs = [
+      pkgs.delta
       pkgs.git
+      pkgs.gnupg
       pkgs.jujutsu
+      pkgs.openssh
       pkgs.python3
     ];
     text = ''
