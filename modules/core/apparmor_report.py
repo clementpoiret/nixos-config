@@ -305,7 +305,7 @@ def aggregate(events: Iterable[PolicyEvent]) -> list[Finding]:
     return sorted_findings(grouped)
 
 
-def _stream_command(command: list[str]) -> Iterator[str]:
+def _stream_command(command: list[str], *, allow_empty: bool = False) -> Iterator[str]:
     process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
@@ -313,9 +313,14 @@ def _stream_command(command: list[str]) -> Iterator[str]:
         text=True,
     )
     assert process.stdout is not None
-    yield from process.stdout
+    saw_output = False
+    for line in process.stdout:
+        saw_output = True
+        yield line
     stderr = process.stderr.read() if process.stderr is not None else ""
     return_code = process.wait()
+    if allow_empty and return_code == 1 and not saw_output and not stderr.strip():
+        return
     if return_code != 0:
         detail = stderr.strip() or f"exit status {return_code}"
         raise RuntimeError(f"{' '.join(command[:2])}: {detail}")
@@ -341,7 +346,7 @@ def journal_lines(args: argparse.Namespace) -> Iterator[str]:
         command.extend(("--since", args.since))
     if args.until:
         command.extend(("--until", args.until))
-    yield from _stream_command(command)
+    yield from _stream_command(command, allow_empty=True)
 
 
 def input_lines(path: str) -> Iterator[str]:

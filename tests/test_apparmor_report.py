@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 import importlib.util
+import io
 import os
 import sys
 import unittest
@@ -22,6 +23,43 @@ SPEC.loader.exec_module(apparmor_report)
 
 
 class AppArmorReportTest(unittest.TestCase):
+    def test_journal_lines_treats_no_grep_matches_as_empty(self) -> None:
+        process = mock.Mock(
+            stdout=io.StringIO(""),
+            stderr=io.StringIO(""),
+        )
+        process.wait.return_value = 1
+        args = mock.Mock(boot="0", since=None, until=None)
+        with (
+            mock.patch.object(
+                apparmor_report.shutil, "which", return_value="/bin/journalctl"
+            ),
+            mock.patch.object(
+                apparmor_report.subprocess, "Popen", return_value=process
+            ),
+        ):
+            lines = list(apparmor_report.journal_lines(args))
+
+        self.assertEqual(lines, [])
+
+    def test_journal_lines_preserves_journalctl_errors(self) -> None:
+        process = mock.Mock(
+            stdout=io.StringIO(""),
+            stderr=io.StringIO("permission denied\n"),
+        )
+        process.wait.return_value = 1
+        args = mock.Mock(boot="0", since=None, until=None)
+        with (
+            mock.patch.object(
+                apparmor_report.shutil, "which", return_value="/bin/journalctl"
+            ),
+            mock.patch.object(
+                apparmor_report.subprocess, "Popen", return_value=process
+            ),
+            self.assertRaisesRegex(RuntimeError, "permission denied"),
+        ):
+            list(apparmor_report.journal_lines(args))
+
     def test_parses_quoted_fields_and_owner_relationship(self) -> None:
         event = apparmor_report.parse_policy_event(
             'audit: type=1400 audit(1786960144.030:4979): apparmor="ALLOWED" '

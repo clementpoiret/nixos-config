@@ -211,6 +211,13 @@ pkgs.testers.runNixOSTest {
     machine.wait_for_unit("apparmor.service")
     machine.succeed("test $(systemctl show -P Result home-manager-test.service) = success")
 
+    with subtest("the automated debug report accepts an empty journal"):
+        machine.succeed("systemctl start apparmor-debug-report.service")
+        machine.succeed(
+            "${pkgs.jq}/bin/jq -e '.summary.events == 0' "
+            "/home/test/.local/state/apparmor-reports/logs.json"
+        )
+
     with subtest("only the selected profiles are loaded"):
         machine.succeed("test -e /etc/apparmor.d/local-agent-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-apply-secret-dns")
