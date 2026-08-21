@@ -68,7 +68,7 @@ uses a predictable PID file in `/tmp`.
 
 ## Intentional compatibility choices
 
-- User namespaces, SMT, automatic PTI selection, SCX/LAVD, rootless Podman,
+- User namespaces, SMT, automatic PTI selection, SCX/LAVD, guarded agent rootless Podman/Buildah,
   libvirt, Xwayland, Bluetooth, QMK/RP2040, Flipper Zero, and host udev rules
   remain available for current workflows.
 - AppArmor does not globally restrict unprivileged user namespaces. Browser,
@@ -176,6 +176,15 @@ Claude additionally has a fail-closed managed sandbox policy. Development agents
 separately opt into read-only host diagnostics; journals and cross-process metadata
 are not part of the ordinary desktop or runtime-introspection baseline.
 
+Codex CLI and Claude Code also receive guarded Podman/Buildah launchers. Exact
+launcher paths enter always-enforced per-agent engine brokers, container payloads
+enter a shared enforced payload profile, and each agent uses separate rootless
+storage and runtime trees. The guard confines host path arguments to the current
+workspace, blocks namespace/device/capability/security overrides, scrubs the host
+environment, and closes inherited file descriptors. See
+[Guarded agent containers](APPARMOR.md#guarded-agent-containers) for supported
+commands and the remaining literal-Nix-store-path limitation.
+
 Mode-aware decisions protect SOPS/age keys and
 decrypted secrets, SSH identities/config/control sockets, GPG private keys and
 agent sockets, mail authentication, Secret Service/keyring channels, the U2F
@@ -198,7 +207,7 @@ The checked inventories explicitly leave broad launchers and privileged
 administrators unconfined, and defer network control-plane, virtualization,
 desktop-session broker, and host-management services to workload-specific
 threat models. This covers shells, terminals, file managers, editors, agents,
-NetworkManager/resolved/chrony/sshd/Tailscale, Podman/libvirt, greetd/D-Bus/
+NetworkManager/resolved/chrony/sshd/Tailscale, general-purpose Podman/libvirt, greetd/D-Bus/
 portals/keyrings/PipeWire/Bluetooth/PCSC, and hardware or GPU management
 daemons. Generic profiles for those classes would either transitively confine
 unrelated work or require misleadingly broad authority. Existing systemd

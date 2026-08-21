@@ -24,9 +24,10 @@ protected-tree denies are added in enforce mode. They are deliberately absent in
 kernel did not emit useful observations for explicit audited denies there, so the VM test exercises both the permitted
 complain behavior and the real enforced boundary before a profile is promoted.
 
-The shared `bwrap` compatibility broker is infrastructure rather than a workload profile. It remains enforced whenever
-an enabled application declares the `bubblewrap` capability, including when local workload mode is `disable`, and is
-therefore intentionally unavailable through `profileOverrides`.
+The shared `bwrap` compatibility broker and the agent container brokers/payload are infrastructure rather than workload
+profiles. They remain enforced whenever an enabled application declares the corresponding `bubblewrap` or `containers`
+capability, including when local workload mode is `disable`, and are therefore intentionally unavailable through
+`profileOverrides`.
 
 Override one workload without changing the global mode:
 
@@ -64,7 +65,8 @@ store, home, and temporary build trees so `uv`, Python virtual environments and 
 build scripts/proc macros, and ephemeral `nix shell` tools work without a manually maintained package list. Launching a
 separately managed application uses a higher-priority transition into that application's own profile when it is loaded.
 Developer profiles also share read access to installed agent skills, the global Git ignore file and Keras settings;
-read/write access to Nix and uv caches; and bounded access to their own file-descriptor and thread-name metadata.
+read/write access to bounded Nix, uv, Go, Cargo, and runtime caches; read/shared-lock access to generated man indexes;
+and bounded access to their own file-descriptor and thread-name metadata.
 
 Applications opt into typed capabilities only when needed:
 
@@ -72,7 +74,7 @@ Applications opt into typed capabilities only when needed:
 desktop, portal, session-bus, network, audio, camera, gpu,
 shared-memory, terminal, runtime-introspection, user-files,
 credential-broker, userns, bubblewrap, developer-exec, host-diagnostics,
-device-discovery
+device-discovery, containers
 ```
 
 Namespace capabilities such as `sys_admin`, `sys_ptrace`, and `setpcap` are generated in the application's main profile
@@ -87,6 +89,46 @@ instead transition only their exact Nix-provided Bubblewrap executable into the 
 `bwrap-userns-restrict` profile. Namespace and mount setup privileges stay in that broker; its `unpriv_bwrap` stacked
 child strips capabilities from sandboxed commands. Claude's managed settings also require its command sandbox, reject
 unsandboxed commands, and fail closed if the backend is unavailable.
+
+### Guarded agent containers
+
+Codex CLI and Claude Code receive `podman` and `buildah` launchers from `pkgs/agent-container-tools`. Their package is
+placed before the underlying container tools in each agent's `PATH`. The launchers work only after the exact agent
+profile transitions into its always-enforced container-engine broker; invoking them unconfined or from another profile
+fails closed. Known engine helpers re-enter that broker, while an unmatched executable launched from a container root
+transitions into the shared, always-enforced `local-agent-container-payload` profile.
+
+The guard treats the current directory as the workspace boundary. It accepts a non-hidden directory below the user's
+home or a child of `/tmp` or `/var/tmp`; build contexts, files, bind mounts, imports, copies, and similar host paths must
+remain below that directory. It rejects host namespace joins, privileged mode, devices, capability changes, security
+options, alternate runtimes/hooks/storage roots/auth files, host environment inheritance, remote control sockets, and
+management commands such as `podman unshare`, `podman mount`, Compose/Kube, and `buildah mount`. Host environment
+variables are reduced to locale/terminal settings plus generated container configuration, and inherited non-standard
+file descriptors are closed before the engine starts.
+
+Each agent has independent rootless state and runtime trees:
+
+```text
+Codex:  ~/.local/share/containers/agents/codex
+        /run/user/$UID/agent-containers/codex
+Claude: ~/.local/share/containers/agents/claude
+        /run/user/$UID/agent-containers/claude
+```
+
+Registry authentication is stored in a private `0600` `auth.json` inside the corresponding state tree. The tools use
+rootless Podman/Buildah, `crun`, fuse-overlayfs, file-backed events and locks, and a dedicated AppArmor disconnected-path
+prefix for container namespace objects. Direct `build`, `run`, `create`, `exec`, and image-transfer commands remain
+available within the guard's argument and workspace rules. Umbrella management commands, including Podman's `image`,
+`container`, `network`, and `volume` groups, are intentionally rejected because their nested option surfaces bypass the
+guard's per-command host-path validation; default rootless networking and named-volume use from `run`/`create` remain
+available.
+
+This is the supported command path, not a system-wide interception mechanism. A process that discovers and invokes the
+underlying Podman or Buildah executable by its literal Nix-store path can bypass the launcher. The current Codex and
+Claude parent profiles remain staged/complain and intentionally support broad developer execution, so treat the broker
+as protection for normal agent-issued container commands rather than a complete malicious-agent boundary. Closing that
+residual path requires promoting the parent profiles and replacing their broad Nix-store execution grant with a reviewed
+manifest.
 
 The `desktop` capability carries the shared compatibility surface used by GTK, Qt, Chromium/Electron, and Gecko:
 read-only root-directory discovery, bounded process/CPU/device/cgroup metadata, per-user Wayland proxy creation, common
@@ -117,9 +159,10 @@ receive SOPS keys, password stores, GPG private key files, or unrelated mail cre
 
 `host-diagnostics` is restricted to `developer-exec` profiles. It grants read-only system journals, AppArmor
 feature/profile metadata, bounded cross-process status and command metadata, and selected kernel, PCI, and module
-metadata. When debug reporting is enabled, it also grants owner-read access to the configured AppArmor report tree. It
-does not grant process environments, memory, foreign file descriptors, kernel log access, or credential paths. Unix
-ownership and ACL checks continue to apply.
+metadata, including DRM/accelerator class discovery and PCI vendor/device identifiers. When debug reporting is enabled,
+it also grants owner-read access to the configured AppArmor report tree. It does not grant GPU device nodes, process
+environments, memory, foreign file descriptors, kernel log access, or credential paths. Unix ownership and ACL checks
+continue to apply.
 
 All profiles allow owner-controlled `/tmp` and `/var/tmp` trees for compatibility. These shared directories remain a
 same-UID cross-application exchange channel; use private runtime directories or application state for data that should
@@ -187,6 +230,7 @@ Use the narrow typed field that matches the requirement:
 - `capabilities` for IPC, network, device, namespace, Bubblewrap, terminal, diagnostics, or non-hidden user project
   trees;
 - `bubblewrapPackage` for the exact shared Bubblewrap derivation used by a `bubblewrap` capability;
+- `containerToolsPackage` for the guarded Podman/Buildah derivation used by a `containers` capability;
 - `extraClosureRoots` for helper package data and libraries;
 - `executionPackages` for commands in a helper package's direct output;
 - `extraExecutables` for one exact executable or AppArmor path expression;
@@ -216,10 +260,11 @@ D-Bus, Unix-socket, signal, or network rules to the common baseline. Add the rel
 If a profile is not yet supportable, put the package in `localAppArmor.inventory` with a specific candidate or exemption
 rationale.
 
-`user-files` grants recursive access only below non-hidden top-level home directories, so document-oriented applications
-can handle future project and sync folders without exposing dotfile credentials. The protected `~/nixos-config` tree and
-the agent-only `~/nixos-config-writable` tree are reserved from that broad grant; enforce mode adds explicit
-denies for them. Desktop applications inherit the
+`user-files` grants recursive read access below non-hidden top-level home directories, including DAC-readable mounted or
+remapped files not owned by the user, while write and lock access remains owner-only. This lets document-oriented
+applications handle future project and sync folders without exposing dotfile credentials. The protected
+`~/nixos-config` tree and the agent-only `~/nixos-config-writable` tree are reserved from that broad grant; enforce mode
+adds explicit denies for them. Desktop applications inherit the
 bounded runtime metadata they commonly need; the explicit `runtime-introspection` capability provides the same model to
 non-desktop workloads. Neither is a general `/proc` or `/sys` grant; broader read-only agent diagnostics require the
 separate `host-diagnostics` capability.

@@ -6,6 +6,7 @@ let
     "audio"
     "bubblewrap"
     "camera"
+    "containers"
     "credential-broker"
     "desktop"
     "developer-exec"
@@ -28,6 +29,7 @@ let
     "gpg-private"
     "hardware-credentials"
     "mail-auth"
+    "netrc"
     "nixos-config-writable"
     "password-store"
     "sops"
@@ -65,6 +67,12 @@ let
           type = types.nullOr types.package;
           default = null;
           description = "Exact Bubblewrap package used by this application's command sandbox.";
+        };
+
+        containerToolsPackage = mkOption {
+          type = types.nullOr types.package;
+          default = null;
+          description = "Exact guarded Podman/Buildah package used by the containers capability.";
         };
 
         homePaths = mkOption {

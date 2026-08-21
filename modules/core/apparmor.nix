@@ -138,12 +138,16 @@ let
       { }
     else
       lib.filterAttrs (_: app: app.enable) homeConfig.localAppArmor.applications;
+  containerApplications = lib.filterAttrs (
+    _: app: lib.elem "containers" app.capabilities
+  ) applicationRegistry;
   configuredSessionReadPackages =
     if homeConfig == null then [ ] else homeConfig.localAppArmor.sessionReadPackages;
   homeInventory = if homeConfig == null then { } else homeConfig.localAppArmor.inventory;
   serviceRegistry = lib.filterAttrs (_: service: service.enable) cfg.services;
 
   profileNameFor = name: "local-${name}";
+  containerEngineProfileNameFor = name: "${profileNameFor name}-container-engine";
   appProfileNames = map profileNameFor (builtins.attrNames applicationRegistry);
   serviceProfileNames = map profileNameFor (builtins.attrNames serviceRegistry);
   managedProfileNames = serviceProfileNames ++ appProfileNames;
@@ -407,7 +411,7 @@ let
   hostDiagnosticsRules = ''
     /etc/machine-id r,
     /proc/[0-9]*/ r,
-    /proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,statm,status} r,
+    /proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,status} r,
     /proc/[0-9]*/task/ r,
     /proc/[0-9]*/task/[0-9]*/ r,
     /proc/[0-9]*/task/[0-9]*/{comm,stat,status} r,
@@ -418,6 +422,8 @@ let
     /proc/sys/user/max_user_namespaces r,
     /proc/sys/vm/{mmap_min_addr,nr_hugepages} r,
     /run/log/journal/{,**} r,
+    /sys/class/{accel,drm}/ r,
+    /sys/devices/pci[0-9a-fA-F]*/**/device r,
     /sys/devices/pci[0-9a-fA-F]*/**/vendor r,
     /sys/kernel/security/apparmor/ r,
     /sys/kernel/security/apparmor/features/{,**} r,
@@ -502,6 +508,9 @@ let
     nixos-config-writable = ''
       audit deny @{HOME}/nixos-config-writable/{,**} wklm,
     '';
+    netrc = ''
+      audit deny @{HOME}/.netrc rwklm,
+    '';
   };
   sensitiveRulesFor =
     state: app:
@@ -520,6 +529,7 @@ let
           "credential-broker"
           "hardware-credentials"
           "nixos-config-writable"
+          "netrc"
         ]
     );
 
@@ -566,6 +576,9 @@ let
     ${lib.optionalString (sensitiveAccess app "nixos-config-writable") ''
       owner @{HOME}/nixos-config-writable/{,**} rwkl,
     ''}
+    ${lib.optionalString (sensitiveAccess app "netrc") ''
+      owner @{HOME}/.netrc r,
+    ''}
   '';
 
   sensitiveHomeRoots = {
@@ -585,6 +598,7 @@ let
     mail-auth = [ ".config/aerc" ];
     hardware-credentials = [ ".config/Yubico" ];
     nixos-config-writable = [ "nixos-config-writable" ];
+    netrc = [ ".netrc" ];
   };
   pathsOverlap =
     left: right: left == right || lib.hasPrefix "${left}/" right || lib.hasPrefix "${right}/" left;
@@ -603,21 +617,24 @@ let
   reservedUserFilesPrefix = "nixos";
   reservedUserFilesCharacters = lib.stringToCharacters reservedUserFilesPrefix;
   escapeCharacterClass = character: if character == "-" then "\\-" else character;
-  userFilesRules = lib.concatStrings (
-    lib.imap0 (
-      index: excludedCharacter:
-      let
-        prefix = lib.concatStrings (lib.take index reservedUserFilesCharacters);
-        excludedCharacters = lib.optionalString (index == 0) "." + escapeCharacterClass excludedCharacter;
-      in
-      lib.optionalString (prefix != "") ''
-        owner @{HOME}/${prefix}/{,**} rwkl,
-      ''
-      + ''
-        owner @{HOME}/${prefix}[^${excludedCharacters}]*/{,**} rwkl,
-      ''
-    ) reservedUserFilesCharacters
-  );
+  userFilesRulesFor =
+    qualifier: permissions:
+    lib.concatStrings (
+      lib.imap0 (
+        index: excludedCharacter:
+        let
+          prefix = lib.concatStrings (lib.take index reservedUserFilesCharacters);
+          excludedCharacters = lib.optionalString (index == 0) "." + escapeCharacterClass excludedCharacter;
+        in
+        lib.optionalString (prefix != "") ''
+          ${qualifier}@{HOME}/${prefix}/{,**} ${permissions},
+        ''
+        + ''
+          ${qualifier}@{HOME}/${prefix}[^${excludedCharacters}]*/{,**} ${permissions},
+        ''
+      ) reservedUserFilesCharacters
+    );
+  userFilesRules = userFilesRulesFor "" "r" + userFilesRulesFor "owner " "rwkl";
 
   applicationCapabilityRules = app: ''
     ${lib.optionalString (hasCapability app "desktop") ''
@@ -658,7 +675,9 @@ let
     ${lib.optionalString (hasCapability app "gpu") ''
       include <abstractions/opengl>
       /dev/dri/{,**} rw,
+      /sys/class/drm/ r,
       /sys/devices/**/drm/ r,
+      /sys/devices/pci[0-9a-fA-F]*/**/device r,
     ''}
     ${lib.optionalString (hasCapability app "device-discovery") deviceDiscoveryRules}
     ${lib.optionalString (hasCapability app "shared-memory" || hasCapability app "developer-exec") ''
@@ -703,8 +722,19 @@ let
       owner @{HOME}/.agents/skills/{,**} r,
       owner @{HOME}/.cache/nix/{,**} rwkl,
       owner @{HOME}/.cache/uv/{,**} rwkl,
+      owner @{HOME}/.cache/go-build/{,**} rwkl,
+      owner @{HOME}/.cache/ort.pyke.io/{,**} rwkl,
+      owner @{HOME}/.cargo/.global-cache rwk,
+      owner @{HOME}/.cargo/.package-cache{,-mutate} rwk,
+      owner @{HOME}/.cargo/registry/{,**} rwkl,
       owner @{HOME}/.config/git/ignore r,
+      owner @{HOME}/.config/go/telemetry/{,**} rwkl,
+      owner @{HOME}/.config/jj/repos/{,**} r,
       owner @{HOME}/.keras/keras.json r,
+      owner @{HOME}/.local/share/*-skills/{,**} r,
+      owner @{HOME}/.local/share/uv/{,**} rwkl,
+      /nix/store/*-man-cache/index.db rk,
+      /var/cache/man/nixos-mandb/index.db rk,
       owner @{HOME}/** m,
       owner @{HOME}/** ix,
       owner /proc/[0-9]*/fd/ r,
@@ -780,6 +810,12 @@ let
       bubblewrapTransition = lib.optionalString (
         hasCapability app "bubblewrap" && app.bubblewrapPackage != null
       ) "priority=100 ${app.bubblewrapPackage}/bin/bwrap Px -> bwrap,";
+      containerTransitions =
+        lib.optionalString (hasCapability app "containers" && app.containerToolsPackage != null)
+          ''
+            priority=110 ${app.containerToolsPackage}/bin/podman Px -> ${containerEngineProfileNameFor name},
+            priority=110 ${app.containerToolsPackage}/bin/buildah Px -> ${containerEngineProfileNameFor name},
+          '';
     in
     {
       inherit state;
@@ -791,9 +827,148 @@ let
           include "${commonRules}"
           ${profileReentryTransitions}
           ${bubblewrapTransition}
+          ${containerTransitions}
         }
       '';
     };
+
+  containerEnginePolicy =
+    name: app:
+    let
+      profileName = containerEngineProfileNameFor name;
+      agentId =
+        if name == "codex-cli" then
+          "codex"
+        else if name == "claude-code" then
+          "claude"
+        else
+          name;
+      containerTools = app.containerToolsPackage;
+      enginePackages = lib.unique ([ containerTools ] ++ containerTools.enginePackages);
+      closureRules = closureReadRules profileName enginePackages;
+      engineExecutionRules = path: ''
+        priority=100 ${path}/bin/** ixr,
+        priority=100 ${path}/lib/** ixr,
+        priority=100 ${path}/lib64/** ixr,
+        priority=100 ${path}/libexec/** ixr,
+        priority=100 ${path}/opt/** ixr,
+        priority=100 ${path}/share/** ixr,
+      '';
+    in
+    {
+      state = "enforce";
+      profile = ''
+        abi <abi/4.0>,
+        include <tunables/global>
+
+        profile ${profileName} flags=(attach_disconnected.path=/apparmor-disconnected/agent-container-engine/,mediate_deleted) {
+          include <abstractions/base>
+          include <abstractions/nameservice>
+          include <abstractions/ssl_certs>
+          include "${closureRules}"
+
+          ${lib.concatMapStrings engineExecutionRules enginePackages}
+          ${containerTools}/libexec/{,**} r,
+          priority=100 /run/wrappers/bin/{newgidmap,newuidmap} ixr,
+          priority=100 /run/wrappers/wrappers.*/{newgidmap,newuidmap} ixr,
+
+          network,
+          unix,
+          userns,
+          capability,
+          mount,
+          remount,
+          umount,
+          pivot_root,
+          ptrace (read, trace) peer=@{profile_name},
+          signal (send, receive) peer=@{profile_name},
+
+          priority=50 /** px -> local-agent-container-payload,
+
+          /apparmor-disconnected/agent-container-engine/{,**} rwklm,
+
+          / r,
+          priority=100 / ix,
+          /etc/{,group,hosts,host.conf,login.defs,nsswitch.conf,passwd,resolv.conf,subgid,subuid} r,
+          /etc/containers/{,**} r,
+          /nix/store/*-login.defs r,
+          /nix/store/*-policy/{,**} r,
+          /proc/ r,
+          /proc/filesystems r,
+          /proc/mounts r,
+          /proc/self/{,**} rw,
+          /proc/sys/kernel/{overflowgid,overflowuid,unprivileged_userns_clone} r,
+          /proc/sys/net/ipv4/{ip_local_port_range,ping_group_range,tcp_rto_max_ms,tcp_syn_linear_timeouts,tcp_syn_retries} r,
+          /proc/sys/net/netfilter/{nf_conntrack_udp_timeout,nf_conntrack_udp_timeout_stream} r,
+          /proc/sys/user/max_user_namespaces r,
+          deny /proc/sys/fs/pipe-max-size r,
+          owner /proc/[0-9]*/ r,
+          owner /proc/[0-9]*/fd/{,**} rw,
+          owner /proc/[0-9]*/{attr/current,cgroup,cmdline,gid_map,loginuid,mountinfo,setgroups,stat,status,uid_map} rw,
+          owner /proc/[0-9]*/task/[0-9]*/mountinfo r,
+          /sys/{,**} r,
+          /sys/fs/cgroup/{,**} rw,
+          /dev/ r,
+          /dev/{full,fuse,null,ptmx,random,tty,urandom,zero} rw,
+          /dev/net/ r,
+          /dev/net/tun rw,
+          owner /dev/pts/[0-9]* rw,
+
+          owner @{HOME}/ r,
+          owner @{HOME}/[^.]*/{,**} rwklm,
+          owner @{HOME}/nixos-config-writable/{,**} rwklm,
+          owner @{HOME}/.local/ rw,
+          owner @{HOME}/.local/share/ rw,
+          owner @{HOME}/.local/share/containers/ rw,
+          owner @{HOME}/.local/share/containers/agents/ rw,
+          @{HOME}/.local/share/containers/agents/${agentId}/{,**} rwklm,
+          owner @{run}/user/[0-9]*/agent-containers/ rw,
+          @{run}/user/[0-9]*/agent-containers/${agentId}/{,**} rwklm,
+          deny /run/log/journal/{,**} r,
+          owner /tmp/{,**} rwklm,
+          deny /var/log/journal/{,**} r,
+          owner /var/tmp/{,**} rwklm,
+
+          audit deny @{HOME}/.netrc rwklm,
+          audit deny @{HOME}/.config/aerc/accounts.conf{,.d/**} rwklm,
+          audit deny @{HOME}/.config/sops/{,**} rwklm,
+          audit deny @{HOME}/.config/sops-nix/{,**} rwklm,
+          audit deny @{HOME}/.gnupg/{,**} rwklm,
+          audit deny @{HOME}/.password-store/{,**} rwklm,
+          audit deny @{HOME}/.local/share/password-store/{,**} rwklm,
+          audit deny @{HOME}/.ssh/{,**} rwklm,
+          audit deny @{run}/user/[0-9]*/keyring/{,**} rwklm,
+          audit deny /run/secrets{,.d}/{,**} rwklm,
+          audit deny /run/user/[0-9]*/secrets.d/{,**} rwklm,
+        }
+      '';
+    };
+
+  containerPayloadPolicy = {
+    state = "enforce";
+    profile = ''
+      abi <abi/4.0>,
+      include <tunables/global>
+
+      profile local-agent-container-payload flags=(attach_disconnected.path=/apparmor-disconnected/agent-container-payload/,mediate_deleted) {
+        network,
+        unix,
+        userns,
+        capability,
+        mount,
+        remount,
+        umount,
+        pivot_root,
+        ptrace,
+        signal,
+
+        / r,
+        /** rwkl,
+        /** mr,
+        /** ix,
+      }
+    '';
+  };
 
   serviceCapabilityRules = service: ''
     ${lib.optionalString (lib.elem "network" service.capabilities) ''
@@ -849,6 +1024,12 @@ let
   applicationPolicies = lib.mapAttrs' (
     name: app: lib.nameValuePair (profileNameFor name) (applicationPolicy name app)
   ) applicationRegistry;
+  containerEnginePolicies = lib.mapAttrs' (
+    name: app: lib.nameValuePair (containerEngineProfileNameFor name) (containerEnginePolicy name app)
+  ) containerApplications;
+  containerPayloadPolicies = lib.optionalAttrs (containerApplications != { }) {
+    local-agent-container-payload = containerPayloadPolicy;
+  };
   servicePolicies = lib.mapAttrs' (
     name: service: lib.nameValuePair (profileNameFor name) (servicePolicy name service)
   ) serviceRegistry;
@@ -900,6 +1081,7 @@ let
       && lib.all validSystemBusPeer app.systemBusPeers
       && (hasCapability app "credential-broker" == sensitiveAccess app "credential-broker")
       && (hasCapability app "bubblewrap" == (app.bubblewrapPackage != null))
+      && (hasCapability app "containers" == (app.containerToolsPackage != null))
       && (!hasCapability app "host-diagnostics" || hasCapability app "developer-exec")
       && (app.profileReentryExecutables == [ ] || hasCapability app "userns")
       && (app.userNamespaceRules == "" || app.userNamespaceRulesRationale != "")
@@ -1114,7 +1296,12 @@ in
       enable = true;
       enableCache = false;
       killUnconfinedConfinables = false;
-      policies = applicationPolicies // servicePolicies // bubblewrapPolicies;
+      policies =
+        applicationPolicies
+        // servicePolicies
+        // bubblewrapPolicies
+        // containerEnginePolicies
+        // containerPayloadPolicies;
     };
 
     environment.etc = lib.optionalAttrs claudeSandboxEnabled {

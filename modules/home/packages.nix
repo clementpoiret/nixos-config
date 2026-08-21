@@ -394,6 +394,8 @@ in
         extraRules = ''
           owner @{HOME}/.config/BraveSoftware/Brave-Browser/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so mr,
           /dev/hidraw[0-9]* rw,
+          /run/udev/data/+hid:0003:1050:0407.* r,
+          /sys/devices/**/0003:1050:0407.*/report_descriptor r,
         '';
         extraRulesRationale = "Brave maps its downloaded Widevine CDM and directly accesses raw-HID FIDO authenticators such as YubiKeys.";
         homePaths = [
@@ -544,6 +546,7 @@ in
         executable = "bin/codex";
         capabilities = [
           "bubblewrap"
+          "containers"
           "developer-exec"
           "host-diagnostics"
           "network"
@@ -551,10 +554,17 @@ in
           "user-files"
         ];
         bubblewrapPackage = pkgs.stable.bubblewrap;
+        containerToolsPackage = pkgs.flake.agent-container-tools;
         homePaths = [ ".codex" ];
+        extraRules = ''
+          owner @{HOME}/.cache/codex-runtimes/{,**} rwkl,
+          owner @{HOME}/.gnupg/.#lk* rwk,
+        '';
+        extraRulesRationale = "Codex updates its managed runtime cache and GnuPG creates a transient lock beside the explicitly allowed agent state.";
         sensitiveAccess = [
           "gpg-agent"
           "nixos-config-writable"
+          "netrc"
           "ssh-config"
           "ssh-control"
           "ssh-identities"
@@ -566,6 +576,7 @@ in
         executable = "bin/claude";
         capabilities = [
           "bubblewrap"
+          "containers"
           "developer-exec"
           "host-diagnostics"
           "network"
@@ -573,11 +584,19 @@ in
           "user-files"
         ];
         bubblewrapPackage = pkgs.stable.bubblewrap;
+        containerToolsPackage = pkgs.flake.agent-container-tools;
         homePaths = [ ".claude" ];
         extraRules = ''
           owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,
+          /etc/claude-code/managed-settings.d/{,**} r,
+          owner @{HOME}/.claude.json rwkl,
+          owner @{HOME}/.claude.json.tmp.* rwkl,
+          owner @{HOME}/.claude.json.lock/{,**} rwkl,
+          owner @{HOME}/.cache/claude-cli-nodejs/{,**} rwkl,
+          owner @{HOME}/.local/share/mime/{globs,magic} r,
+          owner @{HOME}/.local/share/applications/claude-code-url-handler.desktop r,
         '';
-        extraRulesRationale = "Claude Code creates per-session Unix sockets for its local network proxy.";
+        extraRulesRationale = "Claude Code reads its managed policy and desktop integration while atomically updating its CLI state, runtime cache, and local proxy sockets.";
         sensitiveAccess = [
           "gpg-agent"
           "nixos-config-writable"

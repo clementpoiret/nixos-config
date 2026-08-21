@@ -148,7 +148,9 @@
         inherit system;
         config.allowUnfree = true;
       };
+      agentContainerTools = pkgs-stable.callPackage ./pkgs/agent-container-tools { };
       pkgs-flake = {
+        agent-container-tools = agentContainerTools;
         antigravity-cli = antigravity.packages.${system}.antigravity-cli;
         antigravity-ide = antigravity.packages.${system}.antigravity-ide;
         bash-env-json = bash-env-json.packages.${system}.default;
@@ -160,6 +162,7 @@
           upstream.overrideAttrs (oldAttrs: {
             postFixup = (oldAttrs.postFixup or "") + ''
               wrapProgram "$out/bin/claude" \
+                --prefix PATH : ${agentContainerTools}/bin \
                 --set-default HERDR_AGENT claude
             '';
           });
@@ -170,6 +173,7 @@
           upstream.overrideAttrs (oldAttrs: {
             postFixup = (oldAttrs.postFixup or "") + ''
               wrapProgram "$out/bin/codex" \
+                --prefix PATH : ${agentContainerTools}/bin \
                 --set-default HERDR_AGENT codex
             '';
           });
@@ -500,7 +504,13 @@
             states =
               hostConfig:
               pkgs-unstable.lib.mapAttrs (_: policy: policy.state) hostConfig.config.security.apparmor.policies;
-            workloadStates = hostConfig: removeAttrs (states hostConfig) [ "bwrap" ];
+            containerInfrastructurePolicyNames = [
+              "local-agent-container-payload"
+              "local-claude-code-container-engine"
+              "local-codex-cli-container-engine"
+            ];
+            alwaysEnforcedPolicyNames = [ "bwrap" ] ++ containerInfrastructurePolicyNames;
+            workloadStates = hostConfig: removeAttrs (states hostConfig) alwaysEnforcedPolicyNames;
             allStatesAre =
               expected: hostConfig:
               builtins.all (state: state == expected) (builtins.attrValues (workloadStates hostConfig));
@@ -511,6 +521,9 @@
             bravePolicy = complainPolicies.local-brave.profile;
             codexPolicy = complainPolicies.local-codex-cli.profile;
             claudePolicy = complainPolicies.local-claude-code.profile;
+            codexContainerEnginePolicy = complainPolicies.local-codex-cli-container-engine.profile;
+            claudeContainerEnginePolicy = complainPolicies.local-claude-code-container-engine.profile;
+            containerPayloadPolicy = complainPolicies.local-agent-container-payload.profile;
             drawioPolicy = complainPolicies.local-drawio.profile;
             logseqPolicy = complainPolicies.local-logseq.profile;
             disabledSyncthingService = appArmorTestHosts.disable.config.systemd.services.syncthing;
@@ -534,9 +547,16 @@
           assert builtins.all (hostConfig: (states hostConfig).bwrap == "enforce") (
             builtins.attrValues appArmorTestHosts
           );
+          assert builtins.all (
+            hostConfig:
+            builtins.all (name: (states hostConfig).${name} == "enforce") containerInfrastructurePolicyNames
+          ) (builtins.attrValues appArmorTestHosts);
           assert stagedStates.local-apply-secret-dns == "enforce";
           assert builtins.all (
-            name: name == "bwrap" || name == "local-apply-secret-dns" || stagedStates.${name} == "complain"
+            name:
+            builtins.elem name alwaysEnforcedPolicyNames
+            || name == "local-apply-secret-dns"
+            || stagedStates.${name} == "complain"
           ) (builtins.attrNames stagedStates);
           assert !(disabledSyncthingService.serviceConfig ? AppArmorProfile);
           assert
@@ -565,11 +585,15 @@
           assert builtins.elem "${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest"
             laptopHomeAppArmor.applications.thunderbird.extraExecutables;
           assert builtins.elem "developer-exec" laptopHomeAppArmor.applications.codex-cli.capabilities;
+          assert builtins.elem "containers" laptopHomeAppArmor.applications.codex-cli.capabilities;
+          assert builtins.elem "containers" laptopHomeAppArmor.applications.claude-code.capabilities;
           assert builtins.elem "bubblewrap" laptopHomeAppArmor.applications.codex-cli.capabilities;
           assert builtins.elem "bubblewrap" laptopHomeAppArmor.applications.claude-code.capabilities;
           assert builtins.elem "host-diagnostics" laptopHomeAppArmor.applications.codex-cli.capabilities;
           assert builtins.elem "host-diagnostics" laptopHomeAppArmor.applications.claude-code.capabilities;
           assert builtins.elem "ssh-identities" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
+          assert builtins.elem "netrc" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
+          assert !(builtins.elem "netrc" laptopHomeAppArmor.applications.claude-code.sensitiveAccess);
           assert builtins.elem "nixos-config-writable"
             laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
           assert builtins.elem "user-files" laptopHomeAppArmor.applications.codex-cli.capabilities;
@@ -613,6 +637,12 @@
           assert laptopHomeAppArmor.applications.codex-cli.profileReentryExecutables == [ ];
           assert laptopHomeAppArmor.applications.codex-cli.bubblewrapPackage == laptopPkgs.stable.bubblewrap;
           assert
+            laptopHomeAppArmor.applications.codex-cli.containerToolsPackage
+            == laptopPkgs.flake.agent-container-tools;
+          assert
+            laptopHomeAppArmor.applications.claude-code.containerToolsPackage
+            == laptopPkgs.flake.agent-container-tools;
+          assert
             laptopHomeAppArmor.applications.claude-code.bubblewrapPackage == laptopPkgs.stable.bubblewrap;
           assert laptopHomeAppArmor.applications.logseq.executionPackages == [ ];
           assert laptopHomeAppArmor.applications.logseq.profileReentryExecutables == [ ];
@@ -625,6 +655,23 @@
             bravePolicy;
           assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> bwrap" codexPolicy;
           assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> bwrap" claudePolicy;
+          assert pkgs-unstable.lib.hasInfix "/bin/podman Px -> local-codex-cli-container-engine" codexPolicy;
+          assert pkgs-unstable.lib.hasInfix "/bin/buildah Px -> local-claude-code-container-engine"
+            claudePolicy;
+          assert pkgs-unstable.lib.hasInfix "profile local-codex-cli-container-engine"
+            codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "profile local-claude-code-container-engine"
+            claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "priority=50 /** px -> local-agent-container-payload,"
+            codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "priority=50 /** px -> local-agent-container-payload,"
+            claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix
+            "attach_disconnected.path=/apparmor-disconnected/agent-container-engine/"
+            codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "audit deny @{HOME}/.netrc rwklm," codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "profile local-agent-container-payload" containerPayloadPolicy;
+          assert pkgs-unstable.lib.hasInfix "/** rwkl," containerPayloadPolicy;
           assert pkgs-unstable.lib.hasInfix "apparmor-bwrap-userns-restrict" bwrapPolicy;
           assert !(pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" codexPolicy);
           assert pkgs-unstable.lib.hasInfix "Px -> local-drawio" drawioPolicy;
@@ -678,6 +725,47 @@
               grep -F '"profile": "upstream-test"' report.json
               grep -F '"profile_patterns": [' report.json
               grep -F '"audited": 1' report.json
+              touch "$out"
+            '';
+
+        agent-container-guard =
+          let
+            containerTools = self.nixosConfigurations.laptop.pkgs.flake.agent-container-tools;
+          in
+          pkgs-unstable.runCommand "agent-container-guard"
+            {
+              nativeBuildInputs = [
+                containerTools
+                pkgs-unstable.python3
+              ];
+            }
+            ''
+              AGENT_CONTAINER_GUARD_SOURCE=${./pkgs/agent-container-tools/guard.py} \
+                python ${./tests/test_agent_container_guard.py}
+              PYTHONPYCACHEPREFIX="$TMPDIR/pycache" \
+                python -m py_compile ${./pkgs/agent-container-tools/guard.py}
+
+              test -x ${containerTools}/bin/podman
+              test -x ${containerTools}/bin/buildah
+              if ${containerTools}/bin/podman version >podman.stdout 2>podman.stderr; then
+                echo "guarded Podman unexpectedly ran outside an agent broker" >&2
+                exit 1
+              else
+                test "$?" = 126
+              fi
+              grep -F 'enforced agent broker profile' podman.stderr
+
+              mkdir pythonpath
+              printf '%s\n' \
+                'from pathlib import Path' \
+                'Path(__file__).parent.parent.joinpath("pythonpath-loaded").touch()' \
+                > pythonpath/csv.py
+              if PYTHONPATH="$PWD/pythonpath" \
+                ${containerTools}/bin/podman version >poisoned.stdout 2>poisoned.stderr; then
+                echo "guarded Podman unexpectedly ran with a poisoned Python path" >&2
+                exit 1
+              fi
+              test ! -e pythonpath-loaded
               touch "$out"
             '';
 
@@ -787,6 +875,7 @@
             developerApplicationNames = applicationNamesWith "developer-exec";
             hostDiagnosticApplicationNames = applicationNamesWith "host-diagnostics";
             nonTerminalApplicationNames = applicationNamesWithout "terminal";
+            userFilesApplicationNames = applicationNamesWith "user-files";
           in
           pkgs-unstable.runCommand "apparmor-policy-parser"
             {
@@ -969,8 +1058,19 @@
                   grep -F 'owner @{HOME}/.agents/skills/{,**} r,' "$app_common"
                   grep -F 'owner @{HOME}/.cache/nix/{,**} rwkl,' "$app_common"
                   grep -F 'owner @{HOME}/.cache/uv/{,**} rwkl,' "$app_common"
+                  grep -F 'owner @{HOME}/.cache/go-build/{,**} rwkl,' "$app_common"
+                  grep -F 'owner @{HOME}/.cache/ort.pyke.io/{,**} rwkl,' "$app_common"
+                  grep -F 'owner @{HOME}/.cargo/.global-cache rwk,' "$app_common"
+                  grep -F 'owner @{HOME}/.cargo/.package-cache{,-mutate} rwk,' "$app_common"
+                  grep -F 'owner @{HOME}/.cargo/registry/{,**} rwkl,' "$app_common"
+                  grep -F 'owner @{HOME}/.config/go/telemetry/{,**} rwkl,' "$app_common"
+                  grep -F 'owner @{HOME}/.config/jj/repos/{,**} r,' "$app_common"
                   grep -F 'owner @{HOME}/.config/git/ignore r,' "$app_common"
                   grep -F 'owner @{HOME}/.keras/keras.json r,' "$app_common"
+                  grep -F 'owner @{HOME}/.local/share/*-skills/{,**} r,' "$app_common"
+                  grep -F 'owner @{HOME}/.local/share/uv/{,**} rwkl,' "$app_common"
+                  grep -F '/nix/store/*-man-cache/index.db rk,' "$app_common"
+                  grep -F '/var/cache/man/nixos-mandb/index.db rk,' "$app_common"
                   grep -F 'owner @{HOME}/** m,' "$app_common"
                   grep -F 'owner /tmp/** m,' "$app_common"
                   grep -F 'owner /var/tmp/** m,' "$app_common"
@@ -991,18 +1091,30 @@
                   app_profile="$profile_directory/local-$app_name"
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
                   grep -F '/etc/machine-id r,' "$app_common"
-                  grep -F '/proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,statm,status} r,' "$app_common"
+                  grep -F '/proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,status} r,' "$app_common"
+                  ! grep -F '/proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,statm,status} r,' "$app_common"
                   grep -F '/proc/[0-9]*/task/[0-9]*/{comm,stat,status} r,' "$app_common"
                   grep -F '/proc/bus/pci/devices r,' "$app_common"
                   grep -F '/proc/modules r,' "$app_common"
                   grep -F '/proc/sys/kernel/{osrelease,ostype,pid_max,unprivileged_userns_clone} r,' "$app_common"
                   grep -F '/proc/sys/vm/{mmap_min_addr,nr_hugepages} r,' "$app_common"
                   grep -F '/run/log/journal/{,**} r,' "$app_common"
+                  grep -F '/sys/class/{accel,drm}/ r,' "$app_common"
+                  grep -F '/sys/devices/pci[0-9a-fA-F]*/**/device r,' "$app_common"
                   grep -F '/sys/devices/pci[0-9a-fA-F]*/**/vendor r,' "$app_common"
                   grep -F '/sys/kernel/security/apparmor/features/{,**} r,' "$app_common"
                   grep -F '/sys/kernel/security/apparmor/profiles r,' "$app_common"
                   grep -F '/var/log/journal/{,**} r,' "$app_common"
                   grep -F 'owner "/home/${username}/.local/state/apparmor-reports/{,**}" r,' "$app_common"
+                done
+
+                for app_name in ${
+                  pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg userFilesApplicationNames
+                }; do
+                  app_profile="$profile_directory/local-$app_name"
+                  app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -Eq '^[[:space:]]*@\{HOME\}/\[\^\.n\]\*/\{,\*\*\} r,$' "$app_common"
+                  grep -Eq '^[[:space:]]*owner @\{HOME\}/\[\^\.n\]\*/\{,\*\*\} rwkl,$' "$app_common"
                 done
 
                 for app_name in ${
@@ -1020,6 +1132,8 @@
 
                 grep -F 'owner @{HOME}/.config/BraveSoftware/Brave-Browser/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so mr,' "$brave_common"
                 grep -F '/dev/hidraw[0-9]* rw,' "$brave_common"
+                grep -F '/run/udev/data/+hid:0003:1050:0407.* r,' "$brave_common"
+                grep -F '/sys/devices/**/0003:1050:0407.*/report_descriptor r,' "$brave_common"
                 grep -F 'owner "@{HOME}/.pki/nssdb/{,**}" rwkl,' "$brave_common"
 
                 evince_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-evince-common\)"/\1/p' "$profile_directory/local-evince" | head -n 1)"
@@ -1058,6 +1172,17 @@
 
                 claude_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-claude-code-common\)"/\1/p' "$profile_directory/local-claude-code" | head -n 1)"
                 grep -F 'owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,' "$claude_common"
+                grep -F '/etc/claude-code/managed-settings.d/{,**} r,' "$claude_common"
+                grep -F 'owner @{HOME}/.claude.json rwkl,' "$claude_common"
+                grep -F 'owner @{HOME}/.claude.json.tmp.* rwkl,' "$claude_common"
+                grep -F 'owner @{HOME}/.claude.json.lock/{,**} rwkl,' "$claude_common"
+                grep -F 'owner @{HOME}/.cache/claude-cli-nodejs/{,**} rwkl,' "$claude_common"
+                grep -F 'owner @{HOME}/.local/share/mime/{globs,magic} r,' "$claude_common"
+                grep -F 'owner @{HOME}/.local/share/applications/claude-code-url-handler.desktop r,' "$claude_common"
+
+                codex_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-codex-cli-common\)"/\1/p' "$profile_directory/local-codex-cli" | head -n 1)"
+                grep -F 'owner @{HOME}/.cache/codex-runtimes/{,**} rwkl,' "$codex_common"
+                grep -F 'owner @{HOME}/.gnupg/.#lk* rwk,' "$codex_common"
 
                 qbittorrent_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-qbittorrent-common\)"/\1/p' "$profile_directory/local-qbittorrent" | head -n 1)"
                 grep -F 'deny ptrace read peer=unconfined,' "$qbittorrent_common"
@@ -1133,12 +1258,15 @@
               grep -F 'owner @{HOME}/.ssh/id_* r,' "$enforce_codex_common"
               grep -F 'owner @{HOME}/.gnupg/common.conf r,' "$enforce_codex_common"
               grep -F 'owner @{HOME}/.gnupg/trustdb.gpg rw,' "$enforce_codex_common"
+              grep -F 'owner @{HOME}/.netrc r,' "$enforce_codex_common"
               grep -F 'owner @{HOME}/nixos-config-writable/{,**} rwkl,' "$enforce_codex_common"
               grep -F 'audit deny @{HOME}/.gnupg/private-keys-v1.d/{,**} rwklm,' "$enforce_codex_common"
               if grep -F 'audit deny @{HOME}/.ssh/id_* rwklm,' "$enforce_codex_common"; then
                 echo "explicit Codex SSH identity access was overridden by a deny" >&2
                 exit 1
               fi
+              enforce_claude_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-claude-code-common\)"/\1/p' ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-claude-code | head -n 1)"
+              grep -F 'audit deny @{HOME}/.netrc rwklm,' "$enforce_claude_common"
               touch "$out"
             '';
 

@@ -1,4 +1,26 @@
 { home-manager, pkgs }:
+let
+  mkAgentFixture =
+    name:
+    pkgs.writeCBin name ''
+      #include <errno.h>
+      #include <stdio.h>
+      #include <string.h>
+      #include <unistd.h>
+
+      int main(int argc, char **argv) {
+        if (argc < 2) {
+          fprintf(stderr, "${name}: missing command\n");
+          return 64;
+        }
+        execv(argv[1], &argv[1]);
+        fprintf(stderr, "${name}: execv: %s\n", strerror(errno));
+        return 127;
+      }
+    '';
+  claudeFixture = mkAgentFixture "claude-fixture";
+  codexFixture = mkAgentFixture "codex-fixture";
+in
 pkgs.testers.runNixOSTest {
   name = "local-apparmor";
 
@@ -25,7 +47,9 @@ pkgs.testers.runNixOSTest {
         isNormalUser = true;
         home = "/home/test";
         createHome = true;
+        linger = true;
       };
+      users.manageLingering = true;
 
       security.localAppArmor = {
         mode = "disable";
@@ -38,6 +62,8 @@ pkgs.testers.runNixOSTest {
           local-audit-fixture = "complain";
           local-apply-secret-dns = "enforce";
           local-bwrap-fixture = "enforce";
+          local-claude-code = "complain";
+          local-codex-cli = "complain";
           local-enforce-fixture = "enforce";
           local-policy-fixture = "enforce";
           local-syncthing = "enforce";
@@ -106,7 +132,12 @@ pkgs.testers.runNixOSTest {
           imports = [ ../modules/home/apparmor.nix ];
           home = {
             stateVersion = "26.05";
-            packages = [ pkgs.coreutils ];
+            packages = [
+              pkgs.agent-container-tools
+              claudeFixture
+              codexFixture
+              pkgs.coreutils
+            ];
           };
           localAppArmor.applications = {
             agent-fixture = {
@@ -137,6 +168,18 @@ pkgs.testers.runNixOSTest {
               capabilities = [ "bubblewrap" ];
               bubblewrapPackage = pkgs.bubblewrap;
             };
+            claude-code = {
+              package = claudeFixture;
+              executable = "bin/claude-fixture";
+              capabilities = [ "containers" ];
+              containerToolsPackage = pkgs.agent-container-tools;
+            };
+            codex-cli = {
+              package = codexFixture;
+              executable = "bin/codex-fixture";
+              capabilities = [ "containers" ];
+              containerToolsPackage = pkgs.agent-container-tools;
+            };
             enforce-fixture = {
               package = pkgs.coreutils;
               executable = "bin/mkdir";
@@ -151,6 +194,7 @@ pkgs.testers.runNixOSTest {
       };
 
       services.resolved.enable = true;
+      virtualisation.containers.enable = true;
       services.syncthing = {
         enable = true;
         user = "test";
@@ -229,6 +273,76 @@ pkgs.testers.runNixOSTest {
         machine.succeed("test -e /etc/apparmor.d/local-syncthing")
         machine.fail("test -e /etc/apparmor.d/local-brave")
 
+    with subtest("agent container brokers and payloads are always enforced"):
+        machine.succeed(
+            "aa-status --json | ${pkgs.jq}/bin/jq -e "
+            "'.profiles[\"local-codex-cli\"] == \"complain\" and "
+            ".profiles[\"local-claude-code\"] == \"complain\" and "
+            ".profiles[\"local-codex-cli-container-engine\"] == \"enforce\" and "
+            ".profiles[\"local-claude-code-container-engine\"] == \"enforce\" and "
+            ".profiles[\"local-agent-container-payload\"] == \"enforce\"'"
+        )
+
+    with subtest("guarded rootless Buildah and Podman use isolated stores and the payload profile"):
+        container_tools = "${pkgs.agent-container-tools}/bin"
+
+        def guarded(profile, command):
+            launcher = (
+                "${codexFixture}/bin/codex-fixture"
+                if profile == "local-codex-cli"
+                else "${claudeFixture}/bin/claude-fixture"
+            )
+            return (
+                "su -s ${pkgs.bash}/bin/bash test -c "
+                f"'cd /home/test/workspace && aa-exec -p {profile} -- {launcher} "
+                f"{container_tools}/{command}'"
+            )
+
+        machine.succeed(
+            "install -d -o test -g users -m 0700 /home/test/workspace/rootfs/bin"
+        )
+        machine.succeed(
+            "install -o test -g users -m 0555 ${pkgs.pkgsStatic.busybox}/bin/busybox "
+            "/home/test/workspace/rootfs/bin/busybox"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            f"'cd /home/test/workspace && {container_tools}/podman version'"
+        )
+        machine.fail(
+            guarded("local-codex-cli", "podman run --privileged localhost/agent-test")
+        )
+        machine.succeed(guarded("local-codex-cli", "podman version"))
+        machine.succeed(guarded("local-claude-code", "podman version"))
+        machine.succeed(guarded("local-codex-cli", "buildah version"))
+        machine.succeed(guarded("local-codex-cli", "buildah from --name agent-buildah scratch"))
+        machine.succeed(
+            guarded(
+                "local-codex-cli",
+                "buildah copy agent-buildah rootfs/bin/busybox /bin/busybox",
+            )
+        )
+        machine.succeed(
+            guarded(
+                "local-codex-cli",
+                "buildah commit agent-buildah localhost/agent-test",
+            )
+        )
+        machine.succeed(guarded("local-codex-cli", "buildah rm agent-buildah"))
+        machine.succeed(
+            guarded(
+                "local-codex-cli",
+                "podman run --rm localhost/agent-test /bin/busybox cat /proc/self/attr/current",
+            )
+            + " | grep -Fx 'local-agent-container-payload (enforce)'"
+        )
+        machine.succeed(
+            "test -d /home/test/.local/share/containers/agents/codex/storage"
+        )
+        machine.succeed(
+            "test -d /home/test/.local/share/containers/agents/claude/storage"
+        )
+
     with subtest("Bubblewrap is always enforced and brokers namespace setup"):
         machine.succeed(
             "aa-status --json | ${pkgs.jq}/bin/jq -e "
@@ -265,21 +379,32 @@ pkgs.testers.runNixOSTest {
         machine.succeed(
             "install -d -o test -g users -m 0700 "
             "/home/test/.agents/skills/example /home/test/.cache/nix /home/test/.cache/uv "
-            "/home/test/.config/git /home/test/.keras /home/test/.gnupg/private-keys-v1.d "
+            "/home/test/.cargo /home/test/.config/git /home/test/.config/go/telemetry "
+            "/home/test/.keras /home/test/.gnupg/private-keys-v1.d "
             "/home/test/.local/state/apparmor-reports /home/test/nixos-config "
             "/home/test/nixos-config-writable"
         )
         machine.succeed(
             "touch "
-            "/home/test/.agents/skills/example/SKILL.md /home/test/.config/git/ignore "
+            "/home/test/.agents/skills/example/SKILL.md /home/test/.cargo/.global-cache "
+            "/home/test/.config/git/ignore /home/test/.config/go/telemetry/count "
             "/home/test/.keras/keras.json /home/test/.gnupg/common.conf "
             "/home/test/.gnupg/trustdb.gpg /home/test/.gnupg/private-keys-v1.d/private.key "
             "/home/test/.local/state/apparmor-reports/logs.json"
         )
         machine.succeed(
-            "chown -R test:users /home/test/.agents /home/test/.cache /home/test/.config "
+            "chown -R test:users /home/test/.agents /home/test/.cache /home/test/.cargo /home/test/.config "
             "/home/test/.keras /home/test/.gnupg /home/test/.local /home/test/nixos-config "
             "/home/test/nixos-config-writable"
+        )
+        machine.succeed(
+            "install -d -o root -g root -m 0755 /var/cache/man/nixos-mandb/cat1"
+        )
+        machine.succeed(
+            "install -o root -g root -m 0444 /dev/null /var/cache/man/nixos-mandb/index.db"
+        )
+        machine.succeed(
+            "install -o root -g root -m 0666 /dev/null /var/cache/man/nixos-mandb/cat1/cache"
         )
         machine.succeed(
             "chmod 0600 /home/test/.agents/skills/example/SKILL.md /home/test/.config/git/ignore "
@@ -298,7 +423,24 @@ pkgs.testers.runNixOSTest {
             "su -s ${pkgs.bash}/bin/bash test -c "
             "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/touch "
             "/home/test/.cache/nix/allowed /home/test/.cache/uv/allowed "
+            "/home/test/.config/go/telemetry/allowed "
             "/home/test/nixos-config-writable/allowed'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.util-linux}/bin/flock "
+            "/home/test/.cargo/.global-cache ${pkgs.coreutils}/bin/true'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.bash}/bin/bash -c "
+            "\"exec 9</var/cache/man/nixos-mandb/index.db; "
+            "${pkgs.util-linux}/bin/flock --shared 9\"'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/var/cache/man/nixos-mandb/cat1/cache'"
         )
         machine.succeed(
             "su -s ${pkgs.bash}/bin/bash test -c "
@@ -367,6 +509,9 @@ pkgs.testers.runNixOSTest {
             "/home/test/nixos-config/enforced"
         )
         machine.succeed(
+            "install -o root -g root -m 0666 /dev/null /home/test/Documents/shared"
+        )
+        machine.succeed(
             "su -s ${pkgs.bash}/bin/bash test -c "
             "'aa-exec -p local-audit-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
             "/home/test/.config/sops/age/keys.txt'"
@@ -385,6 +530,16 @@ pkgs.testers.runNixOSTest {
             "su -s ${pkgs.bash}/bin/bash test -c "
             "'aa-exec -p local-enforce-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
             "/home/test/nixos-config/enforced'"
+        )
+        machine.succeed(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-enforce-fixture -- ${pkgs.coreutils}/bin/cat "
+            "/home/test/Documents/shared'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-enforce-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/home/test/Documents/shared'"
         )
         machine.succeed(
             "su -s ${pkgs.bash}/bin/bash test -c "
