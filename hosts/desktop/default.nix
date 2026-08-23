@@ -16,17 +16,47 @@
     ./../../modules/features/xwayland.nix
   ];
 
-  boot.kernelParams = [
-    "amd_pstate=active"
-    # Deliberate exception: the pinned ucodenix blob fails the kernel SHA
-    # allowlist; its exact provenance and hash remain recorded in flake.lock.
-    # "microcode.amd_sha_check=off"
+  boot = {
+    initrd = {
+      systemd = {
+        enable = true;
+        tpm2.enable = true;
+      };
 
-    # Optional strict trials. Validate every NVIDIA module signer before the
-    # first option; enable Lockdown only on this non-hibernating host.
-    # "module.sig_enforce=1"
-    # "lockdown=integrity"
-  ];
+      luks.devices = {
+        "luks-57594530-d51d-466c-98ae-b046c1413d0b".crypttabExtraOpts = [
+          "tpm2-device=auto"
+        ];
+        "luks-a4364608-7adf-474b-89c9-47a5e1d07deb".crypttabExtraOpts = [
+          "tpm2-device=auto"
+        ];
+      };
+    };
+
+    lanzaboote = {
+      configurationLimit = 4;
+      measuredBoot = {
+        enable = true;
+        pcrs = [
+          0
+          4
+          7
+        ];
+      };
+    };
+
+    kernelParams = [
+      "amd_pstate=active"
+      # Deliberate exception: the pinned ucodenix blob fails the kernel SHA
+      # allowlist; its exact provenance and hash remain recorded in flake.lock.
+      # "microcode.amd_sha_check=off"
+
+      # Optional strict trials. Validate every NVIDIA module signer before the
+      # first option; enable Lockdown only on this non-hibernating host.
+      # "module.sig_enforce=1"
+      # "lockdown=integrity"
+    ];
+  };
 
   security.protectKernelImage = true;
   # Optional strict trial after inventorying and preloading every required
@@ -42,8 +72,8 @@
   };
 
   environment.etc."crypttab".text = ''
-    crypt-syncthing UUID=b2a3176d-92eb-4df4-b20f-3bb2c1a77229 none luks,discard
-    crypt-cache     UUID=80c11c8a-d26d-4a9a-9782-9c38de05fa72 none luks,discard
+    crypt-syncthing UUID=b2a3176d-92eb-4df4-b20f-3bb2c1a77229 none luks,discard,tpm2-device=auto
+    crypt-cache     UUID=80c11c8a-d26d-4a9a-9782-9c38de05fa72 none luks,discard,tpm2-device=auto
   '';
 
   fileSystems."/srv/syncthing" = {
