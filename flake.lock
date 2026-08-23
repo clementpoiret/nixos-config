@@ -158,6 +158,22 @@
         "type": "github"
       }
     },
+    "clementpoiret-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787479969,
+        "narHash": "sha256-46VmGyeO0v04SaCPW2Q8QNGAWv6RArtnf0C6levT40U=",
+        "owner": "clementpoiret",
+        "repo": "skills",
+        "rev": "6b03b7b024a5995718aa8c6cd26cfb7a32345751",
+        "type": "github"
+      },
+      "original": {
+        "owner": "clementpoiret",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
     "codex-cli": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -926,6 +942,7 @@
         "antigravity": "antigravity",
         "bash-env-json": "bash-env-json",
         "claude-code": "claude-code",
+        "clementpoiret-skills": "clementpoiret-skills",
         "codex-cli": "codex-cli",
         "codex-desktop-linux": "codex-desktop-linux",
         "dms": "dms",

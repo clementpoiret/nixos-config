@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./agent-skills.nix
     ./apparmor.nix
     ./bat.nix # better cat command
     ./btop.nix # resouces monitor
