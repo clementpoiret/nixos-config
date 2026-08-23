@@ -31,9 +31,7 @@
       enable = true;
 
       # Use the C++ daemon, not the original shell implementation.
-      package = pkgs.ananicy-cpp.overrideAttrs (oldAttrs: {
-        patches = (oldAttrs.patches or [ ]) ++ [ ./ananicy-cpp-missing-includes.patch ];
-      });
+      package = pkgs.ananicy-cpp;
 
       # Use CachyOS' ruleset.
       rulesProvider = pkgs.ananicy-rules-cachyos;
