@@ -118,6 +118,7 @@ in
 
       # Networking
       aria2 # Multi-source command-line download utility
+      dnsutils # DNS lookup utilities (dig, host, nslookup)
       motrix-next # dl manager
       protonmail-bridge
       # protonmail-bridge-gui
