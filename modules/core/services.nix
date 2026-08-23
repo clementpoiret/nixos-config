@@ -9,7 +9,9 @@
 let
   homeDirectory = config.users.users.${username}.home;
   syncthingRoot = lib.removeSuffix "/" config.services.syncthing.dataDir;
-  syncthingRoots = [ syncthingRoot ] ++ lib.optional (host == "desktop") "/srv/syncthing";
+  syncthingRoots = lib.unique (
+    [ syncthingRoot ] ++ lib.optional (host == "desktop") "/srv/syncthing"
+  );
 in
 {
   services = {

@@ -696,8 +696,10 @@
             chmod 0600 "$temporary_file"
             chown systemd-resolve:systemd-resolve "$temporary_file"
           '' dnsService.script;
-          assert pkgs-unstable.lib.elem "/home/${username}/Sync" desktopSyncthingPaths;
-          assert pkgs-unstable.lib.elem "/srv/syncthing" desktopSyncthingPaths;
+          assert !(pkgs-unstable.lib.elem "/home/${username}/Sync" desktopSyncthingPaths);
+          assert
+            builtins.length (pkgs-unstable.lib.filter (path: path == "/srv/syncthing") desktopSyncthingPaths)
+            == 1;
           pkgs-unstable.runCommand "apparmor-mode-matrix" { } ''
             touch "$out"
           '';

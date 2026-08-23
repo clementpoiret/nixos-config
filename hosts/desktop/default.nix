@@ -66,6 +66,9 @@
     ];
   };
 
+  services.syncthing.dataDir = lib.mkForce "/srv/syncthing";
+  systemd.services.syncthing.unitConfig.RequiresMountsFor = "/srv/syncthing";
+
   hardware.amdgpu.initrd.enable = true;
 
   hardware.nvidia = {
