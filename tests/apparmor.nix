@@ -570,12 +570,6 @@ pkgs.testers.runNixOSTest {
         )
 
     with subtest("Syncthing runs under its enforced profile"):
-        machine.succeed(
-            "aa-exec -p local-syncthing -- ${pkgs.coreutils}/bin/cat /proc/bus/pci/devices"
-        )
-        machine.succeed(
-            "aa-exec -p local-syncthing -- ${pkgs.coreutils}/bin/cat /proc/modules"
-        )
         machine.wait_for_unit("syncthing.service")
         machine.wait_until_succeeds("systemctl is-active --quiet syncthing.service")
         machine.succeed(
@@ -584,5 +578,11 @@ pkgs.testers.runNixOSTest {
         )
         machine.succeed("test -d /home/test/Sync/.config/syncthing")
         machine.fail("journalctl -k --grep 'profile=\\\"local-syncthing\\\"'")
+        machine.succeed(
+            "aa-exec -p local-syncthing -- ${pkgs.coreutils}/bin/cat /proc/bus/pci/devices"
+        )
+        machine.succeed(
+            "aa-exec -p local-syncthing -- ${pkgs.coreutils}/bin/cat /proc/modules"
+        )
   '';
 }
