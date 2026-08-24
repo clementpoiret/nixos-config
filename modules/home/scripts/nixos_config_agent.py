@@ -361,9 +361,6 @@ def bookmark_position(repo: Path, name: str) -> str | None:
 
 
 def restore_bookmark_position(repo: Path, name: str, position: str | None) -> None:
-    current_position = bookmark_position(repo, name)
-    if current_position == position:
-        return
     if position is None:
         run_jj(
             repo,
@@ -385,6 +382,200 @@ def restore_bookmark_position(repo: Path, name: str, position: str | None) -> No
         )
 
 
+def operation_id(repo: Path) -> str:
+    output = run_jj(
+        repo,
+        "--ignore-working-copy",
+        "op",
+        "log",
+        "--no-graph",
+        "-n",
+        "1",
+        "-T",
+        'self.id() ++ "\\n"',
+    )
+    operations = [line for line in output.splitlines() if line]
+    if len(operations) != 1:
+        raise WorkflowError(
+            f"expected exactly one current operation, found {len(operations)}"
+        )
+    return operations[0]
+
+
+def restore_operations(checkpoints: tuple[tuple[Path, str], ...]) -> None:
+    errors: list[str] = []
+    for repo, checkpoint in reversed(checkpoints):
+        try:
+            run_jj(repo, "op", "restore", checkpoint)
+        except WorkflowError as error:
+            errors.append(f"{repo}: {error}")
+    if errors:
+        raise WorkflowError("; ".join(errors))
+
+
+def is_ancestor(repo: Path, ancestor: str, descendant: str) -> bool:
+    return bool(revision_ids(repo, f"({ancestor}) & ::({descendant})"))
+
+
+def candidate_working_state(
+    repo: Path, expected_baseline: str
+) -> tuple[str, bool, str, str]:
+    current = one_revision(repo, "@", "candidate working-copy")
+    baseline = one_revision(repo, "parents(@)", "candidate parent")
+    if baseline != expected_baseline:
+        raise WorkflowError(
+            "candidate parent does not match the protected baseline; reinitialize or rebase it"
+        )
+    if has_conflicts(repo):
+        raise WorkflowError("candidate working copy has conflicts")
+    return (
+        current,
+        is_empty(repo),
+        revision_value(repo, current, "change_id"),
+        description(repo, current),
+    )
+
+
+def synchronize_fetched_main(
+    protected: Path,
+    candidate: Path,
+    *,
+    old_main: str,
+    remote_main: str,
+    old_baseline: str,
+    protected_current: str,
+    candidate_state_before: tuple[str, bool, str, str],
+) -> tuple[str, str]:
+    checkpoints = (
+        (protected, operation_id(protected)),
+        (candidate, operation_id(candidate)),
+    )
+    old_baseline_change = revision_value(protected, old_baseline, "change_id")
+    protected_change = revision_value(protected, protected_current, "change_id")
+    candidate_current, candidate_empty, candidate_change, candidate_description = (
+        candidate_state_before
+    )
+
+    try:
+        # A promoted handoff is no longer needed and its remote bookmark would
+        # otherwise make the protected baseline immutable during the rebase.
+        forget_handoff_tracking(protected)
+        run_jj(
+            protected,
+            "rebase",
+            "--branch",
+            protected_current,
+            "--onto",
+            remote_main,
+        )
+        if revision_ids(protected, f"({remote_main}..@) & conflicts()"):
+            raise WorkflowError("protected rebase produced conflicts")
+
+        new_protected_current = one_revision(
+            protected, "@", "rebased protected working-copy"
+        )
+        if (
+            revision_value(protected, new_protected_current, "change_id")
+            != protected_change
+        ):
+            raise WorkflowError("protected working-copy change changed during rebase")
+        new_baseline = one_revision(
+            protected, "parents(@)", "rebased protected baseline"
+        )
+        if old_baseline == old_main:
+            if new_baseline != remote_main:
+                raise WorkflowError(
+                    "protected working-copy was not rebased onto GitHub main"
+                )
+        elif (
+            revision_value(protected, new_baseline, "change_id") != old_baseline_change
+        ):
+            raise WorkflowError("protected baseline change changed during rebase")
+
+        run_jj(
+            protected,
+            "bookmark",
+            "advance",
+            f"exact:{MAIN_BOOKMARK}",
+            "--to",
+            remote_main,
+        )
+        run_jj(
+            protected,
+            "bookmark",
+            "set",
+            "--allow-backwards",
+            "-r",
+            new_baseline,
+            BASE_BOOKMARK,
+        )
+
+        run_jj(
+            candidate,
+            "--ignore-working-copy",
+            "git",
+            "fetch",
+            "--remote",
+            UPSTREAM_REMOTE,
+            "--branch",
+            BASE_BOOKMARK,
+        )
+        imported_baseline = one_revision(
+            candidate,
+            f"{BASE_BOOKMARK}@{UPSTREAM_REMOTE}",
+            f"{BASE_BOOKMARK}@{UPSTREAM_REMOTE}",
+        )
+        if imported_baseline != new_baseline:
+            raise WorkflowError("candidate imported an unexpected protected baseline")
+
+        run_jj(
+            candidate,
+            "rebase",
+            "--revision",
+            candidate_current,
+            "--onto",
+            imported_baseline,
+        )
+        if has_conflicts(candidate):
+            raise WorkflowError("candidate rebase produced conflicts")
+        new_candidate_current = one_revision(
+            candidate, "@", "rebased candidate working-copy"
+        )
+        if (
+            revision_value(candidate, new_candidate_current, "change_id")
+            != candidate_change
+        ):
+            raise WorkflowError("candidate working-copy change changed during rebase")
+        if is_empty(candidate) != candidate_empty:
+            raise WorkflowError(
+                "candidate working-copy emptiness changed during rebase"
+            )
+        if description(candidate, new_candidate_current) != candidate_description:
+            raise WorkflowError("candidate description changed during rebase")
+        if one_revision(candidate, "parents(@)", "candidate parent") != new_baseline:
+            raise WorkflowError("candidate was not rebased onto the protected baseline")
+
+        for bookmark in (BASE_BOOKMARK, HANDOFF_BOOKMARK):
+            run_jj(
+                candidate,
+                "bookmark",
+                "set",
+                "--allow-backwards",
+                "-r",
+                new_baseline,
+                bookmark,
+            )
+        return new_baseline, new_candidate_current
+    except WorkflowError as error:
+        try:
+            restore_operations(checkpoints)
+        except WorkflowError as cleanup_error:
+            raise WorkflowError(
+                f"{error}; synchronization rollback also failed: {cleanup_error}"
+            ) from error
+        raise WorkflowError(f"{error}; local state was restored") from error
+
+
 def fetch_updates(
     protected_path: Path,
     candidate_path: Path,
@@ -398,7 +589,11 @@ def fetch_updates(
     candidate = ensure_repository(candidate_path, "candidate")
     configure_upstream_remote(protected, candidate)
 
+    protected_current, old_baseline = protected_state(protected)
     protected_main_before = bookmark_position(protected, MAIN_BOOKMARK)
+    if protected_main_before is None:
+        raise WorkflowError("protected main bookmark is missing")
+    candidate_state_before = candidate_working_state(candidate, old_baseline)
     candidate_main_before = bookmark_position(candidate, MAIN_BOOKMARK)
     try:
         protected_remote = fetch_main(protected, UPSTREAM_REMOTE)
@@ -425,8 +620,6 @@ def fetch_updates(
             "GitHub main changed between repository fetches; run fetch again"
         )
 
-    local_main = bookmark_position(protected, MAIN_BOOKMARK)
-    local_main_text = local_main if local_main else "not present"
     print(
         f"Protected {MAIN_BOOKMARK}@{UPSTREAM_REMOTE}: {protected_remote}", file=output
     )
@@ -434,11 +627,48 @@ def fetch_updates(
         f"Candidate {MAIN_BOOKMARK}@{CANDIDATE_UPSTREAM_REMOTE}: {candidate_remote}",
         file=output,
     )
-    print(f"Protected {MAIN_BOOKMARK}: {local_main_text}", file=output)
+    if protected_main_before == protected_remote or is_ancestor(
+        protected, protected_remote, protected_main_before
+    ):
+        require_ancestor(
+            protected,
+            protected_main_before,
+            old_baseline,
+            "protected baseline is not a descendant of protected main",
+        )
+        print(f"Protected {MAIN_BOOKMARK}: {protected_main_before}", file=output)
+        print(
+            "Fetched GitHub metadata; protected main already contains GitHub main.",
+            file=output,
+        )
+        return protected_remote, candidate_remote
+    if not is_ancestor(protected, protected_main_before, protected_remote):
+        raise WorkflowError(
+            "protected main has diverged from GitHub main; local state was not moved"
+        )
+    require_ancestor(
+        protected,
+        protected_main_before,
+        old_baseline,
+        "protected baseline is not a descendant of protected main",
+    )
+
+    new_baseline, new_candidate = synchronize_fetched_main(
+        protected,
+        candidate,
+        old_main=protected_main_before,
+        remote_main=protected_remote,
+        old_baseline=old_baseline,
+        protected_current=protected_current,
+        candidate_state_before=candidate_state_before,
+    )
+    print(f"Protected {MAIN_BOOKMARK}: {protected_remote}", file=output)
+    print(f"Protected baseline: {old_baseline} -> {new_baseline}", file=output)
     print(
-        "Fetched GitHub metadata; working copies and local bookmarks were not moved.",
+        f"Candidate working-copy: {candidate_state_before[0]} -> {new_candidate}",
         file=output,
     )
+    print("GitHub main advanced and local work was rebased.", file=output)
     return protected_remote, candidate_remote
 
 

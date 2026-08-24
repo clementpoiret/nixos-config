@@ -10,7 +10,7 @@ clone's `origin` must point to GitHub:
 # One-time setup, run from an unconfined terminal after protected @ is an empty change.
 nixos-config-agent init
 
-# Refresh origin/main in both clones without rebasing work or moving local bookmarks.
+# Refresh GitHub main, advance local main, and rebase local work when fast-forwardable.
 nixos-config-agent fetch
 
 cd ~/nixos-config-writable
@@ -31,9 +31,11 @@ both repositories before changing the protected clone. A rejection or stale base
 unchanged. Success leaves an empty working change in both clones.
 
 `fetch` mirrors the protected clone's `origin` URL into the writable clone as `github`, then fetches `origin/main` in
-the protected clone and `github/main` in the writable clone. It preserves both working-copy positions and any local
-`main` bookmarks; it does not rebase active work. If GitHub and local `main` have diverged, reconcile them explicitly
-before publishing.
+the protected clone and `github/main` in the writable clone. When GitHub is a fast-forward of protected `main`, it
+advances local `main`, rebases any promoted protected revisions, and rebases an active or empty writable change onto
+the exact rewritten protected baseline. If either rebase conflicts, both clones are restored while the fetched GitHub
+metadata is retained. A locally-ahead `main` is left unchanged, and genuinely divergent history must be reconciled
+explicitly before publishing.
 
 `push` is an interactive, unconfined post-promotion operation. It refuses an active writable change, conflicts,
 divergent history, or any unpublished revision without a Conventional Commit subject. It signs only unsigned revisions
