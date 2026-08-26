@@ -126,10 +126,11 @@ updates all flake inputs, builds the updated checks, and pushes the verified
 Configure a repository Actions secret named `CACHIX_AUTH_TOKEN` with a
 cache-scoped write token for the private `clementpoiret` Cachix cache. The
 workflow fails before building if this secret is unavailable. Keep the cache
-private because complete host closures include the non-redistributable
+private because the curated host outputs include the non-redistributable
 VirtualBox Extension Pack. Existing paths are pulled from configured binary
-caches; newly built host paths are uploaded and the current host toplevels are
-pinned in Cachix.
+caches; newly built curated outputs are uploaded and the current optimized
+roots are pinned in Cachix. Complete host configurations are built for
+validation without being watched or pinned by Cachix.
 
 ## Hardening changes
 

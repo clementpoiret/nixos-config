@@ -298,27 +298,13 @@ jobs:
 
           cachix pin clementpoiret "host-optimized-${{ matrix.host }}" "$root" --keep-revisions 1
 
-      - name: Build and cache host configuration
-        shell: bash
+      - name: Build host configuration
         run: |
-          set -euo pipefail
-
-          cachix watch-exec clementpoiret -- \
-            nix build \
-              --no-link \
-              --no-update-lock-file \
-              --print-build-logs \
-              ".#checks.x86_64-linux.${{ matrix.host }}-toplevel"
-
-          toplevel="$(
-            nix build \
-              --no-link \
-              --print-out-paths \
-              --no-update-lock-file \
-              ".#checks.x86_64-linux.${{ matrix.host }}-toplevel"
-          )"
-
-          cachix pin clementpoiret "host-toplevel-${{ matrix.host }}" "$toplevel" --keep-revisions 1
+          nix build \
+            --no-link \
+            --no-update-lock-file \
+            --print-build-logs \
+            ".#checks.x86_64-linux.${{ matrix.host }}-toplevel"
 
   commit-update:
     if: github.event_name == 'schedule'
