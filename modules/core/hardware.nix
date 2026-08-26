@@ -33,9 +33,20 @@ let
   };
 
   cachyosHelpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
-  customKernelPackages = cachyosHelpers.kernelModuleLLVMOverride (
-    pkgs.linuxKernel.packagesFor customKernel
-  );
+  customKernelPackages =
+    let
+      kernelPackages = cachyosHelpers.kernelModuleLLVMOverride (
+        pkgs.linuxKernel.packagesFor customKernel
+      );
+    in
+    kernelPackages.extend (
+      _final: prev: {
+        # VirtualBox does not inherit the custom kernel's LLVM build flags.
+        virtualbox = prev.virtualbox.overrideAttrs (oldAttrs: {
+          makeFlags = (oldAttrs.makeFlags or [ ]) ++ kernelPackages.kernel.commonMakeFlags;
+        });
+      }
+    );
   cachedKernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
 in
 {

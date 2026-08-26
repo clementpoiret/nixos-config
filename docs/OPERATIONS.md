@@ -124,9 +124,12 @@ updates all flake inputs, builds the updated checks, and pushes the verified
 `flake.nix` and `flake.lock` directly to `main`.
 
 Configure a repository Actions secret named `CACHIX_AUTH_TOKEN` with a
-cache-scoped write token for the `clementpoiret` Cachix cache. The workflow
-fails before building if this secret is unavailable. Existing paths are pulled
-from configured binary caches; only newly built paths are uploaded to Cachix.
+cache-scoped write token for the private `clementpoiret` Cachix cache. The
+workflow fails before building if this secret is unavailable. Keep the cache
+private because complete host closures include the non-redistributable
+VirtualBox Extension Pack. Existing paths are pulled from configured binary
+caches; newly built host paths are uploaded and the current host toplevels are
+pinned in Cachix.
 
 ## Hardening changes
 
