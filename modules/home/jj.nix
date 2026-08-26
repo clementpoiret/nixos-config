@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 let
   jjMergeConfig = "${config.xdg.configHome}/helix/jj-merge.toml";
 in
@@ -69,4 +69,6 @@ in
       };
     };
   };
+
+  home.packages = with pkgs; [ jjui ];
 }
