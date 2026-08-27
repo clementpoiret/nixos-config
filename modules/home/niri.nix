@@ -93,7 +93,6 @@ in
       prefer-no-csd = true;
 
       environment = {
-        DMS_DISABLE_MATUGEN = "1";
         DMS_DANKBAR_LAYER = "top";
         # DMS_DANKBAR_LAYER = "overlay";
         DMS_HIDE_TRAYIDS = "discord,spotify";
