@@ -1,20 +1,27 @@
 {
   config,
+  host,
   lib,
   pkgs,
   ...
 }:
 let
-  protonBridgeCertificate = ../../certs/cert.pem;
+  protonBridgeCertificates = {
+    desktop = ../../certs/protonmail-bridge-desktop.pem;
+    laptop = ../../certs/protonmail-bridge-laptop.pem;
+  };
+  protonBridgeCertificate =
+    protonBridgeCertificates.${host}
+      or (throw "No Proton Mail Bridge certificate configured for host ${host}");
   thunderbirdProfileRoot = "${config.home.homeDirectory}/.thunderbird";
 in
 {
   programs.thunderbird.enable = true;
 
-  # Bridge serves a self-signed, CA-marked certificate. Installing it through
-  # Thunderbird's certificate policy grants CA trust and makes Thunderbird
-  # reject it as an end-entity certificate. Pin it to Bridge's two loopback
-  # endpoints instead.
+  # Each host's Bridge keeps its private key in its encrypted vault and serves
+  # its own self-signed, CA-marked certificate. Pin that host's public
+  # certificate to Bridge's two loopback endpoints instead of granting CA
+  # trust through Thunderbird's certificate policy.
   home.activation.protonBridgeCertificateOverrides = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     profile_root=${lib.escapeShellArg thunderbirdProfileRoot}
     profiles_file="$profile_root/profiles.ini"
