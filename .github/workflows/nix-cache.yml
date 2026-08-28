@@ -26,11 +26,11 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Install Nix
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         uses: cachix/install-nix-action@630ae543ea3a38a9a4166f03376c02c50f408342 # v31.11.0
 
       - name: Update pinned stable releases
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -74,7 +74,7 @@ jobs:
           update_release_input yorukot/superfile
 
       - name: Update Logseq AppImage
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -154,11 +154,11 @@ jobs:
           grep -Fqx "    hash = \"${hash}\";" "$package_file"
 
       - name: Update flake inputs
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: nix flake update
 
       - name: Verify update scope
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           if ! git diff --quiet -- . ':(exclude)flake.nix' ':(exclude)flake.lock' ':(exclude)pkgs/logseq-appimage/default.nix'; then
             echo "Refusing to continue with changes outside the dependency update scope" >&2
