@@ -79,6 +79,7 @@ in
       # gtt # Google Translate terminal interface (TUI)
       gtrash # Move files to trash instead of permanent delete
       # hexdump # Display files in hex/decimal/octal
+      jq
       killall # Terminate processes by name
       # kdePackages.ksshaskpass # askpass replacement
       # lazysql # Like lazygit, but for sql
