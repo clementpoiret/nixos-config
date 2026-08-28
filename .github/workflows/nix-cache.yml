@@ -7,6 +7,7 @@ on:
   schedule:
     - cron: "17 3 * * 0"
       timezone: Europe/Paris
+  workflow_dispatch:
 
 permissions: {}
 
@@ -307,7 +308,7 @@ jobs:
             ".#checks.x86_64-linux.${{ matrix.host }}-toplevel"
 
   commit-update:
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     needs:
       - shared-checks
       - build-host
