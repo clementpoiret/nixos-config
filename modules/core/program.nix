@@ -1,12 +1,20 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
+let
+  linkctlPackage = inputs.linkctl.packages.${pkgs.stdenv.hostPlatform.system}.linkctl;
+in
 {
+  environment.systemPackages = [ linkctlPackage ];
+
   programs.dconf.enable = true;
   programs.fish.enable = true;
 
-  services.udev.packages = with pkgs; [
-    libfido2
-    yubikey-personalization
+  services.udev.packages = [
+    linkctlPackage
+    pkgs.libfido2
+    pkgs.yubikey-personalization
   ];
+  systemd.packages = [ linkctlPackage ];
+
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = false;

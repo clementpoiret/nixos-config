@@ -28,6 +28,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    linkctl.url = "github:clementpoiret/linkctl";
+
     niri = {
       # url = "github:sodiboo/niri-flake";
       url = "github:sodiboo/niri-flake/e43ef13f23c2c7ae5b10e842745cb345faff4f40"; # 26.04
