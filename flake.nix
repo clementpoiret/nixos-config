@@ -534,6 +534,14 @@
             laptopSecretWriter = builtins.head laptopHome.systemd.user.services.write-ssh-secret-config.Service.ExecStart;
             desktopAgentLoader = desktopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
             laptopAgentLoader = laptopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
+            desktopAgentEnvironment = desktopHome.systemd.user.services.ssh-agent.Service.Environment;
+            laptopAgentEnvironment = laptopHome.systemd.user.services.ssh-agent.Service.Environment;
+            desktopAgentAskpass = pkgs-unstable.lib.removePrefix "SSH_ASKPASS=" (
+              builtins.head (builtins.filter (pkgs-unstable.lib.hasPrefix "SSH_ASKPASS=") desktopAgentEnvironment)
+            );
+            laptopAgentAskpass = pkgs-unstable.lib.removePrefix "SSH_ASKPASS=" (
+              builtins.head (builtins.filter (pkgs-unstable.lib.hasPrefix "SSH_ASKPASS=") laptopAgentEnvironment)
+            );
             desktopGpgSync = desktopHome.systemd.user.services.sync-forwarded-gpg-home;
             laptopGpgSync = laptopHome.systemd.user.services.sync-forwarded-gpg-home;
             desktopGpgSyncScript = builtins.head desktopGpgSync.Service.ExecStart;
@@ -573,6 +581,9 @@
           assert desktopConfig.programs.yubikey-touch-detector.libnotify;
           assert laptopConfig.programs.yubikey-touch-detector.enable;
           assert laptopConfig.programs.yubikey-touch-detector.libnotify;
+          assert builtins.elem "SSH_ASKPASS_REQUIRE=force" desktopAgentEnvironment;
+          assert builtins.elem "SSH_ASKPASS_REQUIRE=force" laptopAgentEnvironment;
+          assert desktopAgentAskpass == laptopAgentAskpass;
           assert gpgSyncIsSessionOneShot desktopHome desktopGpgSync;
           assert gpgSyncIsSessionOneShot laptopHome laptopGpgSync;
           assert desktopHome.programs.jujutsu.settings.signing.behavior == "drop";
@@ -589,6 +600,9 @@
               grep -F 'Host * !github.com !gitlab.com' ${desktopSecretWriter}
               grep -F 'laptop>git@[ssh.github.com]:443' ${desktopAgentLoader}
               grep -F 'desktop>git@[altssh.gitlab.com]:443' ${laptopAgentLoader}
+              grep -F 'systemctl --user show-environment' ${desktopAgentAskpass}
+              grep -F 'DISPLAY=*|WAYLAND_DISPLAY=*' ${desktopAgentAskpass}
+              grep -F 'seahorse/ssh-askpass "$@"' ${desktopAgentAskpass}
               grep -F 'gpg --batch --export 71F084CEA427B23537934233CC6B0EED323A6C13' ${desktopGpgSyncScript}
               grep -F 'Refusing to forward a GPG key file that is not a smartcard stub' ${desktopGpgSyncScript}
               touch "$out"

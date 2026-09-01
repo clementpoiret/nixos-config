@@ -39,6 +39,21 @@ let
       } \
       ${lib.concatMapStringsSep " \\\n      " lib.escapeShellArg identityFiles}
   '';
+  sshAgentAskpass = pkgs.writeShellScript "ssh-agent-askpass" ''
+    set -eu
+
+    if manager_environment="$(${pkgs.systemd}/bin/systemctl --user show-environment)"; then
+      while IFS= read -r variable; do
+        case "$variable" in
+          DISPLAY=*|WAYLAND_DISPLAY=*|XDG_CURRENT_DESKTOP=*|XDG_SESSION_TYPE=*|DBUS_SESSION_BUS_ADDRESS=*)
+            export "$variable"
+            ;;
+        esac
+      done <<< "$manager_environment"
+    fi
+
+    exec ${pkgs.seahorse}/libexec/seahorse/ssh-askpass "$@"
+  '';
 
   writeSshSecretConfig = pkgs.writeShellScript "write-ssh-secret-config" ''
     set -eu
@@ -188,5 +203,11 @@ in
   };
 
   services.ssh-agent.enable = true;
-  systemd.user.services.ssh-agent.Service.ExecStartPost = "${loadConstrainedSshKeys}";
+  systemd.user.services.ssh-agent.Service = {
+    ExecStartPost = "${loadConstrainedSshKeys}";
+    Environment = [
+      "SSH_ASKPASS=${sshAgentAskpass}"
+      "SSH_ASKPASS_REQUIRE=force"
+    ];
+  };
 }
