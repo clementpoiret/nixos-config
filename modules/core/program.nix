@@ -21,6 +21,10 @@ in
     # pinentryFlavor = "qt";
     # pinentryPackage = pkgs.pinentry-qt;
   };
+  programs.yubikey-touch-detector = {
+    enable = true;
+    libnotify = true;
+  };
   services.pcscd.enable = true;
 
   programs.ssh = {

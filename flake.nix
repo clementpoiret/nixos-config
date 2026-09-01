@@ -569,6 +569,10 @@
           assert serverForwardingIsRestricted laptopConfig;
           assert desktopHome.services.gpg-agent.enableExtraSocket;
           assert laptopHome.services.gpg-agent.enableExtraSocket;
+          assert desktopConfig.programs.yubikey-touch-detector.enable;
+          assert desktopConfig.programs.yubikey-touch-detector.libnotify;
+          assert laptopConfig.programs.yubikey-touch-detector.enable;
+          assert laptopConfig.programs.yubikey-touch-detector.libnotify;
           assert gpgSyncIsSessionOneShot desktopHome desktopGpgSync;
           assert gpgSyncIsSessionOneShot laptopHome laptopGpgSync;
           assert desktopHome.programs.jujutsu.settings.signing.behavior == "drop";
