@@ -1,6 +1,7 @@
 { pkgs, ... }:
 let
   fontPackages = with pkgs; [
+    inter
     nerd-fonts.fira-code
     nerd-fonts.hack
     nerd-fonts.jetbrains-mono
