@@ -8,7 +8,6 @@ let
     nerd-fonts.monaspace
     nerd-fonts.noto
     nerd-fonts.symbols-only
-    notonoto
     stix-two
     xits-math
     twemoji-color-font
