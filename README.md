@@ -369,9 +369,10 @@ commits or access GitHub/GitLab. These opt-in aliases forward the local SSH
 agent and the restricted GPG extra socket; ordinary SSH aliases do not. The
 forwarded SSH keys are destination-constrained to GitHub and GitLab, so restore
 the peer and forge host keys in `~/.ssh/known_hosts` before the first switch.
-If the smartcard signing stub did not exist during activation, run
-`gpg --card-status` with the card inserted and switch the configuration again
-to populate the isolated `~/.gnupg-forwarded` home.
+The user-session `sync-forwarded-gpg-home.service` populates the isolated
+`~/.gnupg-forwarded` home. If the smartcard signing stub does not exist when it
+runs, insert the card, run `gpg --card-status`, then run
+`systemctl --user restart sync-forwarded-gpg-home.service`.
 
 Treat the exported files as sensitive metadata and remove the transfer copies
 after verifying the import. A revocation certificate can revoke its

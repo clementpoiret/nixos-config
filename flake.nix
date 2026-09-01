@@ -534,6 +534,15 @@
             laptopSecretWriter = builtins.head laptopHome.systemd.user.services.write-ssh-secret-config.Service.ExecStart;
             desktopAgentLoader = desktopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
             laptopAgentLoader = laptopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
+            desktopGpgSync = desktopHome.systemd.user.services.sync-forwarded-gpg-home;
+            laptopGpgSync = laptopHome.systemd.user.services.sync-forwarded-gpg-home;
+            desktopGpgSyncScript = builtins.head desktopGpgSync.Service.ExecStart;
+            gpgSyncIsSessionOneShot =
+              home: service:
+              !(home.home.activation ? syncForwardedGpgHome)
+              && service.Service.Type == "oneshot"
+              && !(service.Service.RemainAfterExit)
+              && service.Install.WantedBy == [ "default.target" ];
             serverForwardingIsRestricted =
               config:
               config.services.openssh.settings.AllowAgentForwarding
@@ -560,6 +569,12 @@
           assert serverForwardingIsRestricted laptopConfig;
           assert desktopHome.services.gpg-agent.enableExtraSocket;
           assert laptopHome.services.gpg-agent.enableExtraSocket;
+          assert gpgSyncIsSessionOneShot desktopHome desktopGpgSync;
+          assert gpgSyncIsSessionOneShot laptopHome laptopGpgSync;
+          assert desktopHome.programs.jujutsu.settings.signing.behavior == "drop";
+          assert laptopHome.programs.jujutsu.settings.signing.behavior == "drop";
+          assert desktopHome.programs.jujutsu.settings.git.sign-on-push;
+          assert laptopHome.programs.jujutsu.settings.git.sign-on-push;
           pkgs-unstable.runCommand "credential-forwarding" { nativeBuildInputs = [ pkgs-unstable.gnugrep ]; }
             ''
               grep -F 'Host laptop-forwarded' ${desktopSecretWriter}
@@ -570,6 +585,8 @@
               grep -F 'Host * !github.com !gitlab.com' ${desktopSecretWriter}
               grep -F 'laptop>git@[ssh.github.com]:443' ${desktopAgentLoader}
               grep -F 'desktop>git@[altssh.gitlab.com]:443' ${laptopAgentLoader}
+              grep -F 'gpg --batch --export 71F084CEA427B23537934233CC6B0EED323A6C13' ${desktopGpgSyncScript}
+              grep -F 'Refusing to forward a GPG key file that is not a smartcard stub' ${desktopGpgSyncScript}
               touch "$out"
             '';
 

@@ -36,7 +36,7 @@ in
         email = "clement@linux.com";
       };
       signing = {
-        behavior = "own";
+        behavior = "drop";
         backend = "gpg";
         key = "71F084CEA427B23537934233CC6B0EED323A6C13";
       };
