@@ -352,6 +352,27 @@ gpg --card-status
 gpg --list-secret-keys
 ```
 
+Configure both YubiKeys to require a touch for every OpenPGP signature. Insert
+one key at a time and repeat this command for each key (it prompts for the
+OpenPGP admin PIN):
+
+```bash
+ykman openpgp keys set-touch sig on
+```
+
+The `on` policy is reversible. The NixOS configuration deliberately does not
+change token-resident policy automatically.
+
+After switching, use `ssh desktop-forwarded` from the laptop or
+`ssh laptop-forwarded` from the desktop when the remote session needs to sign
+commits or access GitHub/GitLab. These opt-in aliases forward the local SSH
+agent and the restricted GPG extra socket; ordinary SSH aliases do not. The
+forwarded SSH keys are destination-constrained to GitHub and GitLab, so restore
+the peer and forge host keys in `~/.ssh/known_hosts` before the first switch.
+If the smartcard signing stub did not exist during activation, run
+`gpg --card-status` with the card inserted and switch the configuration again
+to populate the isolated `~/.gnupg-forwarded` home.
+
 Treat the exported files as sensitive metadata and remove the transfer copies
 after verifying the import. A revocation certificate can revoke its
 corresponding key, so keep the `openpgp-revocs.d` backup offline and tightly

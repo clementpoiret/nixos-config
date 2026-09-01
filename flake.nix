@@ -522,6 +522,57 @@
             touch "$out"
           '';
 
+        credential-forwarding =
+          let
+            desktopConfig = self.nixosConfigurations.desktop.config;
+            laptopConfig = self.nixosConfigurations.laptop.config;
+            desktopHome = desktopConfig.home-manager.users.${username};
+            laptopHome = laptopConfig.home-manager.users.${username};
+            desktopSsh = desktopHome.programs.ssh.settings;
+            laptopSsh = laptopHome.programs.ssh.settings;
+            desktopSecretWriter = builtins.head desktopHome.systemd.user.services.write-ssh-secret-config.Service.ExecStart;
+            laptopSecretWriter = builtins.head laptopHome.systemd.user.services.write-ssh-secret-config.Service.ExecStart;
+            desktopAgentLoader = desktopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
+            laptopAgentLoader = laptopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
+            serverForwardingIsRestricted =
+              config:
+              config.services.openssh.settings.AllowAgentForwarding
+              && !(config.services.openssh.settings.AllowTcpForwarding)
+              && config.services.openssh.settings.AllowStreamLocalForwarding == "remote"
+              && config.services.openssh.settings.StreamLocalBindUnlink
+              && config.services.openssh.settings.AcceptEnv == [ "GNUPGHOME" ];
+          in
+          assert
+            desktopSsh.defaultAuth.data.IdentityFile == [
+              "~/.ssh/id_ed25519_sk_yk2"
+              "~/.ssh/id_ed25519_sk_yk1"
+            ];
+          assert
+            laptopSsh.defaultAuth.data.IdentityFile == [
+              "~/.ssh/id_ed25519_sk_yk1"
+              "~/.ssh/id_ed25519_sk_yk2"
+            ];
+          assert desktopSsh."github.com".data.IdentityAgent == "SSH_AUTH_SOCK";
+          assert desktopSsh."github.com".data.IdentityFile == "none";
+          assert desktopSsh."gitlab.com".data.IdentityAgent == "SSH_AUTH_SOCK";
+          assert desktopSsh."gitlab.com".data.IdentityFile == "none";
+          assert serverForwardingIsRestricted desktopConfig;
+          assert serverForwardingIsRestricted laptopConfig;
+          assert desktopHome.services.gpg-agent.enableExtraSocket;
+          assert laptopHome.services.gpg-agent.enableExtraSocket;
+          pkgs-unstable.runCommand "credential-forwarding" { nativeBuildInputs = [ pkgs-unstable.gnugrep ]; }
+            ''
+              grep -F 'Host laptop-forwarded' ${desktopSecretWriter}
+              grep -F 'Host desktop-forwarded' ${laptopSecretWriter}
+              grep -F 'ForwardAgent \''${SSH_AUTH_SOCK}' ${desktopSecretWriter}
+              grep -F 'RemoteForward $forwarded_gpg_socket $local_gpg_extra_socket' ${desktopSecretWriter}
+              grep -F 'ControlMaster no' ${desktopSecretWriter}
+              grep -F 'Host * !github.com !gitlab.com' ${desktopSecretWriter}
+              grep -F 'laptop>git@[ssh.github.com]:443' ${desktopAgentLoader}
+              grep -F 'desktop>git@[altssh.gitlab.com]:443' ${laptopAgentLoader}
+              touch "$out"
+            '';
+
         apparmor-mode-matrix =
           let
             states =

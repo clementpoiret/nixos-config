@@ -75,11 +75,14 @@ in
       PubkeyAuthentication = true;
 
       X11Forwarding = false;
-      AllowAgentForwarding = false;
+      AllowAgentForwarding = true;
       AllowTcpForwarding = false;
+      AllowStreamLocalForwarding = "remote";
+      StreamLocalBindUnlink = true;
       GatewayPorts = "no";
       PermitTunnel = false;
       PermitUserEnvironment = false;
+      AcceptEnv = [ "GNUPGHOME" ];
 
       MaxAuthTries = 3;
       MaxSessions = 4;

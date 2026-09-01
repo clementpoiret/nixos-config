@@ -1,11 +1,44 @@
 {
   config,
+  host,
   lib,
   pkgs,
   ...
 }:
 let
   secretPath = name: config.sops.secrets.${name}.path;
+  forwardedGpgHome = "${config.home.homeDirectory}/.gnupg-forwarded";
+  forwardedPeer = if host == "desktop" then "laptop" else "desktop";
+  forwardedAlias = "${forwardedPeer}-forwarded";
+  identityFiles =
+    if host == "desktop" then
+      [
+        "${config.home.homeDirectory}/.ssh/id_ed25519_sk_yk2"
+        "${config.home.homeDirectory}/.ssh/id_ed25519_sk_yk1"
+      ]
+    else
+      [
+        "${config.home.homeDirectory}/.ssh/id_ed25519_sk_yk1"
+        "${config.home.homeDirectory}/.ssh/id_ed25519_sk_yk2"
+      ];
+  forwardedDestinations = [
+    "git@[ssh.github.com]:443"
+    "git@[altssh.gitlab.com]:443"
+    "${forwardedPeer}>git@[ssh.github.com]:443"
+    "${forwardedPeer}>git@[altssh.gitlab.com]:443"
+  ];
+  loadConstrainedSshKeys = pkgs.writeShellScript "load-constrained-ssh-keys" ''
+    set -eu
+
+    export SSH_AUTH_SOCK="''${XDG_RUNTIME_DIR}/ssh-agent"
+    exec ${pkgs.openssh_hpn}/bin/ssh-add \
+      ${
+        lib.concatMapStringsSep " \\\n      " (
+          destination: "-h ${lib.escapeShellArg destination}"
+        ) forwardedDestinations
+      } \
+      ${lib.concatMapStringsSep " \\\n      " lib.escapeShellArg identityFiles}
+  '';
 
   writeSshSecretConfig = pkgs.writeShellScript "write-ssh-secret-config" ''
     set -eu
@@ -17,8 +50,21 @@ let
     install -d -m 700 "''${HOME}/.ssh"
     target="''${HOME}/.ssh/config.secrets"
     tmp="''${target}.tmp"
+    forwarded_gpg_socket="$(${pkgs.gnupg}/bin/gpgconf \
+      --homedir ${lib.escapeShellArg forwardedGpgHome} --list-dir agent-socket)"
+    local_gpg_extra_socket="$(${pkgs.gnupg}/bin/gpgconf --list-dir agent-extra-socket)"
 
     cat > "$tmp" <<EOF
+    Host ${forwardedAlias}
+      HostName ${forwardedPeer}
+      ForwardAgent \''${SSH_AUTH_SOCK}
+      RemoteForward $forwarded_gpg_socket $local_gpg_extra_socket
+      SetEnv GNUPGHOME=${forwardedGpgHome}
+      ExitOnForwardFailure yes
+      ControlMaster no
+      ControlPersist no
+      ControlPath none
+
     Host jz
       HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/jz")})
       User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/jz")})
@@ -66,7 +112,7 @@ let
       Port 443
       SetEnv TERM="xterm-256color"
 
-    Host *
+    Host * !github.com !gitlab.com
       User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/default")})
     EOF
 
@@ -83,13 +129,10 @@ in
 
     settings = {
       defaultAuth = {
-        header = "Host * !leo !leonardo !leo-data !leonardo-data";
+        header = "Host * !github.com !gitlab.com !leo !leonardo !leo-data !leonardo-data";
         IdentityAgent = "none"; # bypass agent everywhere
         IdentitiesOnly = true;
-        IdentityFile = [
-          "~/.ssh/id_ed25519_sk_yk1"
-          "~/.ssh/id_ed25519_sk_yk2"
-        ];
+        IdentityFile = map (file: "~/.ssh/${builtins.baseNameOf file}") identityFiles;
       };
 
       "*" = {
@@ -103,15 +146,21 @@ in
         ServerAliveCountMax = 6;
       };
 
-      "github.com" = {
+      "github.com" = lib.hm.dag.entryBefore [ "defaultAuth" ] {
         HostName = "ssh.github.com";
         Port = 443;
         User = "git";
+        IdentityAgent = "SSH_AUTH_SOCK";
+        IdentityFile = "none";
+        IdentitiesOnly = false;
       };
-      "gitlab.com" = {
+      "gitlab.com" = lib.hm.dag.entryBefore [ "defaultAuth" ] {
         HostName = "altssh.gitlab.com";
         Port = 443;
         User = "git";
+        IdentityAgent = "SSH_AUTH_SOCK";
+        IdentityFile = "none";
+        IdentitiesOnly = false;
       };
     };
   };
@@ -139,4 +188,5 @@ in
   };
 
   services.ssh-agent.enable = true;
+  systemd.user.services.ssh-agent.Service.ExecStartPost = "${loadConstrainedSshKeys}";
 }
