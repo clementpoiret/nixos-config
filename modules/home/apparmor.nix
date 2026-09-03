@@ -25,6 +25,7 @@ let
 
   sensitiveAccessType = types.enum [
     "credential-broker"
+    "forge-auth"
     "gpg-agent"
     "gpg-private"
     "hardware-credentials"

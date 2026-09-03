@@ -618,7 +618,12 @@
               "local-claude-code-container-engine"
               "local-codex-cli-container-engine"
             ];
-            alwaysEnforcedPolicyNames = [ "bwrap" ] ++ containerInfrastructurePolicyNames;
+            bubblewrapInfrastructurePolicyNames = [
+              "bwrap"
+              "local-claude-code-bwrap"
+            ];
+            alwaysEnforcedPolicyNames =
+              bubblewrapInfrastructurePolicyNames ++ containerInfrastructurePolicyNames;
             workloadStates = hostConfig: removeAttrs (states hostConfig) alwaysEnforcedPolicyNames;
             allStatesAre =
               expected: hostConfig:
@@ -627,6 +632,7 @@
             complainPolicies = appArmorTestHosts.complain.config.security.apparmor.policies;
             enforcePolicies = appArmorTestHosts.enforce.config.security.apparmor.policies;
             bwrapPolicy = complainPolicies.bwrap.profile;
+            claudeBwrapPolicy = complainPolicies.local-claude-code-bwrap.profile;
             bravePolicy = complainPolicies.local-brave.profile;
             codexPolicy = complainPolicies.local-codex-cli.profile;
             claudePolicy = complainPolicies.local-claude-code.profile;
@@ -644,6 +650,10 @@
               builtins.fromJSON
                 laptopConfig.environment.etc."claude-code/managed-settings.d/20-sandbox.json".text;
             laptopServiceRegistry = laptopConfig.security.localAppArmor.services;
+            containerRegistriesConfig = laptopConfig.environment.etc."containers/registries.conf".source;
+            containerRegistriesConfigPath = builtins.unsafeDiscardStringContext (
+              toString containerRegistriesConfig
+            );
             appArmorDebugService = laptopConfig.systemd.services.apparmor-debug-report;
             appArmorDebugTimer = laptopConfig.systemd.timers.apparmor-debug-report;
             dnsService = self.nixosConfigurations.laptop.config.systemd.services.apply-secret-dns;
@@ -653,9 +663,10 @@
           assert allStatesAre "disable" appArmorTestHosts.disable;
           assert allStatesAre "complain" appArmorTestHosts.complain;
           assert allStatesAre "enforce" appArmorTestHosts.enforce;
-          assert builtins.all (hostConfig: (states hostConfig).bwrap == "enforce") (
-            builtins.attrValues appArmorTestHosts
-          );
+          assert builtins.all (
+            hostConfig:
+            builtins.all (name: (states hostConfig).${name} == "enforce") bubblewrapInfrastructurePolicyNames
+          ) (builtins.attrValues appArmorTestHosts);
           assert builtins.all (
             hostConfig:
             builtins.all (name: (states hostConfig).${name} == "enforce") containerInfrastructurePolicyNames
@@ -701,6 +712,8 @@
           assert builtins.elem "host-diagnostics" laptopHomeAppArmor.applications.codex-cli.capabilities;
           assert builtins.elem "host-diagnostics" laptopHomeAppArmor.applications.claude-code.capabilities;
           assert builtins.elem "ssh-identities" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
+          assert builtins.elem "forge-auth" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
+          assert builtins.elem "forge-auth" laptopHomeAppArmor.applications.claude-code.sensitiveAccess;
           assert builtins.elem "netrc" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
           assert !(builtins.elem "netrc" laptopHomeAppArmor.applications.claude-code.sensitiveAccess);
           assert builtins.elem "nixos-config-writable"
@@ -734,6 +747,8 @@
           assert builtins.elem laptopPkgs.webkitgtk_4_1
             laptopHomeAppArmor.applications.motrix.executionPackages;
           assert builtins.elem ".logseq" laptopHomeAppArmor.applications.logseq.homePaths;
+          assert builtins.elem ".claude.lock" laptopHomeAppArmor.applications.claude-code.homePaths;
+          assert builtins.elem ".config/anthropic" laptopHomeAppArmor.applications.claude-code.homePaths;
           assert builtins.elem ".local/share/protonmail"
             laptopHomeAppArmor.applications.protonmail-bridge.homePaths;
           assert builtins.elem laptopPkgs.electron.unwrapped
@@ -757,13 +772,18 @@
           assert laptopHomeAppArmor.applications.logseq.profileReentryExecutables == [ ];
           assert pkgs-unstable.lib.isDerivation laptopPkgs.logseq-appimage.appimageContents;
           assert pkgs-unstable.lib.isDerivation laptopPkgs.logseq-appimage.fhsEnv;
+          assert builtins.elem laptopPkgs.util-linux
+            laptopHomeAppArmor.applications.textmaker.extraClosureRoots;
+          assert builtins.elem "${laptopPkgs.util-linux}/bin/whereis"
+            laptopHomeAppArmor.applications.textmaker.extraExecutables;
           assert builtins.hasAttr "broad-launchers" laptopHomeAppArmor.inventory;
           assert builtins.hasAttr "network-control-plane" laptopConfig.security.localAppArmor.inventory;
           assert builtins.hasAttr "apparmor-debug-report" laptopConfig.security.localAppArmor.inventory;
           assert pkgs-unstable.lib.hasInfix "/bin/brave flags=(attach_disconnected,mediate_deleted)"
             bravePolicy;
           assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> bwrap" codexPolicy;
-          assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> bwrap" claudePolicy;
+          assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> local-claude-code-bwrap" claudePolicy;
+          assert pkgs-unstable.lib.hasInfix "apparmor-claude-code-bwrap" claudeBwrapPolicy;
           assert pkgs-unstable.lib.hasInfix "/bin/podman Px -> local-codex-cli-container-engine" codexPolicy;
           assert pkgs-unstable.lib.hasInfix "/bin/buildah Px -> local-claude-code-container-engine"
             claudePolicy;
@@ -779,6 +799,10 @@
             "attach_disconnected.path=/apparmor-disconnected/agent-container-engine/"
             codexContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "audit deny @{HOME}/.netrc rwklm," codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "\"${containerRegistriesConfigPath}\" r,"
+            codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "\"${containerRegistriesConfigPath}\" r,"
+            claudeContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "profile local-agent-container-payload" containerPayloadPolicy;
           assert pkgs-unstable.lib.hasInfix "/** rwkl," containerPayloadPolicy;
           assert pkgs-unstable.lib.hasInfix "apparmor-bwrap-userns-restrict" bwrapPolicy;
@@ -1026,6 +1050,20 @@
                 grep -F 'profile unpriv_bwrap flags=(attach_disconnected,mediate_deleted)' "$bwrap_profile"
                 grep -F 'audit deny capability,' "$bwrap_profile"
 
+                claude_bwrap_policy="$profile_directory/local-claude-code-bwrap"
+                claude_bwrap_profile="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-claude-code-bwrap\)"/\1/p' "$claude_bwrap_policy")"
+                test -r "$claude_bwrap_profile"
+                grep -F 'profile local-claude-code-bwrap flags=(attach_disconnected,mediate_deleted)' "$claude_bwrap_profile"
+                grep -F 'allow pix /** -> &local-claude-code-bwrap//&local-claude-code-bwrap-payload,' "$claude_bwrap_profile"
+                grep -F 'profile local-claude-code-bwrap-payload flags=(attach_disconnected,mediate_deleted)' "$claude_bwrap_profile"
+                grep -F 'allow pix /** -> &local-claude-code-bwrap-payload,' "$claude_bwrap_profile"
+                grep -F 'allow capability sys_admin,' "$claude_bwrap_profile"
+                if grep -F 'audit deny capability,' "$claude_bwrap_profile" \
+                  || grep -F 'profile local-claude-code-bwrap ${self.nixosConfigurations.laptop.pkgs.stable.bubblewrap}/bin/bwrap' "$claude_bwrap_profile"; then
+                  echo "Claude Bubblewrap compatibility profile is not narrowly named" >&2
+                  exit 1
+                fi
+
                 brave_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-brave-common\)"/\1/p' "$profile_directory/local-brave")"
                 test -r "$brave_common"
                 session_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-session-read-only\)"/\1/p' "$brave_common")"
@@ -1100,6 +1138,7 @@
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
                   grep -F 'network netlink dgram,' "$app_common"
                   grep -F '/proc/sys/net/core/somaxconn r,' "$app_common"
+                  grep -F '/proc/sys/net/ipv4/ip_local_port_range r,' "$app_common"
                 done
 
                 for app_name in ${
@@ -1107,7 +1146,11 @@
                 }; do
                   app_profile="$profile_directory/local-$app_name"
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
+                  grep -F '/dev/ r,' "$app_common"
+                  grep -F '/sys/devices/pci[0-9a-fA-F]*:[0-9a-fA-F]*/ r,' "$app_common"
+                  grep -F '/sys/devices/pci[0-9a-fA-F]*:[0-9a-fA-F]*/**/ r,' "$app_common"
                   grep -F '/sys/devices/**/drm/ r,' "$app_common"
+                  grep -F '/sys/devices/**/drm/{card[0-9]*,renderD[0-9]*}/ r,' "$app_common"
                 done
 
                 for app_name in ${
@@ -1119,7 +1162,9 @@
                   grep -F '/dev/ r,' "$app_common"
                   grep -F '/dev/disk/by-uuid/ r,' "$app_common"
                   grep -F '/sys/class/ r,' "$app_common"
-                  grep -F '/sys/class/{dma_heap,graphics,powercap,pwm,rc,thermal,usbmisc,vtconsole,wakeup}/ r,' "$app_common"
+                  grep -F '/sys/class/*/ r,' "$app_common"
+                  grep -F '/run/udev/data/{+hid:*,+usb:*,c10:*,c13:*,c189:*} r,' "$app_common"
+                  grep -F '/sys/devices/**/{0003,0005}:*:*.*/report_descriptor r,' "$app_common"
                   grep -F '/sys/devices/**/usb[0-9]*/**/{bConfigurationValue,busnum,devnum,interface,serial} r,' "$app_common"
                   grep -F '/sys/devices/virtual/tty/tty0/active r,' "$app_common"
                 done
@@ -1130,7 +1175,11 @@
                 }; do
                   app_profile="$profile_directory/local-$app_name"
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
-                  grep -F 'priority=100 ${self.nixosConfigurations.laptop.pkgs.stable.bubblewrap}/bin/bwrap Px -> bwrap,' "$app_profile"
+                  bwrap_target=bwrap
+                  if [ "$app_name" = claude-code ]; then
+                    bwrap_target=local-claude-code-bwrap
+                  fi
+                  grep -F "priority=100 ${self.nixosConfigurations.laptop.pkgs.stable.bubblewrap}/bin/bwrap Px -> $bwrap_target," "$app_profile"
                   if grep -F 'allow mount,' "$app_common" \
                     || grep -F 'allow pivot_root,' "$app_common" \
                     || grep -F 'capability sys_admin,' "$app_common"; then
@@ -1203,6 +1252,8 @@
                   app_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$app_profile" | head -n 1)"
                   grep -F '/etc/machine-id r,' "$app_common"
                   grep -F '/proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,status} r,' "$app_common"
+                  grep -F 'owner /proc/[0-9]*/{gid_map,uid_map} r,' "$app_common"
+                  grep -F 'owner /proc/[0-9]*/attr/current r,' "$app_common"
                   ! grep -F '/proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,statm,status} r,' "$app_common"
                   grep -F '/proc/[0-9]*/task/[0-9]*/{comm,stat,status} r,' "$app_common"
                   grep -F '/proc/bus/pci/devices r,' "$app_common"
@@ -1280,6 +1331,12 @@
                 grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest ixr,' "$thunderbird_common"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender ixr,' "$thunderbird_common"
                 grep -F '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest ixr,' "$thunderbird_common"
+                grep -F 'priority=100 ${self.nixosConfigurations.laptop.pkgs.brave}/bin/brave Px -> local-brave,' "$thunderbird_common"
+
+                for app_name in textmaker planmaker presentations; do
+                  softmaker_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-[^"]*-common\)"/\1/p' "$profile_directory/local-$app_name" | head -n 1)"
+                  grep -F '${self.nixosConfigurations.laptop.pkgs.util-linux}/bin/whereis ixr,' "$softmaker_common"
+                done
 
                 claude_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-claude-code-common\)"/\1/p' "$profile_directory/local-claude-code" | head -n 1)"
                 grep -F 'owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,' "$claude_common"
@@ -1288,8 +1345,16 @@
                 grep -F 'owner @{HOME}/.claude.json.tmp.* rwkl,' "$claude_common"
                 grep -F 'owner @{HOME}/.claude.json.lock/{,**} rwkl,' "$claude_common"
                 grep -F 'owner @{HOME}/.cache/claude-cli-nodejs/{,**} rwkl,' "$claude_common"
+                grep -F 'owner "@{HOME}/.claude.lock/{,**}" rwkl,' "$claude_common"
+                grep -F 'owner "@{HOME}/.config/anthropic/{,**}" rwkl,' "$claude_common"
+                grep -F 'owner @{HOME}/.config/user-dirs.dirs r,' "$claude_common"
                 grep -F 'owner @{HOME}/.local/share/mime/{globs,magic} r,' "$claude_common"
-                grep -F 'owner @{HOME}/.local/share/applications/claude-code-url-handler.desktop r,' "$claude_common"
+                grep -F 'owner @{HOME}/.local/share/applications/claude-code-url-handler.desktop rw,' "$claude_common"
+                grep -F 'deny owner @{HOME}/.config/BraveSoftware/Brave-Browser/{,**} rwklm,' "$claude_common"
+                grep -F 'deny owner @{HOME}/.config/chromium/{,**} rwklm,' "$claude_common"
+                grep -F 'deny owner @{HOME}/.config/google-chrome/{,**} rwklm,' "$claude_common"
+                grep -F 'deny owner @{HOME}/.config/microsoft-edge/{,**} rwklm,' "$claude_common"
+                grep -F 'deny owner @{HOME}/.config/vivaldi/{,**} rwklm,' "$claude_common"
 
                 codex_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-codex-cli-common\)"/\1/p' "$profile_directory/local-codex-cli" | head -n 1)"
                 grep -F 'owner @{HOME}/.cache/codex-runtimes/{,**} rwkl,' "$codex_common"
@@ -1299,6 +1364,12 @@
                 grep -F 'deny ptrace read peer=unconfined,' "$qbittorrent_common"
 
                 grep -F '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-apply-secret-dns"
+                grep -F '"${
+                  toString self.nixosConfigurations.laptop.config.environment.etc."containers/registries.conf".source
+                }" r,' "$profile_directory/local-codex-cli-container-engine"
+                grep -F '"${
+                  toString self.nixosConfigurations.laptop.config.environment.etc."containers/registries.conf".source
+                }" r,' "$profile_directory/local-claude-code-container-engine"
                 grep -F '/run/secrets.d/[0-9]*/dns/' "$profile_directory/local-apply-secret-dns"
                 grep -F 'include <abstractions/dbus-strict>' "$profile_directory/local-apply-secret-dns"
                 grep -F 'dbus (send, receive) bus=system peer=(name=org.freedesktop.systemd1),' "$profile_directory/local-apply-secret-dns"
@@ -1355,6 +1426,9 @@
               fi
               grep -F 'audit deny @{HOME}/.ssh/id_* rwklm,' "$enforce_brave_common"
               grep -F 'audit deny @{HOME}/.ssh/config.secrets rwklm,' "$enforce_brave_common"
+              grep -F 'audit deny @{HOME}/.ssh/known_hosts{,.old} rwklm,' "$enforce_brave_common"
+              grep -F 'audit deny @{HOME}/.config/gh/{config.yml,hosts.yml} rwklm,' "$enforce_brave_common"
+              grep -F 'audit deny @{HOME}/.config/glab-cli/{aliases.yml,config.yml} rwklm,' "$enforce_brave_common"
               grep -F 'audit deny @{HOME}/.ssh/{cm,sockets}/{,**} rwklm,' "$enforce_brave_common"
               grep -F 'audit deny /run/secrets.d/{,**} rwklm,' "$enforce_brave_common"
               grep -F 'audit deny @{HOME}/nixos-config/{,**} wklm,' "$enforce_brave_common"
@@ -1367,6 +1441,9 @@
 
               enforce_codex_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-codex-cli-common\)"/\1/p' ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-codex-cli | head -n 1)"
               grep -F 'owner @{HOME}/.ssh/id_* r,' "$enforce_codex_common"
+              grep -F 'owner @{HOME}/.ssh/known_hosts{,.old} r,' "$enforce_codex_common"
+              grep -F 'owner @{HOME}/.config/gh/{config.yml,hosts.yml} r,' "$enforce_codex_common"
+              grep -F 'owner @{HOME}/.config/glab-cli/{aliases.yml,config.yml} r,' "$enforce_codex_common"
               grep -F 'owner @{HOME}/.gnupg/common.conf r,' "$enforce_codex_common"
               grep -F 'owner @{HOME}/.gnupg/trustdb.gpg rw,' "$enforce_codex_common"
               grep -F 'owner @{HOME}/.netrc r,' "$enforce_codex_common"
@@ -1378,6 +1455,14 @@
               fi
               enforce_claude_common="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-claude-code-common\)"/\1/p' ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-claude-code | head -n 1)"
               grep -F 'audit deny @{HOME}/.netrc rwklm,' "$enforce_claude_common"
+              grep -F 'owner @{HOME}/.ssh/known_hosts{,.old} r,' "$enforce_claude_common"
+              grep -F 'owner @{HOME}/.config/gh/{config.yml,hosts.yml} r,' "$enforce_claude_common"
+              grep -F 'owner @{HOME}/.config/glab-cli/{aliases.yml,config.yml} r,' "$enforce_claude_common"
+              if grep -F 'audit deny @{HOME}/.config/gh/{config.yml,hosts.yml} rwklm,' "$enforce_codex_common" \
+                || grep -F 'audit deny @{HOME}/.config/gh/{config.yml,hosts.yml} rwklm,' "$enforce_claude_common"; then
+                echo "explicit agent forge authentication access was overridden by a deny" >&2
+                exit 1
+              fi
               touch "$out"
             '';
 

@@ -20,6 +20,50 @@ let
     '';
   claudeFixture = mkAgentFixture "claude-fixture";
   codexFixture = mkAgentFixture "codex-fixture";
+  nestedUsernsProbe = pkgs.writeCBin "nested-userns-probe" ''
+    #define _GNU_SOURCE
+    #include <errno.h>
+    #include <fcntl.h>
+    #include <sched.h>
+    #include <stdio.h>
+    #include <string.h>
+    #include <unistd.h>
+
+    int main(void) {
+      char label[512];
+      int label_fd = open("/proc/self/attr/current", O_RDONLY | O_CLOEXEC);
+      if (label_fd == -1) {
+        fprintf(stderr, "nested-userns-probe: open label: %s\n", strerror(errno));
+        return 1;
+      }
+      ssize_t label_length = read(label_fd, label, sizeof(label) - 1);
+      close(label_fd);
+      if (label_length == -1) {
+        fprintf(stderr, "nested-userns-probe: read label: %s\n", strerror(errno));
+        return 1;
+      }
+      label[label_length] = '\0';
+      fputs(label, stdout);
+
+      if (unshare(CLONE_NEWUSER) == -1) {
+        fprintf(stderr, "nested-userns-probe: unshare: %s\n", strerror(errno));
+        return 1;
+      }
+
+      int setgroups_fd = open("/proc/self/setgroups", O_WRONLY | O_CLOEXEC);
+      if (setgroups_fd == -1) {
+        fprintf(stderr, "nested-userns-probe: open setgroups: %s\n", strerror(errno));
+        return 1;
+      }
+      if (write(setgroups_fd, "deny", 4) != 4) {
+        fprintf(stderr, "nested-userns-probe: write setgroups: %s\n", strerror(errno));
+        close(setgroups_fd);
+        return 1;
+      }
+      close(setgroups_fd);
+      return 0;
+    }
+  '';
 in
 pkgs.testers.runNixOSTest {
   name = "local-apparmor";
@@ -148,8 +192,10 @@ pkgs.testers.runNixOSTest {
                 "host-diagnostics"
               ];
               sensitiveAccess = [
+                "forge-auth"
                 "gpg-agent"
                 "nixos-config-writable"
+                "ssh-config"
               ];
               elevatedAccessRationale = "The fixture verifies shared developer state and the intended credential boundaries.";
             };
@@ -171,13 +217,21 @@ pkgs.testers.runNixOSTest {
             claude-code = {
               package = claudeFixture;
               executable = "bin/claude-fixture";
-              capabilities = [ "containers" ];
+              capabilities = [
+                "bubblewrap"
+                "containers"
+              ];
+              bubblewrapPackage = pkgs.bubblewrap;
               containerToolsPackage = pkgs.agent-container-tools;
             };
             codex-cli = {
               package = codexFixture;
               executable = "bin/codex-fixture";
-              capabilities = [ "containers" ];
+              capabilities = [
+                "bubblewrap"
+                "containers"
+              ];
+              bubblewrapPackage = pkgs.bubblewrap;
               containerToolsPackage = pkgs.agent-container-tools;
             };
             enforce-fixture = {
@@ -185,6 +239,7 @@ pkgs.testers.runNixOSTest {
               executable = "bin/mkdir";
               capabilities = [ "user-files" ];
               homePaths = [
+                ".config/gh"
                 ".config/sops/age"
                 "Documents"
               ];
@@ -267,6 +322,7 @@ pkgs.testers.runNixOSTest {
         machine.succeed("test -e /etc/apparmor.d/local-apply-secret-dns")
         machine.succeed("test -e /etc/apparmor.d/local-audit-fixture")
         machine.succeed("test -e /etc/apparmor.d/bwrap")
+        machine.succeed("test -e /etc/apparmor.d/local-claude-code-bwrap")
         machine.succeed("test -e /etc/apparmor.d/local-bwrap-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-enforce-fixture")
         machine.succeed("test -e /etc/apparmor.d/local-policy-fixture")
@@ -348,6 +404,8 @@ pkgs.testers.runNixOSTest {
             "aa-status --json | ${pkgs.jq}/bin/jq -e "
             "'.profiles[\"bwrap\"] == \"enforce\" and "
             ".profiles[\"unpriv_bwrap\"] == \"enforce\" and "
+            ".profiles[\"local-claude-code-bwrap\"] == \"enforce\" and "
+            ".profiles[\"local-claude-code-bwrap-payload\"] == \"enforce\" and "
             ".profiles[\"local-bwrap-fixture\"] == \"enforce\"'"
         )
         machine.succeed(
@@ -355,6 +413,37 @@ pkgs.testers.runNixOSTest {
             "'aa-exec -p local-bwrap-fixture -- ${pkgs.bash}/bin/bash -c "
             "\"exec ${pkgs.bubblewrap}/bin/bwrap --ro-bind / / --dev /dev --proc /proc "
             "--unshare-user --unshare-pid --die-with-parent ${pkgs.coreutils}/bin/true\"'"
+        )
+
+        def agent_sandbox(profile, launcher, command):
+            return (
+                "su -s ${pkgs.bash}/bin/bash test -c "
+                f"'aa-exec -p {profile} -- {launcher} ${pkgs.bubblewrap}/bin/bwrap "
+                "--ro-bind / / --dev /dev --proc /proc --unshare-user --unshare-pid "
+                f"--die-with-parent {command}'"
+            )
+
+        claude_nested_output = machine.succeed(
+            agent_sandbox(
+                "local-claude-code",
+                "${claudeFixture}/bin/claude-fixture",
+                "${nestedUsernsProbe}/bin/nested-userns-probe",
+            )
+        )
+        assert "local-claude-code-bwrap" in claude_nested_output
+        assert "local-claude-code-bwrap-payload" in claude_nested_output
+
+        codex_nested_output = machine.fail(
+            agent_sandbox(
+                "local-codex-cli",
+                "${codexFixture}/bin/codex-fixture",
+                "${nestedUsernsProbe}/bin/nested-userns-probe",
+            )
+        )
+        assert "write setgroups: Permission denied" in codex_nested_output
+        machine.succeed(
+            "journalctl -k --no-pager | grep -F 'profile=\"unpriv_bwrap\"' "
+            "| grep -F 'capname=\"sys_admin\"'"
         )
 
     with subtest("the generic service profile permits only declared data and executables"):
@@ -379,7 +468,8 @@ pkgs.testers.runNixOSTest {
         machine.succeed(
             "install -d -o test -g users -m 0700 "
             "/home/test/.agents/skills/example /home/test/.cache/nix /home/test/.cache/uv "
-            "/home/test/.cargo /home/test/.config/git /home/test/.config/go/telemetry "
+            "/home/test/.cargo /home/test/.config/gh /home/test/.config/glab-cli "
+            "/home/test/.config/git /home/test/.config/go/telemetry /home/test/.ssh "
             "/home/test/.keras /home/test/.gnupg/private-keys-v1.d "
             "/home/test/.local/state/apparmor-reports /home/test/nixos-config "
             "/home/test/nixos-config-writable"
@@ -388,13 +478,15 @@ pkgs.testers.runNixOSTest {
             "touch "
             "/home/test/.agents/skills/example/SKILL.md /home/test/.cargo/.global-cache "
             "/home/test/.config/git/ignore /home/test/.config/go/telemetry/count "
+            "/home/test/.config/gh/config.yml /home/test/.config/gh/hosts.yml "
+            "/home/test/.config/glab-cli/aliases.yml /home/test/.config/glab-cli/config.yml "
             "/home/test/.keras/keras.json /home/test/.gnupg/common.conf "
             "/home/test/.gnupg/trustdb.gpg /home/test/.gnupg/private-keys-v1.d/private.key "
-            "/home/test/.local/state/apparmor-reports/logs.json"
+            "/home/test/.local/state/apparmor-reports/logs.json /home/test/.ssh/known_hosts"
         )
         machine.succeed(
             "chown -R test:users /home/test/.agents /home/test/.cache /home/test/.cargo /home/test/.config "
-            "/home/test/.keras /home/test/.gnupg /home/test/.local /home/test/nixos-config "
+            "/home/test/.keras /home/test/.gnupg /home/test/.local /home/test/.ssh /home/test/nixos-config "
             "/home/test/nixos-config-writable"
         )
         machine.succeed(
@@ -410,14 +502,18 @@ pkgs.testers.runNixOSTest {
             "chmod 0600 /home/test/.agents/skills/example/SKILL.md /home/test/.config/git/ignore "
             "/home/test/.keras/keras.json /home/test/.gnupg/common.conf "
             "/home/test/.gnupg/trustdb.gpg /home/test/.gnupg/private-keys-v1.d/private.key "
-            "/home/test/.local/state/apparmor-reports/logs.json"
+            "/home/test/.local/state/apparmor-reports/logs.json /home/test/.ssh/known_hosts "
+            "/home/test/.config/gh/config.yml /home/test/.config/gh/hosts.yml "
+            "/home/test/.config/glab-cli/aliases.yml /home/test/.config/glab-cli/config.yml"
         )
         machine.succeed(
             "su -s ${pkgs.bash}/bin/bash test -c "
             "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/cat "
             "/home/test/.agents/skills/example/SKILL.md /home/test/.config/git/ignore "
+            "/home/test/.config/gh/config.yml /home/test/.config/gh/hosts.yml "
+            "/home/test/.config/glab-cli/aliases.yml /home/test/.config/glab-cli/config.yml "
             "/home/test/.keras/keras.json /home/test/.gnupg/common.conf "
-            "/home/test/.local/state/apparmor-reports/logs.json'"
+            "/home/test/.local/state/apparmor-reports/logs.json /home/test/.ssh/known_hosts'"
         )
         machine.succeed(
             "su -s ${pkgs.bash}/bin/bash test -c "
@@ -460,6 +556,26 @@ pkgs.testers.runNixOSTest {
             "su -s ${pkgs.bash}/bin/bash test -c "
             "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/cat "
             "/home/test/.gnupg/private-keys-v1.d/private.key'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/home/test/.config/gh/hosts.yml'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/home/test/.config/glab-cli/config.yml'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/truncate -s 1 "
+            "/home/test/.ssh/known_hosts'"
+        )
+        machine.fail(
+            "su -s ${pkgs.bash}/bin/bash test -c "
+            "'aa-exec -p local-enforce-fixture -- ${pkgs.coreutils}/bin/cat "
+            "/home/test/.config/gh/hosts.yml'"
         )
         machine.fail(
             "su -s ${pkgs.bash}/bin/bash test -c "

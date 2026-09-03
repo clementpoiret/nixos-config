@@ -169,12 +169,15 @@ configured GTK/Qt/GVFS plugin set for every GUI profile. Network and user
 namespace rules are likewise emitted from capabilities, while workload-specific
 state paths and sandbox launchers remain explicit registrations. Logseq runs its
 extracted payload against an immutable library tree without runtime mounts, while
-Codex CLI and Claude Code use an exact-path Bubblewrap transition. The shared,
-always-enforced upstream broker owns namespace and mount setup, then stacks an
-`unpriv_bwrap` child profile that strips capabilities from sandboxed commands.
-Claude additionally has a fail-closed managed sandbox policy. Development agents
-separately opt into read-only host diagnostics; journals and cross-process metadata
-are not part of the ordinary desktop or runtime-introspection baseline.
+Codex CLI and Claude Code use exact-path Bubblewrap transitions. Codex uses the
+shared, always-enforced upstream broker, which owns namespace and mount setup and
+then stacks an `unpriv_bwrap` child profile that strips capabilities from sandboxed
+commands. Claude uses a dedicated always-enforced derivative whose payload permits
+`CAP_SYS_ADMIN` only so its seccomp helper can configure a nested user namespace;
+the capability is not granted to the Claude workload profile or the shared broker
+payload. Claude additionally has a fail-closed managed sandbox policy. Development
+agents separately opt into read-only host diagnostics; journals and cross-process
+metadata are not part of the ordinary desktop or runtime-introspection baseline.
 
 Codex CLI and Claude Code also receive guarded Podman/Buildah launchers. Exact
 launcher paths enter always-enforced per-agent engine brokers, container payloads
@@ -185,9 +188,9 @@ environment, and closes inherited file descriptors. See
 [Guarded agent containers](APPARMOR.md#guarded-agent-containers) for supported
 commands and the remaining literal-Nix-store-path limitation.
 
-Mode-aware decisions protect SOPS/age keys and
-decrypted secrets, SSH identities/config/control sockets, GPG private keys and
-agent sockets, mail authentication, Secret Service/keyring channels, the U2F
+Mode-aware decisions protect SOPS/age keys and decrypted secrets, forge CLI
+authentication, SSH identities/config/host keys/control sockets, GPG private keys
+and agent sockets, mail authentication, Secret Service/keyring channels, the U2F
 mapping, and common password-store locations. Credential groups remain denied
 unless the individual application explicitly registers access; being a
 development tool is not a blanket exception. Complain profiles omit these

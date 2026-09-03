@@ -283,6 +283,12 @@ let
       "os-release"
     ]
   );
+  containerRegistriesConfig = lib.attrByPath [
+    "environment"
+    "etc"
+    "containers/registries.conf"
+    "source"
+  ] null config;
   userEnvironmentReadRoots = lib.optional (
     username != null
     && lib.hasAttrByPath [
@@ -363,6 +369,30 @@ let
       '';
   claudeSandboxEnabled =
     applicationRegistry ? claude-code && hasCapability applicationRegistry.claude-code "bubblewrap";
+  claudeBubblewrapProfile =
+    if !claudeSandboxEnabled || bubblewrapProfile == null then
+      null
+    else
+      pkgs.runCommand "apparmor-claude-code-bwrap" { } ''
+        substitute \
+          ${bubblewrapProfile} \
+          "$out" \
+          --replace-fail \
+            'profile bwrap ${bubblewrapPackage}/bin/bwrap flags=' \
+            'profile local-claude-code-bwrap flags=' \
+          --replace-fail \
+            '&bwrap//&unpriv_bwrap' \
+            '&local-claude-code-bwrap//&local-claude-code-bwrap-payload' \
+          --replace-fail \
+            'profile unpriv_bwrap flags=' \
+            'profile local-claude-code-bwrap-payload flags=' \
+          --replace-fail \
+            'allow pix /** -> &unpriv_bwrap,' \
+            'allow pix /** -> &local-claude-code-bwrap-payload,' \
+          --replace-fail \
+            'audit deny capability,' \
+            'allow capability sys_admin,'
+      '';
   needsRuntimeIntrospection =
     app:
     hasCapability app "desktop"
@@ -412,6 +442,8 @@ let
     /etc/machine-id r,
     /proc/[0-9]*/ r,
     /proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,status} r,
+    owner /proc/[0-9]*/{gid_map,uid_map} r,
+    owner /proc/[0-9]*/attr/current r,
     /proc/[0-9]*/task/ r,
     /proc/[0-9]*/task/[0-9]*/ r,
     /proc/[0-9]*/task/[0-9]*/{comm,stat,status} r,
@@ -438,7 +470,9 @@ let
     /dev/ r,
     /dev/disk/by-uuid/ r,
     /sys/class/ r,
-    /sys/class/{dma_heap,graphics,powercap,pwm,rc,thermal,usbmisc,vtconsole,wakeup}/ r,
+    /sys/class/*/ r,
+    /run/udev/data/{+hid:*,+usb:*,c10:*,c13:*,c189:*} r,
+    /sys/devices/**/{0003,0005}:*:*.*/report_descriptor r,
     /sys/devices/**/usb[0-9]*/**/{bConfigurationValue,busnum,devnum,interface,serial} r,
     /sys/devices/virtual/tty/tty0/active r,
   '';
@@ -480,6 +514,10 @@ let
     gpg-agent = ''
       audit deny @{HOME}/.gnupg/S.gpg-agent{,.*} rwklm,
     '';
+    forge-auth = ''
+      audit deny @{HOME}/.config/gh/{config.yml,hosts.yml} rwklm,
+      audit deny @{HOME}/.config/glab-cli/{aliases.yml,config.yml} rwklm,
+    '';
     password-store = ''
       audit deny @{HOME}/.password-store/{,**} rwklm,
       audit deny @{HOME}/.local/share/password-store/{,**} rwklm,
@@ -490,6 +528,7 @@ let
     '';
     ssh-config = ''
       audit deny @{HOME}/.ssh/config.secrets rwklm,
+      audit deny @{HOME}/.ssh/known_hosts{,.old} rwklm,
     '';
     ssh-control = ''
       audit deny @{HOME}/.ssh/{cm,sockets}/{,**} rwklm,
@@ -519,6 +558,7 @@ let
         (group: lib.optionalString (!(sensitiveAccess app group)) sensitiveGroups.${group})
         [
           "sops"
+          "forge-auth"
           "gpg-private"
           "gpg-agent"
           "password-store"
@@ -545,12 +585,17 @@ let
       owner @{HOME}/.gnupg/private-keys-v1.d/{,**} r,
       owner @{HOME}/.gnupg/secring.gpg r,
     ''}
+    ${lib.optionalString (sensitiveAccess app "forge-auth") ''
+      owner @{HOME}/.config/gh/{config.yml,hosts.yml} r,
+      owner @{HOME}/.config/glab-cli/{aliases.yml,config.yml} r,
+    ''}
     ${lib.optionalString (sensitiveAccess app "ssh-identities") ''
       owner @{HOME}/.ssh/id_* r,
       owner @{HOME}/.ssh/*.{key,p12,pem,pfx} r,
     ''}
     ${lib.optionalString (sensitiveAccess app "ssh-config") ''
       owner @{HOME}/.ssh/config.secrets r,
+      owner @{HOME}/.ssh/known_hosts{,.old} r,
     ''}
     ${lib.optionalString (sensitiveAccess app "ssh-control") ''
       owner @{HOME}/.ssh/{cm,sockets}/{,**} rwk,
@@ -588,6 +633,10 @@ let
     ];
     gpg-private = [ ".gnupg" ];
     gpg-agent = [ ".gnupg" ];
+    forge-auth = [
+      ".config/gh"
+      ".config/glab-cli"
+    ];
     password-store = [
       ".password-store"
       ".local/share/password-store"
@@ -665,6 +714,7 @@ let
       include <abstractions/ssl_certs>
       network netlink dgram,
       /proc/sys/net/core/somaxconn r,
+      /proc/sys/net/ipv4/ip_local_port_range r,
     ''}
     ${lib.optionalString (hasCapability app "audio") ''
       include <abstractions/audio>
@@ -674,9 +724,13 @@ let
     ''}
     ${lib.optionalString (hasCapability app "gpu") ''
       include <abstractions/opengl>
+      /dev/ r,
       /dev/dri/{,**} rw,
       /sys/class/drm/ r,
+      /sys/devices/pci[0-9a-fA-F]*:[0-9a-fA-F]*/ r,
+      /sys/devices/pci[0-9a-fA-F]*:[0-9a-fA-F]*/**/ r,
       /sys/devices/**/drm/ r,
+      /sys/devices/**/drm/{card[0-9]*,renderD[0-9]*}/ r,
       /sys/devices/pci[0-9a-fA-F]*/**/device r,
     ''}
     ${lib.optionalString (hasCapability app "device-discovery") deviceDiscoveryRules}
@@ -807,9 +861,11 @@ let
       profileReentryTransitions = lib.concatMapStringsSep "\n" (
         path: "priority=100 ${path} Px -> ${profileName},"
       ) app.profileReentryExecutables;
-      bubblewrapTransition = lib.optionalString (
-        hasCapability app "bubblewrap" && app.bubblewrapPackage != null
-      ) "priority=100 ${app.bubblewrapPackage}/bin/bwrap Px -> bwrap,";
+      bubblewrapTransition =
+        lib.optionalString (hasCapability app "bubblewrap" && app.bubblewrapPackage != null)
+          "priority=100 ${app.bubblewrapPackage}/bin/bwrap Px -> ${
+            if name == "claude-code" then "local-claude-code-bwrap" else "bwrap"
+          },";
       containerTransitions =
         lib.optionalString (hasCapability app "containers" && app.containerToolsPackage != null)
           ''
@@ -891,6 +947,9 @@ let
           priority=100 / ix,
           /etc/{,group,hosts,host.conf,login.defs,nsswitch.conf,passwd,resolv.conf,subgid,subuid} r,
           /etc/containers/{,**} r,
+          ${lib.optionalString (containerRegistriesConfig != null) ''
+            ${quotePath (toString containerRegistriesConfig)} r,
+          ''}
           /nix/store/*-login.defs r,
           /nix/store/*-policy/{,**} r,
           /proc/ r,
@@ -1033,14 +1092,23 @@ let
   servicePolicies = lib.mapAttrs' (
     name: service: lib.nameValuePair (profileNameFor name) (servicePolicy name service)
   ) serviceRegistry;
-  bubblewrapPolicies = lib.optionalAttrs (bubblewrapProfile != null) {
-    bwrap = {
-      state = "enforce";
-      profile = ''
-        include "${bubblewrapProfile}"
-      '';
+  bubblewrapPolicies =
+    lib.optionalAttrs (bubblewrapProfile != null) {
+      bwrap = {
+        state = "enforce";
+        profile = ''
+          include "${bubblewrapProfile}"
+        '';
+      };
+    }
+    // lib.optionalAttrs (claudeBubblewrapProfile != null) {
+      local-claude-code-bwrap = {
+        state = "enforce";
+        profile = ''
+          include "${claudeBubblewrapProfile}"
+        '';
+      };
     };
-  };
 
   serviceAttachments = lib.mapAttrs' (
     name: service:

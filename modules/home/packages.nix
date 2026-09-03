@@ -376,18 +376,24 @@ in
         package = softmakerOffice;
         executable = "bin/softmaker-office-nx-textmaker";
         capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
+        extraClosureRoots = [ pkgs.util-linux ];
+        extraExecutables = [ "${pkgs.util-linux}/bin/whereis" ];
         homePaths = [ "SoftMaker" ];
       };
       planmaker = {
         package = softmakerOffice;
         executable = "bin/softmaker-office-nx-planmaker";
         capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
+        extraClosureRoots = [ pkgs.util-linux ];
+        extraExecutables = [ "${pkgs.util-linux}/bin/whereis" ];
         homePaths = [ "SoftMaker" ];
       };
       presentations = {
         package = softmakerOffice;
         executable = "bin/softmaker-office-nx-presentations";
         capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
+        extraClosureRoots = [ pkgs.util-linux ];
+        extraExecutables = [ "${pkgs.util-linux}/bin/whereis" ];
         homePaths = [ "SoftMaker" ];
       };
       brave = {
@@ -453,6 +459,10 @@ in
           "${pkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender"
           "${pkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest"
         ];
+        extraRules = ''
+          priority=100 ${pkgs.brave}/bin/brave Px -> local-brave,
+        '';
+        extraRulesRationale = "Thunderbird opens web links only through the separately confined Brave profile.";
         homePaths = [
           ".cache/thunderbird"
           ".thunderbird"
@@ -564,6 +574,7 @@ in
         '';
         extraRulesRationale = "Codex updates its managed runtime cache and GnuPG creates a transient lock beside the explicitly allowed agent state.";
         sensitiveAccess = [
+          "forge-auth"
           "gpg-agent"
           "nixos-config-writable"
           "netrc"
@@ -587,7 +598,11 @@ in
         ];
         bubblewrapPackage = pkgs.stable.bubblewrap;
         containerToolsPackage = pkgs.flake.agent-container-tools;
-        homePaths = [ ".claude" ];
+        homePaths = [
+          ".claude"
+          ".claude.lock"
+          ".config/anthropic"
+        ];
         extraRules = ''
           owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,
           /etc/claude-code/managed-settings.d/{,**} r,
@@ -595,11 +610,18 @@ in
           owner @{HOME}/.claude.json.tmp.* rwkl,
           owner @{HOME}/.claude.json.lock/{,**} rwkl,
           owner @{HOME}/.cache/claude-cli-nodejs/{,**} rwkl,
+          owner @{HOME}/.config/user-dirs.dirs r,
           owner @{HOME}/.local/share/mime/{globs,magic} r,
-          owner @{HOME}/.local/share/applications/claude-code-url-handler.desktop r,
+          owner @{HOME}/.local/share/applications/claude-code-url-handler.desktop rw,
+          deny owner @{HOME}/.config/BraveSoftware/Brave-Browser/{,**} rwklm,
+          deny owner @{HOME}/.config/chromium/{,**} rwklm,
+          deny owner @{HOME}/.config/google-chrome/{,**} rwklm,
+          deny owner @{HOME}/.config/microsoft-edge/{,**} rwklm,
+          deny owner @{HOME}/.config/vivaldi/{,**} rwklm,
         '';
-        extraRulesRationale = "Claude Code reads its managed policy and desktop integration while atomically updating its CLI state, runtime cache, and local proxy sockets.";
+        extraRulesRationale = "Claude Code reads its managed policy and desktop integration while updating its CLI state, runtime cache, URL handler, and local proxy sockets; browser profile data remains isolated.";
         sensitiveAccess = [
+          "forge-auth"
           "gpg-agent"
           "nixos-config-writable"
           "ssh-config"
