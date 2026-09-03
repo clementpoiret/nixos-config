@@ -1,5 +1,54 @@
 { pkgs, ... }:
+let
+  clipboardPath = ''
+    path="$(wl-paste --no-newline)"
+    if [[ -z "$path" ]]; then
+      echo "Clipboard does not contain a path" >&2
+      exit 1
+    fi
+
+    if ! path="$(realpath --canonicalize-existing -- "$path")"; then
+      echo "Clipboard path does not exist" >&2
+      exit 1
+    fi
+  '';
+
+  spfDrag = pkgs.writeShellApplication {
+    name = "spf-drag";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.ripdrag
+      pkgs.wl-clipboard
+    ];
+    text = ''
+      ${clipboardPath}
+      ripdrag --and-exit -- "$path" </dev/null >/dev/null 2>&1 &
+    '';
+  };
+
+  spfCopyFile = pkgs.writeShellApplication {
+    name = "spf-copy-file";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.jq
+      pkgs.wl-clipboard
+    ];
+    text = ''
+      ${clipboardPath}
+      uri="$(
+        jq --null-input --raw-output --arg path "$path" \
+          '$path | @uri | "file://" + gsub("%2F"; "/")'
+      )"
+      printf '%s\r\n' "$uri" | wl-copy --type text/uri-list
+    '';
+  };
+in
 {
+  home.packages = [
+    spfDrag
+    spfCopyFile
+  ];
+
   programs.superfile = {
     enable = true;
     package = pkgs.flake.superfile;
@@ -134,6 +183,7 @@
         open_file_with_editor = key "e";
 
         change_panel_mode = key "v";
+        # Copy the focused path, then run :spf-drag or :spf-copy-file.
         copy_path = key "ctrl+p";
         copy_present_working_directory = key "c";
         open_command_line = key ":";
