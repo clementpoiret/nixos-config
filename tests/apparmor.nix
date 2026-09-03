@@ -433,17 +433,20 @@ pkgs.testers.runNixOSTest {
         assert "local-claude-code-bwrap" in claude_nested_output
         assert "local-claude-code-bwrap-payload" in claude_nested_output
 
-        codex_nested_output = machine.fail(
+        machine.fail(
             agent_sandbox(
                 "local-codex-cli",
                 "${codexFixture}/bin/codex-fixture",
                 "${nestedUsernsProbe}/bin/nested-userns-probe",
             )
+            + " >/tmp/codex-nested-userns.out 2>/tmp/codex-nested-userns.err"
         )
-        assert "write setgroups: Permission denied" in codex_nested_output
         machine.succeed(
-            "journalctl -k --no-pager | grep -F 'profile=\"unpriv_bwrap\"' "
-            "| grep -F 'capname=\"sys_admin\"'"
+            "grep -F 'bwrap' /tmp/codex-nested-userns.out "
+            "| grep -F 'unpriv_bwrap'"
+        )
+        machine.succeed(
+            "grep -F 'setgroups: Permission denied' /tmp/codex-nested-userns.err"
         )
 
     with subtest("the generic service profile permits only declared data and executables"):

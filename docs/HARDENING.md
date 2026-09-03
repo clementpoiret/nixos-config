@@ -189,11 +189,11 @@ environment, and closes inherited file descriptors. See
 commands and the remaining literal-Nix-store-path limitation.
 
 Mode-aware decisions protect SOPS/age keys and decrypted secrets, forge CLI
-authentication, SSH identities/config/host keys/control sockets, GPG private keys
-and agent sockets, mail authentication, Secret Service/keyring channels, the U2F
-mapping, and common password-store locations. Credential groups remain denied
-unless the individual application explicitly registers access; being a
-development tool is not a blanket exception. Complain profiles omit these
+authentication, SSH identities/config/known-host records/control sockets, GPG
+private keys and agent sockets, mail authentication, Secret Service/keyring
+channels, the U2F mapping, and common password-store locations. Credential groups
+remain denied unless the individual application explicitly registers access; being
+a development tool is not a blanket exception. Complain profiles omit these
 explicit denies; enforced profiles add and VM-test them. The same boundary
 protects `~/nixos-config`, while the agent profiles alone receive the separately
 reviewed `~/nixos-config-writable` tree.

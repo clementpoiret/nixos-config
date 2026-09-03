@@ -90,10 +90,10 @@ mount setup privileges stay in that broker; its `unpriv_bwrap` stacked child str
 
 Claude uses a separately named, always-enforced derivative of that broker. Its unattached payload profile permits only
 `CAP_SYS_ADMIN` from the capability class so Claude's `apply-seccomp` helper can write `deny` to
-`/proc/self/setgroups` after creating a nested user namespace. The exception is reachable only through Claude's exact
-Bubblewrap transition; it does not grant the capability to Claude's workload profile, Codex, or the shared
-`unpriv_bwrap` payload. Claude's managed settings still require its command sandbox, reject unsandboxed commands, and
-fail closed if the backend is unavailable.
+`/proc/self/setgroups` after creating a nested user namespace. The generator emits this broker transition only for
+Claude's exact Bubblewrap executable; it does not grant the capability to Claude's workload profile, Codex, or the
+shared `unpriv_bwrap` payload. Claude's managed settings still require its command sandbox, reject unsandboxed commands,
+and fail closed if the backend is unavailable.
 
 ### Guarded agent containers
 
@@ -152,17 +152,17 @@ Enforced applications deny undeclared access to these sensitive groups:
 
 ```text
 sops secrets, forge CLI authentication, GPG private keys and agent sockets, password stores,
-SSH identities/config/host keys/control sockets, mail authentication, Secret Service
+SSH identities/config/known-host records/control sockets, mail authentication, Secret Service
 and keyring broker channels, Yubico U2F registrations, and the writable NixOS configuration clone
 ```
 
 Developer execution is not an automatic credential exemption. A developer tool must list each required sensitive group
 explicitly. The current Codex and Claude profiles explicitly receive read-only `gh`/`glab` configuration, SSH
-identities/config/host keys/control sockets, and the GPG agent. The GPG exception includes the public `common.conf` and
-mutable trust database, but not secret-key files; forge tokens and SSH host keys are not writable. Both agents also
-receive `~/nixos-config-writable`, but `~/nixos-config` remains a protected promotion target. They still do not receive
-SOPS keys, password stores, GPG private key files, or unrelated mail credentials. Every descriptor with
-`developer-exec` or any `sensitiveAccess` must include an `elevatedAccessRationale`.
+identities/config/known-host records/control sockets, and the GPG agent. The GPG exception includes the public
+`common.conf` and mutable trust database, but not secret-key files; forge tokens and SSH known-host records are not
+writable. Both agents also receive `~/nixos-config-writable`, but `~/nixos-config` remains a protected promotion target.
+They still do not receive SOPS keys, password stores, GPG private key files, or unrelated mail credentials. Every
+descriptor with `developer-exec` or any `sensitiveAccess` must include an `elevatedAccessRationale`.
 
 `host-diagnostics` is restricted to `developer-exec` profiles. It grants read-only system journals, AppArmor
 feature/profile metadata, bounded cross-process status and command metadata, and selected kernel, PCI, and module
