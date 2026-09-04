@@ -222,6 +222,57 @@ EXPLICIT_VALUE_OPTIONS = {
     "-e",
 }
 
+# These sets describe Podman's valueless flags only. Validation and permission
+# remain governed by the allow/deny tables above.
+PODMAN_RUN_CREATE_FLAGS = {
+    "--detach",
+    "--disable-content-trust",
+    "--help",
+    "--http-proxy",
+    "--init",
+    "--interactive",
+    "--no-healthcheck",
+    "--no-hostname",
+    "--no-hosts",
+    "--oom-kill-disable",
+    "--passwd",
+    "--privileged",
+    "--publish-all",
+    "--quiet",
+    "--read-only",
+    "--read-only-tmpfs",
+    "--replace",
+    "--rm",
+    "--rmi",
+    "--rootfs",
+    "--sig-proxy",
+    "--tls-verify",
+    "--tty",
+    "--unsetenv-all",
+    "-P",
+    "-d",
+    "-i",
+    "-q",
+    "-t",
+}
+PODMAN_CONTAINER_FLAGS = {
+    "create": PODMAN_RUN_CREATE_FLAGS,
+    "exec": {
+        "--detach",
+        "--help",
+        "--interactive",
+        "--latest",
+        "--no-session",
+        "--privileged",
+        "--tty",
+        "-d",
+        "-i",
+        "-l",
+        "-t",
+    },
+    "run": PODMAN_RUN_CREATE_FLAGS,
+}
+
 SAFE_GLOBAL_VALUE_OPTIONS = {"--log-level"}
 SAFE_GLOBAL_FLAGS = {"--help", "--version", "-v"}
 REMOTE_CONTEXT_PREFIXES = (
@@ -384,6 +435,26 @@ def _find_subcommand(arguments: Sequence[str]) -> tuple[str | None, int]:
     return None, len(arguments)
 
 
+def _podman_container_option_end(
+    arguments: Sequence[str], command_index: int, subcommand: str
+) -> int:
+    flags = PODMAN_CONTAINER_FLAGS[subcommand]
+    index = command_index + 1
+    while index < len(arguments):
+        argument = arguments[index]
+        if argument == "--" or not argument.startswith("-"):
+            return index
+        option, inline = _option(argument)
+        index += 1
+        if (
+            inline is None
+            and option not in flags
+            and (argument.startswith("--") or len(argument) == 2)
+        ):
+            index += 1
+    return len(arguments)
+
+
 def _validate_named_podman_operation(
     group: str,
     arguments: Sequence[str],
@@ -472,7 +543,10 @@ def _validate_arguments(
         raise GuardError(f"{tool} subcommand {subcommand!r} is not permitted")
 
     index = command_index + 1
-    while index < len(arguments):
+    option_end = len(arguments)
+    if tool == "podman" and subcommand in PODMAN_CONTAINER_FLAGS:
+        option_end = _podman_container_option_end(arguments, command_index, subcommand)
+    while index < option_end:
         argument = arguments[index]
         option, inline = _option(argument)
 

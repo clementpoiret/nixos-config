@@ -114,7 +114,8 @@ nested exceptions are `podman network create/rm`, `podman image rm`, and `podman
 fixed packaged provider, restricts files to the workspace, and accepts only the configuration flags and environment
 variables needed by the control-plane packaging check. Other host environment variables are reduced to locale/terminal
 settings plus generated container configuration, and inherited non-standard file descriptors are closed before the
-engine starts.
+engine starts. For `podman run`, `create`, and `exec`, host-option validation stops at `--` or the image/container
+positional; later flags belong to the command inside the container.
 
 Each agent has independent rootless state and runtime trees:
 

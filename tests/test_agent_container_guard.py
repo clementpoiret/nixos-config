@@ -161,6 +161,38 @@ class AgentContainerGuardTest(unittest.TestCase):
         self.assertEqual(build.argv[-4:], ["build", "--file", "Containerfile", "."])
         self.assertEqual(run.argv[-4:], ["run", "--volume", f"{source}:/src:ro", "alpine"])
 
+    def test_container_command_arguments_are_not_parsed_as_podman_options(self) -> None:
+        cases = (
+            [
+                "run",
+                "--rm",
+                "--network",
+                "agent-network",
+                "localhost/agent-test",
+                "go",
+                "test",
+                "./internal/adapters/postgres",
+                "-run",
+                "^TestPostgresRestartDurability$",
+                "-count=1",
+                "-v",
+            ],
+            [
+                "create",
+                "localhost/agent-test",
+                "command",
+                "--volume",
+                "/etc:/host",
+            ],
+            ["exec", "agent-test", "command", "--privileged", "-v"],
+            ["run", "--", "localhost/agent-test", "command", "-v"],
+        )
+
+        for arguments in cases:
+            with self.subTest(arguments=arguments):
+                invocation = self.invocation("podman", list(arguments))
+                self.assertEqual(invocation.argv[-len(arguments) :], list(arguments))
+
     def test_rejects_paths_outside_the_workspace(self) -> None:
         cases = (
             ["build", ".."],
@@ -304,6 +336,7 @@ class AgentContainerGuardTest(unittest.TestCase):
     def test_rejects_host_escape_options_in_split_and_equals_forms(self) -> None:
         cases = (
             ["run", "--privileged", "alpine"],
+            ["run", "--name", "agent-test", "--privileged", "alpine"],
             ["run", "--cap-add=SYS_ADMIN", "alpine"],
             ["run", "--device", "/dev/kvm", "alpine"],
             ["run", "--security-opt=apparmor=unconfined", "alpine"],
@@ -321,6 +354,7 @@ class AgentContainerGuardTest(unittest.TestCase):
             ["run", "--log-driver", "passthrough", "alpine"],
             ["run", "--log-opt", "path=/tmp/container.log", "alpine"],
             ["run", "--userns-uid-map", "0:1000:1", "alpine"],
+            ["exec", "--user", "1000", "--privileged", "agent-test", "true"],
             ["build", "--build-context", "docs=/etc", "."],
             ["build", "--chrootdirs", "/etc", "."],
             ["push", "--encryption-key", "jwe:/etc/key.pem", "example"],
@@ -333,6 +367,9 @@ class AgentContainerGuardTest(unittest.TestCase):
                 self.guard.GuardError, "not permitted"
             ):
                 self.invocation("podman", list(arguments))
+
+        with self.assertRaisesRegex(self.guard.GuardError, "requires a value"):
+            self.invocation("podman", ["run", "-v"])
 
     def test_rejects_unsafe_management_subcommands(self) -> None:
         for tool, arguments in (

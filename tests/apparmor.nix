@@ -433,6 +433,12 @@ pkgs.testers.runNixOSTest {
         machine.succeed(
             guarded(
                 "local-claude-code",
+                "podman run --rm localhost/agent-network-build /bin/busybox true -v",
+            )
+        )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
                 "podman run --detach --name agent-exec --user 999:999 "
                 "localhost/agent-network-build /bin/busybox sleep 30",
             )
