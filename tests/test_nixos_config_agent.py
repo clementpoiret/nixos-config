@@ -536,11 +536,21 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.assertEqual(self.revision(self.candidate, "main@github"), published)
         self.assertEqual(self.revision(self.candidate, "parents(@)"), published)
         self.assertEqual(self.revision(self.candidate, "agent-base"), published)
+        self.assertEqual(
+            self.revision(self.candidate, "agent-base@origin"), published
+        )
         self.assertEqual(self.revision(self.candidate, "agent-handoff"), published)
         self.assertTrue(nixos_config_agent.is_empty(self.protected))
         self.assertTrue(nixos_config_agent.is_empty(self.candidate))
         self.assertEqual(
             self.revision(self.protected, f"({published}) & signed()"), published
+        )
+        self.assertEqual(
+            nixos_config_agent.revision_ids(self.candidate, "divergent()"), []
+        )
+        self.assertEqual(
+            nixos_config_agent.revision_ids(self.candidate, "visible_heads()"),
+            [self.revision(self.candidate, "@")],
         )
 
     def test_push_rebases_promoted_work_when_github_advanced(self) -> None:

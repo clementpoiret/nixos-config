@@ -371,6 +371,13 @@ pkgs.testers.runNixOSTest {
             "install -o test -g users -m 0555 ${pkgs.pkgsStatic.busybox}/bin/busybox "
             "/home/test/workspace/rootfs/bin/busybox"
         )
+        machine.succeed(
+            "printf '%s\\n' 'FROM scratch' "
+            "'COPY rootfs/bin/busybox /bin/busybox' "
+            "'RUN [\"/bin/busybox\", \"true\"]' "
+            "> /home/test/workspace/Containerfile && "
+            "chown test:users /home/test/workspace/Containerfile"
+        )
         machine.fail(
             "su -s ${pkgs.bash}/bin/bash test -c "
             f"'cd /home/test/workspace && {container_tools}/podman version'"
@@ -380,6 +387,13 @@ pkgs.testers.runNixOSTest {
         )
         machine.succeed(guarded("local-codex-cli", "podman version"))
         machine.succeed(guarded("local-claude-code", "podman version"))
+        machine.succeed(guarded("local-claude-code", "podman info --format json"))
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman build --tag localhost/agent-network-build .",
+            )
+        )
         machine.succeed(guarded("local-codex-cli", "buildah version"))
         machine.succeed(guarded("local-codex-cli", "buildah from --name agent-buildah scratch"))
         machine.succeed(

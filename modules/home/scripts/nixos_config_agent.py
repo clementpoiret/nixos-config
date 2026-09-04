@@ -764,6 +764,26 @@ def synchronize_candidate(
         raise WorkflowError(
             f"candidate fetched {branch}@{remote} at an unexpected revision"
         )
+    if (remote, branch) != (UPSTREAM_REMOTE, BASE_BOOKMARK):
+        run_jj(
+            candidate,
+            "--ignore-working-copy",
+            "git",
+            "fetch",
+            "--remote",
+            UPSTREAM_REMOTE,
+            "--branch",
+            BASE_BOOKMARK,
+        )
+        imported_baseline = one_revision(
+            candidate,
+            f"{BASE_BOOKMARK}@{UPSTREAM_REMOTE}",
+            f"{BASE_BOOKMARK}@{UPSTREAM_REMOTE}",
+        )
+        if imported_baseline != target:
+            raise WorkflowError(
+                "candidate fetched an unexpected protected baseline"
+            )
 
     current_after_fetch = one_revision(candidate, "@", "candidate working-copy")
     if revision_value(candidate, current_after_fetch, "change_id") != candidate_change:
@@ -771,15 +791,30 @@ def synchronize_candidate(
     if not is_empty(candidate) or has_conflicts(candidate):
         raise WorkflowError("candidate working-copy changed while synchronizing")
     parent_after_fetch = one_revision(candidate, "parents(@)", "candidate parent")
-    expected_parent = parent_after_fetch in (expected_old_baseline, target)
-    if not expected_parent and revisions_are_logically_equivalent(
+    superseded_parent: str | None = None
+    if parent_after_fetch == target:
+        pass
+    elif revisions_are_logically_equivalent(
         candidate, parent_after_fetch, target
     ):
-        expected_parent = True
-    if not expected_parent:
+        superseded_parent = parent_after_fetch
+    elif parent_after_fetch == expected_old_baseline:
+        raise WorkflowError("candidate parent does not match the signed target")
+    else:
         raise WorkflowError("candidate parent changed while synchronizing")
     if parent_after_fetch != target:
         run_jj(candidate, "rebase", "-r", "@", "-d", target)
+
+    if superseded_parent is not None:
+        superseded_heads = revision_ids(
+            candidate,
+            f"({superseded_parent}) & visible_heads()",
+        )
+        if superseded_heads != [superseded_parent]:
+            raise WorkflowError(
+                "superseded candidate parent is not an isolated visible head"
+            )
+        run_jj(candidate, "abandon", "-r", superseded_parent)
 
     for bookmark in (BASE_BOOKMARK, HANDOFF_BOOKMARK):
         run_jj(

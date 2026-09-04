@@ -124,7 +124,9 @@ Claude: ~/.local/share/containers/agents/claude
 
 Registry authentication is stored in a private `0600` `auth.json` inside the corresponding state tree. The tools use
 rootless Podman/Buildah, `crun`, fuse-overlayfs, file-backed events and locks, and a dedicated AppArmor disconnected-path
-prefix for container namespace objects. Direct `build`, `run`, `create`, `exec`, and image-transfer commands remain
+prefix for container namespace objects. The engine brokers may inspect the payload profile's namespace metadata, read
+bounded host uptime/release metadata, adjust their own helper processes' OOM scores, and initialize the named bridge and
+veth sysctls used by rootless networking. Direct `build`, `run`, `create`, `exec`, and image-transfer commands remain
 available within the guard's argument and workspace rules. Umbrella management commands, including Podman's `image`,
 `container`, `network`, and `volume` groups, are intentionally rejected because their nested option surfaces bypass the
 guard's per-command host-path validation; default rootless networking and named-volume use from `run`/`create` remain

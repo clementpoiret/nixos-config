@@ -795,6 +795,19 @@
             codexContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "priority=50 /** px -> local-agent-container-payload,"
             claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "ptrace (read) peer=local-agent-container-payload,"
+            codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "ptrace (read) peer=local-agent-container-payload,"
+            claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "/nix/store/*-etc-os-release r," claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "/proc/uptime r," claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "ip_forward" claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "conf/*/{arp_notify,forwarding,route_localnet,rp_filter} rw,"
+            claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "conf/*/{accept_dad,accept_ra,autoconf,forwarding} rw,"
+            claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "net/{tcp,tcp6,udp,udp6}" claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "oom_score_adj" claudeContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix
             "attach_disconnected.path=/apparmor-disconnected/agent-container-engine/"
             codexContainerEnginePolicy;
