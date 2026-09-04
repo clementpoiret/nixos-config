@@ -1378,6 +1378,10 @@ in
           enabled = true;
           failIfUnavailable = true;
           allowUnsandboxedCommands = false;
+          excludedCommands = [
+            "podman *"
+            "buildah *"
+          ];
         };
       };
     };

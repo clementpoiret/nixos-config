@@ -817,6 +817,11 @@
           assert claudeManagedSettings.sandbox.enabled;
           assert claudeManagedSettings.sandbox.failIfUnavailable;
           assert !(claudeManagedSettings.sandbox.allowUnsandboxedCommands);
+          assert
+            claudeManagedSettings.sandbox.excludedCommands == [
+              "podman *"
+              "buildah *"
+            ];
           assert laptopConfig.programs.ssh.enableAskPassword;
           assert laptopConfig.environment.variables.SSH_ASKPASS == laptopConfig.programs.ssh.askPassword;
           assert dnsService.serviceConfig.UMask == "0077";

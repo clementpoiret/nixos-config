@@ -182,9 +182,12 @@ metadata are not part of the ordinary desktop or runtime-introspection baseline.
 Codex CLI and Claude Code also receive guarded Podman/Buildah launchers. Exact
 launcher paths enter always-enforced per-agent engine brokers, container payloads
 enter a shared enforced payload profile, and each agent uses separate rootless
-storage and runtime trees. The guard confines host path arguments to the current
-workspace, blocks namespace/device/capability/security overrides, scrubs the host
-environment, and closes inherited file descriptors. See
+storage and runtime trees. Claude's managed sandbox statically excludes only these
+launcher command names from Bubblewrap so their outer-profile broker transitions
+remain reachable, while arbitrary unsandboxed commands stay disabled. The guard
+confines host path arguments to the current workspace, blocks
+namespace/device/capability/security overrides, scrubs the host environment, and
+closes inherited file descriptors. See
 [Guarded agent containers](APPARMOR.md#guarded-agent-containers) for supported
 commands and the remaining literal-Nix-store-path limitation.
 

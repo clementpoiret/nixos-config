@@ -329,6 +329,16 @@ pkgs.testers.runNixOSTest {
         machine.succeed("test -e /etc/apparmor.d/local-syncthing")
         machine.fail("test -e /etc/apparmor.d/local-brave")
 
+    with subtest("Claude only bypasses Bubblewrap for guarded container launchers"):
+        machine.succeed(
+            "${pkgs.jq}/bin/jq -e "
+            "'.sandbox.enabled == true and "
+            ".sandbox.failIfUnavailable == true and "
+            ".sandbox.allowUnsandboxedCommands == false and "
+            ".sandbox.excludedCommands == [\"podman *\", \"buildah *\"]' "
+            "/etc/claude-code/managed-settings.d/20-sandbox.json"
+        )
+
     with subtest("agent container brokers and payloads are always enforced"):
         machine.succeed(
             "aa-status --json | ${pkgs.jq}/bin/jq -e "

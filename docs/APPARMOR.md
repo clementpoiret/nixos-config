@@ -92,8 +92,10 @@ Claude uses a separately named, always-enforced derivative of that broker. Its u
 `CAP_SYS_ADMIN` from the capability class so Claude's `apply-seccomp` helper can write `deny` to
 `/proc/self/setgroups` after creating a nested user namespace. The generator emits this broker transition only for
 Claude's exact Bubblewrap executable; it does not grant the capability to Claude's workload profile, Codex, or the
-shared `unpriv_bwrap` payload. Claude's managed settings still require its command sandbox, reject unsandboxed commands,
-and fail closed if the backend is unavailable.
+shared `unpriv_bwrap` payload. Claude's managed settings still require its command sandbox, reject arbitrary unsandboxed
+commands, and fail closed if the backend is unavailable. Guarded `podman` and `buildah` commands are the only static
+Bubblewrap exclusions, allowing their exact launchers to enter the enforced container-engine broker from Claude's outer
+profile.
 
 ### Guarded agent containers
 
