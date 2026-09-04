@@ -406,6 +406,12 @@ pkgs.testers.runNixOSTest {
         machine.succeed(
             guarded(
                 "local-claude-code",
+                "podman build --tag localhost/agent-network-build-cached .",
+            )
+        )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
                 "podman network create agent-test-network",
             )
         )
@@ -427,7 +433,27 @@ pkgs.testers.runNixOSTest {
         machine.succeed(
             guarded(
                 "local-claude-code",
-                "podman image rm localhost/agent-network-build",
+                "podman run --detach --name agent-exec --user 999:999 "
+                "localhost/agent-network-build /bin/busybox sleep 30",
+            )
+        )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman exec agent-exec /bin/busybox true",
+            )
+        )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman rm --force agent-exec",
+            )
+        )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman image rm localhost/agent-network-build "
+                "localhost/agent-network-build-cached",
             )
         )
         machine.succeed(guarded("local-codex-cli", "buildah version"))

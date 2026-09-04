@@ -126,14 +126,17 @@ Claude: ~/.local/share/containers/agents/claude
 ```
 
 Registry authentication is stored in a private `0600` `auth.json` inside the corresponding state tree. The tools use
-rootless Podman/Buildah, `crun`, fuse-overlayfs, file-backed events and locks, and a dedicated AppArmor disconnected-path
-prefix for container namespace objects. The engine brokers may inspect the payload profile's namespace metadata, read
-bounded host uptime/release metadata, adjust their own helper processes' OOM scores, and initialize the named bridge and
-veth sysctls used by rootless networking. Direct `build`, `run`, `create`, `exec`, and image-transfer commands remain
-available within the guard's argument and workspace rules. Podman's umbrella management commands remain rejected apart
-from the explicitly parsed cleanup, network, and configuration-only exceptions above because their nested option
-surfaces otherwise bypass the guard's per-command host-path validation; default rootless networking and named-volume
-use from `run`/`create` remain available.
+rootless Podman/Buildah, `crun`, fuse-overlayfs, file-backed events and locks, a storage-local image-copy default, and a
+dedicated AppArmor disconnected-path prefix for container namespace objects. The engine brokers may inspect the payload
+profile's namespace metadata, mapped container process status, and their own mount tables; signal payload processes for
+container lifecycle operations; read bounded host uptime/release metadata; adjust their own helper processes' OOM
+scores; and initialize the named bridge and veth sysctls used by rootless networking.
+Podman 5.8's fully cached Buildah retag path does not propagate that image-copy default, so the brokers may enumerate
+`/var/tmp` while retaining owner-only access to its contents. Direct `build`, `run`, `create`, `exec`, and image-transfer
+commands remain available within the guard's argument and workspace rules. Podman's umbrella management commands remain
+rejected apart from the explicitly parsed cleanup, network, and configuration-only exceptions above because their
+nested option surfaces otherwise bypass the guard's per-command host-path validation; default rootless networking and
+named-volume use from `run`/`create` remain available.
 
 This is the supported command path, not a system-wide interception mechanism. A process that discovers and invokes the
 underlying Podman or Buildah executable by its literal Nix-store path can bypass the launcher. The current Codex and

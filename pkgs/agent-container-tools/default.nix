@@ -46,6 +46,7 @@ let
   containersConf = writeText "agent-containers.conf" ''
     [engine]
     events_logger = "file"
+    image_copy_tmp_dir = "storage"
     lock_type = "file"
     runtime = "crun"
     compose_providers = ["${podman-compose}/bin/podman-compose"]

@@ -940,6 +940,7 @@ let
           ptrace (read, trace) peer=@{profile_name},
           ptrace (read) peer=local-agent-container-payload,
           signal (send, receive) peer=@{profile_name},
+          signal (send) peer=local-agent-container-payload,
 
           priority=50 /** px -> local-agent-container-payload,
 
@@ -971,6 +972,8 @@ let
           owner /proc/[0-9]*/ r,
           owner /proc/[0-9]*/fd/{,**} rw,
           /proc/[0-9]*/net/{tcp,tcp6,udp,udp6} r,
+          /proc/[0-9]*/stat r,
+          owner /proc/[0-9]*/mounts r,
           owner /proc/[0-9]*/{attr/current,cgroup,cmdline,gid_map,loginuid,mountinfo,oom_score_adj,setgroups,stat,status,uid_map} rw,
           owner /proc/[0-9]*/task/[0-9]*/mountinfo r,
           /sys/{,**} r,
@@ -994,6 +997,7 @@ let
           deny /run/log/journal/{,**} r,
           owner /tmp/{,**} rwklm,
           deny /var/log/journal/{,**} r,
+          /var/tmp/ r,
           owner /var/tmp/{,**} rwklm,
 
           audit deny @{HOME}/.netrc rwklm,

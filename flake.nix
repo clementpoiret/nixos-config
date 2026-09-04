@@ -799,6 +799,10 @@
             codexContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "ptrace (read) peer=local-agent-container-payload,"
             claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "signal (send) peer=local-agent-container-payload,"
+            codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "signal (send) peer=local-agent-container-payload,"
+            claudeContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "/nix/store/*-etc-os-release r," claudeContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "/proc/uptime r," claudeContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "ip_forward" claudeContainerEnginePolicy;
@@ -808,6 +812,12 @@
             claudeContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "net/{tcp,tcp6,udp,udp6}" claudeContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix "oom_score_adj" claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "/proc/[0-9]*/stat r," codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "/proc/[0-9]*/stat r," claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/mounts r," codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/mounts r," claudeContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "/var/tmp/ r," codexContainerEnginePolicy;
+          assert pkgs-unstable.lib.hasInfix "/var/tmp/ r," claudeContainerEnginePolicy;
           assert pkgs-unstable.lib.hasInfix
             "attach_disconnected.path=/apparmor-disconnected/agent-container-engine/"
             codexContainerEnginePolicy;
@@ -904,6 +914,7 @@
               grep -F \
                 'compose_providers = ["${containerTools.podmanCompose}/bin/podman-compose"]' \
                 ${containerTools.containersConf}
+              grep -F 'image_copy_tmp_dir = "storage"' ${containerTools.containersConf}
               grep -a -F 'OPERCORD_' ${containerTools}/bin/podman >/dev/null
               if ${containerTools}/bin/podman version >podman.stdout 2>podman.stderr; then
                 echo "guarded Podman unexpectedly ran outside an agent broker" >&2
