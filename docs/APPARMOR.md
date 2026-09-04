@@ -111,10 +111,10 @@ remain below that directory. It rejects host namespace joins, privileged mode, d
 options, alternate runtimes/hooks/storage roots/auth files, host environment inheritance, remote control sockets, and
 management commands such as `podman unshare`, `podman mount`, Compose execution/Kube, and `buildah mount`. The bounded
 nested exceptions are `podman network create/rm`, `podman image rm`, and `podman compose version/config`; Compose uses a
-fixed packaged provider, restricts files to the workspace, and accepts only the configuration flags and environment
-variables needed by the control-plane packaging check. Other host environment variables are reduced to locale/terminal
-settings plus generated container configuration, and inherited non-standard file descriptors are closed before the
-engine starts. For `podman run`, `create`, and `exec`, host-option validation stops at `--` or the image/container
+fixed packaged Docker Compose v2 provider, restricts files to the workspace, and accepts only the configuration flags
+and environment variables needed by the control-plane packaging check. Other host environment variables are reduced to
+locale/terminal settings plus generated container configuration, and inherited non-standard file descriptors are closed
+before the engine starts. For `podman run`, `create`, and `exec`, host-option validation stops at `--` or the image/container
 positional; later flags belong to the command inside the container.
 
 Each agent has independent rootless state and runtime trees:

@@ -910,10 +910,12 @@
 
               test -x ${containerTools}/bin/podman
               test -x ${containerTools}/bin/buildah
-              test -x ${containerTools.podmanCompose}/bin/podman-compose
+              test -x ${containerTools.composeProvider}/bin/docker-compose
               grep -F \
-                'compose_providers = ["${containerTools.podmanCompose}/bin/podman-compose"]' \
+                'compose_providers = ["${containerTools.composeProvider}/bin/docker-compose"]' \
                 ${containerTools.containersConf}
+              printf '%s\n' '${containerTools.safePath}' | \
+                tr : '\n' | grep -Fx '${containerTools.composeProvider}/bin'
               grep -F 'image_copy_tmp_dir = "storage"' ${containerTools.containersConf}
               grep -a -F 'OPERCORD_' ${containerTools}/bin/podman >/dev/null
               if ${containerTools}/bin/podman version >podman.stdout 2>podman.stderr; then

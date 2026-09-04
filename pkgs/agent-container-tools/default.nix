@@ -4,6 +4,7 @@
   buildah-unwrapped,
   conmon,
   crun,
+  docker-compose,
   fuse-overlayfs,
   iproute2,
   iptables,
@@ -12,7 +13,6 @@
   nftables,
   passt,
   podman,
-  podman-compose,
   python3,
   shadow,
   slirp4netns,
@@ -28,6 +28,7 @@ let
     buildah-unwrapped
     conmon
     crun
+    docker-compose
     fuse-overlayfs
     iproute2
     iptables
@@ -35,7 +36,6 @@ let
     nftables
     passt
     podman
-    podman-compose
     shadow
     slirp4netns
     util-linux
@@ -49,7 +49,7 @@ let
     image_copy_tmp_dir = "storage"
     lock_type = "file"
     runtime = "crun"
-    compose_providers = ["${podman-compose}/bin/podman-compose"]
+    compose_providers = ["${docker-compose}/bin/docker-compose"]
 
     [engine.runtimes]
     crun = ["${crun}/bin/crun"]
@@ -91,7 +91,7 @@ stdenv.mkDerivation {
   '';
 
   passthru = {
-    podmanCompose = podman-compose;
+    composeProvider = docker-compose;
     inherit
       buildah
       containersConf

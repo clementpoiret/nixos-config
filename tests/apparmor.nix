@@ -380,10 +380,22 @@ pkgs.testers.runNixOSTest {
             "chown test:users /home/test/workspace/Containerfile"
         )
         machine.succeed(
-            "printf '%s\\n' 'services:' '  agent-compose:' "
+            "printf '%s\\n' 'services:' '  postgres:' "
             "'    image: localhost/agent-network-build' "
+            "'    healthcheck:' "
+            "'      test: [\"CMD\", \"/bin/busybox\", \"true\"]' "
+            "'  agent-compose:' "
+            "'    image: localhost/agent-network-build' "
+            "'    depends_on:' "
+            "'      postgres:' "
+            "'        condition: service_healthy' "
             "'    environment:' "
             "'      REQUIRED: ''${OPERCORD_POSTGRES_PASSWORD:?required}' "
+            "'    ports:' "
+            "'      - 127.0.0.1:5432:5432' "
+            "'    volumes:' "
+            "'      - agent-data:/data' "
+            "'volumes:' '  agent-data:' "
             "> /home/test/workspace/compose.yaml && "
             "chown test:users /home/test/workspace/compose.yaml"
         )
@@ -430,6 +442,27 @@ pkgs.testers.runNixOSTest {
             )
             + " | grep -Fx agent-compose"
         )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman compose --file compose.yaml --project-name agent-compose config --volumes",
+                "OPERCORD_POSTGRES_PASSWORD=packaging-check",
+            )
+            + " | grep -Fx agent-data"
+        )
+        for expected_config_line in (
+            "condition: service_healthy",
+            "host_ip: 127.0.0.1",
+            'published: "5432"',
+        ):
+            machine.succeed(
+                guarded(
+                    "local-claude-code",
+                    "podman compose --file compose.yaml --project-name agent-compose config",
+                    "OPERCORD_POSTGRES_PASSWORD=packaging-check",
+                )
+                + f" | grep -F '{expected_config_line}'"
+            )
         machine.succeed(
             guarded(
                 "local-claude-code",

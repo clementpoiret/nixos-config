@@ -925,7 +925,7 @@ let
 
           ${lib.concatMapStrings engineExecutionRules enginePackages}
           ${containerTools}/libexec/{,**} r,
-          ${containerTools.podmanCompose}/bin/ r,
+          ${containerTools.composeProvider}/bin/ r,
           priority=100 /run/wrappers/bin/{newgidmap,newuidmap} ixr,
           priority=100 /run/wrappers/wrappers.*/{newgidmap,newuidmap} ixr,
 
