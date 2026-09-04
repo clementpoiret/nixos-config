@@ -12,6 +12,7 @@
   nftables,
   passt,
   podman,
+  podman-compose,
   python3,
   shadow,
   slirp4netns,
@@ -34,6 +35,7 @@ let
     nftables
     passt
     podman
+    podman-compose
     shadow
     slirp4netns
     util-linux
@@ -46,6 +48,7 @@ let
     events_logger = "file"
     lock_type = "file"
     runtime = "crun"
+    compose_providers = ["${podman-compose}/bin/podman-compose"]
 
     [engine.runtimes]
     crun = ["${crun}/bin/crun"]
@@ -87,6 +90,7 @@ stdenv.mkDerivation {
   '';
 
   passthru = {
+    podmanCompose = podman-compose;
     inherit
       buildah
       containersConf

@@ -109,9 +109,12 @@ The guard treats the current directory as the workspace boundary. It accepts a n
 home or a child of `/tmp` or `/var/tmp`; build contexts, files, bind mounts, imports, copies, and similar host paths must
 remain below that directory. It rejects host namespace joins, privileged mode, devices, capability changes, security
 options, alternate runtimes/hooks/storage roots/auth files, host environment inheritance, remote control sockets, and
-management commands such as `podman unshare`, `podman mount`, Compose/Kube, and `buildah mount`. Host environment
-variables are reduced to locale/terminal settings plus generated container configuration, and inherited non-standard
-file descriptors are closed before the engine starts.
+management commands such as `podman unshare`, `podman mount`, Compose execution/Kube, and `buildah mount`. The bounded
+nested exceptions are `podman network create/rm`, `podman image rm`, and `podman compose version/config`; Compose uses a
+fixed packaged provider, restricts files to the workspace, and accepts only the configuration flags and environment
+variables needed by the control-plane packaging check. Other host environment variables are reduced to locale/terminal
+settings plus generated container configuration, and inherited non-standard file descriptors are closed before the
+engine starts.
 
 Each agent has independent rootless state and runtime trees:
 
@@ -127,10 +130,10 @@ rootless Podman/Buildah, `crun`, fuse-overlayfs, file-backed events and locks, a
 prefix for container namespace objects. The engine brokers may inspect the payload profile's namespace metadata, read
 bounded host uptime/release metadata, adjust their own helper processes' OOM scores, and initialize the named bridge and
 veth sysctls used by rootless networking. Direct `build`, `run`, `create`, `exec`, and image-transfer commands remain
-available within the guard's argument and workspace rules. Umbrella management commands, including Podman's `image`,
-`container`, `network`, and `volume` groups, are intentionally rejected because their nested option surfaces bypass the
-guard's per-command host-path validation; default rootless networking and named-volume use from `run`/`create` remain
-available.
+available within the guard's argument and workspace rules. Podman's umbrella management commands remain rejected apart
+from the explicitly parsed cleanup, network, and configuration-only exceptions above because their nested option
+surfaces otherwise bypass the guard's per-command host-path validation; default rootless networking and named-volume
+use from `run`/`create` remain available.
 
 This is the supported command path, not a system-wide interception mechanism. A process that discovers and invokes the
 underlying Podman or Buildah executable by its literal Nix-store path can bypass the launcher. The current Codex and

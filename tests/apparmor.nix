@@ -352,16 +352,17 @@ pkgs.testers.runNixOSTest {
     with subtest("guarded rootless Buildah and Podman use isolated stores and the payload profile"):
         container_tools = "${pkgs.agent-container-tools}/bin"
 
-        def guarded(profile, command):
+        def guarded(profile, command, environment=""):
             launcher = (
                 "${codexFixture}/bin/codex-fixture"
                 if profile == "local-codex-cli"
                 else "${claudeFixture}/bin/claude-fixture"
             )
+            environment_prefix = f"{environment} " if environment else ""
             return (
                 "su -s ${pkgs.bash}/bin/bash test -c "
-                f"'cd /home/test/workspace && aa-exec -p {profile} -- {launcher} "
-                f"{container_tools}/{command}'"
+                f"'cd /home/test/workspace && {environment_prefix}aa-exec -p {profile} "
+                f"-- {launcher} {container_tools}/{command}'"
             )
 
         machine.succeed(
@@ -378,6 +379,14 @@ pkgs.testers.runNixOSTest {
             "> /home/test/workspace/Containerfile && "
             "chown test:users /home/test/workspace/Containerfile"
         )
+        machine.succeed(
+            "printf '%s\\n' 'services:' '  agent-compose:' "
+            "'    image: localhost/agent-network-build' "
+            "'    environment:' "
+            "'      REQUIRED: ''${OPERCORD_POSTGRES_PASSWORD:?required}' "
+            "> /home/test/workspace/compose.yaml && "
+            "chown test:users /home/test/workspace/compose.yaml"
+        )
         machine.fail(
             "su -s ${pkgs.bash}/bin/bash test -c "
             f"'cd /home/test/workspace && {container_tools}/podman version'"
@@ -392,6 +401,33 @@ pkgs.testers.runNixOSTest {
             guarded(
                 "local-claude-code",
                 "podman build --tag localhost/agent-network-build .",
+            )
+        )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman network create agent-test-network",
+            )
+        )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman network rm agent-test-network",
+            )
+        )
+        machine.succeed(guarded("local-claude-code", "podman compose version"))
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman compose --file compose.yaml --project-name agent-compose config --services",
+                "OPERCORD_POSTGRES_PASSWORD=packaging-check",
+            )
+            + " | grep -Fx agent-compose"
+        )
+        machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman image rm localhost/agent-network-build",
             )
         )
         machine.succeed(guarded("local-codex-cli", "buildah version"))

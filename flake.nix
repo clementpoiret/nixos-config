@@ -900,6 +900,11 @@
 
               test -x ${containerTools}/bin/podman
               test -x ${containerTools}/bin/buildah
+              test -x ${containerTools.podmanCompose}/bin/podman-compose
+              grep -F \
+                'compose_providers = ["${containerTools.podmanCompose}/bin/podman-compose"]' \
+                ${containerTools.containersConf}
+              grep -a -F 'OPERCORD_' ${containerTools}/bin/podman >/dev/null
               if ${containerTools}/bin/podman version >podman.stdout 2>podman.stderr; then
                 echo "guarded Podman unexpectedly ran outside an agent broker" >&2
                 exit 1

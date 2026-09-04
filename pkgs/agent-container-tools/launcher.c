@@ -19,6 +19,7 @@ static int is_allowed_environment(const char *entry) {
   return has_name(entry, "COLORTERM") || has_name(entry, "LANG") ||
          has_name(entry, "LANGUAGE") || has_name(entry, "NO_COLOR") ||
          has_name(entry, "TERM") || has_name(entry, "TZ") ||
+         strncmp(entry, "OPERCORD_", 9) == 0 ||
          strncmp(entry, "LC_", 3) == 0;
 }
 

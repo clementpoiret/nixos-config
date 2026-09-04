@@ -5,6 +5,7 @@ import csv
 import errno
 import os
 import pwd
+import re
 import stat
 import sys
 from dataclasses import dataclass
@@ -231,6 +232,24 @@ REMOTE_CONTEXT_PREFIXES = (
     "https://",
     "oci://",
 )
+COMPOSE_CONFIG_FLAGS = {"--quiet", "--services", "--volumes"}
+COMPOSE_CONFIG_ENVIRONMENT = {
+    "OPERCORD_DATABASE_URL_FILE",
+    "OPERCORD_POSTGRES_PASSWORD",
+    "OPERCORD_POSTGRES_PASSWORD_FILE",
+    "OPERCORD_PUBLIC_BASE_URL",
+    "OPERCORD_SESSION_SECRET_FILE",
+    "OPERCORD_TLS_CERT_FILE",
+    "OPERCORD_TLS_KEY_FILE",
+}
+COMPOSE_CONFIG_PATH_ENVIRONMENT = {
+    "OPERCORD_DATABASE_URL_FILE",
+    "OPERCORD_POSTGRES_PASSWORD_FILE",
+    "OPERCORD_SESSION_SECRET_FILE",
+    "OPERCORD_TLS_CERT_FILE",
+    "OPERCORD_TLS_KEY_FILE",
+}
+COMPOSE_PROJECT_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
 
 
 def _profile_name(label: str) -> str:
@@ -365,11 +384,91 @@ def _find_subcommand(arguments: Sequence[str]) -> tuple[str | None, int]:
     return None, len(arguments)
 
 
-def _validate_arguments(tool: str, arguments: Sequence[str], workspace: Path) -> None:
+def _validate_named_podman_operation(
+    group: str,
+    arguments: Sequence[str],
+    allowed_subcommands: set[str],
+) -> str:
+    if not arguments or arguments[0] not in allowed_subcommands:
+        nested = arguments[0] if arguments else None
+        raise GuardError(
+            f"podman {group} subcommand {nested!r} is not permitted"
+        )
+    nested = arguments[0]
+    names = arguments[1:]
+    if not names:
+        raise GuardError(f"podman {group} {nested} requires a name")
+    for name in names:
+        if not name or name.startswith("-"):
+            raise GuardError(
+                f"podman {group} {nested} argument {name!r} is not permitted"
+            )
+    return nested
+
+
+def _validate_compose(arguments: Sequence[str], workspace: Path) -> str:
+    index = 0
+    while index < len(arguments):
+        argument = arguments[index]
+        option, inline = _option(argument)
+        if option in {"--file", "-f"}:
+            value = inline
+            if value is None:
+                index += 1
+                if index >= len(arguments):
+                    raise GuardError(f"podman compose option {option} requires a value")
+                value = arguments[index]
+            _inside_workspace(value, workspace)
+        elif option in {"--project-name", "-p"}:
+            value = inline
+            if value is None:
+                index += 1
+                if index >= len(arguments):
+                    raise GuardError(f"podman compose option {option} requires a value")
+                value = arguments[index]
+            if COMPOSE_PROJECT_RE.fullmatch(value) is None:
+                raise GuardError(f"podman compose project {value!r} is not permitted")
+        else:
+            break
+        index += 1
+
+    if index >= len(arguments) or arguments[index] not in {"config", "version"}:
+        nested = arguments[index] if index < len(arguments) else None
+        raise GuardError(f"podman compose subcommand {nested!r} is not permitted")
+    nested = arguments[index]
+    remaining = arguments[index + 1 :]
+    if nested == "version" and remaining:
+        raise GuardError("podman compose version arguments are not permitted")
+    if nested == "config":
+        for argument in remaining:
+            if argument not in COMPOSE_CONFIG_FLAGS:
+                raise GuardError(
+                    f"podman compose config argument {argument!r} is not permitted"
+                )
+    return nested
+
+
+def _validate_arguments(
+    tool: str, arguments: Sequence[str], workspace: Path
+) -> bool:
     subcommand, command_index = _find_subcommand(arguments)
     if subcommand is None:
-        return
-    if subcommand not in ALLOWED_SUBCOMMANDS[tool]:
+        return False
+
+    compose_config = False
+    if tool == "podman" and subcommand == "network":
+        _validate_named_podman_operation(
+            "network", arguments[command_index + 1 :], {"create", "rm"}
+        )
+    elif tool == "podman" and subcommand == "image":
+        _validate_named_podman_operation(
+            "image", arguments[command_index + 1 :], {"rm"}
+        )
+    elif tool == "podman" and subcommand == "compose":
+        compose_config = (
+            _validate_compose(arguments[command_index + 1 :], workspace) == "config"
+        )
+    elif subcommand not in ALLOWED_SUBCOMMANDS[tool]:
         raise GuardError(f"{tool} subcommand {subcommand!r} is not permitted")
 
     index = command_index + 1
@@ -448,6 +547,7 @@ def _validate_arguments(tool: str, arguments: Sequence[str], workspace: Path) ->
     elif tool == "buildah" and subcommand in {"add", "copy"} and len(positional) > 2:
         for source in positional[1:-1]:
             _inside_workspace(source, workspace)
+    return compose_config
 
 
 def _sanitized_environment(
@@ -458,6 +558,8 @@ def _sanitized_environment(
     safe_path: str,
     containers_conf: str,
     storage_conf: str,
+    workspace: Path,
+    compose_config: bool,
 ) -> dict[str, str]:
     result = {
         key: value
@@ -480,6 +582,14 @@ def _sanitized_environment(
             "XDG_RUNTIME_DIR": str(runtime),
         }
     )
+    if compose_config:
+        for name in COMPOSE_CONFIG_ENVIRONMENT:
+            value = environment.get(name)
+            if value is None:
+                continue
+            if name in COMPOSE_CONFIG_PATH_ENVIRONMENT:
+                _inside_workspace(value, workspace)
+            result[name] = value
     return result
 
 
@@ -547,7 +657,7 @@ def build_invocation(
     if not workspace.is_dir():
         raise GuardError("the current workspace is not a directory")
     _validate_workspace(workspace, home)
-    _validate_arguments(tool, arguments, workspace)
+    compose_config = _validate_arguments(tool, arguments, workspace)
 
     state = home / ".local/share/containers/agents" / agent
     runtime = Path(f"/run/user/{uid}/agent-containers") / agent
@@ -573,6 +683,8 @@ def build_invocation(
         safe_path=safe_path,
         containers_conf=containers_conf,
         storage_conf=storage_conf,
+        workspace=workspace,
+        compose_config=compose_config,
     )
     directories = (
         state,

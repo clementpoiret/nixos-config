@@ -195,6 +195,93 @@ class AgentContainerGuardTest(unittest.TestCase):
             ["build", "--iidfile", "artifacts/image-id", "."],
         )
 
+    def test_allows_only_required_nested_podman_subcommands(self) -> None:
+        compose_file = self.workspace / "compose.yaml"
+        compose_file.write_text("services: {}\n", encoding="utf-8")
+        cases = (
+            ["network", "create", "agent-network"],
+            ["network", "rm", "agent-network"],
+            ["image", "rm", "localhost/agent-test:latest"],
+            ["compose", "version"],
+            ["compose", "config", "--quiet"],
+            ["compose", "config", "--volumes"],
+            [
+                "compose",
+                "--file",
+                str(compose_file),
+                "--project-name",
+                "agent-compose",
+                "config",
+                "--services",
+            ],
+        )
+
+        for arguments in cases:
+            with self.subTest(arguments=arguments):
+                invocation = self.invocation("podman", list(arguments))
+                self.assertEqual(invocation.argv[-len(arguments) :], list(arguments))
+
+    def test_compose_config_receives_only_its_allowlisted_environment(self) -> None:
+        secret_file = self.workspace / "secret"
+        environment = {
+            "HOME": str(self.home),
+            "OPERCORD_DATABASE_URL_FILE": str(secret_file),
+            "OPERCORD_POSTGRES_PASSWORD": "packaging-check",
+            "OPERCORD_UNRELATED": "blocked",
+            "PATH": "/host/path",
+        }
+
+        compose = self.invocation(
+            "podman",
+            ["compose", "config"],
+            environment=environment,
+        )
+        run = self.invocation(
+            "podman",
+            ["run", "--rm", "alpine", "true"],
+            environment=environment,
+        )
+
+        self.assertEqual(
+            compose.environment["OPERCORD_DATABASE_URL_FILE"], str(secret_file)
+        )
+        self.assertEqual(
+            compose.environment["OPERCORD_POSTGRES_PASSWORD"], "packaging-check"
+        )
+        self.assertNotIn("OPERCORD_UNRELATED", compose.environment)
+        self.assertNotIn("OPERCORD_POSTGRES_PASSWORD", run.environment)
+
+    def test_rejects_unsafe_nested_podman_arguments(self) -> None:
+        cases = (
+            ["network", "connect", "agent-network", "container"],
+            ["network", "create", "--driver", "bridge", "agent-network"],
+            ["image", "inspect", "localhost/agent-test:latest"],
+            ["image", "rm", "--force", "localhost/agent-test:latest"],
+            ["compose", "up"],
+            ["compose", "config", "--format", "json"],
+            ["compose", "version", "--short"],
+        )
+        for arguments in cases:
+            with self.subTest(arguments=arguments), self.assertRaisesRegex(
+                self.guard.GuardError, "not permitted"
+            ):
+                self.invocation("podman", list(arguments))
+
+        with self.assertRaisesRegex(self.guard.GuardError, "workspace"):
+            self.invocation(
+                "podman",
+                ["compose", "--file", "/etc/compose.yaml", "config"],
+            )
+        with self.assertRaisesRegex(self.guard.GuardError, "workspace"):
+            self.invocation(
+                "podman",
+                ["compose", "config"],
+                environment={
+                    "HOME": str(self.home),
+                    "OPERCORD_DATABASE_URL_FILE": "/etc/secret",
+                },
+            )
+
     def test_rejects_unscoped_working_directories(self) -> None:
         hidden_workspace = self.home / ".config" / "agent"
         hidden_workspace.mkdir(parents=True)
@@ -256,7 +343,7 @@ class AgentContainerGuardTest(unittest.TestCase):
             ("podman", ["compose", "up"]),
             ("podman", ["container", "cp", "/etc/passwd", "example:/tmp"]),
             ("podman", ["image", "import", "/etc/passwd"]),
-            ("podman", ["network", "create", "agent-network"]),
+            ("podman", ["network", "prune"]),
             ("podman", ["volume", "create", "--opt", "device=/etc", "data"]),
             ("buildah", ["unshare", "cat", "/etc/shadow"]),
             ("buildah", ["mount", "container"]),
