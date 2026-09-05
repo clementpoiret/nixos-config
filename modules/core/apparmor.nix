@@ -8,6 +8,7 @@
 let
   cfg = config.security.localAppArmor;
   inherit (lib) mkOption types;
+  inherit (import ../../lib/apparmor.nix { inherit lib; }) sensitiveGroups inventoryType;
 
   stateType = types.enum [
     "disable"
@@ -81,25 +82,6 @@ let
       };
     }
   );
-
-  inventoryType = types.submodule {
-    options = {
-      kind = mkOption {
-        type = types.enum [
-          "application"
-          "service"
-        ];
-      };
-      status = mkOption {
-        type = types.enum [
-          "candidate"
-          "exempt"
-        ];
-      };
-      target = mkOption { type = types.str; };
-      rationale = mkOption { type = types.str; };
-    };
-  };
 
   hasHomeManagerUser =
     username != null
@@ -450,6 +432,7 @@ let
     /proc/bus/pci/ r,
     /proc/bus/pci/devices r,
     /proc/modules r,
+    /proc/tty/drivers r,
     /proc/sys/kernel/{osrelease,ostype,pid_max,unprivileged_userns_clone} r,
     /proc/sys/user/max_user_namespaces r,
     /proc/sys/vm/{mmap_min_addr,nr_hugepages} r,
@@ -472,7 +455,7 @@ let
     /sys/class/ r,
     /sys/class/*/ r,
     /run/udev/data/{+hid:*,+usb:*,c10:*,c13:*,c189:*} r,
-    /sys/devices/**/{0003,0005}:*:*.*/report_descriptor r,
+    /sys/devices/**/{0003,0005,0018}:*:*.*/report_descriptor r,
     /sys/devices/**/usb[0-9]*/**/{bConfigurationValue,busnum,devnum,interface,serial} r,
     /sys/devices/virtual/tty/tty0/active r,
   '';
@@ -499,164 +482,29 @@ let
     /sys/fs/cgroup/**/cpu.max r,
   '';
 
-  sensitiveGroups = {
-    sops = ''
-      audit deny @{HOME}/.config/sops/age/keys.txt rwklm,
-      audit deny @{HOME}/.config/sops-nix/secrets{,/**} rwklm,
-      audit deny /run/user/[0-9]*/secrets.d/{,/**} rwklm,
-      audit deny /run/secrets/{,/**} rwklm,
-      audit deny /run/secrets.d/{,**} rwklm,
-    '';
-    gpg-private = ''
-      audit deny @{HOME}/.gnupg/private-keys-v1.d/{,**} rwklm,
-      audit deny @{HOME}/.gnupg/secring.gpg rwklm,
-    '';
-    gpg-agent = ''
-      audit deny @{HOME}/.gnupg/S.gpg-agent{,.*} rwklm,
-    '';
-    forge-auth = ''
-      audit deny @{HOME}/.config/gh/{config.yml,hosts.yml} rwklm,
-      audit deny @{HOME}/.config/glab-cli/{aliases.yml,config.yml} rwklm,
-    '';
-    password-store = ''
-      audit deny @{HOME}/.password-store/{,**} rwklm,
-      audit deny @{HOME}/.local/share/password-store/{,**} rwklm,
-    '';
-    ssh-identities = ''
-      audit deny @{HOME}/.ssh/id_* rwklm,
-      audit deny @{HOME}/.ssh/*.{key,p12,pem,pfx} rwklm,
-    '';
-    ssh-config = ''
-      audit deny @{HOME}/.ssh/config.secrets rwklm,
-      audit deny @{HOME}/.ssh/known_hosts{,.old} rwklm,
-    '';
-    ssh-control = ''
-      audit deny @{HOME}/.ssh/{cm,sockets}/{,**} rwklm,
-    '';
-    mail-auth = ''
-      audit deny @{HOME}/.config/aerc/accounts.conf{,.d/**} rwklm,
-    '';
-    credential-broker = ''
-      audit deny @{run}/user/[0-9]*/keyring/{,**} rwklm,
-      audit deny dbus send bus=session peer=(name=org.freedesktop.secrets),
-      audit deny dbus receive bus=session peer=(name=org.freedesktop.secrets),
-    '';
-    hardware-credentials = ''
-      audit deny @{HOME}/.config/Yubico/u2f_keys rwklm,
-    '';
-    nixos-config-writable = ''
-      audit deny @{HOME}/nixos-config-writable/{,**} wklm,
-    '';
-    netrc = ''
-      audit deny @{HOME}/.netrc rwklm,
-    '';
-  };
   sensitiveRulesFor =
     state: app:
     lib.optionalString (state == "enforce") (
-      lib.concatMapStrings
-        (group: lib.optionalString (!(sensitiveAccess app group)) sensitiveGroups.${group})
-        [
-          "sops"
-          "forge-auth"
-          "gpg-private"
-          "gpg-agent"
-          "password-store"
-          "ssh-identities"
-          "ssh-config"
-          "ssh-control"
-          "mail-auth"
-          "credential-broker"
-          "hardware-credentials"
-          "nixos-config-writable"
-          "netrc"
-        ]
+      lib.concatMapStrings (
+        group: lib.optionalString (!(sensitiveAccess app group)) sensitiveGroups.${group}.denyRules
+      ) (builtins.attrNames sensitiveGroups)
     );
 
-  sensitiveAllowsFor = app: ''
-    ${lib.optionalString (sensitiveAccess app "sops") ''
-      owner @{HOME}/.config/sops/age/keys.txt r,
-      owner @{HOME}/.config/sops-nix/secrets{,/**} r,
-      owner /run/user/[0-9]*/secrets.d/{,/**} r,
-      /run/secrets/{,/**} r,
-      /run/secrets.d/[0-9]*/{,**} r,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "gpg-private") ''
-      owner @{HOME}/.gnupg/private-keys-v1.d/{,**} r,
-      owner @{HOME}/.gnupg/secring.gpg r,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "forge-auth") ''
-      owner @{HOME}/.config/gh/{config.yml,hosts.yml} r,
-      owner @{HOME}/.config/glab-cli/{aliases.yml,config.yml} r,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "ssh-identities") ''
-      owner @{HOME}/.ssh/id_* r,
-      owner @{HOME}/.ssh/*.{key,p12,pem,pfx} r,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "ssh-config") ''
-      owner @{HOME}/.ssh/config.secrets r,
-      owner @{HOME}/.ssh/known_hosts{,.old} r,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "ssh-control") ''
-      owner @{HOME}/.ssh/{cm,sockets}/{,**} rwk,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "gpg-agent") ''
-      owner @{HOME}/.gnupg/S.gpg-agent{,.*} rw,
-      owner @{HOME}/.gnupg/common.conf r,
-      owner @{HOME}/.gnupg/trustdb.gpg rw,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "password-store") ''
-      owner @{HOME}/.password-store/{,**} rwkl,
-      owner @{HOME}/.local/share/password-store/{,**} rwkl,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "mail-auth") ''
-      owner @{HOME}/.config/aerc/accounts.conf{,.d/**} r,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "credential-broker") ''
-      owner @{run}/user/[0-9]*/keyring/{,**} rwkl,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "hardware-credentials") ''
-      owner @{HOME}/.config/Yubico/u2f_keys r,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "nixos-config-writable") ''
-      owner @{HOME}/nixos-config-writable/{,**} rwkl,
-    ''}
-    ${lib.optionalString (sensitiveAccess app "netrc") ''
-      owner @{HOME}/.netrc r,
-    ''}
-  '';
+  sensitiveAllowsFor =
+    app:
+    lib.concatMapStrings (
+      group: lib.optionalString (sensitiveAccess app group) sensitiveGroups.${group}.allowRules
+    ) (builtins.attrNames sensitiveGroups);
 
-  sensitiveHomeRoots = {
-    sops = [
-      ".config/sops"
-      ".config/sops-nix"
-    ];
-    gpg-private = [ ".gnupg" ];
-    gpg-agent = [ ".gnupg" ];
-    forge-auth = [
-      ".config/gh"
-      ".config/glab-cli"
-    ];
-    password-store = [
-      ".password-store"
-      ".local/share/password-store"
-    ];
-    ssh-identities = [ ".ssh" ];
-    ssh-config = [ ".ssh" ];
-    ssh-control = [ ".ssh" ];
-    mail-auth = [ ".config/aerc" ];
-    hardware-credentials = [ ".config/Yubico" ];
-    nixos-config-writable = [ "nixos-config-writable" ];
-    netrc = [ ".netrc" ];
-  };
   pathsOverlap =
     left: right: left == right || lib.hasPrefix "${left}/" right || lib.hasPrefix "${right}/" left;
   homePathHasUndeclaredSensitiveAccess =
     app: path:
     lib.any (
       group:
-      !(sensitiveAccess app group) && lib.any (root: pathsOverlap path root) sensitiveHomeRoots.${group}
-    ) (builtins.attrNames sensitiveHomeRoots);
+      !(sensitiveAccess app group)
+      && lib.any (root: pathsOverlap path root) sensitiveGroups.${group}.homeRoots
+    ) (builtins.attrNames sensitiveGroups);
   allowedHomePathsFor =
     app:
     lib.filter (
@@ -775,6 +623,7 @@ let
       /nix/var/log/nix/drvs/{,**} r,
       owner @{HOME}/.agents/skills/{,**} r,
       owner @{HOME}/.cache/nix/{,**} rwkl,
+      owner @{HOME}/.cache/matplotlib/{,**} rwkl,
       owner @{HOME}/.cache/uv/{,**} rwkl,
       owner @{HOME}/.cache/go-build/{,**} rwkl,
       owner @{HOME}/.cache/ort.pyke.io/{,**} rwkl,
@@ -856,6 +705,11 @@ let
         ${app.extraRules}
         ${lib.optionalString (hasCapability app "userns") userNamespaceRules}
         ${app.userNamespaceRules}
+        ${lib.optionalString (hasCapability app "containers") ''
+          # Stack the enforced rejection target, also preserving no-new-privs callers.
+          priority=200 /nix/store/*-podman-*/bin/{podman,podmansh,.podman-wrapped} Px -> ${profileName}//&local-agent-container-denied,
+          priority=200 /nix/store/*-buildah-*/bin/{buildah,.buildah-wrapped} Px -> ${profileName}//&local-agent-container-denied,
+        ''}
         ${lib.optionalString (hasCapability app "developer-exec") "priority=50 /nix/store/** Pix,"}
       '';
       profileReentryTransitions = lib.concatMapStringsSep "\n" (
@@ -1098,8 +952,18 @@ let
   containerEnginePolicies = lib.mapAttrs' (
     name: app: lib.nameValuePair (containerEngineProfileNameFor name) (containerEnginePolicy name app)
   ) containerApplications;
-  containerPayloadPolicies = lib.optionalAttrs (containerApplications != { }) {
+  containerInfrastructurePolicies = lib.optionalAttrs (containerApplications != { }) {
     local-agent-container-payload = containerPayloadPolicy;
+    local-agent-container-denied = {
+      state = "enforce";
+      profile = ''
+        abi <abi/4.0>,
+
+        profile local-agent-container-denied flags=(attach_disconnected,mediate_deleted) {
+          audit deny /** rwklmx,
+        }
+      '';
+    };
   };
   servicePolicies = lib.mapAttrs' (
     name: service: lib.nameValuePair (profileNameFor name) (servicePolicy name service)
@@ -1381,7 +1245,7 @@ in
         // servicePolicies
         // bubblewrapPolicies
         // containerEnginePolicies
-        // containerPayloadPolicies;
+        // containerInfrastructurePolicies;
     };
 
     environment.etc = lib.optionalAttrs claudeSandboxEnabled {

@@ -17,6 +17,12 @@ from pathlib import Path
 
 FIELD_RE = re.compile(r'\b([A-Za-z_][A-Za-z0-9_]*)=(?:"((?:\\.|[^"\\])*)"|(\S+))')
 AUDIT_TIME_RE = re.compile(r"\baudit\((\d+(?:\.\d+)?):")
+AUDIT_ID_RE = re.compile(r"\baudit\(\d+(?:\.\d+)?:([0-9]+)\)")
+AUDIT_DELIVERY_RE = re.compile(
+    r"kauditd_printk_skb: [0-9]+ callbacks suppressed|"
+    r"audit.*(?:audit_lost=[1-9][0-9]*|backlog limit exceeded|rate limit exceeded)",
+    re.IGNORECASE,
+)
 HEX_RE = re.compile(r"(?:[0-9A-Fa-f]{2})+")
 LOAD_ISSUE_RE = re.compile(
     r"\b(error|failed?|failure|warning|unable|invalid|syntax|permission denied)\b",
@@ -38,7 +44,6 @@ IGNORED_DETAIL_FIELDS = {
     "comm",
     "denied",
     "denied_mask",
-    "fsuid",
     "operation",
     "ouid",
     "parent",
@@ -190,7 +195,11 @@ def unpack_input_line(line: str) -> tuple[str, str | None]:
             pass
         else:
             message = entry.get("MESSAGE", "")
-            timestamp = _timestamp_from_epoch(entry.get("__REALTIME_TIMESTAMP"))
+            timestamp = _timestamp_from_epoch(
+                entry.get(
+                    "_SOURCE_REALTIME_TIMESTAMP", entry.get("__REALTIME_TIMESTAMP")
+                )
+            )
             return str(message), timestamp
     audit_time = AUDIT_TIME_RE.search(stripped)
     return stripped, _timestamp_from_epoch(audit_time.group(1)) if audit_time else None
@@ -249,6 +258,8 @@ def parse_kernel_issue(line: str, patterns: list[str]) -> dict[str, str] | None:
     message, timestamp = unpack_input_line(line)
     if not message:
         return None
+    if AUDIT_DELIVERY_RE.search(message):
+        return {"timestamp": timestamp or "unknown", "message": message}
     fields = parse_fields(message)
     if fields.get("apparmor") != "ERROR":
         return None
@@ -326,6 +337,31 @@ def _stream_command(command: list[str], *, allow_empty: bool = False) -> Iterato
         raise RuntimeError(f"{' '.join(command[:2])}: {detail}")
 
 
+def deduplicate_journal_lines(lines: Iterable[str]) -> Iterator[str]:
+    """Keep kernel-only records while counting audit/kernel copies only once."""
+    seen: dict[tuple[object, ...], str] = {}
+    for line in lines:
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError:
+            yield line
+            continue
+        transport = entry.get("_TRANSPORT")
+        message = entry.get("MESSAGE", "")
+        fields = parse_fields(message)
+        audit_id = entry.get("_AUDIT_ID")
+        if transport == "kernel" and (match := AUDIT_ID_RE.search(message)):
+            audit_id = match.group(1)
+        if transport in {"audit", "kernel"} and audit_id and fields.get("apparmor"):
+            # One audit ID can contain distinct records for stacked profiles.
+            fields.pop("type", None)
+            key = (entry.get("_BOOT_ID"), str(audit_id), tuple(sorted(fields.items())))
+            previous = seen.setdefault(key, transport)
+            if previous != transport:
+                continue
+        yield line
+
+
 def journal_lines(args: argparse.Namespace) -> Iterator[str]:
     journalctl = shutil.which("journalctl")
     if journalctl is None:
@@ -336,11 +372,11 @@ def journal_lines(args: argparse.Namespace) -> Iterator[str]:
         "--no-pager",
         "--all",
         "--output=json",
-        "--boot",
-        args.boot,
+        f"--boot={args.boot}",
+        "_TRANSPORT=audit",
         "_TRANSPORT=kernel",
         "--grep",
-        'apparmor="(ALLOWED|AUDIT|DENIED|ERROR)"',
+        'apparmor="(ALLOWED|AUDIT|DENIED|ERROR)"|' + AUDIT_DELIVERY_RE.pattern,
     ]
     if args.since:
         command.extend(("--since", args.since))
@@ -449,8 +485,7 @@ def apparmor_service(
         "--no-pager",
         "--all",
         "--output=json",
-        "--boot",
-        args.boot,
+        f"--boot={args.boot}",
         "--unit",
         "apparmor.service",
     ]
@@ -531,7 +566,7 @@ def render_text(report: dict[str, object], findings: list[Finding]) -> None:
     assert isinstance(service_status, dict)
     assert isinstance(service_issues, list)
     assert isinstance(kernel_issues, list)
-    print("\nPolicy loading:")
+    print("\nPolicy loading and audit delivery:")
     if service_status:
         print(
             "  apparmor.service: "
@@ -542,7 +577,7 @@ def render_text(report: dict[str, object], findings: list[Finding]) -> None:
     for issue in [*service_issues, *kernel_issues]:
         print(f"  {issue['timestamp']}  {issue['message']}")
     if not service_issues and not kernel_issues and not report["service_status_error"]:
-        print("  no load errors found")
+        print("  no load or audit delivery errors found")
     elif report["service_status_error"]:
         print(f"  status unavailable: {report['service_status_error']}")
 
@@ -595,6 +630,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--boot",
         default="0",
+        # Report archive names use UUIDs; journalctl expects undashed boot IDs.
+        type=lambda value: value.replace("-", "") if len(value) == 36 else value,
         metavar="ID",
         help="journal boot ID or offset (default: 0)",
     )
@@ -614,7 +651,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     patterns = args.profiles or ["local-*"]
-    source = f"kernel journal, boot {args.boot}"
+    source = f"audit and kernel journal, boot {args.boot}"
     if args.input:
         source = "standard input" if args.input == "-" else args.input
 
@@ -626,7 +663,7 @@ def main(argv: list[str] | None = None) -> int:
         counts: collections.Counter[str] = collections.Counter()
         event_profiles: set[str] = set()
         kernel_issues: list[dict[str, str]] = []
-        for line in lines:
+        for line in deduplicate_journal_lines(lines):
             event = parse_policy_event(line, patterns)
             if event is not None:
                 add_event(grouped, event)

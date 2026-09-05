@@ -13,6 +13,12 @@
     ./../../modules/features/development-hardware.nix
     ./../../modules/features/virtualization.nix
     ./../../modules/features/xwayland.nix
+    {
+      # Allow panel self-refresh while preserving the other upstream boot parameters.
+      options.boot.kernelParams = lib.mkOption {
+        apply = lib.filter (param: param != "amdgpu.dcdebugmask=0x10");
+      };
+    }
   ];
 
   environment.systemPackages = with pkgs; [
@@ -71,9 +77,12 @@
       };
 
       luks.devices = {
+        # Pass TRIM through both encrypted SSDs; this exposes block allocation patterns.
+        "luks-4b1c13e3-af35-4286-b534-674ca54de75a".allowDiscards = true;
         "luks-4b1c13e3-af35-4286-b534-674ca54de75a".crypttabExtraOpts = [
           "tpm2-device=auto"
         ];
+        "luks-5ee5fadf-22f0-4a53-a33d-63e22931255f".allowDiscards = true;
         "luks-5ee5fadf-22f0-4a53-a33d-63e22931255f".crypttabExtraOpts = [
           "tpm2-device=auto"
         ];
@@ -161,4 +170,41 @@
     KERNEL=="card*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", KERNELS=="0000:c5:00.0", SYMLINK+="dri/amd-igpu"
     KERNEL=="renderD*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", KERNELS=="0000:c5:00.0", SYMLINK+="dri/amd-igpu-render"
   '';
+
+  # Fan Control
+  hardware.fw-fanctrl = {
+    enable = true;
+    config = {
+      defaultStrategy = "lazy";
+    };
+  };
+
+  # Ambient light
+  services.clight = {
+    enable = true;
+    settings = {
+      sensor.devname = "iio:device0";
+      screen.disabled = true;
+
+      backlight = {
+        # [ day, night, sunrise/sunset event ]
+        ac_timeouts = [
+          60
+          60
+          60
+        ];
+        batt_timeouts = [
+          60
+          60
+          60
+        ];
+      };
+    };
+  };
+  location = {
+    # City-level coordinates preserve clight's day/night behavior without
+    # publishing a precise location.
+    latitude = 45.75;
+    longitude = 4.85;
+  };
 }

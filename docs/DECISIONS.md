@@ -2,7 +2,8 @@
 
 ## Flake Shape
 
-The flake stays small and delegates host construction to `lib/mkHost.nix`.
+The flake delegates host construction to `lib/mkHost.nix` and check definitions,
+including AppArmor test host variants, to `tests/flake-checks.nix`.
 Both hosts are `x86_64-linux`, so there is no `flake-parts` or broad
 multi-system abstraction yet.
 
@@ -33,6 +34,11 @@ Standalone Home Manager flake outputs are intentionally not exposed.
 Generated `hardware-configuration.nix` files stay in host directories and
 should remain mostly generated hardware facts.
 
+Host facts declare CPU targets and kernel tick/lazy-RCU tuning. Shared modules
+consume these values directly, so adding a host does not require hostname
+dispatch in the CPU or kernel modules. Fan control, ambient-light settings, and
+location policy belong in the host entrypoint.
+
 The Framework laptop imports `nixos-hardware.nixosModules.framework-16-7040-amd`
 for upstream model defaults. Host-local laptop settings should be limited to
 local policy, hibernation values, and quirks not covered upstream.
@@ -44,8 +50,10 @@ store. Use runtime secret paths from `config.sops.secrets.*.path`.
 
 ## Operations
 
-This repo is local-first for now. CI and cache publishing are intentionally left
-out until they are needed.
+`.github/workflows/nix-cache.yml` builds and caches the configurations on pushes
+to `main`, weekly schedules, and manual dispatch. Scheduled and manual runs also
+update pinned releases and the lockfile. Local checks remain available through
+the flake's `checks.x86_64-linux` outputs.
 
 ## Hardening ownership
 

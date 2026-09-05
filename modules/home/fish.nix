@@ -2,10 +2,6 @@
 {
   programs.fish = {
     enable = true;
-    shellAbbrs = {
-      # cd = "z";
-      # cat = "bat";
-    };
     shellAliases = {
       # utils
       c = "clear";
@@ -30,13 +26,7 @@
       nix-test = "nh os test";
       nix-flake-update = "nix flake update --flake ~/nixos-config";
     };
-    shellInit = ''
-      # (Interactive-only variables like fish_greeting & fish_escape_delay_ms moved to interactiveShellInit)
-    '';
-    shellInitLast = ''
-      # devenv integration currently breaks herdr
-      # devenv hook fish | source
-    '';
+    # Keep `devenv hook fish | source` disabled: it currently breaks herdr.
     interactiveShellInit = ''
       fish_vi_key_bindings
       set fish_greeting # Disable greeting
@@ -154,9 +144,6 @@
       commandline -i $insert_path
       commandline -f repaint
     '';
-    # shellInit = ''
-    #   set fish_greeting # Disable greeting
-    # '';
     plugins = [
       {
         name = "autopair";

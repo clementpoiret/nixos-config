@@ -346,6 +346,7 @@ pkgs.testers.runNixOSTest {
             ".profiles[\"local-claude-code\"] == \"complain\" and "
             ".profiles[\"local-codex-cli-container-engine\"] == \"enforce\" and "
             ".profiles[\"local-claude-code-container-engine\"] == \"enforce\" and "
+            ".profiles[\"local-agent-container-denied\"] == \"enforce\" and "
             ".profiles[\"local-agent-container-payload\"] == \"enforce\"'"
         )
 
@@ -406,6 +407,26 @@ pkgs.testers.runNixOSTest {
         machine.fail(
             guarded("local-codex-cli", "podman run --privileged localhost/agent-test")
         )
+        for profile, launcher in (
+            ("local-codex-cli", "${codexFixture}/bin/codex-fixture"),
+            ("local-claude-code", "${claudeFixture}/bin/claude-fixture"),
+        ):
+            for engine in (
+                "${pkgs.podman}/bin/podman",
+                "${pkgs.podman}/bin/.podman-wrapped",
+                "${pkgs.buildah}/bin/buildah",
+                "${pkgs.buildah-unwrapped}/bin/buildah",
+            ):
+                machine.succeed(f"{engine} --version")
+                for prefix in ("", "${pkgs.util-linux}/bin/setpriv --no-new-privs "):
+                    machine.fail(
+                        "su -s ${pkgs.bash}/bin/bash test -c "
+                        f"'aa-exec -p {profile} -- {prefix}{launcher} {engine} --version'"
+                    )
+        machine.succeed(
+            "journalctl --boot=0 --no-pager "
+            "--grep='apparmor=\"DENIED\".*profile=\"local-agent-container-denied\"'"
+        )
         machine.succeed(guarded("local-codex-cli", "podman version"))
         machine.succeed(guarded("local-claude-code", "podman version"))
         machine.succeed(guarded("local-claude-code", "podman info --format json"))
@@ -450,18 +471,20 @@ pkgs.testers.runNixOSTest {
             )
             + " | grep -Fx agent-data"
         )
+        compose_config = machine.succeed(
+            guarded(
+                "local-claude-code",
+                "podman compose --file compose.yaml --project-name agent-compose config",
+                "OPERCORD_POSTGRES_PASSWORD=packaging-check",
+            )
+        )
         for expected_config_line in (
             "condition: service_healthy",
             "host_ip: 127.0.0.1",
             'published: "5432"',
         ):
-            machine.succeed(
-                guarded(
-                    "local-claude-code",
-                    "podman compose --file compose.yaml --project-name agent-compose config",
-                    "OPERCORD_POSTGRES_PASSWORD=packaging-check",
-                )
-                + f" | grep -F '{expected_config_line}'"
+            assert expected_config_line in compose_config, (
+                f"Missing Compose setting {expected_config_line!r}:\n{compose_config}"
             )
         machine.succeed(
             guarded(
@@ -596,6 +619,7 @@ pkgs.testers.runNixOSTest {
         machine.succeed(
             "install -d -o test -g users -m 0700 "
             "/home/test/.agents/skills/example /home/test/.cache/nix /home/test/.cache/uv "
+            "/home/test/.cache/matplotlib "
             "/home/test/.cargo /home/test/.config/gh /home/test/.config/glab-cli "
             "/home/test/.config/git /home/test/.config/go/telemetry /home/test/.ssh "
             "/home/test/.keras /home/test/.gnupg/private-keys-v1.d "
@@ -647,6 +671,7 @@ pkgs.testers.runNixOSTest {
             "su -s ${pkgs.bash}/bin/bash test -c "
             "'aa-exec -p local-agent-fixture -- ${pkgs.coreutils}/bin/touch "
             "/home/test/.cache/nix/allowed /home/test/.cache/uv/allowed "
+            "/home/test/.cache/matplotlib/fontlist-v390.json "
             "/home/test/.config/go/telemetry/allowed "
             "/home/test/nixos-config-writable/allowed'"
         )

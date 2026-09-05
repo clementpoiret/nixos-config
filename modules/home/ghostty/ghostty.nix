@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  host,
+  ...
+}:
 {
   localAppArmor.sessionReadPackages = [ pkgs.ghostty-host ];
 
@@ -28,7 +33,8 @@
 
       quick-terminal-screen = "mouse";
 
-      custom-shader-animation = "always";
+      # Render on terminal updates on the laptop; animate only while focused elsewhere.
+      custom-shader-animation = host != "laptop";
       custom-shader = "./shaders/cursor_warp.glsl";
       # custom-shader = "./shaders/cursor_tail.glsl";
 

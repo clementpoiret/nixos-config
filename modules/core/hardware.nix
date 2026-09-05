@@ -1,5 +1,4 @@
 {
-  host,
   inputs,
   hostFacts,
   lib,
@@ -7,14 +6,6 @@
   ...
 }:
 let
-  isLaptop =
-    if host == "laptop" then
-      true
-    else if host == "desktop" then
-      false
-    else
-      throw "modules/core/hardware.nix: unsupported host '${host}'";
-
   baseKernel = pkgs.cachyosKernels.linux-cachyos-latest;
   customKernel = baseKernel.override {
     lto = "thin";
@@ -22,7 +13,7 @@ let
 
     cpusched = "eevdf";
     kcfi = true;
-    hzTicks = if isLaptop then "300" else "500";
+    hzTicks = hostFacts.hardware.kernel.hzTicks;
     performanceGovernor = false;
     tickrate = "idle";
     preemptType = "full";
@@ -47,7 +38,6 @@ let
         });
       }
     );
-  cachedKernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
 in
 {
   imports = [ inputs.ucodenix.nixosModules.default ];
@@ -58,7 +48,7 @@ in
     kernelParams = [
       "transparent_hugepage=madvise"
     ]
-    ++ lib.optionals isLaptop [
+    ++ lib.optionals hostFacts.hardware.kernel.lazyRcu [
       "rcutree.enable_rcu_lazy=1"
     ];
 
@@ -94,7 +84,7 @@ in
 
   # specialisation.cached-cachyos.configuration = {
   #   system.nixos.tags = [ "cached-cachyos" ];
-  #   boot.kernelPackages = lib.mkForce cachedKernelPackages;
+  #   boot.kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
   # };
 
   specialisation.latest-nixos.configuration = {

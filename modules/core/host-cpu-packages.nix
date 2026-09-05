@@ -1,16 +1,11 @@
 {
-  host,
+  hostFacts,
   lib,
   ...
 }:
 
 let
-  cpuTargets = {
-    desktop = "znver5";
-    laptop = "znver4";
-  };
-  cpuTarget =
-    cpuTargets.${host} or (throw "host-cpu-packages: no CPU target configured for host ${host}");
+  cpuTarget = hostFacts.hardware.cpuTarget;
 
   appendFlag =
     old: flag:

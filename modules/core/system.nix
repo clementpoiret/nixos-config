@@ -59,7 +59,6 @@
   i18n.defaultLocale = "en_US.UTF-8";
   nixpkgs.config = {
     allowUnfree = true;
-    allowUnfreePredicate = true;
   };
 
   # To prevent getting stuck at shutdown.

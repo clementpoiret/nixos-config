@@ -106,42 +106,4 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-  # Fan Control
-  hardware.fw-fanctrl = {
-    enable = true;
-    config = {
-      defaultStrategy = "lazy";
-    };
-  };
-
-  # Misc
-  ## Ambiant light
-  services.clight = {
-    enable = true;
-    settings = {
-      sensor.devname = "iio:device0";
-      screen.disabled = true;
-
-      backlight = {
-        # [ day, night, sunrise/sunset event ]
-        ac_timeouts = [
-          60
-          60
-          60
-        ];
-        batt_timeouts = [
-          60
-          60
-          60
-        ];
-      };
-    };
-  };
-  location = {
-    # City-level coordinates preserve clight's day/night behavior without
-    # publishing a precise location.
-    latitude = 45.75;
-    longitude = 4.85;
-  };
 }

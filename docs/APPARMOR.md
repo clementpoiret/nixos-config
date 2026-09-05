@@ -25,9 +25,9 @@ kernel did not emit useful observations for explicit audited denies there, so th
 complain behavior and the real enforced boundary before a profile is promoted.
 
 The shared `bwrap` compatibility broker, Claude's dedicated Bubblewrap compatibility broker, and the agent container
-brokers/payload are infrastructure rather than workload profiles. They remain enforced whenever an enabled application
-declares the corresponding `bubblewrap` or `containers` capability, including when local workload mode is `disable`, and
-are therefore intentionally unavailable through `profileOverrides`.
+brokers, payload, and direct-engine rejection profile are infrastructure rather than workload profiles. They remain
+enforced whenever an enabled application declares the corresponding `bubblewrap` or `containers` capability, including
+when local workload mode is `disable`, and are therefore intentionally unavailable through `profileOverrides`.
 
 Override one workload without changing the global mode:
 
@@ -139,12 +139,18 @@ rejected apart from the explicitly parsed cleanup, network, and configuration-on
 nested option surfaces otherwise bypass the guard's per-command host-path validation; default rootless networking and
 named-volume use from `run`/`create` remain available.
 
-This is the supported command path, not a system-wide interception mechanism. A process that discovers and invokes the
-underlying Podman or Buildah executable by its literal Nix-store path can bypass the launcher. The current Codex and
-Claude parent profiles remain staged/complain and intentionally support broad developer execution, so treat the broker
-as protection for normal agent-issued container commands rather than a complete malicious-agent boundary. Closing that
-residual path requires promoting the parent profiles and replacing their broad Nix-store execution grant with a reviewed
-manifest.
+Agent workload profiles stack the always-enforced `local-agent-container-denied` profile onto direct packaged Podman
+and Buildah entry points, including their internal wrappers, at a priority above broad developer execution. That profile
+permits no file access; stacking also supports callers with `no_new_privs`. The separate target is necessary because
+the deployed kernel permits even explicit denies in a complain-mode workload. Use the guarded `podman` and `buildah`
+commands from the agent's PATH; a direct underlying Nix-store engine launch fails instead of silently using the ordinary
+container store. The enforced engine
+broker retains access to those binaries after the guard validates the invocation.
+
+This is not a system-wide interception mechanism or a complete malicious-agent boundary. The current Codex and Claude
+parent profiles remain staged/complain and support broad developer execution; copied or independently built engines can
+still evade package-path rules. Closing that residual path requires promoting the parent profiles and replacing broad
+execution grants with a reviewed manifest.
 
 The `desktop` capability carries the shared compatibility surface used by GTK, Qt, Chromium/Electron, and Gecko:
 read-only root-directory discovery, bounded process/CPU/device/cgroup metadata, per-user Wayland proxy creation, common
@@ -166,6 +172,11 @@ sops secrets, forge CLI authentication, GPG private keys and agent sockets, pass
 SSH identities/config/known-host records/control sockets, mail authentication, Secret Service
 and keyring broker channels, Yubico U2F registrations, and the writable NixOS configuration clone
 ```
+
+`lib/apparmor.nix` defines each group's allow rules, deny rules, and protected home roots.
+Both the accepted `sensitiveAccess` names and the home-path overlap checks derive from that table.
+The same library supplies the inventory schema shared by Home Manager and NixOS; application
+and service descriptors retain their separate schemas.
 
 Developer execution is not an automatic credential exemption. A developer tool must list each required sensitive group
 explicitly. The current Codex and Claude profiles explicitly receive read-only `gh`/`glab` configuration, SSH
@@ -388,7 +399,11 @@ run0 -- apparmor-report --json > apparmor-report.json
 ```
 
 `apparmor-report` restricts records to locally managed profiles, groups repeated events, and reports profile-loading
-errors. `DENIED` entries were blocked, `AUDIT` entries matched an explicit audited allow, and `ALLOWED` entries are
+and audit-delivery errors. It reads both journald's audit transport and the kernel fallback, deduplicating copies by
+boot, audit ID, and record fields while preserving distinct records from stacked profiles. Kernel rate limiting can
+discard most fallback messages even when the audit transport retains them; suppression warnings remain visible.
+Findings retain `fsuid` where available so Nix build-user observations can be distinguished from the desktop workload.
+`DENIED` entries were blocked, `AUDIT` entries matched an explicit audited allow, and `ALLOWED` entries are
 ordinary complain-mode observations. A `null_profile=yes` event
 means an executable transition is unresolved and must be fixed before promotion. Do not allow optional telemetry,
 probing, or unrelated filesystem discovery merely because it appeared in a report.

@@ -62,13 +62,14 @@ class NixosConfigAgentTest(unittest.TestCase):
             ),
             encoding="utf-8",
         )
-        self.old_config = os.environ.get("JJ_CONFIG")
-        self.old_home = os.environ.get("HOME")
         test_home = self.root / "home"
         test_home.mkdir()
-        os.environ["HOME"] = str(test_home)
-        os.environ["JJ_CONFIG"] = str(self.config)
-        self.addCleanup(self._restore_config)
+        self.enterContext(
+            mock.patch.dict(
+                os.environ,
+                {"HOME": str(test_home), "JJ_CONFIG": str(self.config)},
+            )
+        )
 
         subprocess.run(
             ["git", "init", "--bare", "--quiet", str(self.github)],
@@ -108,16 +109,6 @@ class NixosConfigAgentTest(unittest.TestCase):
             f"exact:{nixos_config_agent.MAIN_BOOKMARK}",
         )
 
-    def _restore_config(self) -> None:
-        if self.old_config is None:
-            os.environ.pop("JJ_CONFIG", None)
-        else:
-            os.environ["JJ_CONFIG"] = self.old_config
-        if self.old_home is None:
-            os.environ.pop("HOME", None)
-        else:
-            os.environ["HOME"] = self.old_home
-
     def run_jj(self, repo: Path | None, *arguments: str) -> str:
         command = ["jj", "--no-pager", "--color=never"]
         if repo is not None:
@@ -145,6 +136,38 @@ class NixosConfigAgentTest(unittest.TestCase):
             check_profile=False,
         )
 
+    # These integration fixtures supply confirmation/review callbacks instead
+    # of a live terminal. AppArmor entry validation has its own unit test.
+    def promote(self, *, confirm, review_diff=lambda *_: None) -> str:
+        return nixos_config_agent.promote(
+            self.protected,
+            self.candidate,
+            confirm=confirm,
+            output=io.StringIO(),
+            review_diff=review_diff,
+            check_profile=False,
+            require_tty=False,
+        )
+
+    def push(self, *, confirm, review_diff=lambda *_: None, candidate=None) -> str:
+        return nixos_config_agent.push(
+            self.protected,
+            self.candidate if candidate is None else candidate,
+            confirm=confirm,
+            output=io.StringIO(),
+            review_diff=review_diff,
+            check_profile=False,
+            require_tty=False,
+        )
+
+    def fetch_updates(self, *, output=None) -> tuple[str, str]:
+        return nixos_config_agent.fetch_updates(
+            self.protected,
+            self.candidate,
+            output=io.StringIO() if output is None else output,
+            check_profile=False,
+        )
+
     def describe_candidate(self, subject: str = "fix(apparmor): tighten policy") -> str:
         (self.candidate / "configuration.nix").write_text(
             "candidate\n", encoding="utf-8"
@@ -154,15 +177,7 @@ class NixosConfigAgentTest(unittest.TestCase):
 
     def promote_candidate(self) -> str:
         candidate_id = self.describe_candidate()
-        return nixos_config_agent.promote(
-            self.protected,
-            self.candidate,
-            confirm=lambda _: candidate_id,
-            output=io.StringIO(),
-            review_diff=lambda *_: None,
-            check_profile=False,
-            require_tty=False,
-        )
+        return self.promote(confirm=lambda _: candidate_id)
 
     def confirm_id_from_prompt(self, prompt: str) -> str:
         match = re.search(r"[0-9a-f]{40,64}", prompt)
@@ -226,14 +241,9 @@ class NixosConfigAgentTest(unittest.TestCase):
         candidate_id = self.describe_candidate()
         reviews: list[tuple[Path, str, str]] = []
 
-        promoted = nixos_config_agent.promote(
-            self.protected,
-            self.candidate,
+        promoted = self.promote(
             confirm=lambda _: candidate_id,
-            output=io.StringIO(),
             review_diff=lambda *arguments: reviews.append(arguments),
-            check_profile=False,
-            require_tty=False,
         )
 
         self.assertEqual(promoted, candidate_id)
@@ -247,32 +257,6 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.assertEqual(self.revision(self.protected, "parents(@)"), candidate_id)
         self.assertEqual(self.revision(self.candidate, "parents(@)"), candidate_id)
 
-    def test_display_diff_uses_the_configured_jj_pager(self) -> None:
-        diff = subprocess.CompletedProcess(
-            [], 0, stdout="diff --git a/file b/file\n", stderr=""
-        )
-        review = subprocess.CompletedProcess([], 0)
-        with (
-            mock.patch.object(
-                nixos_config_agent,
-                "run_jj",
-                return_value='["delta", "--side-by-side"]',
-            ),
-            mock.patch.object(
-                nixos_config_agent.subprocess,
-                "run",
-                side_effect=(diff, review),
-            ) as run,
-        ):
-            nixos_config_agent.display_diff(self.protected, "from-id", "to-id")
-
-        diff_call, pager_call = run.call_args_list
-        command = diff_call.args[0]
-        self.assertEqual(command[:3], ["jj", "--no-pager", "--color=never"])
-        self.assertEqual(command[-5:], ["--git", "--from", "from-id", "--to", "to-id"])
-        self.assertEqual(pager_call.args[0], ["delta", "--side-by-side"])
-        self.assertEqual(pager_call.kwargs["input"], diff.stdout)
-
     def test_fetch_advances_main_and_rebases_active_candidate(self) -> None:
         self.initialize()
         candidate_current = self.describe_candidate("fix: keep active candidate")
@@ -282,12 +266,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         upstream_target = self.create_github_change()
         output = io.StringIO()
 
-        protected_remote, candidate_remote = nixos_config_agent.fetch_updates(
-            self.protected,
-            self.candidate,
-            output=output,
-            check_profile=False,
-        )
+        protected_remote, candidate_remote = self.fetch_updates(output=output)
 
         self.assertEqual(protected_remote, upstream_target)
         self.assertEqual(candidate_remote, upstream_target)
@@ -317,12 +296,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         )
         upstream_target = self.create_github_change()
 
-        nixos_config_agent.fetch_updates(
-            self.protected,
-            self.candidate,
-            output=io.StringIO(),
-            check_profile=False,
-        )
+        self.fetch_updates()
 
         protected_baseline = self.revision(self.protected, "parents(@)")
         candidate_baseline = self.revision(self.candidate, "parents(@)")
@@ -356,12 +330,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         candidate_current = self.describe_candidate()
         output = io.StringIO()
 
-        nixos_config_agent.fetch_updates(
-            self.protected,
-            self.candidate,
-            output=output,
-            check_profile=False,
-        )
+        self.fetch_updates(output=output)
 
         self.assertEqual(self.revision(self.protected, "@"), protected_current)
         self.assertEqual(self.revision(self.protected, "parents(@)"), baseline)
@@ -386,12 +355,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         protected_current = self.revision(self.protected, "@")
         candidate_current = self.revision(self.candidate, "@")
 
-        nixos_config_agent.fetch_updates(
-            self.protected,
-            self.candidate,
-            output=io.StringIO(),
-            check_profile=False,
-        )
+        self.fetch_updates()
 
         self.assertEqual(self.revision(self.protected, "main"), local_main)
         self.assertEqual(self.revision(self.protected, "@"), protected_current)
@@ -416,12 +380,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         upstream_target = self.create_github_change()
 
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "diverged"):
-            nixos_config_agent.fetch_updates(
-                self.protected,
-                self.candidate,
-                output=io.StringIO(),
-                check_profile=False,
-            )
+            self.fetch_updates()
 
         self.assertEqual(self.revision(self.protected, "main"), local_main)
         self.assertEqual(self.revision(self.protected, "@"), protected_current)
@@ -440,12 +399,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "conflict"):
-            nixos_config_agent.fetch_updates(
-                self.protected,
-                self.candidate,
-                output=io.StringIO(),
-                check_profile=False,
-            )
+            self.fetch_updates()
 
         self.assertEqual(self.revision(self.protected, "main"), local_main)
         self.assertEqual(self.revision(self.protected, "@"), protected_current)
@@ -467,12 +421,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "conflict"):
-            nixos_config_agent.fetch_updates(
-                self.protected,
-                self.candidate,
-                output=io.StringIO(),
-                check_profile=False,
-            )
+            self.fetch_updates()
 
         self.assertEqual(self.revision(self.protected, "main"), local_main)
         self.assertEqual(self.revision(self.protected, "@"), protected_current)
@@ -503,12 +452,7 @@ class NixosConfigAgentTest(unittest.TestCase):
                 nixos_config_agent.WorkflowError, "candidate fetch failed"
             ),
         ):
-            nixos_config_agent.fetch_updates(
-                self.protected,
-                self.candidate,
-                output=io.StringIO(),
-                check_profile=False,
-            )
+            self.fetch_updates()
 
         self.assertEqual(self.revision(self.protected, "main"), protected_main)
 
@@ -518,14 +462,9 @@ class NixosConfigAgentTest(unittest.TestCase):
         promoted = self.promote_candidate()
         reviews: list[tuple[Path, str, str]] = []
 
-        published = nixos_config_agent.push(
-            self.protected,
-            self.candidate,
+        published = self.push(
             confirm=self.confirm_id_from_prompt,
-            output=io.StringIO(),
             review_diff=lambda *arguments: reviews.append(arguments),
-            check_profile=False,
-            require_tty=False,
         )
 
         self.assertNotEqual(published, promoted)
@@ -562,14 +501,9 @@ class NixosConfigAgentTest(unittest.TestCase):
         upstream_target = self.create_github_change()
         reviews: list[tuple[Path, str, str]] = []
 
-        published = nixos_config_agent.push(
-            self.protected,
-            self.candidate,
+        published = self.push(
             confirm=self.confirm_id_from_prompt,
-            output=io.StringIO(),
             review_diff=lambda *arguments: reviews.append(arguments),
-            check_profile=False,
-            require_tty=False,
         )
 
         self.assertEqual(reviews, [(self.protected, upstream_target, published)])
@@ -597,15 +531,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "did not match"):
-            nixos_config_agent.push(
-                self.protected,
-                self.candidate,
-                confirm=lambda _: "no",
-                output=io.StringIO(),
-                review_diff=lambda *_: None,
-                check_profile=False,
-                require_tty=False,
-            )
+            self.push(confirm=lambda _: "no")
 
         signed_baseline = self.revision(self.protected, "parents(@)")
         self.assertNotEqual(signed_baseline, promoted)
@@ -620,15 +546,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.initialize()
         self.describe_candidate()
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "must be empty"):
-            nixos_config_agent.push(
-                self.protected,
-                self.candidate,
-                confirm=lambda _: "",
-                output=io.StringIO(),
-                review_diff=lambda *_: None,
-                check_profile=False,
-                require_tty=False,
-            )
+            self.push(confirm=lambda _: "")
 
         other_candidate = self.root / "other-writable"
         (self.protected / "bad.txt").write_text("bad subject\n", encoding="utf-8")
@@ -642,15 +560,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         with self.assertRaisesRegex(
             nixos_config_agent.WorkflowError, "Conventional Commit"
         ):
-            nixos_config_agent.push(
-                self.protected,
-                other_candidate,
-                confirm=lambda _: "",
-                output=io.StringIO(),
-                review_diff=lambda *_: None,
-                check_profile=False,
-                require_tty=False,
-            )
+            self.push(confirm=lambda _: "", candidate=other_candidate)
 
     def test_push_refuses_divergent_main(self) -> None:
         self.initialize()
@@ -676,15 +586,7 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.run_jj(self.protected, "edit", protected_current)
 
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "diverged"):
-            nixos_config_agent.push(
-                self.protected,
-                self.candidate,
-                confirm=lambda _: "",
-                output=io.StringIO(),
-                review_diff=lambda *_: None,
-                check_profile=False,
-                require_tty=False,
-            )
+            self.push(confirm=lambda _: "")
 
     def test_refuses_existing_destination(self) -> None:
         self.candidate.mkdir()
@@ -698,44 +600,20 @@ class NixosConfigAgentTest(unittest.TestCase):
         with self.assertRaisesRegex(
             nixos_config_agent.WorkflowError, "change is empty"
         ):
-            nixos_config_agent.promote(
-                self.protected,
-                self.candidate,
-                confirm=lambda _: "",
-                output=io.StringIO(),
-                review_diff=lambda *_: None,
-                check_profile=False,
-                require_tty=False,
-            )
+            self.promote(confirm=lambda _: "")
 
         self.describe_candidate("not a conventional subject")
         with self.assertRaisesRegex(
             nixos_config_agent.WorkflowError, "Conventional Commit"
         ):
-            nixos_config_agent.promote(
-                self.protected,
-                self.candidate,
-                confirm=lambda _: "",
-                output=io.StringIO(),
-                review_diff=lambda *_: None,
-                check_profile=False,
-                require_tty=False,
-            )
+            self.promote(confirm=lambda _: "")
 
     def test_rejection_and_stale_baseline_leave_protected_tree_unchanged(self) -> None:
         self.initialize()
         candidate_id = self.describe_candidate()
         protected_before = self.revision(self.protected, "@")
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "did not match"):
-            nixos_config_agent.promote(
-                self.protected,
-                self.candidate,
-                confirm=lambda _: "no",
-                output=io.StringIO(),
-                review_diff=lambda *_: None,
-                check_profile=False,
-                require_tty=False,
-            )
+            self.promote(confirm=lambda _: "no")
         self.assertEqual(self.revision(self.protected, "@"), protected_before)
 
         (self.protected / "configuration.nix").write_text(
@@ -745,16 +623,38 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.run_jj(self.protected, "new", "-m", "")
         stale_protected = self.revision(self.protected, "@")
         with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "does not match"):
-            nixos_config_agent.promote(
-                self.protected,
-                self.candidate,
-                confirm=lambda _: candidate_id,
-                output=io.StringIO(),
-                review_diff=lambda *_: None,
-                check_profile=False,
-                require_tty=False,
-            )
+            self.promote(confirm=lambda _: candidate_id)
         self.assertEqual(self.revision(self.protected, "@"), stale_protected)
+
+
+class NixosConfigAgentUnitTest(unittest.TestCase):
+    def test_display_diff_uses_the_configured_jj_pager(self) -> None:
+        diff = subprocess.CompletedProcess(
+            [], 0, stdout="diff --git a/file b/file\n", stderr=""
+        )
+        review = subprocess.CompletedProcess([], 0)
+        with (
+            mock.patch.object(
+                nixos_config_agent,
+                "run_jj",
+                return_value='["delta", "--side-by-side"]',
+            ),
+            mock.patch.object(
+                nixos_config_agent.subprocess,
+                "run",
+                side_effect=(diff, review),
+            ) as run,
+        ):
+            nixos_config_agent.display_diff(
+                Path("/review-repository"), "from-id", "to-id"
+            )
+
+        diff_call, pager_call = run.call_args_list
+        command = diff_call.args[0]
+        self.assertEqual(command[:3], ["jj", "--no-pager", "--color=never"])
+        self.assertEqual(command[-5:], ["--git", "--from", "from-id", "--to", "to-id"])
+        self.assertEqual(pager_call.args[0], ["delta", "--side-by-side"])
+        self.assertEqual(pager_call.kwargs["input"], diff.stdout)
 
     def test_requires_unconfined_label(self) -> None:
         with self.assertRaisesRegex(

@@ -49,6 +49,15 @@ let
     pkgs.electron.unwrapped
   ];
 
+  softmakerApplication = name: {
+    package = softmakerOffice;
+    executable = "bin/softmaker-office-nx-${name}";
+    capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
+    extraClosureRoots = [ pkgs.util-linux ];
+    extraExecutables = [ "${pkgs.util-linux}/bin/whereis" ];
+    homePaths = [ "SoftMaker" ];
+  };
+
   codexDesktopPackages = builtins.filter (
     package: lib.hasPrefix "codex-desktop-" (lib.getName package)
   ) config.home.packages;
@@ -372,30 +381,9 @@ in
           "logseq"
         ];
       };
-      textmaker = {
-        package = softmakerOffice;
-        executable = "bin/softmaker-office-nx-textmaker";
-        capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
-        extraClosureRoots = [ pkgs.util-linux ];
-        extraExecutables = [ "${pkgs.util-linux}/bin/whereis" ];
-        homePaths = [ "SoftMaker" ];
-      };
-      planmaker = {
-        package = softmakerOffice;
-        executable = "bin/softmaker-office-nx-planmaker";
-        capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
-        extraClosureRoots = [ pkgs.util-linux ];
-        extraExecutables = [ "${pkgs.util-linux}/bin/whereis" ];
-        homePaths = [ "SoftMaker" ];
-      };
-      presentations = {
-        package = softmakerOffice;
-        executable = "bin/softmaker-office-nx-presentations";
-        capabilities = acceleratedDocumentCapabilities ++ [ "network" ];
-        extraClosureRoots = [ pkgs.util-linux ];
-        extraExecutables = [ "${pkgs.util-linux}/bin/whereis" ];
-        homePaths = [ "SoftMaker" ];
-      };
+      textmaker = softmakerApplication "textmaker";
+      planmaker = softmakerApplication "planmaker";
+      presentations = softmakerApplication "presentations";
       brave = {
         package = pkgs.brave;
         capabilities = browserCapabilities;
@@ -605,6 +593,7 @@ in
         ];
         extraRules = ''
           owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,
+          /etc/claude-code/ r,
           /etc/claude-code/managed-settings.d/{,**} r,
           owner @{HOME}/.claude.json rwkl,
           owner @{HOME}/.claude.json.tmp.* rwkl,

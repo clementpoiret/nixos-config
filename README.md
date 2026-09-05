@@ -23,10 +23,12 @@ with Home Manager integrated into each NixOS build.
 
 - `flake.nix`: flake inputs, overlays, and host outputs.
 - `lib/mkHost.nix`: shared host constructor.
+- `lib/apparmor.nix`: shared sensitive-resource rules and inventory schema.
 - `hosts/<host>/`: host entrypoint, hardware config, and host facts.
 - `modules/core/`: shared NixOS modules.
 - `modules/home/`: Home Manager modules.
 - `pkgs/`: local packages exposed through the default overlay.
+- `tests/flake-checks.nix`: flake checks and AppArmor test host variants.
 - `secrets/`: sops-nix encrypted secrets.
 - `docs/`: bootstrap, operations, architecture decisions, and host notes.
 - `docs/HARDENING.md`: active security posture, strict-control trials, and
@@ -210,11 +212,20 @@ nix-shell -p cpuid --run \
   "cpuid -1 -l 1 -r | sed -n 's/.*eax=0x\([0-9a-f]*\).*/\U\1/p'"
 ```
 
-Create `hosts/<new-host>/facts.nix` with the returned value:
+Create `hosts/<new-host>/facts.nix` with the returned value and the device's
+CPU target and kernel tuning. The tuning below matches the desktop; the
+Framework laptop uses `znver4`, `"300"`, and `lazyRcu = true`:
 
 ```nix
 {
-  hardware.cpuModelId = "REPLACE_WITH_CPUID";
+  hardware = {
+    cpuModelId = "REPLACE_WITH_CPUID";
+    cpuTarget = "znver5";
+    kernel = {
+      hzTicks = "500";
+      lazyRcu = false;
+    };
+  };
 
   home = {
     easyeffects = {
@@ -229,18 +240,19 @@ Create `hosts/<new-host>/facts.nix` with the returned value:
 }
 ```
 
-Register the host and its build check in `flake.nix`. For a host named
-`workstation`, the two entries are:
+Register the host in `flake.nix`. For a host named `workstation`, add:
 
 ```nix
 nixosConfigurations = {
   workstation = mkHost { host = "workstation"; };
 };
+```
 
-checks.${system} = {
-  workstation-toplevel =
-    self.nixosConfigurations.workstation.config.system.build.toplevel;
-};
+Add its build check to the attribute set returned by `tests/flake-checks.nix`:
+
+```nix
+workstation-toplevel =
+  self.nixosConfigurations.workstation.config.system.build.toplevel;
 ```
 
 Keep the existing hosts in both attribute sets. Add an appropriate
@@ -267,7 +279,7 @@ tracked. Use one of these workflows before building:
 jj status
 
 # Plain Git checkout
-git add "hosts/$NEW_HOST" flake.nix secrets/user-secrets.yaml
+git add "hosts/$NEW_HOST" flake.nix tests/flake-checks.nix secrets/user-secrets.yaml
 ```
 
 Committing is not required for a local build, but the files must be tracked.

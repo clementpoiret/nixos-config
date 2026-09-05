@@ -7,7 +7,9 @@ Desktop workstation with an MSI MAG X870E Tomahawk WiFi motherboard, Ryzen 9
 
 Local host policy includes:
 
-- CachyOS latest LTO Zen4 kernel and AMD P-State active mode.
+- CachyOS latest LTO Zen4 kernel with 500 Hz tuning and AMD P-State active mode.
+- `facts.nix` selects `znver5` for host-optimized applications and leaves lazy RCU
+  at its kernel default.
 - Power Profiles Daemon defaults to Balanced, while LAVD Autopilot remains the
   interactive sched-ext policy.
 - The frequency CCD is preferred through the kernel's `amd_x3d_mode` interface.
@@ -73,12 +75,19 @@ keyboard/module access rules, AMD common defaults, and power profile defaults.
 Local host policy includes:
 
 - CachyOS latest LTO Zen4 kernel with laptop-specific 300 Hz and lazy RCU tuning.
+- `facts.nix` selects `znver4` for host-optimized applications and records kernel tuning.
+- Fan control, ambient-light adjustment, and city-level location policy live in `default.nix`.
 - LAVD Autopower follows the active platform power profile when selecting its
   power mode, CPU preference order, and core-compaction policy.
 - Hibernation resume device and swapfile offset.
 - AMD dGPU/iGPU stable DRM symlinks.
 - ROCm runtime, OpenCL, and ML-training support in `hosts/laptop/rocm.nix`.
-- `amdgpu.sg_display=0`.
+- Ghostty shaders render only on terminal updates; desktop shaders animate only
+  while focused.
+- TRIM passes through both LUKS mappings to the SSDs. This exposes block
+  allocation patterns on the encrypted devices.
+- Panel self-refresh is allowed by filtering the inherited
+  `amdgpu.dcdebugmask=0x10` workaround out of the kernel parameters.
 - The ucodenix SHA-check bypass is disabled; verify the loaded microcode
   revision and kernel log after firmware, kernel, or ucodenix updates.
 - Local power-button and lid behavior.
@@ -92,3 +101,13 @@ Build target:
 ```bash
 nix build .#checks.x86_64-linux.laptop-toplevel
 ```
+
+Apply the TRIM and panel self-refresh changes using the `boot` workflow in
+`OPERATIONS.md`, then reboot. Check that `/proc/cmdline` no longer contains
+`amdgpu.dcdebugmask=0x10` and that `lsblk -D` reports a nonzero `DISC-MAX` for
+both LUKS mappings. Test static screen content, video, and suspend/resume on
+both AC and battery power. Removing the override permits the driver's default
+PSR behavior; it does not prove the panel enters PSR or establish battery savings.
+If display hangs return, boot the previous generation and remove the
+`boot.kernelParams` filter in `hosts/laptop/default.nix` to restore the upstream
+workaround.

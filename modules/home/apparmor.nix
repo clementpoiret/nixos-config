@@ -1,6 +1,7 @@
 { lib, ... }:
 let
   inherit (lib) mkOption types;
+  inherit (import ../../lib/apparmor.nix { inherit lib; }) sensitiveGroups inventoryType;
 
   capabilityType = types.enum [
     "audio"
@@ -23,21 +24,7 @@ let
     "user-files"
   ];
 
-  sensitiveAccessType = types.enum [
-    "credential-broker"
-    "forge-auth"
-    "gpg-agent"
-    "gpg-private"
-    "hardware-credentials"
-    "mail-auth"
-    "netrc"
-    "nixos-config-writable"
-    "password-store"
-    "sops"
-    "ssh-config"
-    "ssh-control"
-    "ssh-identities"
-  ];
+  sensitiveAccessType = types.enum (builtins.attrNames sensitiveGroups);
 
   applicationType = types.submodule (
     { name, ... }:
@@ -151,33 +138,6 @@ let
     }
   );
 
-  inventoryType = types.submodule (
-    { ... }:
-    {
-      options = {
-        kind = mkOption {
-          type = types.enum [
-            "application"
-            "service"
-          ];
-        };
-        status = mkOption {
-          type = types.enum [
-            "candidate"
-            "exempt"
-          ];
-        };
-        target = mkOption {
-          type = types.str;
-          description = "Package, launcher class, or service represented by this entry.";
-        };
-        rationale = mkOption {
-          type = types.str;
-          description = "Why the workload is not currently attached to a local profile.";
-        };
-      };
-    }
-  );
 in
 {
   options.localAppArmor = {

@@ -3,8 +3,10 @@ from __future__ import annotations
 import datetime as dt
 import importlib.util
 import io
+import json
 import os
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -23,6 +25,91 @@ SPEC.loader.exec_module(apparmor_report)
 
 
 class AppArmorReportTest(unittest.TestCase):
+    def test_accepts_archive_boot_ids_and_preserves_signed_offsets(self) -> None:
+        parser = apparmor_report.build_parser()
+        self.assertEqual(
+            parser.parse_args(["--boot", "12a90c1d-74a4-4405-9565-b5aa12c79fbc"]).boot,
+            "12a90c1d74a444059565b5aa12c79fbc",
+        )
+        self.assertEqual(parser.parse_args(["--boot", "-1"]).boot, "-1")
+
+    @staticmethod
+    def journal_record(message: str, transport: str, boot: str = "boot-a") -> str:
+        entry = {"MESSAGE": message, "_TRANSPORT": transport, "_BOOT_ID": boot}
+        if transport == "audit":
+            entry["_AUDIT_ID"] = "42"
+        return json.dumps(entry)
+
+    def test_queries_audit_and_kernel_transports_with_delivery_warnings(self) -> None:
+        args = mock.Mock(boot="-1", since="yesterday", until="today")
+        with (
+            mock.patch.object(
+                apparmor_report.shutil, "which", return_value="journalctl"
+            ),
+            mock.patch.object(
+                apparmor_report, "_stream_command", return_value=iter([])
+            ) as stream,
+        ):
+            self.assertEqual(list(apparmor_report.journal_lines(args)), [])
+        command = stream.call_args.args[0]
+        self.assertIn("--boot=-1", command)
+        self.assertIn("_TRANSPORT=audit", command)
+        self.assertIn("_TRANSPORT=kernel", command)
+        self.assertIn("kauditd_printk_skb", command[command.index("--grep") + 1])
+        self.assertEqual(command[-4:], ["--since", "yesterday", "--until", "today"])
+
+    def test_deduplicates_transports_without_losing_stacked_or_kernel_only_records(
+        self,
+    ) -> None:
+        message = (
+            'apparmor="ALLOWED" operation="open" class="file" profile="local-test" '
+            'name="/tmp/example" pid=12 comm="cat" requested_mask="r" denied_mask="r"'
+        )
+        audit = self.journal_record("AVC " + message, "audit")
+        kernel = self.journal_record(
+            "audit: type=1400 audit(1.0:42): " + message, "kernel"
+        )
+        stacked = self.journal_record(
+            "AVC "
+            + message.replace('profile="local-test"', 'profile="local-test//child"'),
+            "audit",
+        )
+        kernel_only = self.journal_record(
+            "audit: type=1400 audit(1.0:43): " + message, "kernel"
+        )
+        other_boot = self.journal_record("AVC " + message, "audit", "boot-b")
+        for copies in ([audit, kernel], [kernel, audit]):
+            with self.subTest(order=copies):
+                lines = list(
+                    apparmor_report.deduplicate_journal_lines(
+                        [*copies, stacked, kernel_only, other_boot]
+                    )
+                )
+                self.assertEqual(lines, [copies[0], stacked, kernel_only, other_boot])
+
+    def test_retains_repeated_raw_records_without_audit_identity(self) -> None:
+        raw = 'apparmor="DENIED" profile="local-test" name="/tmp/example"'
+        journal = json.dumps({"MESSAGE": raw})
+        lines = [raw, raw, journal, journal]
+        self.assertEqual(list(apparmor_report.deduplicate_journal_lines(lines)), lines)
+
+    def test_reports_audit_delivery_failures_independently_of_profile_filter(
+        self,
+    ) -> None:
+        for message in (
+            "kauditd_printk_skb: 17262 callbacks suppressed",
+            "audit: audit_lost=42 audit_rate_limit=0 audit_backlog_limit=64",
+            "audit: backlog limit exceeded",
+            "audit: rate limit exceeded",
+        ):
+            with self.subTest(message=message):
+                issue = apparmor_report.parse_kernel_issue(message, ["local-test"])
+                self.assertIsNotNone(issue)
+                self.assertEqual(issue["message"], message)
+        self.assertIsNone(
+            apparmor_report.parse_kernel_issue("audit: audit_lost=0", ["*"])
+        )
+
     def test_journal_lines_treats_no_grep_matches_as_empty(self) -> None:
         process = mock.Mock(
             stdout=io.StringIO(""),
@@ -74,6 +161,7 @@ class AppArmorReportTest(unittest.TestCase):
         self.assertEqual(event.result, "ALLOWED")
         self.assertEqual(event.targets, (("name", "/home/test/file with spaces"),))
         self.assertIn(("owner_match", "yes"), event.details)
+        self.assertIn(("fsuid", "1000"), event.details)
         assert event.timestamp is not None
         self.assertEqual(
             dt.datetime.fromisoformat(event.timestamp).timestamp(), 1786960144
@@ -182,6 +270,18 @@ class AppArmorReportTest(unittest.TestCase):
         assert timestamp is not None
         self.assertEqual(dt.datetime.fromisoformat(timestamp).timestamp(), 1786960144)
 
+    def test_prefers_audit_event_timestamp_to_journal_receipt_time(self) -> None:
+        _, timestamp = apparmor_report.unpack_input_line(
+            json.dumps(
+                {
+                    "MESSAGE": "example",
+                    "_SOURCE_REALTIME_TIMESTAMP": "1786960144030000",
+                    "__REALTIME_TIMESTAMP": "1786960154030000",
+                }
+            )
+        )
+        self.assertEqual(dt.datetime.fromisoformat(timestamp).timestamp(), 1786960144)
+
     def test_extracts_and_collapses_aa_status_profile_modes(self) -> None:
         modes = apparmor_report.extract_profile_modes(
             {
@@ -201,29 +301,34 @@ class AppArmorReportTest(unittest.TestCase):
         )
 
     def test_current_profile_modes_applies_globs_without_hardcoded_filter(self) -> None:
-        process = mock.Mock(
-            returncode=0,
-            stdout='{"profiles":{"local-brave":"complain","upstream":"enforce"}}',
-            stderr="",
-        )
-        with (
-            mock.patch.object(
-                apparmor_report.shutil, "which", return_value="/bin/aa-status"
+        cases = (
+            (
+                "profiles",
+                """print('{"profiles":{"local-brave":"complain","upstream":"enforce"}}')""",
+                {"local-brave": "complain", "upstream": "enforce"},
+                None,
             ),
-            mock.patch.object(
-                apparmor_report.subprocess, "run", return_value=process
-            ) as run,
-        ):
-            modes, error = apparmor_report.current_profile_modes(["*"])
-
-        self.assertIsNone(error)
-        self.assertEqual(modes, {"local-brave": "complain", "upstream": "enforce"})
-        run.assert_called_once_with(
-            ["/bin/aa-status", "--json"],
-            capture_output=True,
-            text=True,
-            check=False,
+            ("command error", 'sys.exit("permission denied")', {}, "permission denied"),
         )
+        for name, response, expected_modes, expected_error in cases:
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as temporary:
+                aa_status = Path(temporary) / "aa-status"
+                aa_status.write_text(
+                    f"#!{sys.executable}\n"
+                    "import sys\n"
+                    "if sys.argv[1:] != ['--json']:\n"
+                    "    sys.exit('expected --json')\n"
+                    f"{response}\n",
+                    encoding="utf-8",
+                )
+                aa_status.chmod(0o755)
+                with mock.patch.object(
+                    apparmor_report.shutil, "which", return_value=str(aa_status)
+                ):
+                    modes, error = apparmor_report.current_profile_modes(["*"])
+
+                self.assertEqual(error, expected_error)
+                self.assertEqual(modes, expected_modes)
 
 
 if __name__ == "__main__":
