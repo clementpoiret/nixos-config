@@ -191,6 +191,14 @@
           stable = pkgs-stable;
           flake = pkgs-flake;
 
+          # Deezer bundles libffmpeg.so; its redundant NW.js dependency is insecure.
+          deezer-enhanced = (prev.deezer-enhanced.override { nwjs = null; }).overrideAttrs (oldAttrs: {
+            buildInputs = oldAttrs.buildInputs ++ [
+              final.libgbm
+              final.alsa-lib
+            ];
+          });
+
           # The pinned niri-flake package still requires libdisplay-info 0.2.
           libdisplay-info_0_2 = pkgs-stable.libdisplay-info_0_2;
         })

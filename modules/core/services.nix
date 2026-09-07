@@ -2,6 +2,7 @@
   config,
   host,
   lib,
+  options,
   pkgs,
   username,
   ...
@@ -12,6 +13,15 @@ let
   syncthingRoots = lib.unique (
     [ syncthingRoot ] ++ lib.optional (host == "desktop") "/srv/syncthing"
   );
+  journalSettings = {
+    Storage = "persistent";
+    Compress = true;
+    Seal = true;
+    SystemMaxUse = "1G";
+    MaxRetentionSec = "30day";
+    RateLimitIntervalSec = "30s";
+    RateLimitBurst = 10000;
+  };
 in
 {
   services = {
@@ -26,15 +36,12 @@ in
         seahorse
       ];
     };
-    journald.extraConfig = ''
-      Storage=persistent
-      Compress=yes
-      Seal=yes
-      SystemMaxUse=1G
-      MaxRetentionSec=30day
-      RateLimitIntervalSec=30s
-      RateLimitBurst=10000
-    '';
+    # Support both the checked-in nixpkgs and the CI dependency update.
+    journald =
+      if options.services.journald ? settings then
+        { settings.Journal = journalSettings; }
+      else
+        { extraConfig = lib.generators.toKeyValue { } journalSettings; };
     timesyncd.enable = false;
     chrony = {
       enable = true;

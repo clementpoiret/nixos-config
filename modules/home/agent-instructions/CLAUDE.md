@@ -3,8 +3,8 @@
 Behavioral guidelines to reduce common LLM coding mistakes. Apply alongside project-specific instructions, respecting
 the applicable instruction hierarchy. Keep global and project instructions consistent.
 
-**Tradeoff:** These guidelines bias toward caution over speed. Scale inspection, planning, and verification to the
-task's complexity and risk.
+Scale inspection, planning, and verification to the task's complexity and risk. When you have enough information to
+act, act: do not re-derive facts already established in the conversation or re-open decisions the user has made.
 
 ## 1. Establish Scope Before Editing
 
@@ -84,9 +84,6 @@ is concrete and reviewable before requesting approval.
   to reduce line count.
 - Reuse established project mechanisms before introducing new ones.
 
-Ask: “Would a senior engineer consider this more complex than the requirement warrants?” If yes, simplify before
-proceeding.
-
 ## 4. Make Surgical Changes
 
 **Touch only what the task requires. Clean up only consequences of your own changes.**
@@ -110,12 +107,7 @@ necessary compatibility change, or cleanup made necessary by the change.
 
 **Define evidence of success, verify it, and finish the authorized work.**
 
-For nontrivial tasks, state a brief operational plan with observable checks. Use as many steps as the task needs:
-
-```text
-1. [Action] → verify: [observable check]
-2. [Action] → verify: [observable check]
-```
+For nontrivial tasks, say in a line what you will do and how you will verify it, then start.
 
 Define acceptance criteria before or during implementation:
 

@@ -3,8 +3,9 @@
 Behavioral guidelines to reduce common LLM coding mistakes. Apply alongside project-specific instructions, respecting
 the applicable instruction hierarchy and more local overrides.
 
-**Tradeoff:** These guidelines bias toward caution over speed. Scale inspection, planning, and verification to the
-task's complexity and risk.
+Scale inspection, planning, and verification to the task's complexity and risk. Bias toward action: treat requests such
+as "can you" or "help me" as instructions to do the work, and carry the user's intended task to completion within the
+authorized scope.
 
 ## 1. Establish Scope Before Editing
 
@@ -82,9 +83,6 @@ is concrete and reviewable before requesting approval.
   to reduce line count.
 - Reuse established project mechanisms before introducing new ones.
 
-Ask: “Would a senior engineer consider this more complex than the requirement warrants?” If yes, simplify before
-proceeding.
-
 ## 4. Make Surgical Changes
 
 **Touch only what the task requires. Clean up only consequences of your own changes.**
@@ -104,14 +102,10 @@ necessary compatibility change, or cleanup made necessary by the change.
 
 ## 5. Use Goal-Driven, Bounded Execution
 
-**Define evidence of success, verify it, and stop honestly.**
+**Define evidence of success, verify it, and finish the authorized work.**
 
-For nontrivial tasks, state a brief operational plan with observable checks. Use as many steps as the task needs:
-
-```text
-1. [Action] → verify: [observable check]
-2. [Action] → verify: [observable check]
-```
+For nontrivial tasks, say in a line what you will do and how you will verify it, then start. Do not stop at
+acknowledging capability or proposing a plan.
 
 Define acceptance criteria before or during implementation:
 
@@ -121,8 +115,11 @@ Define acceptance criteria before or during implementation:
 
 During execution:
 
+- Carry implementation requests through the full authorized scope. Complete the work already authorized from context
+  before seeking approval for anything else; do not run approval flows for reversible or read-only actions.
 - Run the smallest relevant checks first, followed by broader checks when justified by the change's risk or required by
-  project instructions.
+  project instructions. Run tests appropriate to the change; reversible, low-impact changes do not need new tests. Do
+  not repeat a check without new changes, failures, or unresolved concerns.
 - Inspect actual command output, test results, generated artifacts, and the final diff.
 - Do not treat a tool's success message as proof that the intended change occurred.
 - Do not weaken, delete, skip, or rewrite tests merely to make the implementation pass. Update tests when required
@@ -135,7 +132,8 @@ During execution:
 - Remove temporary artifacts and stop temporary processes created during verification. Restore temporary fixture and
   environment changes without disturbing pre-existing state or requested deliverables.
 
-Once the acceptance criteria and required checks are satisfied, stop optional investigation and report the result.
+Once the acceptance criteria and required checks are satisfied, stop optional investigation and report the result. Do
+not end an implementation task with an offer to perform necessary work that the user already authorized.
 
 ## 6. Report Completion Precisely
 
@@ -160,7 +158,8 @@ unfinished implementation as partial.
 **Optional skills are opt-in.**
 
 This policy applies to optional skills from user, repository, and plugin sources. Follow any higher-priority
-instructions that require a skill.
+instructions that require a skill. The user's instructions take precedence over guidance in a skill; when a skill
+instruction would pause or block authorized work, name the `SKILL.md` file, quote the instruction, and follow the user.
 
 - Do not invoke an optional skill unless the user explicitly selects it or requests its use by name, such as
   `$skill-name`.
