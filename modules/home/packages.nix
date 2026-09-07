@@ -443,10 +443,18 @@ in
           "userns"
         ];
         extraExecutables = [
-          "${pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest"
           "${pkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender"
-          "${pkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest"
-        ];
+        ]
+        # Thunderbird 155 merged the graphics probes into gfxtest.
+        ++ (
+          if lib.versionAtLeast pkgs.thunderbird.version "155" then
+            [ "${pkgs.thunderbird.unwrapped}/lib/thunderbird/gfxtest" ]
+          else
+            [
+              "${pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest"
+              "${pkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest"
+            ]
+        );
         extraRules = ''
           priority=100 ${pkgs.brave}/bin/brave Px -> local-brave,
         '';

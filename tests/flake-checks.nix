@@ -316,8 +316,21 @@ in
     assert builtins.elem ".pki/nssdb" laptopHomeAppArmor.applications.brave.homePaths;
     assert builtins.elem "${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender"
       laptopHomeAppArmor.applications.thunderbird.extraExecutables;
-    assert builtins.elem "${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest"
-      laptopHomeAppArmor.applications.thunderbird.extraExecutables;
+    assert
+      laptopHomeAppArmor.applications.thunderbird.extraExecutables
+      == map (name: "${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/${name}") (
+        if pkgs-unstable.lib.versionAtLeast laptopPkgs.thunderbird.version "155" then
+          [
+            "pingsender"
+            "gfxtest"
+          ]
+        else
+          [
+            "pingsender"
+            "glxtest"
+            "vaapitest"
+          ]
+      );
     assert builtins.elem "developer-exec" laptopHomeAppArmor.applications.codex-cli.capabilities;
     assert builtins.elem "containers" laptopHomeAppArmor.applications.codex-cli.capabilities;
     assert builtins.elem "containers" laptopHomeAppArmor.applications.claude-code.capabilities;
@@ -602,6 +615,7 @@ in
 
   apparmor-policy-parser =
     let
+      laptopPkgs = self.nixosConfigurations.laptop.pkgs;
       configurations = [
         self.nixosConfigurations.desktop
         self.nixosConfigurations.laptop
@@ -994,9 +1008,18 @@ in
           require_rule 'owner "@{HOME}/.local/share/protonmail/{,**}" rwkl,' "$protonmail_bridge_common"
 
           thunderbird_common="$(common_rules "$profile_directory/local-thunderbird")"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest ixr,' "$thunderbird_common"
           require_rule '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender ixr,' "$thunderbird_common"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest ixr,' "$thunderbird_common"
+          ${
+            if pkgs-unstable.lib.versionAtLeast laptopPkgs.thunderbird.version "155" then
+              ''
+                require_rule '${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/gfxtest ixr,' "$thunderbird_common"
+              ''
+            else
+              ''
+                require_rule '${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest ixr,' "$thunderbird_common"
+                require_rule '${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest ixr,' "$thunderbird_common"
+              ''
+          }
           require_rule 'priority=100 ${self.nixosConfigurations.laptop.pkgs.brave}/bin/brave Px -> local-brave,' "$thunderbird_common"
 
           for app_name in textmaker planmaker presentations; do
