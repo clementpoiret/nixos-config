@@ -15,11 +15,11 @@ let
 in
 {
   imports = [
-    inputs.dms.nixosModules.greeter
+    inputs.dank-greeter.nixosModules.default
   ];
 
   services.greetd.enable = true;
-  programs.dank-material-shell.greeter = {
+  programs.dms-greeter = {
     enable = true;
     compositor.name = "niri";
     configHome = "/home/${username}";
