@@ -104,6 +104,8 @@
         }
       ];
     };
+
+    pki.certificateFiles = [ "/home/clementpoiret/opercord_lab/pki/opercord-ca/ca.key" ];
   };
 
   system.tools.nixos-rebuild.enableRun0Elevation = true;
