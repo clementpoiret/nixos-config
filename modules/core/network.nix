@@ -92,7 +92,10 @@ in
     };
   };
 
-  environment.systemPackages = with pkgs; [ networkmanagerapplet ];
+  environment.systemPackages = with pkgs; [
+    networkmanagerapplet
+    wireguard-tools
+  ];
 
   services.resolved = {
     enable = true;
