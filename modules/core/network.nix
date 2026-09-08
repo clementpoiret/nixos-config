@@ -9,6 +9,10 @@
 let
   dnsSecretName = "dns/${host}";
   nameservers = hostFacts.network.nameservers or [ ];
+  projectVpnAddresses = {
+    laptop = "10.77.0.3/24";
+    desktop = "10.77.0.4/24";
+  };
   dnsServiceEnabled = builtins.hasAttr dnsSecretName config.sops.secrets;
   dnsTools = with pkgs; [
     coreutils
@@ -22,6 +26,12 @@ in
     networkmanager.enable = true;
     tempAddresses = "default";
     inherit nameservers;
+    wg-quick.interfaces.wg0 = {
+      # Start/stop manually with systemctl start/stop wg-quick-wg0.service.
+      autostart = false;
+      configFile = config.sops.templates."wg0.conf".path;
+    };
+    hosts."10.77.0.1" = [ "cp.opercord.test" ];
     nftables.enable = true;
     firewall = {
       enable = true;
@@ -39,6 +49,22 @@ in
       connectionTrackingModules = [ ];
       logRefusedConnections = false;
     };
+  };
+
+  sops.templates."wg0.conf" = {
+    mode = "0400";
+    # Keep peer details out of the Nix store; load the separate private key at runtime.
+    content = ''
+      [Interface]
+      Address = ${projectVpnAddresses.${host}}
+      PostUp = ${pkgs.wireguard-tools}/bin/wg set %i private-key /etc/wireguard/private.key
+
+      [Peer]
+      PublicKey = ${config.sops.placeholder."wireguard/vps_public_key"}
+      Endpoint = ${config.sops.placeholder."wireguard/vps_ip"}:51820
+      AllowedIPs = 10.77.0.0/24
+      PersistentKeepalive = 25
+    '';
   };
 
   # These systems are network endpoints, not routers.

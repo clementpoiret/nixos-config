@@ -14,6 +14,8 @@
 
     secrets = {
       "dns/${host}".mode = "0400";
+      "wireguard/vps_public_key".mode = "0400";
+      "wireguard/vps_ip".mode = "0400";
     };
   };
 }
