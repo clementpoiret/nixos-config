@@ -106,6 +106,15 @@ let
       IdentityFile none
       IdentitiesOnly no
 
+    # Opercord hosts require wg0 (wg-quick-wg0.service) to be active.
+    Host opercord-cp-01
+      HostName 10.77.0.1
+      User clementpoiret
+
+    Host opercord-edge-01
+      HostName 10.77.0.2
+      User clementpoiret
+
     Host rpihome
       HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/rpihome")})
 
