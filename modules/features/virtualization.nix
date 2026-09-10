@@ -34,7 +34,8 @@
 
   environment.systemPackages = with pkgs; [
     dnsmasq
-    podman-compose
+    # podman-compose
+    docker-compose
     virt-viewer
   ];
 }
