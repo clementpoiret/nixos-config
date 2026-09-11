@@ -227,7 +227,6 @@ in
 
       # Security
       age # Simple modern file encryption
-      gcr
       openssl # SSL/TLS protocol implementation
       proton-pass # Password manager
       proton-pass-cli # CLI version :)
