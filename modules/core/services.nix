@@ -29,12 +29,7 @@ in
     dbus = {
       enable = true;
       implementation = "broker";
-      packages = with pkgs; [
-        gcr
-        gnome-keyring
-        libsecret
-        seahorse
-      ];
+      packages = [ pkgs.gnome-keyring ];
     };
     # Support both the checked-in nixpkgs and the CI dependency update.
     journald =
