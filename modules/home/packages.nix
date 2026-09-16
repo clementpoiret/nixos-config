@@ -130,6 +130,7 @@ in
       aria2 # Multi-source command-line download utility
       dnsutils # DNS lookup utilities (dig, host, nslookup)
       motrix-next # dl manager
+      protonmail-desktop
       protonmail-bridge
       # protonmail-bridge-gui
       # protonvpn-cli # ProtonVPN command-line interface
@@ -477,6 +478,15 @@ in
         ];
         sensitiveAccess = [ "credential-broker" ];
         elevatedAccessRationale = "Proton Mail Bridge stores its authentication material through the secret-service broker.";
+      };
+      protonmail-desktop = {
+        package = pkgs.protonmail-desktop;
+        executable = "bin/proton-mail";
+        capabilities = electronCapabilities ++ [ "credential-broker" ];
+        executionPackages = electronExecutionPackages;
+        homePaths = [ ".config/Proton Mail" ];
+        sensitiveAccess = [ "credential-broker" ];
+        elevatedAccessRationale = "Proton Mail Desktop uses the desktop secret-service broker for stored credentials.";
       };
       proton-pass = {
         package = pkgs.proton-pass;
