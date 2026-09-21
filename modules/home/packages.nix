@@ -63,6 +63,15 @@ let
   ) config.home.packages;
   codexDesktopPackage =
     if builtins.length codexDesktopPackages == 1 then builtins.head codexDesktopPackages else null;
+  t3codePackages = inputs.t3code.packages.${pkgs.stdenv.hostPlatform.system};
+  t3codeRuntimeOptions = {
+    enableCodex = true;
+    enableClaude = true;
+    enableJujutsu = true;
+    codex = pkgs.flake.codex-cli;
+    claude-code = pkgs.flake.claude-code;
+    jujutsu = pkgs.jujutsu;
+  };
 in
 {
   imports = [
@@ -249,14 +258,8 @@ in
       # flake.antigravity-ide
       flake.claude-code
       flake.codex-cli
-      (inputs.t3code.packages.${pkgs.stdenv.hostPlatform.system}.t3code.override {
-        enableCodex = true;
-        enableClaude = true;
-        enableJujutsu = true;
-        codex = pkgs.flake.codex-cli;
-        claude-code = pkgs.flake.claude-code;
-        jujutsu = pkgs.jujutsu;
-      })
+      (t3codePackages.t3code.override t3codeRuntimeOptions)
+      (t3codePackages.t3code-desktop.override t3codeRuntimeOptions)
       deezer-enhanced
       dstask
       # flake.gemini-cli # Gemini protocol client
