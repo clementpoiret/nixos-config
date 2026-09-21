@@ -249,6 +249,14 @@ in
       # flake.antigravity-ide
       flake.claude-code
       flake.codex-cli
+      (inputs.t3code.packages.${pkgs.stdenv.hostPlatform.system}.t3code.override {
+        enableCodex = true;
+        enableClaude = true;
+        enableJujutsu = true;
+        codex = pkgs.flake.codex-cli;
+        claude-code = pkgs.flake.claude-code;
+        jujutsu = pkgs.jujutsu;
+      })
       deezer-enhanced
       dstask
       # flake.gemini-cli # Gemini protocol client

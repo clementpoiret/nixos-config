@@ -93,6 +93,10 @@
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+    t3code = {
+      url = "github:clementpoiret/t3code-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     clementpoiret-skills = {
       url = "github:clementpoiret/skills";
       flake = false;

@@ -1113,6 +1113,7 @@
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "superfile": "superfile",
+        "t3code": "t3code",
         "ucodenix": "ucodenix"
       }
     },
@@ -1344,6 +1345,26 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "t3code": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789980729,
+        "narHash": "sha256-oIaUTjIMYjDMffOTSuNWb1Z8vQdpInfZRX//AtBxBso=",
+        "owner": "clementpoiret",
+        "repo": "t3code-flake",
+        "rev": "965bb31bf4408b79e2665f7659d6510b6e99dc76",
+        "type": "github"
+      },
+      "original": {
+        "owner": "clementpoiret",
+        "repo": "t3code-flake",
         "type": "github"
       }
     },
