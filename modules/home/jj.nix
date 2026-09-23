@@ -42,17 +42,17 @@ in
       };
       git.sign-on-push = true;
       ui = {
-        default-command = "log";
+        editor = "hx";
         merge-editor = "hx";
-
-        show-cryptographic-signatures = true;
-
-        pager = [
-          "delta"
-          "--diff-so-fancy"
-          "--side-by-side"
+        show-cryptographic-signatures = false;
+      };
+      aliases.lsig = {
+        definition = [
+          "log"
+          "--config"
+          "ui.show-cryptographic-signatures=true"
         ];
-        diff-formatter = ":git";
+        doc = "Show log with cryptographic signature verification";
       };
       merge-tools.hx = {
         program = "hx";

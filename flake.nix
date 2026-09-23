@@ -30,6 +30,11 @@
 
     linkctl.url = "github:clementpoiret/linkctl";
 
+    lumen = {
+      url = "github:jnsahaj/lumen";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     niri = {
       # url = "github:sodiboo/niri-flake";
       url = "github:sodiboo/niri-flake/e43ef13f23c2c7ae5b10e842745cb345faff4f40"; # 26.04
@@ -138,6 +143,7 @@
       # helium,
       herdr,
       home-manager,
+      lumen,
       # orion-browser,
       niri,
       nix-cachyos-kernel,
@@ -183,6 +189,7 @@
         glide-browser = glide-browser.packages.${system}.default;
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
+        lumen = lumen.packages.${system}.lumen;
         niri-unstable = niri.packages.${system}.niri-unstable;
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;

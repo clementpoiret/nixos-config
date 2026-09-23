@@ -7,6 +7,7 @@
     ./btop.nix # resouces monitor
     ./chtsh.nix
     ./cleanup.nix # auto delete files
+    ./delta.nix
     ./easyeffects/easyeffects.nix # audio profile
     ./fish.nix # shell
     ./fuzzel.nix # launcher
@@ -19,6 +20,7 @@
     ./jj.nix # just another version control tool
     ./kitty.nix # terminal
     ./lazygit.nix
+    ./lumen.nix
     ./niri.nix # wm
     # ./nushell/nushell.nix # shell
     ./nvim/nvim.nix # neovim editor

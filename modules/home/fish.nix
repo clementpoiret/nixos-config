@@ -14,6 +14,12 @@
       la = "ls -a";
       ldu = "ls -d";
 
+      # Lumen diff viewer
+      ld = "lumen diff";
+      ldw = "lumen diff --watch";
+      lpr = "lumen diff --detect-pr";
+      ldw-wrap = "lumen diff --wrap";
+
       # nix
       cdnix = "cd ~/nixos-config";
       cdnix-agent = "cd ~/nixos-config-writable";

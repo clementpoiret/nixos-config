@@ -28,16 +28,6 @@
     signing.key = "BBA69D0DB3494EDD127D7C80A0288D6D0CD0D231";
   };
 
-  programs.delta = {
-    enable = true;
-    enableGitIntegration = true;
-    options = {
-      line-numbers = true;
-      side-by-side = true;
-      navigate = true;
-    };
-  };
-
   home.packages = [ pkgs.mergiraf ];
 
   home.file.".gitattributes".source = ./gitattributes;
