@@ -203,7 +203,13 @@ in
     assert laptopHome.programs.jujutsu.settings.signing.behavior == "drop";
     assert desktopHome.programs.jujutsu.settings.git.sign-on-push;
     assert laptopHome.programs.jujutsu.settings.git.sign-on-push;
-    pkgs-unstable.runCommand "credential-forwarding" { nativeBuildInputs = [ pkgs-unstable.gnugrep ]; }
+    pkgs-unstable.runCommand "credential-forwarding"
+      {
+        nativeBuildInputs = [
+          pkgs-unstable.gnugrep
+          pkgs-unstable.gnused
+        ];
+      }
       ''
         grep -F 'Host laptop-forwarded' ${desktopSecretWriter}
         grep -F 'Host desktop-forwarded' ${laptopSecretWriter}
@@ -218,6 +224,38 @@ in
         grep -F 'seahorse/ssh-askpass "$@"' ${desktopAgentAskpass}
         grep -F 'gpg --batch --export 71F084CEA427B23537934233CC6B0EED323A6C13' ${desktopGpgSyncScript}
         grep -F 'Refusing to forward a GPG key file that is not a smartcard stub' ${desktopGpgSyncScript}
+
+        cat > fake-ssh-add <<'EOF'
+        #!/bin/sh
+        if [ "$1" = -l ]; then
+          probes=$(cat "$TEST_DIR/probes")
+          probes=$((probes + 1))
+          printf '%s\n' "$probes" > "$TEST_DIR/probes"
+          [ "$probes" -gt "$READY_AFTER" ] && exit 1
+          exit 2
+        fi
+        touch "$TEST_DIR/loaded"
+        EOF
+        chmod +x fake-ssh-add
+        sed -E "s@/nix/store/[^[:space:]]+/bin/ssh-add@$PWD/fake-ssh-add@g" \
+          ${laptopAgentLoader} > test-loader
+        chmod +x test-loader
+
+        export TEST_DIR="$PWD/agent-test"
+        mkdir "$TEST_DIR"
+        printf '0\n' > "$TEST_DIR/probes"
+        export READY_AFTER=2
+        XDG_RUNTIME_DIR="$TEST_DIR" ./test-loader
+        test "$(cat "$TEST_DIR/probes")" = 3
+        test -e "$TEST_DIR/loaded"
+
+        rm "$TEST_DIR/loaded"
+        printf '0\n' > "$TEST_DIR/probes"
+        READY_AFTER=50 XDG_RUNTIME_DIR="$TEST_DIR" ./test-loader > "$TEST_DIR/output" 2>&1 \
+          && exit 1
+        test "$(cat "$TEST_DIR/probes")" = 50
+        test ! -e "$TEST_DIR/loaded"
+        grep -F 'SSH agent did not become available' "$TEST_DIR/output"
         touch "$out"
       '';
 

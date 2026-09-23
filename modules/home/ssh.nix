@@ -31,6 +31,27 @@ let
     set -eu
 
     export SSH_AUTH_SOCK="''${XDG_RUNTIME_DIR}/ssh-agent"
+    # ExecStartPost can run before ssh-agent has bound its socket.
+    for attempt in {1..50}; do
+      if ${pkgs.openssh_hpn}/bin/ssh-add -l >/dev/null 2>&1; then
+        break
+      else
+        status=$?
+        if [ "$status" -eq 1 ]; then
+          break # The agent is ready but has no identities yet.
+        fi
+        if [ "$status" -ne 2 ]; then
+          exit "$status"
+        fi
+      fi
+
+      if [ "$attempt" -eq 50 ]; then
+        echo "SSH agent did not become available at $SSH_AUTH_SOCK" >&2
+        exit 1
+      fi
+      ${pkgs.coreutils}/bin/sleep 0.1
+    done
+
     exec ${pkgs.openssh_hpn}/bin/ssh-add \
       ${
         lib.concatMapStringsSep " \\\n      " (
