@@ -93,6 +93,36 @@ class AppArmorReportTest(unittest.TestCase):
         lines = [raw, raw, journal, journal]
         self.assertEqual(list(apparmor_report.deduplicate_journal_lines(lines)), lines)
 
+    def test_compact_deduplication_evicts_old_audit_ids(self) -> None:
+        message = (
+            'apparmor="ALLOWED" operation="open" class="file" profile="local-test" '
+            'name="/tmp/example" requested_mask="r" denied_mask="r"'
+        )
+
+        def record(audit_id: int, transport: str) -> str:
+            entry = {
+                "MESSAGE": message,
+                "_TRANSPORT": transport,
+                "_BOOT_ID": "boot-a",
+            }
+            if transport == "audit":
+                entry["_AUDIT_ID"] = str(audit_id)
+            else:
+                entry["MESSAGE"] = f"audit(1.0:{audit_id}): {message}"
+            return json.dumps(entry)
+
+        records = [
+            record(1, "audit"),
+            record(2, "audit"),
+            record(2, "kernel"),
+            record(3, "audit"),
+            record(1, "kernel"),
+        ]
+        self.assertEqual(
+            list(apparmor_report.deduplicate_journal_lines(records, max_seen=2)),
+            [records[0], records[1], records[3], records[4]],
+        )
+
     def test_reports_audit_delivery_failures_independently_of_profile_filter(
         self,
     ) -> None:
@@ -206,6 +236,59 @@ class AppArmorReportTest(unittest.TestCase):
         self.assertEqual(findings[0].count, 2)
         self.assertEqual(findings[0].operations, {"getattr", "open"})
         self.assertEqual(findings[0].commands, {"brave", "worker"})
+
+    def test_compact_report_preserves_totals_and_priority_findings(self) -> None:
+        allowed = [
+            'apparmor="ALLOWED" operation="open" class="file" '
+            f'profile="local-test" name="/tmp/item-{index}" '
+            'requested_mask="r" denied_mask="r"'
+            for index in range(apparmor_report.COMPACT_LIMITS["ALLOWED"] + 5)
+        ]
+        denied = (
+            'apparmor="DENIED" operation="open" class="file" '
+            'profile="local-test" name="/tmp/blocked" '
+            'requested_mask="r" denied_mask="r"'
+        )
+        null_profile = (
+            'apparmor="ALLOWED" operation="exec" class="file" '
+            'profile="local-test//null-child" name="/tmp/child" '
+            'requested_mask="x" denied_mask="x"'
+        )
+        records = "\n".join([*allowed, allowed[0], denied, null_profile]) + "\n"
+
+        def run(*options: str) -> dict[str, object]:
+            output = io.StringIO()
+            with (
+                mock.patch.object(sys, "stdin", io.StringIO(records)),
+                mock.patch.object(sys, "stdout", output),
+            ):
+                self.assertEqual(
+                    apparmor_report.main(["--input", "-", "--json", *options]), 0
+                )
+            return json.loads(output.getvalue())
+
+        compact = run("--compact")
+        self.assertEqual(compact["summary"]["events"], len(allowed) + 3)
+        self.assertEqual(compact["summary"]["omitted_events"], 5)
+        self.assertEqual(compact["summary"]["groups"], 2_002)
+        self.assertEqual(len(compact["findings"]), 2_002)
+        self.assertEqual(compact["overflow"][0]["count"], 5)
+        self.assertIn("/tmp/item-2000", compact["overflow"][0]["sample"])
+        self.assertTrue(any(item["result"] == "DENIED" for item in compact["findings"]))
+        self.assertTrue(any(item["null_profile"] for item in compact["findings"]))
+        self.assertEqual(
+            next(
+                item
+                for item in compact["findings"]
+                if item["targets"].get("name") == "/tmp/item-0"
+            )["count"],
+            2,
+        )
+
+        full = run()
+        self.assertEqual(full["summary"]["omitted_events"], 0)
+        self.assertEqual(full["summary"]["groups"], len(allowed) + 2)
+        self.assertEqual(full["overflow"], [])
 
     def test_parses_and_prioritizes_explicit_audit_records(self) -> None:
         audit_event = apparmor_report.parse_policy_event(

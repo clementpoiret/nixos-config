@@ -28,6 +28,14 @@ LOAD_ISSUE_RE = re.compile(
     r"\b(error|failed?|failure|warning|unable|invalid|syntax|permission denied)\b",
     re.IGNORECASE,
 )
+COMPACT_LIMITS = {
+    "DENIED": 2_000,
+    "AUDIT": 500,
+    "ALLOWED_NULL": 500,
+    "ALLOWED": 2_000,
+}
+COMPACT_AUDIT_IDS = 8_192
+COMPACT_OVERFLOW_GROUPS = 512
 
 TARGET_FIELDS = (
     "name",
@@ -133,6 +141,40 @@ class Finding:
             "null_profile": self.null_profile,
             "count": self.count,
             "commands": sorted(self.commands),
+            "first": self.first,
+            "last": self.last,
+            "sample": self.sample,
+        }
+
+
+@dataclass
+class Overflow:
+    result: str
+    profile: str
+    event_class: str
+    null_profile: bool
+    count: int = 0
+    first: str | None = None
+    last: str | None = None
+    sample: str = ""
+
+    def add(self, event: PolicyEvent) -> None:
+        self.count += 1
+        if event.timestamp:
+            if self.first is None or event.timestamp < self.first:
+                self.first = event.timestamp
+            if self.last is None or event.timestamp > self.last:
+                self.last = event.timestamp
+        if not self.sample:
+            self.sample = event.raw
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "result": self.result,
+            "profile": self.profile,
+            "class": self.event_class,
+            "null_profile": self.null_profile,
+            "count": self.count,
             "first": self.first,
             "last": self.last,
             "sample": self.sample,
@@ -269,8 +311,8 @@ def parse_kernel_issue(line: str, patterns: list[str]) -> dict[str, str] | None:
     return {"timestamp": timestamp or "unknown", "message": message}
 
 
-def add_event(grouped: dict[tuple[object, ...], Finding], event: PolicyEvent) -> None:
-    key = (
+def finding_key(event: PolicyEvent) -> tuple[object, ...]:
+    return (
         event.result,
         event.profile,
         event.event_class,
@@ -280,6 +322,10 @@ def add_event(grouped: dict[tuple[object, ...], Finding], event: PolicyEvent) ->
         event.details,
         event.null_profile,
     )
+
+
+def add_event(grouped: dict[tuple[object, ...], Finding], event: PolicyEvent) -> None:
+    key = finding_key(event)
     finding = grouped.get(key)
     if finding is None:
         finding = Finding(
@@ -337,9 +383,11 @@ def _stream_command(command: list[str], *, allow_empty: bool = False) -> Iterato
         raise RuntimeError(f"{' '.join(command[:2])}: {detail}")
 
 
-def deduplicate_journal_lines(lines: Iterable[str]) -> Iterator[str]:
+def deduplicate_journal_lines(
+    lines: Iterable[str], *, max_seen: int | None = None
+) -> Iterator[str]:
     """Keep kernel-only records while counting audit/kernel copies only once."""
-    seen: dict[tuple[object, ...], str] = {}
+    seen: collections.OrderedDict[tuple[object, ...], str] = collections.OrderedDict()
     for line in lines:
         try:
             entry = json.loads(line)
@@ -356,8 +404,14 @@ def deduplicate_journal_lines(lines: Iterable[str]) -> Iterator[str]:
             # One audit ID can contain distinct records for stacked profiles.
             fields.pop("type", None)
             key = (entry.get("_BOOT_ID"), str(audit_id), tuple(sorted(fields.items())))
-            previous = seen.setdefault(key, transport)
-            if previous != transport:
+            previous = seen.get(key)
+            if previous is None:
+                seen[key] = transport
+                if max_seen is not None and len(seen) > max_seen:
+                    seen.popitem(last=False)
+            else:
+                seen.move_to_end(key)
+            if previous is not None and previous != transport:
                 continue
         yield line
 
@@ -545,6 +599,10 @@ def render_text(report: dict[str, object], findings: list[Finding]) -> None:
         f"{summary['audited']} explicit audit observations; "
         f"{summary['allowed']} complain observations; {summary['groups']} grouped findings"
     )
+    if summary["omitted_events"]:
+        print(
+            f"Compact report: {summary['omitted_events']} events summarized in overflow"
+        )
 
     profile_modes = report["current_profile_modes"]
     assert isinstance(profile_modes, dict)
@@ -608,6 +666,17 @@ def render_text(report: dict[str, object], findings: list[Finding]) -> None:
                 )
                 print(f"           seen={interval}")
 
+    overflow = report["overflow"]
+    assert isinstance(overflow, list)
+    if overflow:
+        print("\nAdditional events beyond compact detail limits:")
+        for item in overflow:
+            print(
+                f"  {item['count']} {item['result']} {item['profile']} "
+                f"{item['class']} null_profile={item['null_profile']}"
+            )
+            print(f"           sample={item['sample']}")
+
     print(
         "\nReview each observation against an intentional workload before adding a rule. "
         "null_profile=yes indicates an unresolved execution transition that must be fixed before enforcement."
@@ -645,6 +714,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--json", action="store_true", help="emit machine-readable JSON"
     )
+    parser.add_argument(
+        "--compact",
+        action="store_true",
+        help="bound detailed findings and summarize excess events",
+    )
     return parser
 
 
@@ -660,13 +734,45 @@ def main(argv: list[str] | None = None) -> int:
             input_lines(args.input) if args.input else journal_lines(args)
         )
         grouped: dict[tuple[object, ...], Finding] = {}
+        retained: collections.Counter[str] = collections.Counter()
+        overflow: dict[tuple[str, str, str, bool], Overflow] = {}
         counts: collections.Counter[str] = collections.Counter()
         event_profiles: set[str] = set()
         kernel_issues: list[dict[str, str]] = []
-        for line in deduplicate_journal_lines(lines):
+        for line in deduplicate_journal_lines(
+            lines, max_seen=COMPACT_AUDIT_IDS if args.compact else None
+        ):
             event = parse_policy_event(line, patterns)
             if event is not None:
-                add_event(grouped, event)
+                category = (
+                    "ALLOWED_NULL"
+                    if event.result == "ALLOWED" and event.null_profile
+                    else event.result
+                )
+                key = finding_key(event)
+                if (
+                    not args.compact
+                    or key in grouped
+                    or retained[category] < COMPACT_LIMITS[category]
+                ):
+                    if key not in grouped:
+                        retained[category] += 1
+                    add_event(grouped, event)
+                else:
+                    overflow_key = (
+                        event.result,
+                        event.profile,
+                        event.event_class,
+                        event.null_profile,
+                    )
+                    if (
+                        overflow_key not in overflow
+                        and len(overflow) >= COMPACT_OVERFLOW_GROUPS
+                    ):
+                        overflow_key = (event.result, "*", "*", event.null_profile)
+                    if overflow_key not in overflow:
+                        overflow[overflow_key] = Overflow(*overflow_key)
+                    overflow[overflow_key].add(event)
                 counts[event.result] += 1
                 event_profiles.add(event.profile)
                 continue
@@ -678,6 +784,14 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     findings = sorted_findings(grouped)
+    overflow_items = sorted(
+        overflow.values(),
+        key=lambda item: (
+            {"DENIED": 0, "AUDIT": 1, "ALLOWED": 2}[item.result],
+            item.profile,
+            item.event_class,
+        ),
+    )
     profile_modes: dict[str, str] = {}
     profile_status_error: str | None = None
     service_status: dict[str, str] = {}
@@ -699,6 +813,7 @@ def main(argv: list[str] | None = None) -> int:
             "audited": counts["AUDIT"],
             "allowed": counts["ALLOWED"],
             "groups": len(findings),
+            "omitted_events": sum(item.count for item in overflow_items),
             "profiles": len(event_profiles),
         },
         "current_profile_modes": profile_modes,
@@ -708,6 +823,7 @@ def main(argv: list[str] | None = None) -> int:
         "service_status_error": service_status_error,
         "kernel_issues": kernel_issues,
         "findings": [finding.as_dict() for finding in findings],
+        "overflow": [item.as_dict() for item in overflow_items],
     }
 
     if args.json:

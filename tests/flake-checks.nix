@@ -389,6 +389,7 @@ in
     assert builtins.elem "runtime-introspection" laptopServiceRegistry.syncthing.capabilities;
     assert builtins.elem "/proc/bus/pci/devices" laptopServiceRegistry.syncthing.readOnlyPaths;
     assert builtins.elem "/proc/modules" laptopServiceRegistry.syncthing.readOnlyPaths;
+    assert builtins.elem "/proc/sys/kernel/osrelease" laptopServiceRegistry.syncthing.readOnlyPaths;
     assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
     assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/stat r,"
       laptopServiceRegistry.apply-secret-dns.extraRules;
@@ -1022,11 +1023,17 @@ in
           motrix_common="$(common_rules "$profile_directory/local-motrix")"
           require_rule '${self.nixosConfigurations.laptop.pkgs.webkitgtk_4_1}/libexec/** ixr,' "$motrix_common"
           require_rule 'owner "@{HOME}/.local/share/com.motrix.next/{,**}" rwkl,' "$motrix_common"
+          require_rule 'owner "@{HOME}/.config/com.motrix.next/{,**}" rwkl,' "$motrix_common"
+          require_rule 'owner @{HOME}/.mozilla/native-messaging-hosts/com.motrix.next.browser.json rwkl,' "$motrix_common"
+          require_rule 'owner @{run}/user/[0-9]*/tray-icon/tray-icon-motrix-next-*.png rwkl,' "$motrix_common"
 
           logseq_common="$(common_rules "$profile_directory/local-logseq")"
           require_rule '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/AppRun ixr,' "$logseq_common"
           require_rule '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/logseq ixr,' "$logseq_common"
           require_rule 'owner "@{HOME}/.logseq/{,**}" rwkl,' "$logseq_common"
+          require_rule 'owner @{HOME}/.local/bin/logseq rwkl,' "$logseq_common"
+          require_rule '/nix/store/*-gvfs-*/lib/gio/modules/libgvfsdbus.so mr,' "$logseq_common"
+          require_rule '/nix/store/*-gvfs-*/lib/gvfs/libgvfscommon.so mr,' "$logseq_common"
           if grep -F '${self.nixosConfigurations.laptop.pkgs.bubblewrap}' "$logseq_common" \
             || grep -F 'mount,' "$logseq_common" \
             || grep -F 'pivot_root' "$logseq_common" \
@@ -1086,6 +1093,32 @@ in
           codex_common="$(common_rules "$profile_directory/local-codex-cli")"
           require_rule 'owner @{HOME}/.cache/codex-runtimes/{,**} rwkl,' "$codex_common"
           require_rule 'owner @{HOME}/.gnupg/.#lk* rwk,' "$codex_common"
+          for agent_common in "$codex_common" "$claude_common"; do
+            require_rule 'owner @{HOME}/.cache/opercord-*/{,**} rwkl,' "$agent_common"
+            require_rule 'owner @{HOME}/.cache/huggingface/xet/{,**} rwkl,' "$agent_common"
+            require_rule 'owner @{HOME}/.cache/nixpkgs-review/{,**} rwkl,' "$agent_common"
+            require_rule 'owner @{HOME}/.cargo/advisory-db{,s}/{,**} rwkl,' "$agent_common"
+            require_rule 'owner @{HOME}/.local/share/devenv/{,**} rwkl,' "$agent_common"
+          done
+          codex_desktop_common="$(common_rules "$profile_directory/local-codex-desktop")"
+          if grep -F 'owner @{HOME}/.cache/huggingface/xet/{,**} rwkl,' "$codex_desktop_common" \
+            || grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$codex_common" \
+            || grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$claude_common"; then
+            echo "agent cache exceptions leaked into another profile or browser cache" >&2
+            exit 1
+          fi
+
+          vivaldi_common="$(common_rules "$profile_directory/local-vivaldi")"
+          require_rule 'owner @{HOME}/.local/lib/vivaldi/media-codecs-*/libffmpeg.so mr,' "$vivaldi_common"
+          require_rule 'owner "@{HOME}/.pki/nssdb/{,**}" rwkl,' "$vivaldi_common"
+
+          proton_pass_common="$(common_rules "$profile_directory/local-proton-pass")"
+          require_rule 'owner @{HOME}/.mozilla/native-messaging-hosts/me.proton.pass.nm.json rwkl,' "$proton_pass_common"
+          require_rule 'owner @{HOME}/.config/BraveSoftware/Brave-Browser/NativeMessagingHosts/me.proton.pass.nm.json rwkl,' "$proton_pass_common"
+          if grep -F 'owner "@{HOME}/.config/BraveSoftware/{,**}" rwkl,' "$proton_pass_common"; then
+            echo "Proton Pass received broad browser profile access" >&2
+            exit 1
+          fi
 
           qbittorrent_common="$(common_rules "$profile_directory/local-qbittorrent")"
           require_rule 'deny ptrace read peer=unconfined,' "$qbittorrent_common"
@@ -1108,6 +1141,13 @@ in
           require_rule 'network netlink dgram,' "$profile_directory/local-syncthing"
           require_rule '"/proc/bus/pci/devices" r,' "$profile_directory/local-syncthing"
           require_rule '"/proc/modules" r,' "$profile_directory/local-syncthing"
+          require_rule '"/proc/sys/kernel/osrelease" r,' "$profile_directory/local-syncthing"
+          for agent_name in codex-cli claude-code; do
+            engine_profile="$profile_directory/local-$agent_name-container-engine"
+            require_rule '/proc/sys/fs/binfmt_misc/ r,' "$engine_profile"
+            require_rule '/proc/sys/net/core/somaxconn r,' "$engine_profile"
+            require_rule '/proc/[0-9]*/cgroup r,' "$engine_profile"
+          done
 
           pqiv_common="$(common_rules "$profile_directory/local-pqiv")"
           if grep -F 'owner @{HOME}/** rwkl,' "$pqiv_common" \

@@ -67,6 +67,9 @@ separately managed application uses a higher-priority transition into that appli
 Developer profiles also share read access to installed agent skills, the global Git ignore file and Keras settings;
 read/write access to bounded Nix, uv, Go, Cargo, and runtime caches; read/shared-lock access to generated man indexes;
 and bounded access to their own file-descriptor and thread-name metadata.
+Codex CLI and Claude Code additionally share a named development-cache allow-list for observed package-manager, build,
+model, and project caches. The Hugging Face grant covers `~/.cache/huggingface/xet` only; its token files and browser
+caches are outside this allow-list. Codex Desktop does not inherit these agent-specific additions.
 
 Applications opt into typed capabilities only when needed:
 
@@ -422,8 +425,16 @@ security.localAppArmor.debug = {
 The path is an output directory; it may be absolute or begin with `~/`, which resolves against the configured primary
 user's home. Every 30 minutes, `apparmor-debug-report.timer` atomically updates `logs.json` with a cumulative report for
 the current boot and `boots/<boot-id>.json` with that boot's latest snapshot. The automated report passes `--profile
-'*'`, so it includes problem signals from every AppArmor profile while continuing to omit routine successful
-load/replace/remove records. Manual `apparmor-report` invocations still default to `local-*`.
+'*' --compact`, so it includes problem signals from every AppArmor profile while continuing to omit routine successful
+load/replace/remove records. Manual `apparmor-report` invocations still default to `local-*` and full detail; add
+`--compact` to inspect the same bounded format manually.
+
+Compact reports retain event totals and up to 2,000 distinct `DENIED`, 500 `AUDIT`, 500 null-profile `ALLOWED`,
+and 2,000 other `ALLOWED` findings. Later distinct findings appear as per-profile/class overflow counts with a sample
+record; after 512 overflow groups, additional profiles/classes are pooled by result and null-profile status.
+`summary.omitted_events` counts their events. The audit/kernel deduplication window is also bounded in compact
+mode, so a journal copy arriving after its audit ID has left that window can be counted twice. Inspect the full journal
+or a targeted manual report when overflow hides a path needed for policy work.
 
 The report contains raw sample paths and process details. Its directories are mode `0700`, its JSON files are mode
 `0600`, and all are owned by the configured user. Generate a report immediately or inspect scheduling and failures with:
@@ -437,6 +448,9 @@ run0 -- journalctl -u apparmor-debug-report.service
 Per-boot archives are intentionally retained until manually removed. Disabling debug collection removes the service and
 timer but does not delete existing reports. An unclean shutdown can leave the final interval only in the persistent
 journal; journal rotation and rate limiting also bound what any later report can recover.
+Deleting JSON during a boot does not reset its counts: the timer recreates the report from the current boot's journal.
+For a fresh baseline after a policy change, reboot into the new generation, then remove the old `logs.json` and
+`boots/*.json` files before generating a report. New events from that boot remain visible.
 
 Do not run `aa-logprof` directly against `/etc/apparmor.d`: active files are generated from immutable Nix store paths.
 Use suggestions only as research, then add the narrow declarative rule to the owning module and rerun the checks.

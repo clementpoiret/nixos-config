@@ -49,6 +49,34 @@ let
     pkgs.electron.unwrapped
   ];
 
+  agentCacheRoots = [
+    "equimo"
+    "gh"
+    "gopls"
+    "huggingface/xet"
+    "ms-playwright-go"
+    "nixpkgs-review"
+    "nixpkgs-update"
+    "pip"
+    "pip-audit"
+    "pnpm"
+    "rattler"
+    "torch"
+    "typst"
+    "yarn"
+    "zig"
+  ];
+  agentCacheRules = ''
+    owner @{HOME}/.cache/ r,
+    owner @{HOME}/.cache/huggingface/ r,
+    ${lib.concatMapStrings (path: ''
+      owner @{HOME}/.cache/${path}/{,**} rwkl,
+    '') agentCacheRoots}
+    owner @{HOME}/.cargo/advisory-db{,s}/{,**} rwkl,
+    owner @{HOME}/.local/share/devenv/{,**} rwkl,
+    owner @{run}/user/[0-9]*/devenv-*/{,**} rwkl,
+  '';
+
   softmakerApplication = name: {
     package = softmakerOffice;
     executable = "bin/softmaker-office-nx-${name}";
@@ -383,8 +411,11 @@ in
         ];
         extraRules = ''
           ${pkgs.logseq-appimage.appimageContents}/*.so* mr,
+          owner @{HOME}/.local/bin/logseq rwkl,
+          /nix/store/*-gvfs-*/lib/gio/modules/libgvfsdbus.so mr,
+          /nix/store/*-gvfs-*/lib/gvfs/libgvfscommon.so mr,
         '';
-        extraRulesRationale = "Logseq maps Electron libraries from the root of its extracted AppImage.";
+        extraRulesRationale = "Logseq maps its AppImage and GVFS libraries and maintains its CLI launcher.";
         homePaths = [
           ".logseq"
           ".config/Logseq"
@@ -438,9 +469,14 @@ in
       vivaldi = {
         package = pkgs.vivaldi;
         capabilities = browserCapabilities;
+        extraRules = ''
+          owner @{HOME}/.local/lib/vivaldi/media-codecs-*/libffmpeg.so mr,
+        '';
+        extraRulesRationale = "Vivaldi maps the locally installed versioned media codec.";
         homePaths = [
           ".cache/vivaldi"
           ".config/vivaldi"
+          ".pki/nssdb"
         ];
         sensitiveAccess = [ "credential-broker" ];
         elevatedAccessRationale = "Vivaldi uses the desktop secret-service broker for user-approved credentials.";
@@ -504,6 +540,16 @@ in
         executable = "bin/proton-pass";
         capabilities = electronCapabilities ++ [ "credential-broker" ];
         executionPackages = electronExecutionPackages;
+        extraRules = ''
+          owner @{HOME}/.mozilla/native-messaging-hosts/me.proton.pass.nm.json rwkl,
+          owner @{HOME}/.librewolf/native-messaging-hosts/me.proton.pass.nm.json rwkl,
+          owner @{HOME}/.config/BraveSoftware/Brave-Browser/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
+          owner @{HOME}/.config/vivaldi/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
+          owner @{HOME}/.config/chromium/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
+          owner @{HOME}/.config/google-chrome/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
+          owner @{HOME}/.config/microsoft-edge/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
+        '';
+        extraRulesRationale = "Proton Pass maintains only its named browser native-messaging manifests.";
         homePaths = [
           ".cache/Proton Pass"
           ".config/Proton Pass"
@@ -556,9 +602,18 @@ in
         executable = "bin/motrix-next";
         capabilities = electronDocumentCapabilities;
         executionPackages = [ pkgs.webkitgtk_4_1 ];
+        extraRules = ''
+          owner @{HOME}/.mozilla/native-messaging-hosts/com.motrix.next.browser.json rwkl,
+          owner @{HOME}/.config/google-chrome/NativeMessagingHosts/com.motrix.next.browser.json rwkl,
+          owner @{HOME}/.config/microsoft-edge/NativeMessagingHosts/com.motrix.next.browser.json rwkl,
+          owner @{run}/user/[0-9]*/tray-icon/ rwkl,
+          owner @{run}/user/[0-9]*/tray-icon/tray-icon-motrix-next-*.png rwkl,
+        '';
+        extraRulesRationale = "Motrix maintains its named browser manifests and session tray icons.";
         homePaths = [
           ".cache/Motrix"
           ".config/Motrix"
+          ".config/com.motrix.next"
           ".config/motrix"
           ".local/share/com.motrix.next"
         ];
@@ -585,10 +640,11 @@ in
         containerToolsPackage = pkgs.flake.agent-container-tools;
         homePaths = [ ".codex" ];
         extraRules = ''
+          ${agentCacheRules}
           owner @{HOME}/.cache/codex-runtimes/{,**} rwkl,
           owner @{HOME}/.gnupg/.#lk* rwk,
         '';
-        extraRulesRationale = "Codex updates its managed runtime cache and GnuPG creates a transient lock beside the explicitly allowed agent state.";
+        extraRulesRationale = "Codex uses the shared named development caches, its managed runtime cache, and a transient GnuPG lock.";
         sensitiveAccess = [
           "forge-auth"
           "gpg-agent"
@@ -620,6 +676,7 @@ in
           ".config/anthropic"
         ];
         extraRules = ''
+          ${agentCacheRules}
           owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,
           /etc/claude-code/ r,
           /etc/claude-code/managed-settings.d/{,**} r,
@@ -636,7 +693,7 @@ in
           deny owner @{HOME}/.config/microsoft-edge/{,**} rwklm,
           deny owner @{HOME}/.config/vivaldi/{,**} rwklm,
         '';
-        extraRulesRationale = "Claude Code reads its managed policy and desktop integration while updating its CLI state, runtime cache, URL handler, and local proxy sockets; browser profile data remains isolated.";
+        extraRulesRationale = "Claude Code uses the shared named development caches, managed policy, CLI state, URL handler, and local proxy sockets; browser profile data remains isolated.";
         sensitiveAccess = [
           "forge-auth"
           "gpg-agent"

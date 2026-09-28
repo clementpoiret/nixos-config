@@ -70,6 +70,7 @@ in
         "${homeDirectory}/"
         "/proc/bus/pci/devices"
         "/proc/modules"
+        "/proc/sys/kernel/osrelease"
       ];
       readWritePaths =
         builtins.concatMap (path: [

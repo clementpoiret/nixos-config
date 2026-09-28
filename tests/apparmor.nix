@@ -158,6 +158,7 @@ pkgs.testers.runNixOSTest {
               "/home/test/"
               "/proc/bus/pci/devices"
               "/proc/modules"
+              "/proc/sys/kernel/osrelease"
             ];
             readWritePaths = [
               "/home/test/Sync/"
@@ -852,6 +853,9 @@ pkgs.testers.runNixOSTest {
         )
         machine.succeed(
             "aa-exec -p local-syncthing -- ${pkgs.coreutils}/bin/cat /proc/modules"
+        )
+        machine.succeed(
+            "aa-exec -p local-syncthing -- ${pkgs.coreutils}/bin/cat /proc/sys/kernel/osrelease"
         )
   '';
 }

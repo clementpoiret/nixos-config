@@ -815,7 +815,9 @@ let
           /proc/mounts r,
           /proc/uptime r,
           /proc/self/{,**} rw,
+          /proc/sys/fs/binfmt_misc/ r,
           /proc/sys/kernel/{overflowgid,overflowuid,unprivileged_userns_clone} r,
+          /proc/sys/net/core/somaxconn r,
           /proc/sys/net/ipv4/ip_forward rw,
           /proc/sys/net/ipv4/conf/*/{arp_notify,forwarding,route_localnet,rp_filter} rw,
           /proc/sys/net/ipv4/{ip_local_port_range,ping_group_range,tcp_rto_max_ms,tcp_syn_linear_timeouts,tcp_syn_retries} r,
@@ -826,6 +828,7 @@ let
           owner /proc/[0-9]*/ r,
           owner /proc/[0-9]*/fd/{,**} rw,
           /proc/[0-9]*/net/{tcp,tcp6,udp,udp6} r,
+          /proc/[0-9]*/cgroup r,
           /proc/[0-9]*/stat r,
           owner /proc/[0-9]*/mounts r,
           owner /proc/[0-9]*/{attr/current,cgroup,cmdline,gid_map,loginuid,mountinfo,oom_score_adj,setgroups,stat,status,uid_map} rw,
@@ -1105,7 +1108,7 @@ let
       trap 'rm -f "$report_temporary"' EXIT
 
       systemd-tmpfiles --create --prefix="$output_directory"
-      apparmor-report --profile '*' --json > "$report_temporary"
+      apparmor-report --profile '*' --compact --json > "$report_temporary"
       setpriv --reuid "$report_user" --regid "$report_group" --init-groups -- \
         ${apparmorDebugReportWriter}/bin/apparmor-debug-report-writer \
         "$output_directory" "$boot_id" < "$report_temporary"
