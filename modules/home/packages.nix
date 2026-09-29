@@ -8,9 +8,9 @@
 let
   softmakerOffice = pkgs.softmaker-office-nx.override {
     officeVersion = {
-      version = "1502";
+      version = "1504";
       edition = "";
-      hash = "sha256-24CnmZ5lnx7+NvZxiAgib0uYCfUQuUgRuVW+K6AeB3U=";
+      hash = "sha256-C2pVHiVSPuuuLffomNlezi91mILzQ22Qxz+mUD6JWbE=";
     };
   };
 
