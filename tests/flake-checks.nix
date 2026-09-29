@@ -68,6 +68,23 @@ let
   };
 in
 {
+  manage-dns-portal =
+    pkgs-unstable.runCommand "manage-dns-portal-test"
+      {
+        nativeBuildInputs = with pkgs-unstable; [
+          bash
+          coreutils
+          gawk
+          gnugrep
+          gnused
+          jq
+        ];
+      }
+      ''
+        bash ${./manage-dns.sh} ${../modules/core/manage-dns-portal.sh} ${../modules/core/manage-dns-connection-change.sh}
+        touch "$out"
+      '';
+
   host-cpu-optimizations =
     let
       desktopPkgs = self.nixosConfigurations.desktop.pkgs;

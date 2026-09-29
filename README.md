@@ -271,6 +271,15 @@ SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt" \
 
 Do not put decrypted values on a command line or in a Nix expression.
 
+On captive-portal Wi-Fi, run `manage-dns disable` before opening the portal's
+HTTP login page, then `manage-dns enable` after signing in. `manage-dns status`
+shows the active mode and resolver configuration. Portal mode temporarily uses
+the Wi-Fi connection's DNS without DNSSEC or DNS-over-TLS and disconnects
+Tailscale if it was running. The normal DNS settings and prior Tailscale state
+return when portal mode ends; switching to a different NetworkManager
+connection also ends it. The temporary settings live under `/run` and disappear
+on reboot.
+
 New files in a Git worktree are invisible to flake evaluation until they are
 tracked. Use one of these workflows before building:
 

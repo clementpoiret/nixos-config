@@ -19,11 +19,34 @@ let
     gnused
     systemd
   ];
+  portalDns = pkgs.writeShellApplication {
+    name = "manage-dns-portal";
+    runtimeInputs = with pkgs; [
+      coreutils
+      gawk
+      jq
+      networkmanager
+      systemd
+      config.services.tailscale.package
+    ];
+    text = builtins.readFile ./manage-dns-portal.sh;
+  };
+  portalConnectionChange = pkgs.writeShellApplication {
+    name = "manage-dns-connection-change";
+    runtimeInputs = with pkgs; [
+      coreutils
+      systemd
+    ];
+    text = builtins.readFile ./manage-dns-connection-change.sh;
+  };
 in
 {
   networking = {
     hostName = "${host}";
     networkmanager.enable = true;
+    networkmanager.dispatcherScripts = [
+      { source = "${portalConnectionChange}/bin/manage-dns-connection-change"; }
+    ];
     tempAddresses = "default";
     inherit nameservers;
     wg-quick.interfaces.wg0 = {
@@ -225,5 +248,35 @@ in
 
       systemctl reload-or-restart systemd-resolved.service
     '';
+  };
+
+  # The later drop-in temporarily clears the private global DNS route so
+  # NetworkManager's Wi-Fi DNS can serve the portal login.
+  systemd.services.manage-dns-portal = {
+    description = "Temporarily use captive portal DNS";
+    after = [
+      "NetworkManager.service"
+      "systemd-resolved.service"
+      "tailscaled.service"
+      "apply-secret-dns.service"
+    ];
+    requires = [ "systemd-resolved.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      RuntimeDirectory = "manage-dns-portal";
+      RuntimeDirectoryMode = "0700";
+      UMask = "0077";
+      NoNewPrivileges = true;
+      PrivateTmp = true;
+      ProtectHome = true;
+      ProtectSystem = "strict";
+      ReadWritePaths = [
+        "/run/manage-dns-portal"
+        "/run/systemd/resolved.conf.d"
+      ];
+      ExecStart = "${portalDns}/bin/manage-dns-portal start";
+      ExecStop = "${portalDns}/bin/manage-dns-portal stop";
+    };
   };
 }
