@@ -57,6 +57,7 @@ let
     "ms-playwright-go"
     "nixpkgs-review"
     "nixpkgs-update"
+    "opercord-*"
     "pip"
     "pip-audit"
     "pnpm"
