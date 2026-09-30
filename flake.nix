@@ -116,7 +116,7 @@
     };
 
     herdr = {
-      url = "github:herdrdev/herdr/v0.9.2";
+      url = "github:herdrdev/herdr/v0.9.3";
     };
 
     # orion-browser = {
@@ -209,6 +209,11 @@
               final.alsa-lib
             ];
           });
+
+          # Zotero 10's runtime patches target Gecko 140, not unstable's ESR 153.
+          zotero = prev.zotero.override {
+            firefox-esr-153-unwrapped = pkgs-stable.firefox-esr-140-unwrapped;
+          };
 
           # The pinned niri-flake package still requires libdisplay-info 0.2.
           libdisplay-info_0_2 = pkgs-stable.libdisplay-info_0_2;
@@ -323,6 +328,7 @@
           mkCacheRoot = name: entries: pkgs-unstable.linkFarm name entries;
         in
         {
+          collabora-desktop-bin = pkgs-unstable.callPackage ./pkgs/collabora-desktop-bin { };
           cache-root-desktop = mkCacheRoot "nixos-config-cache-root-desktop" desktopCacheEntries;
           cache-root-laptop = mkCacheRoot "nixos-config-cache-root-laptop" laptopCacheEntries;
           cache-root = mkCacheRoot "nixos-config-cache-root" (desktopCacheEntries ++ laptopCacheEntries);
