@@ -34,7 +34,6 @@
     };
 
     lanzaboote = {
-      configurationLimit = 4;
       measuredBoot = {
         enable = true;
         pcrs = [

@@ -91,7 +91,6 @@
 
     lanzaboote = {
       autoEnrollKeys.includeFirmwareBuiltinKeys = true;
-      configurationLimit = 4;
       measuredBoot = {
         enable = true;
         pcrs = [

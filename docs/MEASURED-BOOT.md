@@ -231,7 +231,7 @@ boot = {
   };
 
   lanzaboote = {
-    configurationLimit = 8;
+    configurationLimit = 2;
     measuredBoot = {
       enable = true;
       pcrs = [
@@ -246,8 +246,12 @@ boot = {
 
 The existing device paths remain in
 `hosts/laptop/hardware-configuration.nix`; Nix merges these token options into
-those definitions. `configurationLimit` must be at most eight because that is
-the maximum policy size currently supported by `systemd-pcrlock`.
+those definitions. The shared bootloader module retains two generations.
+`systemd-pcrlock` supports at most eight alternatives per PCR. During a
+bootloader update, two bootloader versions × two generations × the base and
+`latest-nixos` images produce eight PCR 4 alternatives. Four generations would
+produce sixteen alternatives and fail policy generation. Lanzaboote counts the
+protected booted generation within the retention limit.
 
 Do not put `tpm2-pin=yes` or PCR selections in `crypttabExtraOpts`. The LUKS2
 systemd token written during enrollment records the PIN requirement and PCR
@@ -387,6 +391,19 @@ nix build .#checks.x86_64-linux.laptop-toplevel
 nixos-rebuild boot --flake .#laptop --elevate=run0
 run0 -- reboot
 ```
+
+If NH reports only `Bootloader activation failed`, run the same boot operation
+directly to expose the installer and PCR-policy errors:
+
+```bash
+run0 -- /run/current-system/bin/switch-to-configuration boot
+```
+
+For `PCR policies with more than 8 alternatives per PCR`, reduce retained
+generations or specialisations and rebuild. Keep both `current` and `previous`
+bootloader measurements: the running system may still have booted through the
+previous bootloader. This policy-size failure does not require resetting the
+TPM, moving `pcrlock.json`, or replacing LUKS tokens.
 
 Keep the recovery keys available when booting an older generation. A token
 created by a newer systemd is not guaranteed to work in an older initrd, while

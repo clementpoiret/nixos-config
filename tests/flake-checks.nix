@@ -68,6 +68,26 @@ let
   };
 in
 {
+  measured-boot-retention =
+    let
+      excessiveRetentionHost = self.nixosConfigurations.laptop.extendModules {
+        modules = [
+          ({ lib, ... }: {
+            boot.lanzaboote.configurationLimit = lib.mkForce 4;
+          })
+        ];
+      };
+      retentionAssertions = builtins.filter (
+        assertion:
+        !assertion.assertion && pkgs-unstable.lib.hasInfix "Measured boot with PCR 4" assertion.message
+      ) excessiveRetentionHost.config.assertions;
+    in
+    assert builtins.length retentionAssertions == 1;
+    assert !(builtins.tryEval excessiveRetentionHost.config.system.build.toplevel.drvPath).success;
+    pkgs-unstable.runCommand "measured-boot-retention" { } ''
+      touch "$out"
+    '';
+
   manage-dns-portal =
     pkgs-unstable.runCommand "manage-dns-portal-test"
       {
