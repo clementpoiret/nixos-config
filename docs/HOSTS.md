@@ -1,5 +1,26 @@
 # Hosts
 
+## Shared boot and compositor policy
+
+Both hosts retain four CachyOS generations in the boot menu. The `latest-nixos`
+kernel specialisation is retired, including entries embedded in older retained
+generations. See `MEASURED-BOOT.md` for the PCR policy budget and installer cleanup.
+
+Niri's source remains pinned, but its baseline and CPU-optimized binaries are built
+with the host package set. They dynamically load Mesa from `/run/opengl-driver`,
+so a prebuilt Niri from an older package set can fail at login with
+`GLIBC_2.43 not found` even when both kernels boot successfully. To check this
+boundary without activating the configuration or acquiring a GPU:
+
+```bash
+nix build --no-link --no-update-lock-file .#checks.x86_64-linux.niri-mesa-runtime
+```
+
+If a new generation has a black login screen, boot a working generation and
+inspect the failed boot's greeter logs with
+`journalctl -b -1 -t dms-greeter/niri --no-pager`. Select the appropriate boot index
+from `journalctl --list-boots` if more than one boot was attempted.
+
 ## desktop
 
 Desktop workstation with an MSI MAG X870E Tomahawk WiFi motherboard, Ryzen 9

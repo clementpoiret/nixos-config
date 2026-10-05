@@ -66,7 +66,9 @@ in
           NIX_CFLAGS_COMPILE = appendFlag (old.NIX_CFLAGS_COMPILE or null) "-march=${cpuTarget}";
         });
         herdrHost = rustFor prev.flake.herdr;
-        niriBaseline = prev.flake.niri-unstable;
+        # Build the pinned source with the host libraries: Mesa is loaded from
+        # /run/opengl-driver and can require a newer glibc than flake packages use.
+        niriBaseline = prev.niri-unstable;
         niriHost = (rustFor niriBaseline).overrideAttrs (old: {
           # GitHub's generic builders cannot execute host-optimized binaries.
           # Use the baseline package only to generate architecture-independent completions.

@@ -87,11 +87,6 @@ in
   #   boot.kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
   # };
 
-  specialisation.latest-nixos.configuration = {
-    system.nixos.tags = [ "latest-nixos" ];
-    boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
-  };
-
   services = {
     scx = {
       enable = true;

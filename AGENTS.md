@@ -10,3 +10,7 @@
   `modules/core/bootloader.nix`: bootloader versions multiply retained generations
   and their specialisations. See `docs/MEASURED-BOOT.md` for the verified NH error
   diagnostic; successful host builds do not exercise the live TPM policy update.
+- Build Niri's pinned source through the host overlay (`prev.niri-unstable`), not
+  the input flake's independently built package. Mesa loads from `/run/opengl-driver`
+  and can require a newer glibc. The `niri-mesa-runtime` flake check exercises this
+  dynamic loading boundary without a GPU; a successful host build alone misses it.

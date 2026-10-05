@@ -42,9 +42,14 @@ in
 
     lanzaboote = {
       enable = true;
-      # Two bootloader versions × two generations × two kernel choices = eight
+      # Two bootloader versions × four generations × one kernel choice = eight
       # PCR 4 alternatives. Lanzaboote keeps the booted generation within this limit.
-      configurationLimit = lib.mkDefault 2;
+      configurationLimit = lib.mkDefault 4;
+      # Retained generations still embed the retired specialisation in boot.json.
+      # Skip it during installation so its entries and PCR measurements are collected.
+      package = inputs.lanzaboote.packages.${pkgs.stdenv.hostPlatform.system}.lzbt.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./lanzaboote-drop-latest-nixos.patch ];
+      });
       pkiBundle = "/var/lib/sbctl";
       autoEnrollKeys = {
         enable = true;

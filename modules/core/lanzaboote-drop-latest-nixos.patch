@@ -1,0 +1,14 @@
+diff --git a/systemd/src/install.rs b/systemd/src/install.rs
+--- a/systemd/src/install.rs
++++ b/systemd/src/install.rs
+@@ -233,6 +233,9 @@
+                 .with_context(|| format!("Failed to install generation {}", generation.version))?;
+ 
+-            for specialisation in generation.specialisations.values() {
++            for (name, specialisation) in &generation.specialisations {
++                if name.to_string() == "latest-nixos" {
++                    continue;
++                }
+                 self.install_generation(specialisation)
+                     .context("Failed to install specialisation.")?;
+             }

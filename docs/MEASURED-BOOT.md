@@ -231,7 +231,7 @@ boot = {
   };
 
   lanzaboote = {
-    configurationLimit = 2;
+    configurationLimit = 4;
     measuredBoot = {
       enable = true;
       pcrs = [
@@ -246,12 +246,15 @@ boot = {
 
 The existing device paths remain in
 `hosts/laptop/hardware-configuration.nix`; Nix merges these token options into
-those definitions. The shared bootloader module retains two generations.
+those definitions. The shared bootloader module retains four generations with
+the CachyOS kernel; the `latest-nixos` specialisation has been removed.
 `systemd-pcrlock` supports at most eight alternatives per PCR. During a
-bootloader update, two bootloader versions × two generations × the base and
-`latest-nixos` images produce eight PCR 4 alternatives. Four generations would
-produce sixteen alternatives and fail policy generation. Lanzaboote counts the
-protected booted generation within the retention limit.
+bootloader update, two bootloader versions × four generations × one kernel
+image produce eight PCR 4 alternatives. Adding a kernel specialisation would
+produce sixteen alternatives and fail policy generation. The installer also
+skips `latest-nixos` in retained older generations, allowing its obsolete boot
+entries and measurements to be collected. Lanzaboote counts the protected
+booted generation within the retention limit.
 
 Do not put `tpm2-pin=yes` or PCR selections in `crypttabExtraOpts`. The LUKS2
 systemd token written during enrollment records the PIN requirement and PCR

@@ -190,7 +190,6 @@
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
         lumen = lumen.packages.${system}.lumen;
-        niri-unstable = niri.packages.${system}.niri-unstable;
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };

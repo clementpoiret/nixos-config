@@ -72,9 +72,9 @@ in
     let
       excessiveRetentionHost = self.nixosConfigurations.laptop.extendModules {
         modules = [
-          ({ lib, ... }: {
-            boot.lanzaboote.configurationLimit = lib.mkForce 4;
-          })
+          {
+            specialisation.extra-kernel.configuration = { };
+          }
         ];
       };
       retentionAssertions = builtins.filter (
@@ -82,11 +82,61 @@ in
         !assertion.assertion && pkgs-unstable.lib.hasInfix "Measured boot with PCR 4" assertion.message
       ) excessiveRetentionHost.config.assertions;
     in
+    assert self.nixosConfigurations.laptop.config.boot.lanzaboote.configurationLimit == 4;
+    assert self.nixosConfigurations.desktop.config.boot.lanzaboote.configurationLimit == 4;
+    assert self.nixosConfigurations.laptop.config.specialisation == { };
+    assert self.nixosConfigurations.desktop.config.specialisation == { };
     assert builtins.length retentionAssertions == 1;
     assert !(builtins.tryEval excessiveRetentionHost.config.system.build.toplevel.drvPath).success;
     pkgs-unstable.runCommand "measured-boot-retention" { } ''
       touch "$out"
     '';
+
+  lanzaboote-historical-retention =
+    let
+      host = self.nixosConfigurations.laptop;
+    in
+    pkgs-unstable.runCommand "lanzaboote-historical-retention"
+      {
+        nativeBuildInputs = [ pkgs-unstable.python3 ];
+      }
+      ''
+        export PATH=${host.config.systemd.package}/lib/systemd:$PATH
+        python ${./lanzaboote-retention.py} \
+          ${pkgs-unstable.lib.getExe host.config.boot.lanzaboote.package} \
+          ${host.config.systemd.package} \
+          ${host.config.boot.lanzaboote.package.src}/systemd/tests/fixtures/uefi-keys
+        touch "$out"
+      '';
+
+  niri-mesa-runtime =
+    let
+      checkHost =
+        hostName:
+        let
+          pkgs = self.nixosConfigurations.${hostName}.pkgs;
+        in
+        ''
+          for binary in ${pkgs.niri-host}/bin/niri ${pkgs.niri-baseline}/bin/niri; do
+            loader=$(patchelf --print-interpreter "$binary")
+            library_path=$(patchelf --print-rpath "$binary")
+            "$loader" --library-path "$library_path" ./mesa-load \
+              ${pkgs.mesa}/lib/libgallium-${pkgs.mesa.version}.so
+          done
+        '';
+    in
+    pkgs-unstable.runCommandCC "niri-mesa-runtime"
+      {
+        nativeBuildInputs = [ pkgs-unstable.patchelf ];
+      }
+      ''
+        # Niri already has libm loaded when it opens the graphics driver.
+        $CC -Wall -Wextra -Werror ${./niri-mesa-load.c} \
+          -Wl,--no-as-needed -lm -ldl -o mesa-load
+        ${checkHost "desktop"}
+        ${checkHost "laptop"}
+        touch "$out"
+      '';
 
   manage-dns-portal =
     pkgs-unstable.runCommand "manage-dns-portal-test"
