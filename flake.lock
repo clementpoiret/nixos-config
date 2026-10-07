@@ -193,11 +193,11 @@
     "clementpoiret-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1789374804,
-        "narHash": "sha256-4LhEtkXEguxp7aHnM0p2x6hvHOZiSCKtmCraoaipM9I=",
+        "lastModified": 1791366177,
+        "narHash": "sha256-q+ZaxgVz8gtyzMA14obnpW65h38hanrUu1jt+omapQY=",
         "owner": "clementpoiret",
         "repo": "skills",
-        "rev": "3095d4d8dd72e3078b010cb67d89e3d449137e04",
+        "rev": "80a534395527397653e49b201f9a3df5a71381e3",
         "type": "github"
       },
       "original": {

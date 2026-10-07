@@ -36,5 +36,9 @@ in
         force = true;
         source = ./agent-instructions/CLAUDE.md;
       };
+      ".config/opencode/AGENTS.md" = {
+        force = true;
+        source = ./agent-instructions/AGENTS.md;
+      };
     };
 }
