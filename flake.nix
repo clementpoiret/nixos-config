@@ -98,6 +98,10 @@
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+    opencode = {
+      url = "github:anomalyco/opencode/v2";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     t3code = {
       url = "github:clementpoiret/t3code-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -151,6 +155,7 @@
       nixpkgs,
       nixpkgs-master,
       nixpkgs-stable,
+      opencode,
       stylix,
       superfile,
       ...
@@ -190,6 +195,7 @@
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
         lumen = lumen.packages.${system}.lumen;
+        opencode = opencode.packages.${system}.default;
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };

@@ -287,6 +287,7 @@ in
       # flake.antigravity-ide
       flake.claude-code
       flake.codex-cli
+      flake.opencode
       (t3codePackages.t3code.override t3codeRuntimeOptions)
       (t3codePackages.t3code-desktop.override t3codeRuntimeOptions)
       deezer-enhanced
