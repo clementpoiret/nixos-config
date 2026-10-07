@@ -32,6 +32,10 @@ Project-level instructions override these.
 - Stay in scope: no adjacent refactors, dependency or toolchain upgrades, lockfile regeneration, broad renames, or
   repo-wide formatting unless the task needs them. Mention unrelated bugs instead of fixing them.
 - Preserve the user's uncommitted work. Remove code your change made obsolete; leave pre-existing dead code alone.
+- Plans and roadmaps you are given are private and disposable. Never carry their vocabulary into anything that persists:
+  revision descriptions, code, identifiers, comments, docs, test names, file names, or bookmarks. That means no phase
+  numbers or names ("phase 1", "milestone B", "step 3"), plan codenames, or references to plan files. Name things for
+  what they are and do. Don't copy or commit plans.
 
 ## Version control
 
@@ -42,8 +46,10 @@ Project-level instructions override these.
   the current working copy with `jj new -m "<description>"`. If the working-copy revision is already empty and
   undescribed, reuse it with `jj describe -m` instead of stacking another empty one. Follow-up requests on the same task
   stay in the same revision.
-- The description is a one-line summary of the intended change, in the repo's existing commit style. Update it with
-  `jj describe -m` if the scope changes.
+- Descriptions follow Conventional Commits: `type(scope): summary`. Use `feat`, `fix`, `refactor`, `perf`, `test`,
+  `docs`, `build`, `ci`, or `chore`; the optional scope is the affected component; the summary is imperative, lowercase,
+  without a trailing period, and states what the change does. Update the description with `jj describe -m` if the scope
+  changes.
 - Always pass `-m`, and avoid anything that opens an editor or interactive UI (`jj describe` without `-m`, `jj split`,
   `-i`/`--interactive` flags); it will hang.
 - Creating and describing your own revisions is part of the task. Get approval before `jj git push`, moving or deleting
