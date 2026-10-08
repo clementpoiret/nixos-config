@@ -14,7 +14,8 @@ Project-level instructions override these.
   production data, credentials, permissions, or infrastructure; incurring material cost.
 - The machine is likely NixOS: don't assume standard Linux paths (use `command -v` and `#!/usr/bin/env` shebangs), and
   never install tools system-wide (`apt`, `sudo pip`, `npm -g`); add them to the project's devenv.sh environment
-  (`devenv.nix`, run through `devenv shell`), and ask before creating one in a repo that doesn't have it.
+  (`devenv.nix`, run through `devenv shell`), and ask before creating one in a repo that doesn't have it, or use
+  `nix shell nixpkgs#<tool>` for one-off tools.
 
 ## Implementation
 
