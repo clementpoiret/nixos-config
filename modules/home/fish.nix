@@ -197,7 +197,7 @@
         enabled = true;
       };
 
-      store-failed = false;
+      store_failed = false;
     };
     enableFishIntegration = true;
   };
