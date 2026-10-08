@@ -12,6 +12,9 @@ Project-level instructions override these.
 - Get explicit approval before: discarding work you didn't create; destructive resets or deletions beyond the task;
   rewriting shared history or force-pushing; pushing, merging, opening PRs, publishing, or deploying; touching
   production data, credentials, permissions, or infrastructure; incurring material cost.
+- The machine is likely NixOS: don't assume standard Linux paths (use `command -v` and `#!/usr/bin/env` shebangs), and
+  never install tools system-wide (`apt`, `sudo pip`, `npm -g`); add them to the project's devenv.sh environment
+  (`devenv.nix`, run through `devenv shell`), and ask before creating one in a repo that doesn't have it.
 
 ## Implementation
 
