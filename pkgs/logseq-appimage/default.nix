@@ -12,11 +12,11 @@
 
 let
   pname = "logseq-appimage";
-  version = "2.0.1";
+  version = "2.0.2";
 
   src = fetchurl {
     url = "https://github.com/logseq/logseq/releases/download/${version}/Logseq-linux-x86_64-${version}.AppImage";
-    hash = "sha256-Sd42cHizdnD+vbmH5WK3Xe4eGulsKL+4c4d5xCKX3Qw=";
+    hash = "sha256-EzVyVib2y/vzsAt3Q6YDVtLX2tEjzwC7+XSpvu9VaHA=";
   };
 
   appimageContents = appimageTools.extract {
