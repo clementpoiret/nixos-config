@@ -328,7 +328,6 @@ def configure_upstream_remote(protected: Path, candidate: Path) -> str:
 def fetch_main(repo: Path, remote: str) -> str:
     run_jj(
         repo,
-        "--ignore-working-copy",
         "git",
         "fetch",
         "--remote",
@@ -452,7 +451,7 @@ def synchronize_fetched_main(
     )
     old_baseline_change = revision_value(protected, old_baseline, "change_id")
     protected_change = revision_value(protected, protected_current, "change_id")
-    candidate_current, candidate_empty, candidate_change, candidate_description = (
+    _, candidate_empty, candidate_change, candidate_description = (
         candidate_state_before
     )
 
@@ -512,7 +511,6 @@ def synchronize_fetched_main(
 
         run_jj(
             candidate,
-            "--ignore-working-copy",
             "git",
             "fetch",
             "--remote",
@@ -528,11 +526,12 @@ def synchronize_fetched_main(
         if imported_baseline != new_baseline:
             raise WorkflowError("candidate imported an unexpected protected baseline")
 
+        # Fetching a rewritten imported baseline can already rebase @.
         run_jj(
             candidate,
             "rebase",
             "--revision",
-            candidate_current,
+            "@",
             "--onto",
             imported_baseline,
         )
@@ -747,7 +746,6 @@ def synchronize_candidate(
     candidate_change = revision_value(candidate, candidate_current, "change_id")
     run_jj(
         candidate,
-        "--ignore-working-copy",
         "git",
         "fetch",
         "--remote",
@@ -767,7 +765,6 @@ def synchronize_candidate(
     if (remote, branch) != (UPSTREAM_REMOTE, BASE_BOOKMARK):
         run_jj(
             candidate,
-            "--ignore-working-copy",
             "git",
             "fetch",
             "--remote",

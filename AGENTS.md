@@ -14,3 +14,10 @@
   the input flake's independently built package. Mesa loads from `/run/opengl-driver`
   and can require a newer glibc. The `niri-mesa-runtime` flake check exercises this
   dynamic loading boundary without a GPU; a successful host build alone misses it.
+
+# Jujutsu synchronization
+
+- Fetching a rewritten imported `agent-base` can automatically rebase the writable
+  working change. Keep working-copy updates enabled for these fetches and use the
+  current `@` for the subsequent rebase; the pre-fetch commit ID can be obsolete.
+  The agent integration tests reproduce this with a tracked, imported baseline.

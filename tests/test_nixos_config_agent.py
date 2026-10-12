@@ -324,6 +324,41 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.assertTrue((self.protected / "upstream.txt").is_file())
         self.assertTrue((self.candidate / "upstream.txt").is_file())
 
+    def test_fetch_rebases_imported_baseline_and_preserves_active_candidate(self) -> None:
+        (self.protected / "local.txt").write_text("local\n", encoding="utf-8")
+        self.run_jj(self.protected, "describe", "-m", "fix: keep local work")
+        self.run_jj(self.protected, "new", "-m", "")
+        baseline = self.initialize()
+        self.run_jj(self.candidate, "bookmark", "track", "agent-base@origin")
+        candidate_current = self.describe_candidate("fix: keep active candidate")
+        candidate_change = nixos_config_agent.revision_value(
+            self.candidate, "@", "change_id"
+        )
+        upstream_target = self.create_github_change()
+
+        self.fetch_updates()
+
+        protected_baseline = self.revision(self.protected, "parents(@)")
+        self.assertNotEqual(protected_baseline, baseline)
+        self.assertEqual(self.revision(self.candidate, "parents(@)"), protected_baseline)
+        self.assertEqual(self.revision(self.protected, "main"), upstream_target)
+        self.assertNotEqual(self.revision(self.candidate, "@"), candidate_current)
+        self.assertEqual(
+            nixos_config_agent.revision_value(self.candidate, "@", "change_id"),
+            candidate_change,
+        )
+        self.assertEqual(
+            nixos_config_agent.description(self.candidate), "fix: keep active candidate\n"
+        )
+        self.assertEqual(
+            (self.candidate / "configuration.nix").read_text(encoding="utf-8"),
+            "candidate\n",
+        )
+        self.assertEqual(
+            (self.candidate / "local.txt").read_text(encoding="utf-8"), "local\n"
+        )
+        self.assertTrue((self.candidate / "upstream.txt").is_file())
+
     def test_fetch_without_upstream_change_does_not_rewrite_work(self) -> None:
         baseline = self.initialize()
         protected_current = self.revision(self.protected, "@")
@@ -412,7 +447,11 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.assertEqual(self.revision(self.candidate, "main@github"), upstream_target)
 
     def test_fetch_rolls_back_candidate_rebase_conflict(self) -> None:
+        (self.protected / "local.txt").write_text("local\n", encoding="utf-8")
+        self.run_jj(self.protected, "describe", "-m", "fix: keep local work")
+        self.run_jj(self.protected, "new", "-m", "")
         baseline = self.initialize()
+        self.run_jj(self.candidate, "bookmark", "track", "agent-base@origin")
         candidate_current = self.describe_candidate()
         protected_current = self.revision(self.protected, "@")
         local_main = self.revision(self.protected, "main")
