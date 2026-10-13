@@ -233,7 +233,7 @@ in
       brave # Privacy-focused web browser
       # firefox-devedition # Firefox Developer Edition
       # glide.glide-browser # Keyboard-focused browser
-      flake.glide-browser # Keyboard-focused browser
+      # flake.glide-browser # Keyboard-focused browser
       # flake.helium
       mullvad-browser
       # flake.orion-browser
@@ -250,6 +250,7 @@ in
       mpv # Media player
 
       # Office & Documents
+      collabora-desktop-bin
       drawio # Diagrams editor
       evince # PDF/document viewer
       hugo # Static site generator
@@ -446,17 +447,17 @@ in
         sensitiveAccess = [ "credential-broker" ];
         elevatedAccessRationale = "Brave uses the desktop secret-service broker for user-approved credentials.";
       };
-      glide = {
-        package = pkgs.flake.glide-browser;
-        executable = "bin/glide";
-        capabilities = browserCapabilities;
-        homePaths = [
-          ".cache/glide"
-          ".config/glide"
-        ];
-        sensitiveAccess = [ "credential-broker" ];
-        elevatedAccessRationale = "Glide uses the desktop secret-service broker for user-approved credentials.";
-      };
+      # glide = {
+      #   package = pkgs.flake.glide-browser;
+      #   executable = "bin/glide";
+      #   capabilities = browserCapabilities;
+      #   homePaths = [
+      #     ".cache/glide"
+      #     ".config/glide"
+      #   ];
+      #   sensitiveAccess = [ "credential-broker" ];
+      #   elevatedAccessRationale = "Glide uses the desktop secret-service broker for user-approved credentials.";
+      # };
       mullvad-browser = {
         package = pkgs.mullvad-browser;
         executable = "bin/mullvad-browser";
