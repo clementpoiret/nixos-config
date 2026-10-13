@@ -68,6 +68,37 @@ let
   };
 in
 {
+  binary-release-signatures =
+    pkgs-unstable.runCommand "binary-release-signatures"
+      {
+        nativeBuildInputs = [
+          pkgs-unstable.python3
+          pkgs-unstable.gnupg
+        ];
+        PYTHONPATH = ../pkgs;
+        BRAVE_UPDATER_SOURCE = ../pkgs/update-brave.py;
+        PROTON_UPDATER_SOURCE = ../pkgs/update-proton.py;
+        BRAVE_RELEASE_KEY = ../pkgs/brave/release-key.asc;
+        BRIDGE_RELEASE_KEY = ../pkgs/protonmail-bridge/release-key.asc;
+        RELEASE_SIGNATURE_FIXTURES = ./fixtures/release-signatures;
+      }
+      ''
+        python ${./test_release_signatures.py}
+        touch "$out"
+      '';
+
+  proton-package-updates =
+    pkgs-unstable.runCommand "proton-package-updates"
+      {
+        nativeBuildInputs = [ pkgs-unstable.python3 ];
+        PYTHONPATH = ../pkgs;
+      }
+      ''
+        PROTON_UPDATER_SOURCE=${../pkgs/update-proton.py} \
+          python ${./test_update_proton.py}
+        touch "$out"
+      '';
+
   measured-boot-retention =
     let
       excessiveRetentionHost = self.nixosConfigurations.laptop.extendModules {

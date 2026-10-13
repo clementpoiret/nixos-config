@@ -1,0 +1,841 @@
+{
+  "Releases": [
+    {
+      "CategoryName": "Stable",
+      "Version": "3.27.1",
+      "ReleaseDate": "2026-10-08",
+      "RolloutProportion": 0.25,
+      "Commit": "43b9237786",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.27.1-1_amd64.deb",
+          "Sha512CheckSum": "c4e29cb37af4ed8ecb5311f30db3ac5da55b74c395a408f31e323c14e70d4f9d296c95859785cde3b2a5ca1759792299641232a5b1a9e6e6014cfd4f2e60355a",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.27.1-1.x86_64.rpm",
+          "Sha512CheckSum": "3c4c6f42729a4b53de3667a67bc965445fd137daf7e6316ae5be1b8faadb60d06d08049beb9363d19ccc0fe28260eea975dac733d90425bb6c5ea3ac82ddf334",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "484417097eb8c713359a2a9ce335ec80f772cd9790b95495f637175c648188274558f7ef9e68d977d4f2c69c663f60ce4ae1947ed3b96ddc7a11c2a29a0c09cd",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.27.1_linux_update.tgz",
+          "Sha512CheckSum": "a29dbcf3dfac3ba772671070392c98118e849a36e593a438d4cdaf7cee08080911e3781af01a78ff4d425305aa269aa0385ab82656a0dc171af14fc0924f5921",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.27.1",
+      "ReleaseDate": "2026-10-05",
+      "RolloutProportion": 1,
+      "Commit": "43b9237786",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.27.1-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.27.1-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "43b2755e4882ce03777f4827abf175f55d9772618a20890b79614fa43222b4952b69285b7c36ac471cf85fb1ad985d9c9fd199b25f0413093a6d9775048a6f31",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.27.1_linux_update.tgz",
+          "Sha512CheckSum": "a29dbcf3dfac3ba772671070392c98118e849a36e593a438d4cdaf7cee08080911e3781af01a78ff4d425305aa269aa0385ab82656a0dc171af14fc0924f5921",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.27.0",
+      "ReleaseDate": "2026-09-23",
+      "RolloutProportion": 1,
+      "Commit": "04e46eb4fb",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.27.0-1_amd64.deb",
+          "Sha512CheckSum": "27574ac783a5897439dcdde9e3821ee717ec6732edd46f1f4ed1d4fb1ed3779ba97c5b1f2c0c6d886f3f5a1ba12e093b4ff147b15ae15af7caf1250390c7ca59",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.27.0-1.x86_64.rpm",
+          "Sha512CheckSum": "d146995524f3b416fe576cc92b6268c6685602936810a256e5fef4c9361b0546e16817580160cbd618ee6d8c3051d3d878c13ff534335780353ac2637370983c",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "43b2755e4882ce03777f4827abf175f55d9772618a20890b79614fa43222b4952b69285b7c36ac471cf85fb1ad985d9c9fd199b25f0413093a6d9775048a6f31",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.27.0_linux_update.tgz",
+          "Sha512CheckSum": "e54718f3e31a8f8d4cc4a0584842c0cbb66abfbe3a576f9e9d9bfe716217b1b7671fd03b4f15ebfa386cf0fea3271783d2ce78c4fc42f32e185a6c2dd917a45c",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.27.0",
+      "ReleaseDate": "2026-09-16",
+      "RolloutProportion": 1,
+      "Commit": "04e46eb4fb",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.27.0-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.27.0-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "896e93d95bb05fa978a91efb2e6286af6659817d542161179c6047169dce59c901ebd5a65e1aa47fbc0716ccece80fe9bb35f2956d83eb21c532f4469fd4e18f",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.27.0_linux_update.tgz",
+          "Sha512CheckSum": "e54718f3e31a8f8d4cc4a0584842c0cbb66abfbe3a576f9e9d9bfe716217b1b7671fd03b4f15ebfa386cf0fea3271783d2ce78c4fc42f32e185a6c2dd917a45c",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.26.0",
+      "ReleaseDate": "2026-08-31",
+      "RolloutProportion": 1,
+      "Commit": "726f7aa62a",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.26.0-1_amd64.deb",
+          "Sha512CheckSum": "4050d6445dc599ca22c19235786c229a7d0cae819c979312050bdea39eb0e4826fc049717b24e0e8516ac82a0315a38b6f92e2da3243c92638035444114519e5",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.26.0-1.x86_64.rpm",
+          "Sha512CheckSum": "198489e3e76e4e3b8d71e06025c8e6141297eb9073d5543d529fcef0817bc01c8fa1791e68d10b8175419399080440f32f9cf1682e578c8a2cc463d8a1bfe1f4",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "896e93d95bb05fa978a91efb2e6286af6659817d542161179c6047169dce59c901ebd5a65e1aa47fbc0716ccece80fe9bb35f2956d83eb21c532f4469fd4e18f",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.26.0_linux_update.tgz",
+          "Sha512CheckSum": "c4a96a677b816bf7ddd8290f076cd1954ec8cdb0a1d38c5f6a9735bdeb0c1f391721ffeb0334923a733fb1f21b9799cf140826aee3087fda190dbfa4c49bef06",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.26.0",
+      "ReleaseDate": "2026-08-24",
+      "RolloutProportion": 1,
+      "Commit": "726f7aa62a",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.26.0-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.26.0-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "f8b08fe2222075652da0fcad629f37f72197e947e2a49d6ec6e377ba23447e19b563bcfff29fde9376ec1acfb5aac63b584ac11bb26f8a4acbfe690c8c03c89b",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.26.0_linux_update.tgz",
+          "Sha512CheckSum": "c4a96a677b816bf7ddd8290f076cd1954ec8cdb0a1d38c5f6a9735bdeb0c1f391721ffeb0334923a733fb1f21b9799cf140826aee3087fda190dbfa4c49bef06",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.25.0",
+      "ReleaseDate": "2026-06-15",
+      "RolloutProportion": 1,
+      "Commit": "f1f599e971",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.25.0-1_amd64.deb",
+          "Sha512CheckSum": "847320e2c190fac6f09e762cd34dbba35d1f01b2cddf79dc157d66d6c8b149b8290552efd714f4c5b6635e7451d7fbf462c5f2e75412629ab8978fdc7ced288c",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.25.0-1.x86_64.rpm",
+          "Sha512CheckSum": "f8b1eb2ec275175c56fb2838caf450d9ecba88f94efe4d232146ed8552a9fd79f21a6a5858a96f5fb82bbf30fba25fe2ecfd56ccd5553d3d81eb64f4f02d646a",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "f8b08fe2222075652da0fcad629f37f72197e947e2a49d6ec6e377ba23447e19b563bcfff29fde9376ec1acfb5aac63b584ac11bb26f8a4acbfe690c8c03c89b",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.25.0_linux_update.tgz",
+          "Sha512CheckSum": "b038fcc0c61d77c05d5aba64d0647412ea68b4c1111db2e9af3cfefedeea0fa69d368a3c467551d66c7f49fa8be2f7a222ac5db3703f73a6b731b4b70c3ece2a",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.25.0",
+      "ReleaseDate": "2026-06-08",
+      "RolloutProportion": 1,
+      "Commit": "f1f599e971",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.25.0-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.25.0-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "cbc12c1b97dc17c7a2172035d76abdc956cbfdb43a18116e2a4692079c5c708c1e61301a44c017ce8a4f2394de5b691ea34385d6890aebbe42c70555761b38f6",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.25.0_linux_update.tgz",
+          "Sha512CheckSum": "b038fcc0c61d77c05d5aba64d0647412ea68b4c1111db2e9af3cfefedeea0fa69d368a3c467551d66c7f49fa8be2f7a222ac5db3703f73a6b731b4b70c3ece2a",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.24.2",
+      "ReleaseDate": "2026-04-29",
+      "RolloutProportion": 1,
+      "Commit": "d9cf2b9d49",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.24.2-1_amd64.deb",
+          "Sha512CheckSum": "734b3b222263bdd24dab951f6b091b7daad09d25d14df403d90034df88f176644d18697107eb67dd601efc2fad3809aebdb4e5456fc26ee9e1a8db8e6b47c66f",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.24.2-1.x86_64.rpm",
+          "Sha512CheckSum": "afdfa7eaa0314d13f38905d8e08adb38bc193ff23415cb7c7e0d6fbc6ef5d70e1a353d51e2cffea7c34f2a093d34b9e008bacb6f2fb1f4aaa2dbcec7c247c934",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "cbc12c1b97dc17c7a2172035d76abdc956cbfdb43a18116e2a4692079c5c708c1e61301a44c017ce8a4f2394de5b691ea34385d6890aebbe42c70555761b38f6",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.24.2_linux_update.tgz",
+          "Sha512CheckSum": "b5721b51312e826a3008447aebc4fe1f79ecac7d1806a193747b2c91bfadf0c35628a9d3101b61d08111f6754f1ca9f7fa039bd8335b55d61aedbbc5d4348063",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.24.2",
+      "ReleaseDate": "2026-04-24",
+      "RolloutProportion": 1,
+      "Commit": "d9cf2b9d49",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.24.2-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.24.2-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "5d072e0c464453dd2f668ee987ad3ee8aefc245250662ba8f633487e35af8f0b4a245358087e18968b980c38edc450beba9aa1b7a3a459e89f4bea27fdbf72c2",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.24.2_linux_update.tgz",
+          "Sha512CheckSum": "b5721b51312e826a3008447aebc4fe1f79ecac7d1806a193747b2c91bfadf0c35628a9d3101b61d08111f6754f1ca9f7fa039bd8335b55d61aedbbc5d4348063",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.24.1",
+      "ReleaseDate": "2026-04-14",
+      "RolloutProportion": 1,
+      "Commit": "744023856a",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.24.1-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.24.1-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "e3f749a80600cec99b6ba1b7fff1f8c39011df0b0586f098337dc77d5ebcecdc35b8e95af08f946308e19fc29b4529e666d342aa6ec877689b3bb383b5e879a5",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.24.1_linux_update.tgz",
+          "Sha512CheckSum": "062e4b4515b6e4c02ab0819814c7c7d5bbc675aae410cd73cdd82ade1976b77511d4dab3ea97573e20787f21c7cca0bc137a9b335db0b5239afddf52e8a90534",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.24.0",
+      "ReleaseDate": "2026-04-06",
+      "RolloutProportion": 1,
+      "Commit": "73e43aaaca",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.24.0-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.24.0-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "e3f749a80600cec99b6ba1b7fff1f8c39011df0b0586f098337dc77d5ebcecdc35b8e95af08f946308e19fc29b4529e666d342aa6ec877689b3bb383b5e879a5",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.24.0_linux_update.tgz",
+          "Sha512CheckSum": "5a218826631b29c8baa7ca7cdcd94cfe69baa01c7f2619a43a9af96335b228fa8dcc5bdd6120a6034b6cca34568cf57eb69ca23e0afc3b7997928fcd8fa8bb05",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.23.1",
+      "ReleaseDate": "2026-03-25",
+      "RolloutProportion": 1,
+      "Commit": "592897b9ce",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.23.1-1_amd64.deb",
+          "Sha512CheckSum": "cf29c64c9871773dc5ec7b5352a413b7919dd3b5bbcbfeeb65f353f7950aa13ac2c1255a767b7dd9c7e402e57366c4a85a0ab2341128b133379e1adc16d7a282",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.23.1-1.x86_64.rpm",
+          "Sha512CheckSum": "2ecebc91bb347fff815bce7e77bbee1e951263fb8a141295a95be970ea68f5140517810346495ead0428802563c17666c7825f1525fb54281f0c06dd8de45296",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "e3f749a80600cec99b6ba1b7fff1f8c39011df0b0586f098337dc77d5ebcecdc35b8e95af08f946308e19fc29b4529e666d342aa6ec877689b3bb383b5e879a5",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.23.1_linux_update.tgz",
+          "Sha512CheckSum": "522a7e67731d9ad20098681037eaa1f3773bd610a76815c5ec2d21a36cbd199348feec77f5d4a8261a7bd1752e73f279d2474af2b459438734be51d13fbcb757",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.23.1",
+      "ReleaseDate": "2026-03-16",
+      "RolloutProportion": 1,
+      "Commit": "592897b9ce",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.23.1-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.23.1-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "d784f274e1077f74f5cb96e7c357dd702cd3ec6774d0317e0a2ace2f6642382a829bbcacb5566b4c75e2cd9060d1ef658e04c93e02248697d3535fc3359d634d",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.23.1_linux_update.tgz",
+          "Sha512CheckSum": "522a7e67731d9ad20098681037eaa1f3773bd610a76815c5ec2d21a36cbd199348feec77f5d4a8261a7bd1752e73f279d2474af2b459438734be51d13fbcb757",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.23.0",
+      "ReleaseDate": "2026-03-04",
+      "RolloutProportion": 0.1,
+      "Commit": "6ab92ab35b",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.23.0-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.23.0-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "d784f274e1077f74f5cb96e7c357dd702cd3ec6774d0317e0a2ace2f6642382a829bbcacb5566b4c75e2cd9060d1ef658e04c93e02248697d3535fc3359d634d",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.23.0_linux_update.tgz",
+          "Sha512CheckSum": "e369ad19c7f6300bf3fbf49eb2cb1b7d5d0b19491b6a9be91a8d9fb5bff3816cb98ca1359f46abb4b5e887d1d2045c5f013f4c7c3648464557bdc6cd4a751a95",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.22.0",
+      "ReleaseDate": "2026-02-25",
+      "RolloutProportion": 1,
+      "Commit": "87bba395d0",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.22.0-1_amd64.deb",
+          "Sha512CheckSum": "e4eb00e2ab39403cfc7e99996a7d26867921ec2b32e30b047b8a6e9980255bfd353c946e05e4f2b6aab8f5f68368e56b18ea29bcfbe40e0880972d727eb06d99",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.22.0-1.x86_64.rpm",
+          "Sha512CheckSum": "c5f5055fa7a37afc79a532743db3c3eb4c53278e9fe4925c386bb76183a9d14ada2b809f38c308674805baa678096e6fc1c8514de8d3bd01ddf111d9e99bfede",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "d784f274e1077f74f5cb96e7c357dd702cd3ec6774d0317e0a2ace2f6642382a829bbcacb5566b4c75e2cd9060d1ef658e04c93e02248697d3535fc3359d634d",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.22.0_linux_update.tgz",
+          "Sha512CheckSum": "5a1bbad70b0612a531ded0a51528b20597cac68081e6a71c4f8355d75ac65a41626499cd51ce5e818bd8b567439c8311b0cdcba13bbc94b45fbbf2190902ae08",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.22.0",
+      "ReleaseDate": "2026-02-09",
+      "RolloutProportion": 1,
+      "Commit": "87bba395d0",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.22.0-1_amd64.deb",
+          "Sha512CheckSum": "e4eb00e2ab39403cfc7e99996a7d26867921ec2b32e30b047b8a6e9980255bfd353c946e05e4f2b6aab8f5f68368e56b18ea29bcfbe40e0880972d727eb06d99",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.22.0-1.x86_64.rpm",
+          "Sha512CheckSum": "c5f5055fa7a37afc79a532743db3c3eb4c53278e9fe4925c386bb76183a9d14ada2b809f38c308674805baa678096e6fc1c8514de8d3bd01ddf111d9e99bfede",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "d784f274e1077f74f5cb96e7c357dd702cd3ec6774d0317e0a2ace2f6642382a829bbcacb5566b4c75e2cd9060d1ef658e04c93e02248697d3535fc3359d634d",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.22.0_linux_update.tgz",
+          "Sha512CheckSum": "5a1bbad70b0612a531ded0a51528b20597cac68081e6a71c4f8355d75ac65a41626499cd51ce5e818bd8b567439c8311b0cdcba13bbc94b45fbbf2190902ae08",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.21.2",
+      "ReleaseDate": "2025-07-21",
+      "RolloutProportion": 1,
+      "Commit": "4cc2ded001",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.21.2-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.21.2-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "4ce4f7ebeeb33b9f0e1cd6db2d634caf15e9d56964c534cba83827b2ac56706810762f207ecbe62763bdd4eb3f153165e5821aceb57430332a251841276d40e6",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.21.2_linux_update.tgz",
+          "Sha512CheckSum": "5f9a45b7dcce06a3e9d1d818c40639904a405041db9465268e3b9bd779726992162357560c464c7330104a196d36f49f7d0e9b11ca05dd810f4b267ca28781ff",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.21.2",
+      "ReleaseDate": "2025-07-14",
+      "RolloutProportion": 1,
+      "Commit": "4cc2ded001",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.21.2-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.21.2-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "4ce4f7ebeeb33b9f0e1cd6db2d634caf15e9d56964c534cba83827b2ac56706810762f207ecbe62763bdd4eb3f153165e5821aceb57430332a251841276d40e6",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.21.2_linux_update.tgz",
+          "Sha512CheckSum": "5f9a45b7dcce06a3e9d1d818c40639904a405041db9465268e3b9bd779726992162357560c464c7330104a196d36f49f7d0e9b11ca05dd810f4b267ca28781ff",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.21.1",
+      "ReleaseDate": "2025-06-25",
+      "RolloutProportion": 1,
+      "Commit": "e9ea976773",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.21.1-1_amd64.deb",
+          "Sha512CheckSum": "3abb0ed36593c39f50a5d578b7b1b71a221d6842443d2cbcf2a1fcbbbad440ad7726b66d9be27cadcda43790500301c1b62895b256aa6f44329d38c00c2977ef",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.21.1-1.x86_64.rpm",
+          "Sha512CheckSum": "24aa62958241da55890cfe1d100e9b6499d9b059db13cf2399a3dcd1627ba4fb25940f30b3645b43fb3dd23f6126744248e88843af061c601f17536122741b9e",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "4ce4f7ebeeb33b9f0e1cd6db2d634caf15e9d56964c534cba83827b2ac56706810762f207ecbe62763bdd4eb3f153165e5821aceb57430332a251841276d40e6",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.21.1_linux_update.tgz",
+          "Sha512CheckSum": "105267578079b60ac23727937ab6caeba11bb5c28561f3d141e16f636f22e435cf3541e4de5c801f6b70cde5a9bafbadce2b9dbe52bacfdde62816a4a8cdf4be",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.21.1",
+      "ReleaseDate": "2025-06-16",
+      "RolloutProportion": 1,
+      "Commit": "e9ea976773",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.21.1-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.21.1-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "44c34eabe786501e4b77ec86d1b7091ac5e8db15a5d3323359871a033625b971ba535eff6b7f19508de2f18785ea489ea2bcf11ab8f938a0b80bff85d57ba0a4",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.21.1_linux_update.tgz",
+          "Sha512CheckSum": "105267578079b60ac23727937ab6caeba11bb5c28561f3d141e16f636f22e435cf3541e4de5c801f6b70cde5a9bafbadce2b9dbe52bacfdde62816a4a8cdf4be",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.21.0",
+      "ReleaseDate": "2025-06-09",
+      "RolloutProportion": 0.5,
+      "Commit": "50ab740b92",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.21.0-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.21.0-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "44c34eabe786501e4b77ec86d1b7091ac5e8db15a5d3323359871a033625b971ba535eff6b7f19508de2f18785ea489ea2bcf11ab8f938a0b80bff85d57ba0a4",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.21.0_linux_update.tgz",
+          "Sha512CheckSum": "b396c500f6cde5027fc82930c8e5ed622c1cc3c38941b58454c423d1520cb1cb8872917b46cb3c9fd4bdb0e363310cd5f120171159d66ddb0f08cf2f42ae72b2",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.20.1",
+      "ReleaseDate": "2025-06-02",
+      "RolloutProportion": 1,
+      "Commit": "675b37a2fa",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.20.1-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.20.1-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "44c34eabe786501e4b77ec86d1b7091ac5e8db15a5d3323359871a033625b971ba535eff6b7f19508de2f18785ea489ea2bcf11ab8f938a0b80bff85d57ba0a4",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.20.1_linux_update.tgz",
+          "Sha512CheckSum": "231de49592ef8ca1466e8baf00dc4b717f807f7f04ccebf250544dcc87054bb104e771386db05598c51a34dde19cbc853ae28952100cc21d022a08882dc3bee7",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.20.0",
+      "ReleaseDate": "2025-05-20",
+      "RolloutProportion": 0,
+      "Commit": "05623a9e49",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.20.0-1_amd64.deb",
+          "Sha512CheckSum": "ae8b57e5fa613476189723fc1ad21a5c44465769c5e0f83e8acd673681ca9655b0cc6856d8f63ccf2581188e33eef3894e081e13eb0cfaf499f3c4d426dd72bf",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.20.0-1.x86_64.rpm",
+          "Sha512CheckSum": "4603067a76c4a53232db3ba1964063759edd6bf4631bb71203dd7e2a143bddcfe9724476e2d990e386cef72da06d856e5ea99588b1853251e66eb632ec1ed00f",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "44c34eabe786501e4b77ec86d1b7091ac5e8db15a5d3323359871a033625b971ba535eff6b7f19508de2f18785ea489ea2bcf11ab8f938a0b80bff85d57ba0a4",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.20.0_linux_update.tgz",
+          "Sha512CheckSum": "903e45165e3305a9ed60ce608065c4f247eec5224912f2c55364a8c46ca376a45597a83059fe000e269434a5708b433fb5dbc47cdc7a434c6e35b5c95c220420",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.20.0",
+      "ReleaseDate": "2025-05-20",
+      "RolloutProportion": 0,
+      "Commit": "05623a9e49",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.20.0-1_amd64.deb",
+          "Sha512CheckSum": "ae8b57e5fa613476189723fc1ad21a5c44465769c5e0f83e8acd673681ca9655b0cc6856d8f63ccf2581188e33eef3894e081e13eb0cfaf499f3c4d426dd72bf",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.20.0-1.x86_64.rpm",
+          "Sha512CheckSum": "4603067a76c4a53232db3ba1964063759edd6bf4631bb71203dd7e2a143bddcfe9724476e2d990e386cef72da06d856e5ea99588b1853251e66eb632ec1ed00f",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "44c34eabe786501e4b77ec86d1b7091ac5e8db15a5d3323359871a033625b971ba535eff6b7f19508de2f18785ea489ea2bcf11ab8f938a0b80bff85d57ba0a4",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.20.0_linux_update.tgz",
+          "Sha512CheckSum": "903e45165e3305a9ed60ce608065c4f247eec5224912f2c55364a8c46ca376a45597a83059fe000e269434a5708b433fb5dbc47cdc7a434c6e35b5c95c220420",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "Stable",
+      "Version": "3.19.0",
+      "ReleaseDate": "2025-04-16",
+      "RolloutProportion": 1,
+      "Commit": "9f4801b738",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/stable_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.19.0-1_amd64.deb",
+          "Sha512CheckSum": "d25e2c3461b1b13362bf173aac251cef512f22c5aad9851d5393e29fe80051060e20fefcae1b5406679e0d19da9372f8fb0af37d3aa8f1317c146e0114825716",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.19.0-1.x86_64.rpm",
+          "Sha512CheckSum": "dec18f1721550eb0154724d7badd304c7c48395a8e6f1c406621a0caaf890814f01e425d9e86a6bfe1c57f353c5b9d3f764b27194c35cc8cfc45cc2daa629819",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "e84f800729277e0587adbf40e1bdb1c66f445c545801d62e21e86d99ea4b93f2b4e5bca8e650a9aba3595172a9664b14385fa9f6ae3c77ec4a2b9f21d417cfe4",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.19.0_linux_update.tgz",
+          "Sha512CheckSum": "bab74806b726d566123bf016d1602d852b078afefe5ba2e6c41276213eeb9566ea0e91e22c43da67f249626fc043b84ad491740f6ed6908a5762fcbdcffa6207",
+          "Identifier": "package"
+        }
+      ]
+    },
+    {
+      "CategoryName": "EarlyAccess",
+      "Version": "3.19.0",
+      "ReleaseDate": "2025-04-01",
+      "RolloutProportion": 1,
+      "Commit": "9f4801b738",
+      "ReleaseNotesPage": "https://proton.me/download/bridge/early_releases.html",
+      "LandingPage": "https://proton.me/mail/bridge#download",
+      "File": [
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge_3.19.0-1_amd64.deb",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/protonmail-bridge-3.19.0-1.x86_64.rpm",
+          "Sha512CheckSum": "",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/PKGBUILD",
+          "Sha512CheckSum": "ad62161c42e9c2744e4d4ef9e5f3627c23cb740bca41eb2621297ee2a8486e6765b4c9747276ce6cca410972810e467327a94e7a5f55222cdb7ca86109633f1a",
+          "Identifier": "installer"
+        },
+        {
+          "Url": "https://proton.me/download/bridge/bridge_3.19.0_linux_update.tgz",
+          "Sha512CheckSum": "bab74806b726d566123bf016d1602d852b078afefe5ba2e6c41276213eeb9566ea0e91e22c43da67f249626fc043b84ad491740f6ed6908a5762fcbdcffa6207",
+          "Identifier": "package"
+        }
+      ]
+    }
+  ]
+}

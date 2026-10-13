@@ -334,6 +334,11 @@
         in
         {
           collabora-desktop-bin = pkgs-unstable.callPackage ./pkgs/collabora-desktop-bin { };
+          brave = pkgs-unstable.callPackage ./pkgs/brave { upstreamBrave = pkgs-unstable.brave; };
+          proton-pass = pkgs-unstable.callPackage ./pkgs/proton-pass { };
+          proton-pass-cli = pkgs-unstable.callPackage ./pkgs/proton-pass-cli { };
+          protonmail-bridge = pkgs-unstable.callPackage ./pkgs/protonmail-bridge { };
+          protonmail-desktop = pkgs-unstable.callPackage ./pkgs/protonmail-desktop { };
           cache-root-desktop = mkCacheRoot "nixos-config-cache-root-desktop" desktopCacheEntries;
           cache-root-laptop = mkCacheRoot "nixos-config-cache-root-laptop" laptopCacheEntries;
           cache-root = mkCacheRoot "nixos-config-cache-root" (desktopCacheEntries ++ laptopCacheEntries);

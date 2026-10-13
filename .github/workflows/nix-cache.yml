@@ -153,6 +153,14 @@ jobs:
           grep -Fqx "  version = \"${version}\";" "$package_file"
           grep -Fqx "    hash = \"${hash}\";" "$package_file"
 
+      - name: Update official Proton and Brave binaries
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          nix shell --no-update-lock-file --inputs-from . nixpkgs#python3 nixpkgs#gnupg \
+            --command python3 pkgs/update-proton.py
+          nix shell --no-update-lock-file --inputs-from . nixpkgs#python3 nixpkgs#gnupg \
+            --command python3 pkgs/update-brave.py
+
       - name: Update flake inputs
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: nix flake update
@@ -160,7 +168,7 @@ jobs:
       - name: Verify update scope
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
-          if ! git diff --quiet -- . ':(exclude)flake.nix' ':(exclude)flake.lock' ':(exclude)pkgs/logseq-appimage/default.nix'; then
+          if ! git diff --quiet -- . ':(exclude)flake.nix' ':(exclude)flake.lock' ':(exclude)pkgs/logseq-appimage/default.nix' ':(exclude)pkgs/proton-pass/default.nix' ':(exclude)pkgs/proton-pass-cli/default.nix' ':(exclude)pkgs/protonmail-bridge/default.nix' ':(exclude)pkgs/protonmail-desktop/default.nix' ':(exclude)pkgs/brave/release.json'; then
             echo "Refusing to continue with changes outside the dependency update scope" >&2
             git diff --stat >&2
             exit 1
@@ -174,6 +182,11 @@ jobs:
             flake.nix
             flake.lock
             pkgs/logseq-appimage/default.nix
+            pkgs/proton-pass/default.nix
+            pkgs/proton-pass-cli/default.nix
+            pkgs/protonmail-bridge/default.nix
+            pkgs/protonmail-desktop/default.nix
+            pkgs/brave/release.json
           if-no-files-found: error
           retention-days: 1
 
@@ -227,6 +240,8 @@ jobs:
             --no-update-lock-file \
             --print-build-logs \
             --keep-going \
+            .#checks.x86_64-linux.proton-package-updates \
+            .#checks.x86_64-linux.binary-release-signatures \
             .#checks.x86_64-linux.host-cpu-optimizations \
             .#checks.x86_64-linux.apparmor-mode-matrix \
             .#checks.x86_64-linux.apparmor-policy-parser \
@@ -328,12 +343,12 @@ jobs:
 
       - name: Commit updated dependencies
         run: |
-          if git diff --quiet -- flake.nix flake.lock pkgs/logseq-appimage/default.nix; then
+          if git diff --quiet -- flake.nix flake.lock pkgs/logseq-appimage/default.nix pkgs/proton-pass/default.nix pkgs/proton-pass-cli/default.nix pkgs/protonmail-bridge/default.nix pkgs/protonmail-desktop/default.nix pkgs/brave/release.json; then
             echo "Dependencies are already current"
             exit 0
           fi
 
-          if ! git diff --quiet -- . ':(exclude)flake.nix' ':(exclude)flake.lock' ':(exclude)pkgs/logseq-appimage/default.nix'; then
+          if ! git diff --quiet -- . ':(exclude)flake.nix' ':(exclude)flake.lock' ':(exclude)pkgs/logseq-appimage/default.nix' ':(exclude)pkgs/proton-pass/default.nix' ':(exclude)pkgs/proton-pass-cli/default.nix' ':(exclude)pkgs/protonmail-bridge/default.nix' ':(exclude)pkgs/protonmail-desktop/default.nix' ':(exclude)pkgs/brave/release.json'; then
             echo "Refusing to commit changes outside the dependency update scope" >&2
             git diff --stat >&2
             exit 1
@@ -341,6 +356,6 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add flake.nix flake.lock pkgs/logseq-appimage/default.nix
+          git add flake.nix flake.lock pkgs/logseq-appimage/default.nix pkgs/proton-pass/default.nix pkgs/proton-pass-cli/default.nix pkgs/protonmail-bridge/default.nix pkgs/protonmail-desktop/default.nix pkgs/brave/release.json
           git commit -m "chore(deps): update dependencies"
           git push origin HEAD:main

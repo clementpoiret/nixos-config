@@ -5,7 +5,9 @@
       dirContents = builtins.readDir ./.;
       genPackage = name: {
         inherit name;
-        value = final.callPackage (./. + "/${name}") { };
+        value = final.callPackage (./. + "/${name}") (
+          if name == "brave" then { upstreamBrave = prev.brave; } else { }
+        );
       };
       names = builtins.filter (
         name: dirContents.${name} == "directory" && builtins.pathExists (./. + "/${name}/default.nix")
