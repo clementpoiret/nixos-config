@@ -3,7 +3,7 @@
 ## Daily Workflow
 
 The active system continues to build from the protected `~/nixos-config` clone. Give coding agents
-`~/nixos-config-writable` instead, then promote exactly one reviewed Jujutsu change. The protected
+`~/nixos-config-writable` instead, then promote a reviewed linear Jujutsu stack. The protected
 clone's `origin` must point to GitHub:
 
 ```bash
@@ -24,16 +24,17 @@ nixos-config-agent push
 ```
 
 `init` refuses an existing destination and clones the exact protected baseline. `promote` requires an interactive,
-unconfined terminal; an empty protected working change; one non-empty, conflict-free candidate whose sole parent is that
-baseline; and a Conventional Commit description. It fetches the exact candidate through a local handoff bookmark,
-displays its full Git diff through the configured Jujutsu pager (Delta), requires the complete commit ID, and rechecks
-both repositories before changing the protected clone. A rejection or stale baseline leaves the protected working tree
+unconfined terminal; an empty protected working change; a linear candidate stack rooted at that exact baseline;
+and conflict-free revisions with Conventional Commit descriptions. An empty writable working change above the stack
+is left out of the promotion. It fetches the stack's exact tip through a local handoff bookmark, lists every revision,
+displays its cumulative Git diff through the configured Jujutsu pager (Delta), requires the complete tip commit ID,
+and rechecks both repositories before changing the protected clone. A rejection or stale baseline leaves the protected working tree
 unchanged. Success leaves an empty working change in both clones.
 
 `fetch` mirrors the protected clone's `origin` URL into the writable clone as `github`, then fetches `origin/main` in
 the protected clone and `github/main` in the writable clone. When GitHub is a fast-forward of protected `main`, it
-advances local `main`, rebases any promoted protected revisions, and rebases an active or empty writable change onto
-the exact rewritten protected baseline. If either rebase conflicts, both clones are restored while the fetched GitHub
+advances local `main`, rebases any promoted protected revisions, and rebases the complete writable stack, including an
+empty working change, onto the exact rewritten protected baseline. If either rebase conflicts, both clones are restored while the fetched GitHub
 metadata is retained. A locally-ahead `main` is left unchanged, and genuinely divergent history must be reconciled
 explicitly before publishing.
 

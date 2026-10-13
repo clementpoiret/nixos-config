@@ -37,6 +37,10 @@
 
 # Jujutsu synchronization
 
+- Promotion accepts a linear stack rooted at the exact protected baseline, with
+  every promoted revision checked for conflicts and a Conventional Commit subject.
+  An empty writable tip is excluded; `fetch` rebases the whole pending stack while
+  preserving its change IDs. The agent integration tests verify both paths.
 - Fetching a rewritten imported `agent-base` can automatically rebase the writable
   working change. Keep working-copy updates enabled for these fetches and use the
   current `@` for the subsequent rebase; the pre-fetch commit ID can be obsolete.

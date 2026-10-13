@@ -179,6 +179,12 @@ class NixosConfigAgentTest(unittest.TestCase):
         candidate_id = self.describe_candidate()
         return self.promote(confirm=lambda _: candidate_id)
 
+    def create_candidate_stack(self) -> list[str]:
+        first = self.describe_candidate()
+        self.run_jj(self.candidate, "new", "-m", "feat: extend configuration")
+        (self.candidate / "additional.nix").write_text("additional\n", encoding="utf-8")
+        return [first, self.revision(self.candidate, "@")]
+
     def confirm_id_from_prompt(self, prompt: str) -> str:
         match = re.search(r"[0-9a-f]{40,64}", prompt)
         self.assertIsNotNone(match)
@@ -257,6 +263,120 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.assertEqual(self.revision(self.protected, "parents(@)"), candidate_id)
         self.assertEqual(self.revision(self.candidate, "parents(@)"), candidate_id)
 
+    def test_promotes_complete_reviewed_stack_without_rewriting_revisions(self) -> None:
+        baseline = self.initialize()
+        revisions = self.create_candidate_stack()
+        reviews = []
+
+        promoted = self.promote(
+            confirm=lambda _: revisions[-1],
+            review_diff=lambda *arguments: reviews.append(arguments),
+        )
+
+        self.assertEqual(promoted, revisions[-1])
+        self.assertEqual(reviews, [(self.protected, baseline, revisions[-1])])
+        for repo in (self.protected, self.candidate):
+            self.assertTrue(nixos_config_agent.is_empty(repo))
+            self.assertEqual(self.revision(repo, "@-"), revisions[-1])
+            self.assertEqual(self.revision(repo, "@--"), revisions[0])
+            self.assertEqual((repo / "configuration.nix").read_text(), "candidate\n")
+            self.assertEqual((repo / "additional.nix").read_text(), "additional\n")
+
+    def test_promotes_stack_below_empty_working_copy(self) -> None:
+        self.initialize()
+        revisions = self.create_candidate_stack()
+        self.run_jj(self.candidate, "new", "-m", "")
+
+        self.assertEqual(self.promote(confirm=lambda _: revisions[-1]), revisions[-1])
+        self.assertEqual(self.revision(self.protected, "@-"), revisions[-1])
+        self.assertEqual(self.revision(self.candidate, "@-"), revisions[-1])
+
+    def test_refuses_nonconventional_description_inside_candidate_stack(self) -> None:
+        self.initialize()
+        revisions = self.create_candidate_stack()
+        self.run_jj(self.candidate, "describe", "-r", revisions[0], "-m", "invalid subject")
+        protected_before = self.revision(self.protected, "@")
+
+        with self.assertRaisesRegex(
+            nixos_config_agent.WorkflowError, "Conventional Commit"
+        ):
+            self.promote(confirm=lambda _: self.fail("invalid stack reached review"))
+        self.assertEqual(self.revision(self.protected, "@"), protected_before)
+
+    def test_refuses_merge_revisions_in_candidate_stack(self) -> None:
+        baseline = self.initialize()
+        first = self.describe_candidate()
+        self.run_jj(
+            self.candidate, "new", baseline, "-m", "feat: add independent configuration"
+        )
+        (self.candidate / "additional.nix").write_text("additional\n", encoding="utf-8")
+        second = self.revision(self.candidate, "@")
+        self.run_jj(
+            self.candidate, "new", first, second, "-m", "feat: merge configuration"
+        )
+        protected_before = self.revision(self.protected, "@")
+
+        with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "linear stack"):
+            self.promote(confirm=lambda _: self.fail("merge reached review"))
+        self.assertEqual(self.revision(self.protected, "@"), protected_before)
+
+    def test_refuses_conflicted_ancestor_even_when_candidate_tip_is_resolved(self) -> None:
+        baseline = self.initialize()
+        first = self.describe_candidate()
+        self.run_jj(self.candidate, "new", baseline, "-m", "fix: change configuration")
+        (self.candidate / "configuration.nix").write_text("other\n", encoding="utf-8")
+        self.run_jj(self.candidate, "rebase", "-r", "@", "-d", first)
+        self.assertTrue(nixos_config_agent.has_conflicts(self.candidate))
+        self.run_jj(self.candidate, "new", "-m", "fix: resolve configuration")
+        (self.candidate / "configuration.nix").write_text("resolved\n", encoding="utf-8")
+        self.assertFalse(nixos_config_agent.has_conflicts(self.candidate))
+
+        with self.assertRaisesRegex(nixos_config_agent.WorkflowError, "conflicts"):
+            self.promote(confirm=lambda _: self.fail("conflicted stack reached review"))
+
+    def test_refuses_working_copy_movement_during_stack_review(self) -> None:
+        self.initialize()
+        revisions = self.create_candidate_stack()
+        protected_before = self.revision(self.protected, "@")
+
+        def move_candidate(_):
+            self.run_jj(self.candidate, "new", "-m", "")
+            return revisions[-1]
+
+        with self.assertRaisesRegex(
+            nixos_config_agent.WorkflowError, "state changed during review"
+        ):
+            self.promote(confirm=move_candidate)
+        self.assertEqual(self.revision(self.protected, "@"), protected_before)
+
+    def test_fetch_preserves_revision_stack_and_empty_working_copy(self) -> None:
+        self.initialize()
+        revisions = self.create_candidate_stack()
+        self.run_jj(self.candidate, "new", "-m", "")
+        change_ids = [
+            nixos_config_agent.revision_value(self.candidate, revision, "change_id")
+            for revision in revisions
+        ]
+        working_change = nixos_config_agent.revision_value(self.candidate, "@", "change_id")
+        upstream = self.create_github_change()
+
+        self.fetch_updates()
+
+        self.assertEqual(self.revision(self.candidate, "@---"), upstream)
+        self.assertTrue(nixos_config_agent.is_empty(self.candidate))
+        self.assertEqual(
+            nixos_config_agent.revision_value(self.candidate, "@", "change_id"),
+            working_change,
+        )
+        for revision, change_id in zip(("@--", "@-"), change_ids):
+            self.assertEqual(
+                nixos_config_agent.revision_value(self.candidate, revision, "change_id"),
+                change_id,
+            )
+        self.assertEqual((self.candidate / "configuration.nix").read_text(), "candidate\n")
+        self.assertEqual((self.candidate / "additional.nix").read_text(), "additional\n")
+        self.assertEqual((self.candidate / "upstream.txt").read_text(), "from GitHub\n")
+
     def test_fetch_advances_main_and_rebases_active_candidate(self) -> None:
         self.initialize()
         candidate_current = self.describe_candidate("fix: keep active candidate")
@@ -330,7 +450,13 @@ class NixosConfigAgentTest(unittest.TestCase):
         self.run_jj(self.protected, "new", "-m", "")
         baseline = self.initialize()
         self.run_jj(self.candidate, "bookmark", "track", "agent-base@origin")
-        candidate_current = self.describe_candidate("fix: keep active candidate")
+        candidate_root = self.describe_candidate("fix: keep active candidate")
+        root_change = nixos_config_agent.revision_value(
+            self.candidate, candidate_root, "change_id"
+        )
+        self.run_jj(self.candidate, "new", "-m", "feat: extend configuration")
+        (self.candidate / "additional.nix").write_text("additional\n", encoding="utf-8")
+        candidate_current = self.revision(self.candidate, "@")
         candidate_change = nixos_config_agent.revision_value(
             self.candidate, "@", "change_id"
         )
@@ -340,7 +466,11 @@ class NixosConfigAgentTest(unittest.TestCase):
 
         protected_baseline = self.revision(self.protected, "parents(@)")
         self.assertNotEqual(protected_baseline, baseline)
-        self.assertEqual(self.revision(self.candidate, "parents(@)"), protected_baseline)
+        self.assertEqual(self.revision(self.candidate, "@--"), protected_baseline)
+        self.assertEqual(
+            nixos_config_agent.revision_value(self.candidate, "@-", "change_id"),
+            root_change,
+        )
         self.assertEqual(self.revision(self.protected, "main"), upstream_target)
         self.assertNotEqual(self.revision(self.candidate, "@"), candidate_current)
         self.assertEqual(
@@ -348,8 +478,13 @@ class NixosConfigAgentTest(unittest.TestCase):
             candidate_change,
         )
         self.assertEqual(
-            nixos_config_agent.description(self.candidate), "fix: keep active candidate\n"
+            nixos_config_agent.description(self.candidate), "feat: extend configuration\n"
         )
+        self.assertEqual(
+            nixos_config_agent.description(self.candidate, "@-"),
+            "fix: keep active candidate\n",
+        )
+        self.assertEqual((self.candidate / "additional.nix").read_text(), "additional\n")
         self.assertEqual(
             (self.candidate / "configuration.nix").read_text(encoding="utf-8"),
             "candidate\n",

@@ -180,24 +180,44 @@ def protected_state(repo: Path) -> tuple[str, str]:
     return current, baseline
 
 
-def candidate_state(repo: Path, expected_baseline: str) -> tuple[str, str]:
+def candidate_stack(repo: Path, expected_baseline: str) -> list[str]:
     current = one_revision(repo, "@", "candidate working-copy")
-    baseline = one_revision(repo, "parents(@)", "candidate parent")
-    if baseline != expected_baseline:
+    if not revision_ids(repo, f"present({expected_baseline}) & ::({current})"):
         raise WorkflowError(
-            "candidate parent does not match the protected baseline; reinitialize or rebase it"
+            "candidate stack does not match the protected baseline; reinitialize or rebase it"
         )
-    if is_empty(repo):
+    if revision_ids(repo, f"({expected_baseline}..{current}) & conflicts()"):
+        raise WorkflowError("candidate stack has conflicts")
+    revisions = []
+    revision = current
+    while revision != expected_baseline:
+        parents = revision_ids(repo, f"parents({revision})")
+        if len(parents) != 1:
+            raise WorkflowError(
+                "candidate history must be a linear stack on the protected baseline"
+            )
+        revisions.append(revision)
+        revision = parents[0]
+    revisions.reverse()
+    return revisions
+
+
+def candidate_state(repo: Path, expected_baseline: str) -> tuple[str, str]:
+    revisions = candidate_stack(repo, expected_baseline)
+    if revisions and is_empty(repo, revisions[-1]):
+        revisions.pop()
+    if not revisions:
         raise WorkflowError("candidate change is empty")
-    if has_conflicts(repo):
-        raise WorkflowError("candidate change has conflicts")
-    change_description = description(repo).strip()
-    subject = change_description.splitlines()[0] if change_description else ""
-    if not CONVENTIONAL_COMMIT_RE.fullmatch(subject):
-        raise WorkflowError(
-            "candidate description must start with a Conventional Commit subject"
-        )
-    return current, change_description
+    descriptions = []
+    for revision in revisions:
+        change_description = description(repo, revision).strip()
+        subject = change_description.splitlines()[0] if change_description else ""
+        if not CONVENTIONAL_COMMIT_RE.fullmatch(subject):
+            raise WorkflowError(
+                f"candidate revision {revision} description must start with a Conventional Commit subject"
+            )
+        descriptions.append(f"{revision}\n{change_description}")
+    return revisions[-1], "\n\n".join(descriptions)
 
 
 def idle_candidate_state(repo: Path, expected_baseline: str) -> str:
@@ -418,20 +438,17 @@ def is_ancestor(repo: Path, ancestor: str, descendant: str) -> bool:
 
 def candidate_working_state(
     repo: Path, expected_baseline: str
-) -> tuple[str, bool, str, str]:
+) -> tuple[str, bool, str, str, str]:
     current = one_revision(repo, "@", "candidate working-copy")
-    baseline = one_revision(repo, "parents(@)", "candidate parent")
-    if baseline != expected_baseline:
-        raise WorkflowError(
-            "candidate parent does not match the protected baseline; reinitialize or rebase it"
-        )
-    if has_conflicts(repo):
-        raise WorkflowError("candidate working copy has conflicts")
+    revisions = candidate_stack(repo, expected_baseline)
+    if not revisions:
+        raise WorkflowError("candidate working copy must be above the protected baseline")
     return (
         current,
         is_empty(repo),
         revision_value(repo, current, "change_id"),
         description(repo, current),
+        revision_value(repo, revisions[0], "change_id"),
     )
 
 
@@ -443,7 +460,7 @@ def synchronize_fetched_main(
     remote_main: str,
     old_baseline: str,
     protected_current: str,
-    candidate_state_before: tuple[str, bool, str, str],
+    candidate_state_before: tuple[str, bool, str, str, str],
 ) -> tuple[str, str]:
     checkpoints = (
         (protected, operation_id(protected)),
@@ -451,7 +468,7 @@ def synchronize_fetched_main(
     )
     old_baseline_change = revision_value(protected, old_baseline, "change_id")
     protected_change = revision_value(protected, protected_current, "change_id")
-    _, candidate_empty, candidate_change, candidate_description = (
+    _, candidate_empty, candidate_change, candidate_description, stack_root_change = (
         candidate_state_before
     )
 
@@ -526,16 +543,19 @@ def synchronize_fetched_main(
         if imported_baseline != new_baseline:
             raise WorkflowError("candidate imported an unexpected protected baseline")
 
-        # Fetching a rewritten imported baseline can already rebase @.
+        # Fetching a rewritten baseline can already rewrite the stack's commit IDs.
+        stack_root = one_revision(
+            candidate, f"({stack_root_change}) & ::@", "candidate stack root"
+        )
         run_jj(
             candidate,
             "rebase",
-            "--revision",
-            "@",
+            "--revisions",
+            f"{stack_root}::@",
             "--onto",
             imported_baseline,
         )
-        if has_conflicts(candidate):
+        if revision_ids(candidate, f"({imported_baseline}..@) & conflicts()"):
             raise WorkflowError("candidate rebase produced conflicts")
         new_candidate_current = one_revision(
             candidate, "@", "rebased candidate working-copy"
@@ -551,7 +571,8 @@ def synchronize_fetched_main(
             )
         if description(candidate, new_candidate_current) != candidate_description:
             raise WorkflowError("candidate description changed during rebase")
-        if one_revision(candidate, "parents(@)", "candidate parent") != new_baseline:
+        rebased_stack = candidate_stack(candidate, new_baseline)
+        if revision_value(candidate, rebased_stack[0], "change_id") != stack_root_change:
             raise WorkflowError("candidate was not rebased onto the protected baseline")
 
         for bookmark in (BASE_BOOKMARK, HANDOFF_BOOKMARK):
@@ -1146,6 +1167,7 @@ def promote(
     protected = ensure_repository(protected_path, "protected")
     candidate = ensure_repository(candidate_path, "candidate")
     protected_current, baseline = protected_state(protected)
+    candidate_working_copy = one_revision(candidate, "@", "candidate working-copy")
     candidate_current, change_description = candidate_state(candidate, baseline)
 
     run_jj(
@@ -1178,7 +1200,7 @@ def promote(
         )
 
     print(f"Candidate: {candidate_current}", file=output)
-    print(f"Description:\n{change_description}\n", file=output)
+    print(f"Candidate revisions:\n{change_description}\n", file=output)
     output.flush()
     review_diff(protected, baseline, imported)
     typed = confirm(
@@ -1200,6 +1222,8 @@ def promote(
         current_again != protected_current
         or baseline_again != baseline
         or candidate_again != candidate_current
+        or one_revision(candidate, "@", "candidate working-copy")
+        != candidate_working_copy
         or description_again != change_description
         or imported_again != imported
     ):
@@ -1210,7 +1234,7 @@ def promote(
     run_jj(protected, "new", imported, "-m", "")
     try:
         candidate_after = one_revision(candidate, "@", "candidate working-copy")
-        if candidate_after != candidate_current:
+        if candidate_after != candidate_working_copy:
             raise WorkflowError(
                 "protected promotion succeeded, but the candidate moved before it could be advanced"
             )
