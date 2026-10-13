@@ -68,6 +68,52 @@ let
   };
 in
 {
+  collabora-font-cache =
+    let
+      collabora = self.packages.${pkgs-unstable.stdenv.hostPlatform.system}.collabora-desktop-bin;
+    in
+    pkgs-unstable.runCommand "collabora-font-cache"
+      {
+        nativeBuildInputs = [
+          pkgs-unstable.fontconfig
+          pkgs-unstable.gnused
+        ];
+      }
+      ''
+        export HOME="$TMPDIR/home"
+        export XDG_CONFIG_HOME="$HOME/.config"
+        export XDG_DATA_HOME="$HOME/.local/share"
+        mkdir -p "$XDG_DATA_HOME/fonts"
+        cp ${pkgs-unstable.dejavu_fonts}/share/fonts/truetype/DejaVuSans.ttf "$XDG_DATA_HOME/fonts/"
+        cat > fonts.conf <<EOF
+        <?xml version="1.0"?>
+        <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+        <fontconfig>
+          <dir>$XDG_DATA_HOME/fonts</dir>
+          <cachedir prefix="xdg">fontconfig</cachedir>
+        </fontconfig>
+        EOF
+        # The Nix build sandbox has no sysfs; font matching does not need it.
+        sed -e 's|-- /app/bin/coda-qt|-- /usr/bin/fc-match|' \
+          -e '\|--ro-bind /sys /sys|d' ${collabora.launcher} > font-probe
+
+        for cache in "$HOME/.cache" "$TMPDIR/custom-cache"; do
+          export XDG_CACHE_HOME="$cache"
+          FONTCONFIG_FILE="$PWD/fonts.conf" fc-cache --force
+          find "$cache/fontconfig" -name '*cache-*' -exec sha256sum {} + | sort > host-cache-before
+          if [ "$cache" = "$HOME/.cache" ]; then
+            unset XDG_CACHE_HOME
+          fi
+          bash font-probe -f '%{family}\n%{file}\n%{charset}\n' 'DejaVu Sans' > match
+          grep -Fx 'DejaVu Sans' match
+          grep -qE '^20-7e( |$)' match
+          test -s "$cache/collabora-desktop-bin/fontconfig/CACHEDIR.TAG"
+          find "$cache/fontconfig" -name '*cache-*' -exec sha256sum {} + | sort > host-cache-after
+          cmp host-cache-before host-cache-after
+        done
+        touch "$out"
+      '';
+
   binary-release-signatures =
     pkgs-unstable.runCommand "binary-release-signatures"
       {

@@ -97,6 +97,7 @@ let
       --setenv QT_PLUGIN_PATH /app/lib/plugins:/usr/lib/plugins \
       --setenv QML2_IMPORT_PATH /app/lib/qml:/usr/lib/qml \
       --setenv XDG_DATA_DIRS /app/share:/usr/share:/usr/share/runtime/share:"''${XDG_DATA_DIRS:-/run/current-system/sw/share}" \
+      --setenv XDG_CACHE_HOME "''${XDG_CACHE_HOME:-$HOME/.cache}/collabora-desktop-bin" \
       --setenv FONTCONFIG_FILE /usr/etc/fonts/fonts.conf \
       --setenv FONTCONFIG_PATH /usr/etc/fonts \
       --setenv OPENSSL_CONF /usr/etc/pki/tls/openssl.cnf \
@@ -115,6 +116,7 @@ runCommand "collabora-desktop-bin-${version}"
         runtime
         graphics
         runtimeRoot
+        launcher
         ;
     };
     meta = {
