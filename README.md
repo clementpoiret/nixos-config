@@ -341,6 +341,74 @@ authentication. Install a working `~/.ssh/authorized_keys` before the first
 boot if remote recovery is required. Do not copy `/etc/ssh/ssh_host_*` from a
 different machine; the new device must keep its own host identity.
 
+#### Sign or Renew SSH Certificates with Proton Pass
+
+Keep the issuing SSH CA private key as an SSH key item in the Proton Pass
+vault `SSH CA`. Store its matching public key as `~/.ssh/ssh_ca.pub` on each
+host; copy it from the item's public-key field. YubiKey handles, public keys,
+and issued certificates stay in `~/.ssh`. The YubiKey private keys remain on
+the hardware.
+
+On a new host, authenticate interactively with `pass-cli login`. The CLI uses
+the desktop Secret Service keyring. Unlock it before starting the service;
+if you configured a CLI session lock, also run `pass-cli session unlock` when
+that session is locked.
+
+Start the separate CA signing agent manually:
+
+```bash
+systemctl --user start proton-pass-ca-agent.service
+systemctl --user status proton-pass-ca-agent.service
+env SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/proton-pass-ca/agent.sock" ssh-add -l
+ssh-keygen -lf ~/.ssh/ssh_ca.pub
+```
+
+Wait until `ssh-add -l` lists the CA and confirm its fingerprint matches the
+local CA public key. Starting the systemd service does not wait for the CLI
+to fetch the key. For startup errors, inspect
+`journalctl --user -u proton-pass-ca-agent.service -n 50`.
+
+The same command signs previously uncertified public keys or replaces their
+existing certificates. This example preserves the `clementpoiret` principal
+and issues certificates valid for one year, starting five minutes ago to
+allow for clock skew:
+
+```bash
+env SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/proton-pass-ca/agent.sock" \
+  ssh-keygen -U -s ~/.ssh/ssh_ca.pub \
+    -I 'clementpoiret@pers' \
+    -n clementpoiret \
+    -V '-5m:+365d' \
+    ~/.ssh/id_ed25519_sk_yk1.pub \
+    ~/.ssh/id_ed25519_sk_yk2.pub
+
+ssh-keygen -L -f ~/.ssh/id_ed25519_sk_yk1-cert.pub
+ssh-keygen -L -f ~/.ssh/id_ed25519_sk_yk2-cert.pub
+systemctl --user stop proton-pass-ca-agent.service
+```
+
+`-U` asks the agent to sign with the CA selected by its public key. The
+resulting `*-cert.pub` files are public certificates; the CA private key is
+not exported to `~/.ssh`. For other identities, change the input public-key
+paths and use principals permitted by the destination server. A certificate
+principal need not equal the SSH login username when the server explicitly
+maps it.
+
+Stop the CA agent after use, including when signing fails. It also stops
+after five minutes or when the graphical session ends. It does not start
+automatically, change `SSH_AUTH_SOCK`, or participate in agent forwarding.
+The ordinary OpenSSH agent retains the destination-constrained YubiKey
+identities and host-specific ordering.
+
+After renewal, ordinary SSH connections read the updated certificates from
+disk. Refresh the certificates held by the OpenSSH agent with:
+
+```bash
+systemctl --user restart ssh-agent.service
+```
+
+#### Restore GPG Material
+
 For GPG:
 
 - export public keys in backup mode and import them in restore mode so that

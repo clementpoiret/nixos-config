@@ -567,7 +567,14 @@ in
           "network"
           "terminal"
         ];
-        homePaths = [ ".config/proton-pass-cli" ];
+        extraRules = ''
+          owner @{run}/user/[0-9]*/proton-pass-ca/{,agent.sock} rw,
+        '';
+        extraRulesRationale = "The on-demand SSH CA agent creates only its named socket in a private runtime directory.";
+        homePaths = [
+          ".config/proton-pass-cli"
+          ".local/share/proton-pass-cli"
+        ];
         sensitiveAccess = [ "credential-broker" ];
         elevatedAccessRationale = "Proton Pass CLI stores its authentication material through the secret-service broker.";
       };

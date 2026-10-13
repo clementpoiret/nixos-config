@@ -615,10 +615,7 @@ in
 
   services.gnome-keyring = {
     enable = true;
-    components = [
-      "secrets"
-      "ssh"
-    ];
+    components = [ "secrets" ];
   };
 
   home.sessionVariables = {

@@ -258,6 +258,18 @@ in
         && config.services.openssh.settings.AllowStreamLocalForwarding == "remote"
         && config.services.openssh.settings.StreamLocalBindUnlink
         && config.services.openssh.settings.AcceptEnv == [ "GNUPGHOME" ];
+      caAgentIsOnDemand =
+        home:
+        let
+          service = home.systemd.user.services.proton-pass-ca-agent;
+        in
+        (service.Install.WantedBy or [ ]) == [ ]
+        && (service.Install.RequiredBy or [ ]) == [ ]
+        && service.Unit.PartOf == [ "graphical-session.target" ]
+        && service.Service.RuntimeMaxSec == "5min"
+        && service.Service.RuntimeDirectoryMode == "0700"
+        && service.Service.UMask == "0077"
+        && home.services.gnome-keyring.components == [ "secrets" ];
     in
     assert
       desktopSsh.defaultAuth.data.IdentityFile == [
@@ -275,6 +287,8 @@ in
     assert desktopSsh."gitlab.com".data.IdentityFile == "none";
     assert serverForwardingIsRestricted desktopConfig;
     assert serverForwardingIsRestricted laptopConfig;
+    assert caAgentIsOnDemand desktopHome;
+    assert caAgentIsOnDemand laptopHome;
     assert desktopHome.services.gpg-agent.enableExtraSocket;
     assert laptopHome.services.gpg-agent.enableExtraSocket;
     assert desktopConfig.programs.yubikey-touch-detector.enable;
@@ -1135,6 +1149,10 @@ in
 
           proton_pass_common="$(common_rules "$profile_directory/local-proton-pass")"
           require_rule '${self.nixosConfigurations.laptop.pkgs.electron.unwrapped}/libexec/** ixr,' "$proton_pass_common"
+
+          proton_pass_cli_common="$(common_rules "$profile_directory/local-proton-pass-cli")"
+          require_rule 'owner "@{HOME}/.local/share/proton-pass-cli/{,**}" rwkl,' "$proton_pass_cli_common"
+          require_rule 'owner @{run}/user/[0-9]*/proton-pass-ca/{,agent.sock} rw,' "$proton_pass_cli_common"
 
           protonmail_bridge_common="$(common_rules "$profile_directory/local-protonmail-bridge")"
           require_rule 'owner "@{HOME}/.local/share/protonmail/{,**}" rwkl,' "$protonmail_bridge_common"

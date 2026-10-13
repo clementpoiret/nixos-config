@@ -240,4 +240,23 @@ in
       "SSH_ASKPASS_REQUIRE=force"
     ];
   };
+
+  systemd.user.services.proton-pass-ca-agent = {
+    Unit = {
+      Description = "Proton Pass SSH certificate signing agent";
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "simple";
+      ExecStart = "${pkgs.proton-pass-cli}/bin/pass-cli ssh-agent start --vault-name 'SSH CA' --socket-path %t/proton-pass-ca/agent.sock";
+      Environment = [
+        "PROTON_PASS_KEY_PROVIDER=keyring"
+        "PROTON_PASS_LINUX_KEYRING=dbus"
+      ];
+      RuntimeDirectory = "proton-pass-ca";
+      RuntimeDirectoryMode = "0700";
+      RuntimeMaxSec = "5min";
+      UMask = "0077";
+    };
+  };
 }

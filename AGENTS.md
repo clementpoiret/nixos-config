@@ -15,6 +15,12 @@
   and can require a newer glibc. The `niri-mesa-runtime` flake check exercises this
   dynamic loading boundary without a GPU; a successful host build alone misses it.
 
+# SSH agents
+
+- Keep the Proton Pass CA signing socket separate from the forwarded OpenSSH
+  agent. Proton Pass CLI 2.4.2 cannot sign FIDO identities or enforce OpenSSH
+  destination constraints; the YubiKey forwarding restrictions depend on OpenSSH.
+
 # Jujutsu synchronization
 
 - Fetching a rewritten imported `agent-base` can automatically rebase the writable
