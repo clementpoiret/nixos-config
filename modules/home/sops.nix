@@ -24,11 +24,20 @@
       "hostnames/jzpp" = { };
       "hostnames/leo" = { };
       "hostnames/leo-data" = { };
+      "hostnames/mng1" = { };
+      "hostnames/mng2" = { };
+      "hostnames/mna1" = { };
+      "hostnames/mna2" = { };
+      "hostnames/mnt1" = { };
+      "hostnames/mnt2" = { };
+      "hostnames/mnt3" = { };
+      "hostnames/mnt4" = { };
       "hostusers/default" = { };
       "hostusers/defaultBoot" = { };
       "hostusers/bastion" = { };
       "hostusers/jz" = { };
       "hostusers/leo" = { };
+      "hostusers/mn" = { };
 
       "ports/vpspersboot" = { };
 

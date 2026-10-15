@@ -127,6 +127,55 @@ let
       IdentityFile none
       IdentitiesOnly no
 
+    Host mng1
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/mng1")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/mn")})
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+    Host mng2
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/mng2")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/mn")})
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+    Host mna1
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/mna1")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/mn")})
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+    Host mna2
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/mna2")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/mn")})
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+    Host mnt1
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/mnt1")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/mn")})
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+    Host mnt2
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/mnt2")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/mn")})
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+    Host mnt3
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/mnt3")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/mn")})
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+    Host mnt4
+      HostName $(read_secret ${lib.escapeShellArg (secretPath "hostnames/mnt4")})
+      User $(read_secret ${lib.escapeShellArg (secretPath "hostusers/mn")})
+      IdentityAgent SSH_AUTH_SOCK
+      IdentityFile none
+      IdentitiesOnly no
+
     # Opercord hosts require wg0 (wg-quick-wg0.service) to be active.
     Host opercord-cp-01
       HostName 10.77.0.1
