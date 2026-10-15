@@ -234,7 +234,7 @@ in
 
         # Connection multiplexing: one auth reused by many commands
         ControlMaster = "auto";
-        ControlPersist = "15m";
+        ControlPersist = "1h";
         ControlPath = "~/.ssh/sockets/%C";
         ServerAliveInterval = 30;
         ServerAliveCountMax = 6;
