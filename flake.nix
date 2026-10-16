@@ -195,7 +195,10 @@
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
         lumen = lumen.packages.${system}.lumen;
-        opencode = opencode.packages.${system}.default;
+        opencode = opencode.packages.${system}.default.overrideAttrs {
+          # Upstream's source filter omits script/native-arch.ts, used by the CLI build.
+          src = opencode.outPath;
+        };
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };

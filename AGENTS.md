@@ -28,6 +28,10 @@
   the input flake's independently built package. Mesa loads from `/run/opengl-driver`
   and can require a newer glibc. The `niri-mesa-runtime` flake check exercises this
   dynamic loading boundary without a GPU; a successful host build alone misses it.
+- OpenCode's CLI build imports root-level `script/native-arch.ts`, which its
+  upstream Nix source filter omits. Keep the full-source override until that filter
+  includes the build scripts. Verified with
+  `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.flake.opencode`.
 
 # SSH agents
 
