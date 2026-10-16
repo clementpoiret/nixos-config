@@ -99,7 +99,7 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     opencode = {
-      url = "github:anomalyco/opencode/v2";
+      url = "github:anomalyco/opencode";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     t3code = {
