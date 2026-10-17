@@ -9,15 +9,19 @@
   autoPatchelfHook,
   libgcc,
   libxkbcommon,
+  channel ? "stable",
 }:
 
+let
+  release = (builtins.fromJSON (builtins.readFile ./releases.json)).${channel};
+in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "proton-pass";
-  version = "1.42.0";
+  inherit (release) version;
 
   src = fetchurl {
     url = "https://proton.me/download/pass/linux/proton-pass_${finalAttrs.version}_amd64.deb";
-    hash = "sha512-hgVQyHQdoVNJTTgXQyJsnUTPukKzgSOfDwgzNhAdYOJzQMELAMK80qDsXNjCJqToy2BQiUC5z9zAeVhK8DXuyA==";
+    inherit (release) hash;
   };
 
   nativeBuildInputs = [
@@ -68,6 +72,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       "$out/share/proton-pass/app.asar/.webpack/main/native_modules/native.linux-x64-gnu.node"
     runHook postInstallCheck
   '';
+
+  passthru = { inherit channel; };
 
   meta = {
     description = "Desktop application for Proton Pass";

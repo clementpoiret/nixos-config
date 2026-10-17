@@ -1,8 +1,11 @@
 # Dependency updates
 
 - The local Proton binary updater was verified with `python3 pkgs/update-proton.py`;
-  it selects stable releases and pins Proton's published checksums, which Nix
-  verifies during builds. Bridge uses `bridge/linux/x86/v1/version.json`; the old
+  it pins Proton's published checksums, which Nix verifies during builds. Mail and
+  Pass keep stable/beta pins in `releases.json`; beta includes stable releases to
+  avoid downgrades and accepts only Mail's `EarlyAccess` or Pass's `Beta`, not Alpha.
+  Bridge and Pass CLI remain stable-only. Bridge uses
+  `bridge/linux/x86/v1/version.json`; the old
   `bridge/version_linux.json` feed is stale. Its feed and DEB signatures are verified
   against the pinned Bridge public key; Mail, Pass and Pass CLI currently publish
   checksums without Linux binary signatures. Keep Mail and Pass on nixpkgs' Electron

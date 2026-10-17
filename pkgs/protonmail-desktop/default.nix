@@ -6,15 +6,19 @@
   asar,
   makeWrapper,
   electron,
+  channel ? "stable",
 }:
 
+let
+  release = (builtins.fromJSON (builtins.readFile ./releases.json)).${channel};
+in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "protonmail-desktop";
-  version = "1.14.0";
+  inherit (release) version;
 
   src = fetchurl {
     url = "https://proton.me/download/mail/linux/${finalAttrs.version}/ProtonMail-desktop-beta.deb";
-    hash = "sha512-WQhjL+NOPUC2mMlFm7d0Qopbau3XyJ7Z/2g5S5AifGiaWgPucZ+bOk4gx8SmnOZ/5AqxLg80Q1npAFx76DnYGA==";
+    inherit (release) hash;
   };
 
   nativeBuildInputs = [
@@ -50,6 +54,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       --set-default ELECTRON_IS_DEV 0 \
       --inherit-argv0
   '';
+
+  passthru = { inherit channel; };
 
   meta = {
     description = "Desktop application for Proton Mail and Calendar";

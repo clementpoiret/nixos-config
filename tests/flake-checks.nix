@@ -145,6 +145,44 @@ in
         touch "$out"
       '';
 
+  proton-package-channels =
+    let
+      checkPackage =
+        name:
+        let
+          packages = self.packages.${pkgs-unstable.stdenv.hostPlatform.system};
+          stable = packages.${name};
+          beta = packages."${name}-beta";
+          pins = builtins.fromJSON (builtins.readFile (../pkgs + "/${name}/releases.json"));
+        in
+        assert stable.channel == "stable";
+        assert stable.version == pins.stable.version;
+        assert beta.channel == "beta";
+        assert beta.version == pins.beta.version;
+        assert (stable.override { channel = "beta"; }).drvPath == beta.drvPath;
+        assert builtins.all (
+          host:
+          let
+            home = host.config.home-manager.users.${username};
+            package = host.pkgs."${name}-beta";
+            appArmorPackage = home.localAppArmor.applications.${name}.package;
+          in
+          host.pkgs.${name}.channel == "stable"
+          && package.channel == "beta"
+          && appArmorPackage.channel == "beta"
+          && appArmorPackage.drvPath == package.drvPath
+          && builtins.any (installed: installed.drvPath == package.drvPath) home.home.packages
+        ) (builtins.attrValues self.nixosConfigurations);
+        true;
+    in
+    assert builtins.all checkPackage [
+      "protonmail-desktop"
+      "proton-pass"
+    ];
+    pkgs-unstable.runCommand "proton-package-channels" { } ''
+      touch "$out"
+    '';
+
   measured-boot-retention =
     let
       excessiveRetentionHost = self.nixosConfigurations.laptop.extendModules {

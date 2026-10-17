@@ -168,7 +168,7 @@ in
       aria2 # Multi-source command-line download utility
       dnsutils # DNS lookup utilities (dig, host, nslookup)
       motrix-next # dl manager
-      protonmail-desktop
+      protonmail-desktop-beta
       protonmail-bridge
       # protonmail-bridge-gui
       # protonvpn-cli # ProtonVPN command-line interface
@@ -268,7 +268,7 @@ in
       # Security
       age # Simple modern file encryption
       openssl # SSL/TLS protocol implementation
-      proton-pass # Password manager
+      proton-pass-beta # Password manager
       proton-pass-cli # CLI version :)
       sops # Encrypted secrets management
       step-cli # X509, OAuth, JWT, OATH OTP, etc
@@ -530,7 +530,7 @@ in
         elevatedAccessRationale = "Proton Mail Bridge stores its authentication material through the secret-service broker.";
       };
       protonmail-desktop = {
-        package = pkgs.protonmail-desktop;
+        package = pkgs.protonmail-desktop-beta;
         executable = "bin/proton-mail";
         capabilities = electronCapabilities ++ [ "credential-broker" ];
         executionPackages = electronExecutionPackages;
@@ -539,7 +539,7 @@ in
         elevatedAccessRationale = "Proton Mail Desktop uses the desktop secret-service broker for stored credentials.";
       };
       proton-pass = {
-        package = pkgs.proton-pass;
+        package = pkgs.proton-pass-beta;
         executable = "bin/proton-pass";
         capabilities = electronCapabilities ++ [ "credential-broker" ];
         executionPackages = electronExecutionPackages;

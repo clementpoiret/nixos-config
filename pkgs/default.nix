@@ -13,5 +13,9 @@
         name: dirContents.${name} == "directory" && builtins.pathExists (./. + "/${name}/default.nix")
       ) (builtins.attrNames dirContents);
     in
-    builtins.listToAttrs (map genPackage names);
+    builtins.listToAttrs (map genPackage names)
+    // {
+      proton-pass-beta = final.proton-pass.override { channel = "beta"; };
+      protonmail-desktop-beta = final.protonmail-desktop.override { channel = "beta"; };
+    };
 }

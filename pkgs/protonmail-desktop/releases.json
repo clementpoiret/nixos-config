@@ -1,0 +1,10 @@
+{
+  "stable": {
+    "version": "1.14.0",
+    "hash": "sha512-WQhjL+NOPUC2mMlFm7d0Qopbau3XyJ7Z/2g5S5AifGiaWgPucZ+bOk4gx8SmnOZ/5AqxLg80Q1npAFx76DnYGA=="
+  },
+  "beta": {
+    "version": "1.15.0",
+    "hash": "sha512-mg8/ShGQsBAXvs31oK6SWDp/PGejSxVX6nqoC/7X5bbXcBu/CjiM7eOKPn2MW8RSKxhgXrGUmCiyyVSVRFn1XA=="
+  }
+}
