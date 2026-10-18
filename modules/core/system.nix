@@ -59,6 +59,8 @@
   i18n.defaultLocale = "en_US.UTF-8";
   nixpkgs.config = {
     allowUnfree = true;
+    # Zotero 10 requires this end-of-life runtime until it supports a maintained ESR.
+    permittedInsecurePackages = [ "firefox-esr-140-bin-unwrapped-140.17.0esr" ];
   };
 
   # To prevent getting stuck at shutdown.

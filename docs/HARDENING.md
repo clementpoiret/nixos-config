@@ -75,6 +75,10 @@ uses a predictable PID file in `/tmp`.
   Electron, AppImage, Flatpak, Bubblewrap, Nix, and rootless-container
   compatibility remains controlled by their own profiles and existing kernel
   settings.
+- Zotero 10 still requires end-of-life Firefox ESR 140. Both hosts explicitly
+  permit only `firefox-esr-140-bin-unwrapped-140.17.0esr`; this accepts the lack
+  of further security fixes. Remove the exception when Zotero supports a
+  maintained runtime.
 - `lvfs-testing` remains an explicit firmware-update source; selecting and
   applying an update is still an administrative action.
 - USBGuard is not enabled. Follow [USBGUARD.md](USBGUARD.md) only after every
@@ -150,7 +154,7 @@ The application inventory covers:
   Draw.io, Zotero, Logseq, and the three SoftMaker applications;
 - browsers and network clients: Brave, Glide, Mullvad Browser, Vivaldi,
   Thunderbird, Proton Mail Bridge, Proton Pass and its CLI, Proton VPN,
-  qBittorrent, Motrix, and Deezer;
+  qBittorrent, Rayburst, and Deezer;
 - development tools: Codex Desktop and CLI, and Claude Code.
 
 Application attachments use their exact Nix store executables. Transitive

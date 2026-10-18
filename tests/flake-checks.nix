@@ -624,10 +624,13 @@ in
     assert builtins.elem "/run/secrets.d/[0-9]*/dns/laptop"
       laptopServiceRegistry.apply-secret-dns.readOnlyPaths;
     assert builtins.elem ".config/enchant" laptopHomeAppArmor.applications.inkscape.homePaths;
-    assert builtins.elem ".local/share/com.motrix.next"
-      laptopHomeAppArmor.applications.motrix.homePaths;
+    assert laptopHomeAppArmor.applications.rayburst.package == laptopPkgs.rayburst;
+    assert laptopHomeAppArmor.applications.rayburst.executable == "bin/rayburst";
+    assert builtins.elem laptopPkgs.rayburst laptopConfig.home-manager.users.${username}.home.packages;
+    assert builtins.elem ".local/share/dev.aninsomniacy.rayburst"
+      laptopHomeAppArmor.applications.rayburst.homePaths;
     assert builtins.elem laptopPkgs.webkitgtk_4_1
-      laptopHomeAppArmor.applications.motrix.executionPackages;
+      laptopHomeAppArmor.applications.rayburst.executionPackages;
     assert builtins.elem ".logseq" laptopHomeAppArmor.applications.logseq.homePaths;
     assert builtins.elem ".claude.lock" laptopHomeAppArmor.applications.claude-code.homePaths;
     assert builtins.elem ".config/anthropic" laptopHomeAppArmor.applications.claude-code.homePaths;
@@ -1236,12 +1239,21 @@ in
           evince_common="$(common_rules "$profile_directory/local-evince")"
           require_rule 'owner @{HOME}/.local/share/gvfs-metadata/{,**} r,' "$evince_common"
 
-          motrix_common="$(common_rules "$profile_directory/local-motrix")"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.webkitgtk_4_1}/libexec/** ixr,' "$motrix_common"
-          require_rule 'owner "@{HOME}/.local/share/com.motrix.next/{,**}" rwkl,' "$motrix_common"
-          require_rule 'owner "@{HOME}/.config/com.motrix.next/{,**}" rwkl,' "$motrix_common"
-          require_rule 'owner @{HOME}/.mozilla/native-messaging-hosts/com.motrix.next.browser.json rwkl,' "$motrix_common"
-          require_rule 'owner @{run}/user/[0-9]*/tray-icon/tray-icon-motrix-next-*.png rwkl,' "$motrix_common"
+          rayburst_common="$(common_rules "$profile_directory/local-rayburst")"
+          test -x '${laptopPkgs.rayburst}/bin/rayburst'
+          require_rule 'profile local-rayburst ${laptopPkgs.rayburst}/bin/rayburst flags=' "$profile_directory/local-rayburst"
+          require_rule '${laptopPkgs.webkitgtk_4_1}/libexec/** ixr,' "$rayburst_common"
+          require_rule 'owner "@{HOME}/.cache/dev.aninsomniacy.rayburst/{,**}" rwkl,' "$rayburst_common"
+          require_rule 'owner "@{HOME}/.local/share/dev.aninsomniacy.rayburst/{,**}" rwkl,' "$rayburst_common"
+          require_rule 'owner "@{HOME}/.config/dev.aninsomniacy.rayburst/{,**}" rwkl,' "$rayburst_common"
+          for manifest_directory in .mozilla/native-messaging-hosts .config/google-chrome/NativeMessagingHosts .config/microsoft-edge/NativeMessagingHosts; do
+            require_rule "owner @{HOME}/$manifest_directory/ rw," "$rayburst_common"
+            require_rule "owner @{HOME}/$manifest_directory/{dev.aninsomniacy.rayburst.browser.json,.tmp*} rwkl," "$rayburst_common"
+          done
+          if grep -E 'com[.]motrix[.]next|/Motrix|/motrix|tray-icon' "$rayburst_common"; then
+            echo "Rayburst unexpectedly retains obsolete Motrix state or tray permissions" >&2
+            exit 1
+          fi
 
           logseq_common="$(common_rules "$profile_directory/local-logseq")"
           require_rule '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/AppRun ixr,' "$logseq_common"

@@ -218,11 +218,6 @@
             ];
           });
 
-          # Zotero 10's runtime patches target Gecko 140, not unstable's ESR 153.
-          zotero = prev.zotero.override {
-            firefox-esr-153-unwrapped = pkgs-stable.firefox-esr-140-unwrapped;
-          };
-
           # The pinned niri-flake package still requires libdisplay-info 0.2.
           libdisplay-info_0_2 = pkgs-stable.libdisplay-info_0_2;
         })

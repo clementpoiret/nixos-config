@@ -17,12 +17,18 @@
   updaters require GnuPG on PATH. Brave's signed checksum is verified in the updater
   and build. Public keys are pinned from the vendors' official signing-key pages;
   key rotations require review and are outside CI's dependency-update allowlist.
-- When changing Zotero's Firefox override in `flake.nix`, match the Gecko major in
-  `app/config.sh` (`GECKO_VERSION_LINUX`) from `pkgs.zotero.src`. Nixpkgs can move
-  to a newer ESR while Zotero's actor-patching scripts still require the older one.
-  Flake evaluation does not catch this mismatch. From the repository root, the
-  verified package check is `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.zotero`;
+- Zotero's Gecko major must match `app/config.sh` (`GECKO_VERSION_LINUX`) from
+  `pkgs.zotero.src`. Nixpkgs now supplies a private `firefox-esr-140-bin.nix`
+  runtime; the old `firefox-esr-153-unwrapped` override is no longer accepted.
+  That runtime is end-of-life: keep its approved insecure-package exception in
+  `modules/core/system.nix` version-specific. Flake evaluation does not catch
+  runtime/source mismatches. The verified package check from the repository root
+  is `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.zotero`;
   also rebuild both host toplevels and the AppArmor parser after changing it.
+- Rayburst's Tauri state uses `dev.aninsomniacy.rayburst`; its native browser host
+  is `dev.aninsomniacy.rayburst.browser`. Registration atomically replaces JSON
+  manifests through `.tmp*` files in the browser directories. Its native Linux
+  tray uses D-Bus, not Motrix's runtime tray-icon PNG files (verified in package source).
 - For measured-boot changes, preserve the PCR 4 alternative budget enforced in
   `modules/core/bootloader.nix`: bootloader versions multiply retained generations
   and their specialisations. See `docs/MEASURED-BOOT.md` for the verified NH error

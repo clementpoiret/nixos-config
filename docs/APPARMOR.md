@@ -37,7 +37,7 @@ security.localAppArmor = {
   profileOverrides = {
     local-syncthing = "enforce";
     local-brave = "complain";
-    local-motrix = "disable";
+    local-rayburst = "disable";
   };
 };
 ```
@@ -222,13 +222,16 @@ local-planmaker         local-presentations       local-brave
 local-glide             local-mullvad-browser     local-vivaldi
 local-thunderbird       local-protonmail-bridge   local-proton-pass
 local-proton-pass-cli   local-proton-vpn          local-qbittorrent
-local-motrix            local-deezer              local-codex-cli
+local-rayburst          local-deezer              local-codex-cli
 local-claude-code       local-codex-desktop
 ```
 
 `local-codex-desktop` is conditional on the single Codex Desktop derivation actually installed by Home Manager. Its
 assertion prevents package/profile drift. Font and theme modules register their asset packages through
 `localAppArmor.sessionReadPackages` instead of granting the entire Home Manager package set extra permissions.
+
+Rayburst replaces Motrix Next and uses `dev.aninsomniacy.rayburst` for its application state. Upstream does not migrate
+Motrix tasks or history; old state is left untouched. Existing `local-motrix` overrides must be renamed to `local-rayburst`.
 
 Service registrations use `security.localAppArmor.services` in their owning module:
 

@@ -167,7 +167,7 @@ in
       # Networking
       aria2 # Multi-source command-line download utility
       dnsutils # DNS lookup utilities (dig, host, nslookup)
-      motrix-next # dl manager
+      rayburst # Download manager
       protonmail-desktop-beta
       protonmail-bridge
       # protonmail-bridge-gui
@@ -607,25 +607,23 @@ in
         '';
         extraRulesRationale = "qBittorrent's optional host-process inspection is intentionally unavailable.";
       };
-      motrix = {
-        package = pkgs.motrix-next;
-        executable = "bin/motrix-next";
+      rayburst = {
+        package = pkgs.rayburst;
         capabilities = electronDocumentCapabilities;
         executionPackages = [ pkgs.webkitgtk_4_1 ];
         extraRules = ''
-          owner @{HOME}/.mozilla/native-messaging-hosts/com.motrix.next.browser.json rwkl,
-          owner @{HOME}/.config/google-chrome/NativeMessagingHosts/com.motrix.next.browser.json rwkl,
-          owner @{HOME}/.config/microsoft-edge/NativeMessagingHosts/com.motrix.next.browser.json rwkl,
-          owner @{run}/user/[0-9]*/tray-icon/ rwkl,
-          owner @{run}/user/[0-9]*/tray-icon/tray-icon-motrix-next-*.png rwkl,
+          owner @{HOME}/.mozilla/native-messaging-hosts/ rw,
+          owner @{HOME}/.mozilla/native-messaging-hosts/{dev.aninsomniacy.rayburst.browser.json,.tmp*} rwkl,
+          owner @{HOME}/.config/google-chrome/NativeMessagingHosts/ rw,
+          owner @{HOME}/.config/google-chrome/NativeMessagingHosts/{dev.aninsomniacy.rayburst.browser.json,.tmp*} rwkl,
+          owner @{HOME}/.config/microsoft-edge/NativeMessagingHosts/ rw,
+          owner @{HOME}/.config/microsoft-edge/NativeMessagingHosts/{dev.aninsomniacy.rayburst.browser.json,.tmp*} rwkl,
         '';
-        extraRulesRationale = "Motrix maintains its named browser manifests and session tray icons.";
+        extraRulesRationale = "Rayburst atomically registers its named browser manifests using temporary files in each native-messaging directory.";
         homePaths = [
-          ".cache/Motrix"
-          ".config/Motrix"
-          ".config/com.motrix.next"
-          ".config/motrix"
-          ".local/share/com.motrix.next"
+          ".cache/dev.aninsomniacy.rayburst"
+          ".config/dev.aninsomniacy.rayburst"
+          ".local/share/dev.aninsomniacy.rayburst"
         ];
       };
       deezer = {
