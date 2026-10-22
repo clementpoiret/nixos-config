@@ -11,12 +11,12 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "proton-pass-cli";
-  version = "2.4.2";
+  version = "2.5.1";
   strictDeps = true;
 
   src = fetchurl {
     url = "https://proton.me/download/pass-cli/${finalAttrs.version}/pass-cli-linux-x86_64";
-    hash = "sha256-QIm99ZgRQKxb7mXS15v5h2dTf1TTMZe3nl+GxjBxSEI=";
+    hash = "sha256-QOJ2ReBIX18NuSi4FGnRxafIlooWKVbpQAaUdiRMArE=";
   };
 
   nativeBuildInputs = [
