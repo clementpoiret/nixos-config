@@ -69,7 +69,7 @@ pkgs.testers.runNixOSTest {
   name = "local-apparmor";
 
   nodes.machine =
-    { ... }:
+    { config, ... }:
     {
       imports = [
         ../modules/core/apparmor.nix
@@ -119,12 +119,12 @@ pkgs.testers.runNixOSTest {
             packageRoots = with pkgs; [
               bash
               coreutils
-              systemd
+              config.systemd.package
             ];
             executionPackages = with pkgs; [
               bash
               coreutils
-              systemd
+              config.systemd.package
             ];
             systemBusPeers = [ "org.freedesktop.systemd1" ];
             readOnlyPaths = [ "/run/secrets/dns/test" ];

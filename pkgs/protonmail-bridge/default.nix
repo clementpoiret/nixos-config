@@ -4,6 +4,7 @@
   fetchurl,
   dpkg,
   autoPatchelfHook,
+  patchelf,
   libsecret,
   libfido2,
   versionCheckHook,
@@ -13,6 +14,14 @@
 
 let
   signatureHash = "sha256-euM3BpMhLA3eaTdzIsE/D+ilK09Ooq7JhOj9+FPLtD4=";
+  # Patchelf 0.19.2 corrupts this vendor Go executable; keep the working ELF rewriter.
+  bridgePatchelf = patchelf.overrideAttrs {
+    version = "0.15.2";
+    src = fetchurl {
+      url = "https://github.com/NixOS/patchelf/releases/download/0.15.2/patchelf-0.15.2.tar.bz2";
+      hash = "sha256-F3RfVkFZyOIo/EEtplogSLhGxLa0Igt3y/IkFuAvLXw=";
+    };
+  };
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "protonmail-bridge";
@@ -25,6 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     dpkg
+    bridgePatchelf
     autoPatchelfHook
     gnupg
     python3

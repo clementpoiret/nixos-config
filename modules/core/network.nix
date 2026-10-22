@@ -14,10 +14,11 @@ let
     desktop = "10.77.0.4/24";
   };
   dnsServiceEnabled = builtins.hasAttr dnsSecretName config.sops.secrets;
+  # Unit PATHs use NixOS's configured systemd, not necessarily pkgs.systemd.
   dnsTools = with pkgs; [
     coreutils
     gnused
-    systemd
+    config.systemd.package
   ];
   portalDns = pkgs.writeShellApplication {
     name = "manage-dns-portal";

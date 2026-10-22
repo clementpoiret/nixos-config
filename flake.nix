@@ -218,6 +218,11 @@
             ];
           });
 
+          # sphinxHook reads a scalar, not a Bash array, with structured attributes.
+          khal = prev.khal.overridePythonAttrs (_: {
+            sphinxBuilders = "html man";
+          });
+
           # The pinned niri-flake package still requires libdisplay-info 0.2.
           libdisplay-info_0_2 = pkgs-stable.libdisplay-info_0_2;
         })

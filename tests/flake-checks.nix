@@ -610,6 +610,14 @@ in
     assert builtins.elem "/proc/modules" laptopServiceRegistry.syncthing.readOnlyPaths;
     assert builtins.elem "/proc/sys/kernel/osrelease" laptopServiceRegistry.syncthing.readOnlyPaths;
     assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
+    assert builtins.all (
+      host:
+      let
+        service = host.config.security.localAppArmor.services.apply-secret-dns;
+      in
+      builtins.elem host.config.systemd.package service.packageRoots
+      && builtins.elem host.config.systemd.package service.executionPackages
+    ) (builtins.attrValues self.nixosConfigurations);
     assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/stat r,"
       laptopServiceRegistry.apply-secret-dns.extraRules;
     assert laptopConfig.security.localAppArmor.debug.enable;

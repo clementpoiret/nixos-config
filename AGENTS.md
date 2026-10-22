@@ -10,6 +10,12 @@
   against the pinned Bridge public key; Mail, Pass and Pass CLI currently publish
   checksums without Linux binary signatures. Keep Mail and Pass on nixpkgs' Electron
   runtime so their existing AppArmor execution rules continue to apply.
+- Bridge's vendor Go executable segfaults after patching with patchelf 0.19.2;
+  its package-local 0.15.2 pin was verified with the runtime version install check.
+  Keep that check and the DEB signature verification enabled when changing the pin.
+- Khal's Sphinx hook reads `sphinxBuilders` as a scalar even with structured
+  attributes. Keep `"html man"` rather than a list so its declared man output is
+  produced; both the package and man output builds were verified.
 - Pass's native `.node` modules must be unpacked from the ASAR and patched against
   `libxkbcommon` and `libgcc`. Its install check loads the module through Electron's
   ASAR resolver; a successful resource-only build does not exercise this boundary.
@@ -54,6 +60,13 @@
   upstream Nix source filter omits. Keep the full-source override until that filter
   includes the build scripts. Verified with
   `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.flake.opencode`.
+
+# AppArmor
+
+- Confined systemd services must allow `config.systemd.package`, not just
+  `pkgs.systemd`: NixOS customizes the package used by unit PATHs. The DNS writer
+  VM test exercises the actual service command, and the mode-matrix check covers
+  both host registries without granting wildcard store execution.
 
 # SSH agents
 
