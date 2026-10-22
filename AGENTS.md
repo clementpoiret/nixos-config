@@ -46,6 +46,10 @@
   and the verified stale `kcfi` helper-symbol pitfall.
   GitHub runners do not inherit NixOS `nix.settings`: keep the kernel cache in
   `cachix-action.extraPullNames` in both build jobs, which installs its URL and key.
+  The kernel flake's `kernelModuleSignOverride` signs external modules after
+  stripping and supplies `.ko.cer` certificates for Nixpkgs' module-tree aggregator.
+  Keep that helper when constructing custom kernel package sets; do not add
+  duplicate local signing overrides.
 - OpenCode's CLI build imports root-level `script/native-arch.ts`, which its
   upstream Nix source filter omits. Keep the full-source override until that filter
   includes the build scripts. Verified with

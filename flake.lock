@@ -847,11 +847,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1792613676,
-        "narHash": "sha256-fRk9QY4CvZ/6mRssCLLwHWktvx5ANC0g0Po2HEVo0dE=",
+        "lastModified": 1792674746,
+        "narHash": "sha256-aEwzT0XA2+DophQPHpdeAnChy9z5g4/X0sJMriG7v1w=",
         "owner": "clementpoiret",
         "repo": "nix-cachyos-kernel",
-        "rev": "061610f413db7e7b7e422d569cd18214a9b12a64",
+        "rev": "dfe8055405169c574ae029f7411bced5d5cc3eba",
         "type": "github"
       },
       "original": {

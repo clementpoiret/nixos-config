@@ -4,7 +4,11 @@ Both hosts use `linuxPackages-cachyos-latest-lto-zen4` from
 `github:clementpoiret/nix-cachyos-kernel/release`. Keep the flake's own nixpkgs
 input and `overlays.pinned`: the release branch and unmodified preset match
 the kernels published to `https://nixos-cachyos-kernels.cachix.org`.
-The package set already includes the LLVM and VirtualBox module build fixes.
+The package set includes LLVM and VirtualBox module build fixes and applies the
+`kernelModuleSignOverride` helper. It signs external modules such as `acpi_call`
+and `framework_laptop` after stripping when their installers skip Kbuild's
+signing step, producing the `.ko.cer` certificates Nixpkgs' module-tree
+aggregator needs. Do not duplicate these signing overrides locally.
 
 ## Differences from the custom kernel
 
@@ -51,8 +55,9 @@ running kernel.
 
 In `modules/core/hardware.nix`, insert this `let` block between the module
 arguments (`}:`) and its returned attribute set (`{`), then replace
-`boot.kernelPackages` with `customKernelPackages`. The per-host timer values
-remain in `hosts/laptop/facts.nix` and `hosts/desktop/facts.nix`.
+`boot.kernelPackages` with
+`cachyosHelpers.kernelModuleSignOverride customKernelPackages`. The per-host
+timer values remain in `hosts/laptop/facts.nix` and `hosts/desktop/facts.nix`.
 
 ```nix
 let
@@ -95,3 +100,5 @@ Restoring these overrides requires a custom kernel build. Update the kernel
 assertions in `host-cpu-optimizations` in `tests/flake-checks.nix` to check the
 restored policy rather than equality with the cached preset, and update the
 active baseline in `HARDENING.md`.
+Keep the `kernelModuleSignOverride` wrapper: a custom kernel build does not
+repair package installers that skip Kbuild's signing step.
