@@ -276,6 +276,8 @@ in
       laptopPkgs = self.nixosConfigurations.laptop.pkgs;
       desktopKernel = self.nixosConfigurations.desktop.config.boot.kernelPackages.kernel;
       laptopKernel = self.nixosConfigurations.laptop.config.boot.kernelPackages.kernel;
+      cachedKernel =
+        self.inputs.nix-cachyos-kernel.packages.${pkgs-unstable.stdenv.hostPlatform.system}.linux-cachyos-latest-lto-zen4;
       flagsText =
         flags: if builtins.isList flags then pkgs-unstable.lib.concatStringsSep " " flags else flags;
       hasFlag = flag: flags: pkgs-unstable.lib.hasInfix flag (flagsText flags);
@@ -326,13 +328,14 @@ in
         assert check (configIs "y" kernel.structuredExtraConfig.MZEN4);
         assert check (configIs "n" kernel.structuredExtraConfig.GENERIC_CPU);
         assert check (configIs "n" kernel.structuredExtraConfig.X86_NATIVE_CPU);
+        assert check (kernel.drvPath == cachedKernel.drvPath);
         true;
     in
     assert checkHost "desktop" "znver5";
     assert checkHost "laptop" "znver4";
     assert desktopPkgs.flake.herdr.drvPath != laptopPkgs.flake.herdr.drvPath;
     assert desktopPkgs.niri-baseline.drvPath == laptopPkgs.niri-baseline.drvPath;
-    assert desktopKernel.drvPath != laptopKernel.drvPath;
+    assert desktopKernel.drvPath == laptopKernel.drvPath;
     pkgs-unstable.runCommand "host-cpu-optimizations" { } ''
       touch "$out"
     '';

@@ -37,6 +37,13 @@
   the input flake's independently built package. Mesa loads from `/run/opengl-driver`
   and can require a newer glibc. The `niri-mesa-runtime` flake check exercises this
   dynamic loading boundary without a GPU; a successful host build alone misses it.
+- Keep CachyOS on the personal flake's `release` branch, own nixpkgs input, and
+  `overlays.pinned`. Its `linuxPackages-cachyos-latest-lto-zen4` already supplies
+  LLVM/VirtualBox module fixes; `host-cpu-optimizations` verifies both hosts use
+  the exact cached kernel derivation. Cache output signatures were verified with
+  `nix store verify --store https://nixos-cachyos-kernels.cachix.org --no-contents`
+  and the configured key. See `docs/KERNEL.md` for the preserved custom recipe
+  and the verified stale `kcfi` helper-symbol pitfall.
 - OpenCode's CLI build imports root-level `script/native-arch.ts`, which its
   upstream Nix source filter omits. Keep the full-source override until that filter
   includes the build scripts. Verified with

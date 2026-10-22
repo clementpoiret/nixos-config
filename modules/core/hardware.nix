@@ -5,46 +5,12 @@
   pkgs,
   ...
 }:
-let
-  baseKernel = pkgs.cachyosKernels.linux-cachyos-latest;
-  customKernel = baseKernel.override {
-    lto = "thin";
-    processorOpt = "zen4";
-
-    cpusched = "eevdf";
-    kcfi = true;
-    hzTicks = hostFacts.hardware.kernel.hzTicks;
-    performanceGovernor = false;
-    tickrate = "idle";
-    preemptType = "full";
-    ccHarder = true;
-    bbr3 = false;
-    hugepage = "madvise";
-    autoModules = true;
-  };
-
-  cachyosHelpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
-  customKernelPackages =
-    let
-      kernelPackages = cachyosHelpers.kernelModuleLLVMOverride (
-        pkgs.linuxKernel.packagesFor customKernel
-      );
-    in
-    kernelPackages.extend (
-      _final: prev: {
-        # VirtualBox does not inherit the custom kernel's LLVM build flags.
-        virtualbox = prev.virtualbox.overrideAttrs (oldAttrs: {
-          makeFlags = (oldAttrs.makeFlags or [ ]) ++ kernelPackages.kernel.commonMakeFlags;
-        });
-      }
-    );
-in
 {
   imports = [ inputs.ucodenix.nixosModules.default ];
 
   boot = {
-    # This optimized CachyOS profile may require a local build.
-    kernelPackages = customKernelPackages;
+    # Keep the preset unmodified for cache hits; see docs/KERNEL.md for the custom recipe.
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
     kernelParams = [
       "transparent_hugepage=madvise"
     ]
@@ -81,11 +47,6 @@ in
       # tmpfsSize = "50%";
     };
   };
-
-  # specialisation.cached-cachyos.configuration = {
-  #   system.nixos.tags = [ "cached-cachyos" ];
-  #   boot.kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
-  # };
 
   services = {
     scx = {

@@ -17,11 +17,13 @@
         "https://nix-community.cachix.org"
         "https://niri.cachix.org"
         "https://clementpoiret.cachix.org"
+        "https://nixos-cachyos-kernels.cachix.org"
       ];
       trusted-public-keys = [
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
         "clementpoiret.cachix.org-1:+W8ndoDBppOP0zcLzkPYSCH6j3kKNH4ckfJCQ138PZo="
+        "nixos-cachyos-kernels.cachix.org-1:ccFqQ2GZOeTAPrZaDDsCY5Rk1Ndg/+NnM2s6UwIDTS0="
       ];
       sandbox = true;
       require-sigs = true;

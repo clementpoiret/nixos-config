@@ -12,8 +12,8 @@ Both hosts use:
 
 - Lanzaboote Secure Boot with owner-only ESP mount masks and a PKI under
   `/var/lib/sbctl`;
-- a custom CachyOS EEVDF/ThinLTO/KCFI kernel with a cached CachyOS recovery
-  specialisation;
+- the cached CachyOS EEVDF/ThinLTO Zen 4 kernel from the personal kernel flake;
+  this preset does not enable KCFI (see [kernel configuration](KERNEL.md));
 - kernel information, BPF, userfaultfd, TTY, filesystem-link, ASLR, and
   end-host network sysctl restrictions;
 - AppArmor with locally managed application and service profiles, user
@@ -91,7 +91,7 @@ uses a predictable PID file in `/tmp`.
 ## Optional strict trials
 
 The trial settings are left commented beside their natural owners. Enable one
-per boot generation, retain the recovery specialisation, and record the result
+per boot generation, retain a working generation, and record the result
 before trying the next control.
 
 | Control | Location | Required validation |
@@ -257,7 +257,7 @@ nixos-rebuild boot --flake .#desktop --elevate=run0
 run0 -- reboot
 ```
 
-Keep a working generation and the `cached-cachyos` specialisation. Maintain
+Keep a working generation with a known-good kernel. Maintain
 offline LUKS recovery material, two FIDO devices, SOPS recovery keys, per-host
 Secure Boot key backups, and a NixOS installer.
 Recompute the laptop Btrfs `resume_offset` whenever its swapfile is recreated,
@@ -272,7 +272,7 @@ check:
 ```bash
 uname -r
 cat /proc/cmdline
-zgrep -E 'CONFIG_(CFI_CLANG|MODULE_SIG_FORCE|LOCK_DOWN|PREEMPT|HZ_|NO_HZ|TRANSPARENT_HUGEPAGE)' /proc/config.gz
+zgrep -E 'CONFIG_(CFI|MODULE_SIG_FORCE|LOCK_DOWN|PREEMPT|HZ_|NO_HZ|TRANSPARENT_HUGEPAGE)' /proc/config.gz
 cat /sys/kernel/security/lsm
 cat /sys/kernel/security/lockdown 2>/dev/null || true
 
