@@ -44,6 +44,8 @@
   `nix store verify --store https://nixos-cachyos-kernels.cachix.org --no-contents`
   and the configured key. See `docs/KERNEL.md` for the preserved custom recipe
   and the verified stale `kcfi` helper-symbol pitfall.
+  GitHub runners do not inherit NixOS `nix.settings`: keep the kernel cache in
+  `cachix-action.extraPullNames` in both build jobs, which installs its URL and key.
 - OpenCode's CLI build imports root-level `script/native-arch.ts`, which its
   upstream Nix source filter omits. Keep the full-source override until that filter
   includes the build scripts. Verified with
