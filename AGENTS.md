@@ -61,6 +61,16 @@
   includes the build scripts. Verified with
   `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.flake.opencode`.
 
+# GTK theming
+
+- DMS's GTK apply script refuses Home Manager-managed `gtk.css` symlinks.
+  Keep `stylix.targets.gtk.colors.enable = false` and `gtk.gtk4.theme = null`
+  so DMS owns the stylesheets while Stylix keeps fonts and cursors. A GTK4
+  theme makes Home Manager generate `gtk.css` even without `extraCss`.
+  Verified both hosts with
+  `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.dms-gtk-theming`,
+  which runs upstream apply/patch against writable copies of packaged adw-gtk3.
+
 # AppArmor
 
 - Confined systemd services must allow `config.systemd.package`, not just

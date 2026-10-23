@@ -253,6 +253,57 @@ in
         touch "$out"
       '';
 
+  dms-gtk-theming =
+    let
+      checkHost =
+        hostName:
+        let
+          home = self.nixosConfigurations.${hostName}.config.home-manager.users.${username};
+        in
+        assert !home.stylix.targets.gtk.colors.enable;
+        assert !(home.xdg.configFile ? "gtk-3.0/gtk.css");
+        assert !(home.xdg.configFile ? "gtk-4.0/gtk.css");
+        assert home.gtk.theme.name == "adw-gtk3";
+        assert home.gtk.font.name == home.stylix.fonts.sansSerif.name;
+        assert home.gtk.font.size == home.stylix.fonts.sizes.applications;
+        assert home.gtk.cursorTheme.name == home.stylix.cursor.name;
+        assert home.gtk.iconTheme.name == home.stylix.icons.dark;
+        ''
+          export HOME="$TMPDIR/${hostName}"
+          export XDG_CONFIG_HOME="$HOME/.config"
+          export XDG_DATA_HOME="$HOME/.local/share"
+          export XDG_DATA_DIRS=${home.gtk.theme.package}/share
+          mkdir -p "$XDG_CONFIG_HOME"/gtk-{3,4}.0
+          cp ${home.xdg.configFile."gtk-3.0/settings.ini".source} "$XDG_CONFIG_HOME/gtk-3.0/settings.ini"
+          cp ${home.xdg.configFile."gtk-4.0/settings.ini".source} "$XDG_CONFIG_HOME/gtk-4.0/settings.ini"
+          for version in 3 4; do
+            cat > "$XDG_CONFIG_HOME/gtk-$version.0/dank-colors.css" <<'EOF'
+          /* BEGIN DMS OVERRIDE */
+          @define-color accent_color #123456;
+          /* END DMS OVERRIDE */
+          EOF
+          done
+
+          for mode in true false true; do
+            bash ${self.inputs.dms}/quickshell/scripts/gtk.sh "$XDG_CONFIG_HOME" apply "$mode"
+            test ! -L "$XDG_CONFIG_HOME/gtk-4.0/gtk.css"
+            grep -Fx '@import url("dank-colors.css");' "$XDG_CONFIG_HOME/gtk-4.0/gtk.css"
+            bash ${self.inputs.dms}/quickshell/scripts/gtk.sh "$XDG_CONFIG_HOME" patch "$mode"
+            variant=""
+            [ "$mode" = true ] || variant="-dark"
+            grep -Fx '@define-color accent_color #123456;' \
+              "$XDG_DATA_HOME/themes/adw-gtk3$variant/gtk-3.0/gtk.css"
+          done
+          cmp ${home.xdg.configFile."gtk-3.0/settings.ini".source} "$XDG_CONFIG_HOME/gtk-3.0/settings.ini"
+          cmp ${home.xdg.configFile."gtk-4.0/settings.ini".source} "$XDG_CONFIG_HOME/gtk-4.0/settings.ini"
+        '';
+    in
+    pkgs-unstable.runCommand "dms-gtk-theming" { } ''
+      ${checkHost "desktop"}
+      ${checkHost "laptop"}
+      touch "$out"
+    '';
+
   manage-dns-portal =
     pkgs-unstable.runCommand "manage-dns-portal-test"
       {

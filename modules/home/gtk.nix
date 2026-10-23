@@ -20,6 +20,14 @@ in
 
   gtk = {
     enable = true;
+
+    theme = {
+      name = "adw-gtk3";
+      package = pkgs.adw-gtk3;
+    };
+
+    # Importing a GTK4 theme would make Home Manager own gtk.css again.
+    gtk4.theme = null;
   };
 
   home.pointerCursor.enable = true;

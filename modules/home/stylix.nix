@@ -50,6 +50,8 @@
     opacity.desktop = 0.0;
 
     targets.dank-material-shell.enable = false;
+    # DMS needs writable GTK stylesheets, not Home Manager's store symlinks.
+    targets.gtk.colors.enable = false;
     targets.neovim.enable = false;
   };
 }
