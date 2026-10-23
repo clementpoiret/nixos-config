@@ -609,6 +609,10 @@ in
     assert builtins.elem "/proc/bus/pci/devices" laptopServiceRegistry.syncthing.readOnlyPaths;
     assert builtins.elem "/proc/modules" laptopServiceRegistry.syncthing.readOnlyPaths;
     assert builtins.elem "/proc/sys/kernel/osrelease" laptopServiceRegistry.syncthing.readOnlyPaths;
+    assert !laptopConfig.systemd.services.syncthing.serviceConfig.RestrictSUIDSGID;
+    assert laptopConfig.systemd.services.syncthing.serviceConfig.NoNewPrivileges;
+    assert
+      self.nixosConfigurations.desktop.config.systemd.services.syncthing.serviceConfig.RestrictSUIDSGID;
     assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
     assert builtins.all (
       host:

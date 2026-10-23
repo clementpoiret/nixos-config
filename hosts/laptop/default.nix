@@ -63,6 +63,9 @@
       HandleLidSwitch = "suspend-then-hibernate";
     };
   };
+  # Syncthing preserves existing directory setgid bits when applying permissions.
+  systemd.services.syncthing.serviceConfig.RestrictSUIDSGID = lib.mkForce false;
+
   systemd.sleep.settings.Sleep = {
     HibernateDelaySec = "30m";
     MemorySleepMode = "s2idle";

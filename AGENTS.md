@@ -68,6 +68,12 @@
   VM test exercises the actual service command, and the mode-matrix check covers
   both host registries without granting wildcard store execution.
 
+# Syncthing
+
+- Keep the laptop-only `RestrictSUIDSGID` exception: Syncthing preserves existing
+  directory setgid bits during chmod, which systemd otherwise rejects with EPERM.
+  Leave `NoNewPrivileges`, AppArmor, and writable-path restrictions enabled.
+
 # SSH agents
 
 - Keep the Proton Pass CA signing socket separate from the forwarded OpenSSH
