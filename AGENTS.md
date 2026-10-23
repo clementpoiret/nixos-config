@@ -61,15 +61,20 @@
   includes the build scripts. Verified with
   `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.flake.opencode`.
 
-# GTK theming
+# Application theming
 
 - DMS's GTK apply script refuses Home Manager-managed `gtk.css` symlinks.
   Keep `stylix.targets.gtk.colors.enable = false` and `gtk.gtk4.theme = null`
   so DMS owns the stylesheets while Stylix keeps fonts and cursors. A GTK4
   theme makes Home Manager generate `gtk.css` even without `extraCss`.
   Verified both hosts with
-  `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.dms-gtk-theming`,
+  `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.dms-application-theming`,
   which runs upstream apply/patch against writable copies of packaged adw-gtk3.
+- Keep `stylix.targets.qt.enable = false` and qtct/Kvantum settings unmanaged:
+  DMS rewrites qtct files with `sed -i`, replacing Home Manager symlinks with
+  regular files that block later activation. Keep the Qt platform themes on
+  qt5ct/qt6ct rather than GTK passthrough; install Kvantum's plugins without
+  forcing `QT_STYLE_OVERRIDE`, so existing selections remain available.
 
 # AppArmor
 

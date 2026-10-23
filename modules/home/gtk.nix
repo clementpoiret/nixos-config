@@ -44,5 +44,12 @@ in
 
   qt = {
     enable = true;
+    platformTheme.name = "qtct";
+
+    # Keep the existing style available without managing qtct or Kvantum settings.
+    style.package = with pkgs; [
+      libsForQt5.qtstyleplugin-kvantum
+      qt6Packages.qtstyleplugin-kvantum
+    ];
   };
 }

@@ -53,5 +53,6 @@
     # DMS needs writable GTK stylesheets, not Home Manager's store symlinks.
     targets.gtk.colors.enable = false;
     targets.neovim.enable = false;
+    targets.qt.enable = false;
   };
 }

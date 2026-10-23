@@ -253,12 +253,13 @@ in
         touch "$out"
       '';
 
-  dms-gtk-theming =
+  dms-application-theming =
     let
       checkHost =
         hostName:
         let
-          home = self.nixosConfigurations.${hostName}.config.home-manager.users.${username};
+          host = self.nixosConfigurations.${hostName}.config;
+          home = host.home-manager.users.${username};
         in
         assert !home.stylix.targets.gtk.colors.enable;
         assert !(home.xdg.configFile ? "gtk-3.0/gtk.css");
@@ -268,6 +269,14 @@ in
         assert home.gtk.font.size == home.stylix.fonts.sizes.applications;
         assert home.gtk.cursorTheme.name == home.stylix.cursor.name;
         assert home.gtk.iconTheme.name == home.stylix.icons.dark;
+        assert !home.stylix.targets.qt.enable;
+        assert !(home.xdg.configFile ? "qt5ct/qt5ct.conf");
+        assert !(home.xdg.configFile ? "qt6ct/qt6ct.conf");
+        assert !(home.xdg.configFile ? "Kvantum/kvantum.kvconfig");
+        assert home.qt.platformTheme.name == "qtct";
+        assert home.qt.style.name == null;
+        assert host.environment.variables.QT_QPA_PLATFORMTHEME == "qt5ct";
+        assert host.environment.variables.QT_QPA_PLATFORMTHEME_QT6 == "qt6ct";
         ''
           export HOME="$TMPDIR/${hostName}"
           export XDG_CONFIG_HOME="$HOME/.config"
@@ -283,6 +292,17 @@ in
           /* END DMS OVERRIDE */
           EOF
           done
+          mkdir -p "$XDG_DATA_HOME/color-schemes"
+          printf '[Colors:Window]\nBackgroundNormal=18,52,86\n' \
+            > "$XDG_DATA_HOME/color-schemes/DankMatugen.colors"
+          for qtct in qt5ct qt6ct; do
+            mkdir -p "$XDG_CONFIG_HOME/$qtct"
+            cat > "$XDG_CONFIG_HOME/$qtct/$qtct.conf" <<'EOF'
+          [Appearance]
+          style=Fusion
+          custom_palette=false
+          EOF
+          done
 
           for mode in true false true; do
             bash ${self.inputs.dms}/quickshell/scripts/gtk.sh "$XDG_CONFIG_HOME" apply "$mode"
@@ -293,16 +313,31 @@ in
             [ "$mode" = true ] || variant="-dark"
             grep -Fx '@define-color accent_color #123456;' \
               "$XDG_DATA_HOME/themes/adw-gtk3$variant/gtk-3.0/gtk.css"
+            bash ${self.inputs.dms}/quickshell/scripts/qt.sh "$XDG_CONFIG_HOME"
+            for qtct in qt5ct qt6ct; do
+              qt_config="$XDG_CONFIG_HOME/$qtct/$qtct.conf"
+              grep -Fx "color_scheme_path=$XDG_DATA_HOME/color-schemes/DankMatugen.colors" "$qt_config"
+              grep -Fx 'custom_palette=true' "$qt_config"
+              grep -Fx 'style=Fusion' "$qt_config"
+              test "$(grep -c '^color_scheme_path=' "$qt_config")" -eq 1
+            done
           done
           cmp ${home.xdg.configFile."gtk-3.0/settings.ini".source} "$XDG_CONFIG_HOME/gtk-3.0/settings.ini"
           cmp ${home.xdg.configFile."gtk-4.0/settings.ini".source} "$XDG_CONFIG_HOME/gtk-4.0/settings.ini"
         '';
     in
-    pkgs-unstable.runCommand "dms-gtk-theming" { } ''
-      ${checkHost "desktop"}
-      ${checkHost "laptop"}
-      touch "$out"
-    '';
+    pkgs-unstable.runCommand "dms-application-theming"
+      {
+        nativeBuildInputs = with pkgs-unstable; [
+          libsForQt5.qt5ct
+          qt6Packages.qt6ct
+        ];
+      }
+      ''
+        ${checkHost "desktop"}
+        ${checkHost "laptop"}
+        touch "$out"
+      '';
 
   manage-dns-portal =
     pkgs-unstable.runCommand "manage-dns-portal-test"

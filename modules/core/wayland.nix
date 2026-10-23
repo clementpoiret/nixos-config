@@ -47,8 +47,8 @@ in
 
       # QT
       QT_QPA_PLATFORM = "wayland";
-      QT_QPA_PLATFORMTHEME = "gtk3";
-      QT_QPA_PLATFORMTHEME_QT6 = "gtk3";
+      QT_QPA_PLATFORMTHEME = "qt5ct";
+      QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
       QT_AUTO_SCREEN_SCALE_FACTOR = "1";
       QT_SCALE_FACTOR_ROUNDING_POLICY = "RoundPreferFloor";
       QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
