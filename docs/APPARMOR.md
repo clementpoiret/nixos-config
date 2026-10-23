@@ -354,10 +354,10 @@ nix build .#checks.x86_64-linux.desktop-toplevel \
 nix flake check --no-update-lock-file
 ```
 
-The mode matrix verifies states, overrides, exact package registration, namespace transitions, credential exceptions,
-and systemd attachments. The parser check parses every desktop, laptop, and all-enforced policy, verifies capability
-rules across every relevant registered profile, and confirms that ordinary closure/session rules do not grant implicit
-execution. The VM enforces a generic service fixture including runtime metadata, the exact DNS-secret boundary, and a
+The mode matrix verifies states, overrides, invalid descriptors, package/profile alignment, and systemd attachments.
+The parser check parses every desktop, laptop, and all-enforced policy, checks executable paths, and protects
+read-only closures, namespace privilege separation, and credential boundaries without snapshotting every capability rule.
+The VM enforces a generic service fixture including runtime metadata, the exact DNS-secret boundary, and a
 running Syncthing service. It also exercises shared developer caches and metadata while retaining the GPG private-key
 and protected-configuration boundaries.
 

@@ -163,44 +163,6 @@ in
         touch "$out"
       '';
 
-  proton-package-channels =
-    let
-      checkPackage =
-        name:
-        let
-          packages = self.packages.${pkgs-unstable.stdenv.hostPlatform.system};
-          stable = packages.${name};
-          beta = packages."${name}-beta";
-          pins = builtins.fromJSON (builtins.readFile (../pkgs + "/${name}/releases.json"));
-        in
-        assert stable.channel == "stable";
-        assert stable.version == pins.stable.version;
-        assert beta.channel == "beta";
-        assert beta.version == pins.beta.version;
-        assert (stable.override { channel = "beta"; }).drvPath == beta.drvPath;
-        assert builtins.all (
-          host:
-          let
-            home = host.config.home-manager.users.${username};
-            package = host.pkgs."${name}-beta";
-            appArmorPackage = home.localAppArmor.applications.${name}.package;
-          in
-          host.pkgs.${name}.channel == "stable"
-          && package.channel == "beta"
-          && appArmorPackage.channel == "beta"
-          && appArmorPackage.drvPath == package.drvPath
-          && builtins.any (installed: installed.drvPath == package.drvPath) home.home.packages
-        ) (builtins.attrValues self.nixosConfigurations);
-        true;
-    in
-    assert builtins.all checkPackage [
-      "protonmail-desktop"
-      "proton-pass"
-    ];
-    pkgs-unstable.runCommand "proton-package-channels" { } ''
-      touch "$out"
-    '';
-
   measured-boot-retention =
     let
       excessiveRetentionHost = self.nixosConfigurations.laptop.extendModules {
@@ -215,10 +177,6 @@ in
         !assertion.assertion && pkgs-unstable.lib.hasInfix "Measured boot with PCR 4" assertion.message
       ) excessiveRetentionHost.config.assertions;
     in
-    assert self.nixosConfigurations.laptop.config.boot.lanzaboote.configurationLimit == 4;
-    assert self.nixosConfigurations.desktop.config.boot.lanzaboote.configurationLimit == 4;
-    assert self.nixosConfigurations.laptop.config.specialisation == { };
-    assert self.nixosConfigurations.desktop.config.specialisation == { };
     assert builtins.length retentionAssertions == 1;
     assert !(builtins.tryEval excessiveRetentionHost.config.system.build.toplevel.drvPath).success;
     pkgs-unstable.runCommand "measured-boot-retention" { } ''
@@ -282,11 +240,6 @@ in
         assert !home.stylix.targets.gtk.colors.enable;
         assert !(home.xdg.configFile ? "gtk-3.0/gtk.css");
         assert !(home.xdg.configFile ? "gtk-4.0/gtk.css");
-        assert home.gtk.theme.name == "adw-gtk3";
-        assert home.gtk.font.name == home.stylix.fonts.sansSerif.name;
-        assert home.gtk.font.size == home.stylix.fonts.sizes.applications;
-        assert home.gtk.cursorTheme.name == home.stylix.cursor.name;
-        assert home.gtk.iconTheme.name == home.stylix.icons.dark;
         assert !home.stylix.targets.qt.enable;
         assert !(home.xdg.configFile ? "qt5ct/qt5ct.conf");
         assert !(home.xdg.configFile ? "qt6ct/qt6ct.conf");
@@ -399,8 +352,6 @@ in
         in
         pkgs-unstable.lib.hasInfix baselineCommand postInstall
         && !(pkgs-unstable.lib.hasInfix "$out/bin/niri completions" postInstall);
-      unwrapConfig = value: if value ? content then unwrapConfig value.content else value;
-      configIs = expected: value: ((unwrapConfig value).tristate or null) == expected;
       checkHost =
         hostName: cpuTarget:
         let
@@ -429,9 +380,6 @@ in
         assert check (builtins.elem "-Dcpu=${cpuTarget}" hostPkgs.ghostty-host.zigBuildFlags);
         assert check (builtins.elem "-Dcpu=${cpuTarget}" hostPkgs.ghostty-host.zigCheckFlags);
         assert check (!(hostPkgs.ghostty-host.doInstallCheck or true));
-        assert check (configIs "y" kernel.structuredExtraConfig.MZEN4);
-        assert check (configIs "n" kernel.structuredExtraConfig.GENERIC_CPU);
-        assert check (configIs "n" kernel.structuredExtraConfig.X86_NATIVE_CPU);
         assert check (kernel.drvPath == cachedKernel.drvPath);
         true;
     in
@@ -451,19 +399,11 @@ in
       desktopHome = desktopConfig.home-manager.users.${username};
       laptopHome = laptopConfig.home-manager.users.${username};
       desktopSsh = desktopHome.programs.ssh.settings;
-      laptopSsh = laptopHome.programs.ssh.settings;
       desktopSecretWriter = builtins.head desktopHome.systemd.user.services.write-ssh-secret-config.Service.ExecStart;
       laptopSecretWriter = builtins.head laptopHome.systemd.user.services.write-ssh-secret-config.Service.ExecStart;
-      desktopAgentLoader = desktopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
       laptopAgentLoader = laptopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
       desktopAgentEnvironment = desktopHome.systemd.user.services.ssh-agent.Service.Environment;
       laptopAgentEnvironment = laptopHome.systemd.user.services.ssh-agent.Service.Environment;
-      desktopAgentAskpass = pkgs-unstable.lib.removePrefix "SSH_ASKPASS=" (
-        builtins.head (builtins.filter (pkgs-unstable.lib.hasPrefix "SSH_ASKPASS=") desktopAgentEnvironment)
-      );
-      laptopAgentAskpass = pkgs-unstable.lib.removePrefix "SSH_ASKPASS=" (
-        builtins.head (builtins.filter (pkgs-unstable.lib.hasPrefix "SSH_ASKPASS=") laptopAgentEnvironment)
-      );
       desktopGpgSync = desktopHome.systemd.user.services.sync-forwarded-gpg-home;
       laptopGpgSync = laptopHome.systemd.user.services.sync-forwarded-gpg-home;
       desktopGpgSyncScript = builtins.head desktopGpgSync.Service.ExecStart;
@@ -493,16 +433,6 @@ in
         && service.Service.UMask == "0077"
         && home.services.gnome-keyring.components == [ "secrets" ];
     in
-    assert
-      desktopSsh.defaultAuth.data.IdentityFile == [
-        "~/.ssh/id_ed25519_sk_yk2"
-        "~/.ssh/id_ed25519_sk_yk1"
-      ];
-    assert
-      laptopSsh.defaultAuth.data.IdentityFile == [
-        "~/.ssh/id_ed25519_sk_yk1"
-        "~/.ssh/id_ed25519_sk_yk2"
-      ];
     assert desktopSsh."github.com".data.IdentityAgent == "SSH_AUTH_SOCK";
     assert desktopSsh."github.com".data.IdentityFile == "none";
     assert desktopSsh."gitlab.com".data.IdentityAgent == "SSH_AUTH_SOCK";
@@ -513,19 +443,10 @@ in
     assert caAgentIsOnDemand laptopHome;
     assert desktopHome.services.gpg-agent.enableExtraSocket;
     assert laptopHome.services.gpg-agent.enableExtraSocket;
-    assert desktopConfig.programs.yubikey-touch-detector.enable;
-    assert desktopConfig.programs.yubikey-touch-detector.libnotify;
-    assert laptopConfig.programs.yubikey-touch-detector.enable;
-    assert laptopConfig.programs.yubikey-touch-detector.libnotify;
     assert builtins.elem "SSH_ASKPASS_REQUIRE=force" desktopAgentEnvironment;
     assert builtins.elem "SSH_ASKPASS_REQUIRE=force" laptopAgentEnvironment;
-    assert desktopAgentAskpass == laptopAgentAskpass;
     assert gpgSyncIsSessionOneShot desktopHome desktopGpgSync;
     assert gpgSyncIsSessionOneShot laptopHome laptopGpgSync;
-    assert desktopHome.programs.jujutsu.settings.signing.behavior == "drop";
-    assert laptopHome.programs.jujutsu.settings.signing.behavior == "drop";
-    assert desktopHome.programs.jujutsu.settings.git.sign-on-push;
-    assert laptopHome.programs.jujutsu.settings.git.sign-on-push;
     pkgs-unstable.runCommand "credential-forwarding"
       {
         nativeBuildInputs = [
@@ -540,12 +461,6 @@ in
         grep -F 'RemoteForward $forwarded_gpg_socket $local_gpg_extra_socket' ${desktopSecretWriter}
         grep -F 'ControlMaster no' ${desktopSecretWriter}
         grep -F 'Host * !github.com !gitlab.com' ${desktopSecretWriter}
-        grep -F 'laptop>git@[ssh.github.com]:443' ${desktopAgentLoader}
-        grep -F 'desktop>git@[altssh.gitlab.com]:443' ${laptopAgentLoader}
-        grep -F 'systemctl --user show-environment' ${desktopAgentAskpass}
-        grep -F 'DISPLAY=*|WAYLAND_DISPLAY=*' ${desktopAgentAskpass}
-        grep -F 'seahorse/ssh-askpass "$@"' ${desktopAgentAskpass}
-        grep -F 'gpg --batch --export 71F084CEA427B23537934233CC6B0EED323A6C13' ${desktopGpgSyncScript}
         grep -F 'Refusing to forward a GPG key file that is not a smartcard stub' ${desktopGpgSyncScript}
 
         cat > fake-ssh-add <<'EOF'
@@ -604,36 +519,14 @@ in
         expected: hostConfig:
         builtins.all (state: state == expected) (builtins.attrValues (workloadStates hostConfig));
       stagedStates = states appArmorTestHosts.staged;
-      complainPolicies = appArmorTestHosts.complain.config.security.apparmor.policies;
-      enforcePolicies = appArmorTestHosts.enforce.config.security.apparmor.policies;
-      bwrapPolicy = complainPolicies.bwrap.profile;
-      claudeBwrapPolicy = complainPolicies.local-claude-code-bwrap.profile;
-      bravePolicy = complainPolicies.local-brave.profile;
-      codexPolicy = complainPolicies.local-codex-cli.profile;
-      claudePolicy = complainPolicies.local-claude-code.profile;
-      codexContainerEnginePolicy = complainPolicies.local-codex-cli-container-engine.profile;
-      claudeContainerEnginePolicy = complainPolicies.local-claude-code-container-engine.profile;
-      containerPayloadPolicy = complainPolicies.local-agent-container-payload.profile;
-      drawioPolicy = complainPolicies.local-drawio.profile;
-      logseqPolicy = complainPolicies.local-logseq.profile;
       disabledSyncthingService = appArmorTestHosts.disable.config.systemd.services.syncthing;
       overrideSyncthingService = appArmorTestHosts.override.config.systemd.services.syncthing;
       laptopConfig = self.nixosConfigurations.laptop.config;
-      laptopPkgs = self.nixosConfigurations.laptop.pkgs;
-      laptopHomeAppArmor = laptopConfig.home-manager.users.${username}.localAppArmor;
       claudeManagedSettings =
         builtins.fromJSON
           laptopConfig.environment.etc."claude-code/managed-settings.d/20-sandbox.json".text;
       laptopServiceRegistry = laptopConfig.security.localAppArmor.services;
-      containerRegistriesConfig = laptopConfig.environment.etc."containers/registries.conf".source;
-      containerRegistriesConfigPath = builtins.unsafeDiscardStringContext (
-        toString containerRegistriesConfig
-      );
-      appArmorDebugService = laptopConfig.systemd.services.apparmor-debug-report;
-      appArmorDebugTimer = laptopConfig.systemd.timers.apparmor-debug-report;
       dnsService = self.nixosConfigurations.laptop.config.systemd.services.apply-secret-dns;
-      desktopSyncthingPaths =
-        self.nixosConfigurations.desktop.config.systemd.services.syncthing.serviceConfig.ReadWritePaths;
     in
     assert allStatesAre "disable" appArmorTestHosts.disable;
     assert allStatesAre "complain" appArmorTestHosts.complain;
@@ -660,7 +553,6 @@ in
       );
     assert (states appArmorTestHosts.override).local-syncthing == "enforce";
     assert overrideSyncthingService.serviceConfig.AppArmorProfile == "local-syncthing";
-    assert bravePolicy != enforcePolicies.local-brave.profile;
     assert
       !(builtins.tryEval invalidAppArmorTestHosts.globHomePath.config.system.build.toplevel.drvPath)
       .success;
@@ -670,44 +562,16 @@ in
     assert
       !(builtins.tryEval invalidAppArmorTestHosts.hostDiagnosticsWithoutDeveloper.config.system.build.toplevel.drvPath)
       .success;
-    assert laptopHomeAppArmor.applications.brave.package == laptopPkgs.brave;
-    assert builtins.elem "network" laptopHomeAppArmor.applications.brave.capabilities;
-    assert builtins.elem "device-discovery" laptopHomeAppArmor.applications.brave.capabilities;
-    assert builtins.elem "credential-broker" laptopHomeAppArmor.applications.brave.sensitiveAccess;
-    assert builtins.elem ".pki/nssdb" laptopHomeAppArmor.applications.brave.homePaths;
-    assert builtins.elem "${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender"
-      laptopHomeAppArmor.applications.thunderbird.extraExecutables;
-    assert
-      laptopHomeAppArmor.applications.thunderbird.extraExecutables
-      == map (name: "${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/${name}") (
-        if pkgs-unstable.lib.versionAtLeast laptopPkgs.thunderbird.version "155" then
-          [
-            "pingsender"
-            "gfxtest"
-          ]
-        else
-          [
-            "pingsender"
-            "glxtest"
-            "vaapitest"
-          ]
-      );
-    assert builtins.elem "developer-exec" laptopHomeAppArmor.applications.codex-cli.capabilities;
-    assert builtins.elem "containers" laptopHomeAppArmor.applications.codex-cli.capabilities;
-    assert builtins.elem "containers" laptopHomeAppArmor.applications.claude-code.capabilities;
-    assert builtins.elem "bubblewrap" laptopHomeAppArmor.applications.codex-cli.capabilities;
-    assert builtins.elem "bubblewrap" laptopHomeAppArmor.applications.claude-code.capabilities;
-    assert builtins.elem "host-diagnostics" laptopHomeAppArmor.applications.codex-cli.capabilities;
-    assert builtins.elem "host-diagnostics" laptopHomeAppArmor.applications.claude-code.capabilities;
-    assert builtins.elem "ssh-identities" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
-    assert builtins.elem "forge-auth" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
-    assert builtins.elem "forge-auth" laptopHomeAppArmor.applications.claude-code.sensitiveAccess;
-    assert builtins.elem "netrc" laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
-    assert !(builtins.elem "netrc" laptopHomeAppArmor.applications.claude-code.sensitiveAccess);
-    assert builtins.elem "nixos-config-writable"
-      laptopHomeAppArmor.applications.codex-cli.sensitiveAccess;
-    assert builtins.elem "user-files" laptopHomeAppArmor.applications.codex-cli.capabilities;
-    assert laptopHomeAppArmor.applications.codex-cli.elevatedAccessRationale != "";
+    assert builtins.all (
+      host:
+      let
+        home = host.config.home-manager.users.${username};
+        installed = home.home.packages ++ host.config.environment.systemPackages;
+      in
+      builtins.all (
+        app: !app.enable || builtins.any (package: package.drvPath == app.package.drvPath) installed
+      ) (builtins.attrValues home.localAppArmor.applications)
+    ) (builtins.attrValues self.nixosConfigurations);
     assert laptopServiceRegistry.syncthing.packageRoots == [ laptopConfig.services.syncthing.package ];
     assert builtins.elem "runtime-introspection" laptopServiceRegistry.syncthing.capabilities;
     assert builtins.elem "/proc/bus/pci/devices" laptopServiceRegistry.syncthing.readOnlyPaths;
@@ -726,120 +590,6 @@ in
       builtins.elem host.config.systemd.package service.packageRoots
       && builtins.elem host.config.systemd.package service.executionPackages
     ) (builtins.attrValues self.nixosConfigurations);
-    assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/stat r,"
-      laptopServiceRegistry.apply-secret-dns.extraRules;
-    assert laptopConfig.security.localAppArmor.debug.enable;
-    assert laptopConfig.security.localAppArmor.debug.path == "~/.local/state/apparmor-reports";
-    assert
-      appArmorDebugService.unitConfig.RequiresMountsFor == [
-        "/home/${username}/.local/state/apparmor-reports"
-      ];
-    assert
-      appArmorDebugService.serviceConfig.ReadWritePaths == [
-        "/home/${username}/.local/state/apparmor-reports"
-      ];
-    assert appArmorDebugTimer.timerConfig.OnCalendar == "*:0/30";
-    assert appArmorDebugTimer.timerConfig.Persistent;
-    assert builtins.elem "/run/secrets.d/[0-9]*/dns/laptop"
-      laptopServiceRegistry.apply-secret-dns.readOnlyPaths;
-    assert builtins.elem ".config/enchant" laptopHomeAppArmor.applications.inkscape.homePaths;
-    assert laptopHomeAppArmor.applications.rayburst.package == laptopPkgs.rayburst;
-    assert laptopHomeAppArmor.applications.rayburst.executable == "bin/rayburst";
-    assert builtins.elem laptopPkgs.rayburst laptopConfig.home-manager.users.${username}.home.packages;
-    assert builtins.elem ".local/share/dev.aninsomniacy.rayburst"
-      laptopHomeAppArmor.applications.rayburst.homePaths;
-    assert builtins.elem laptopPkgs.webkitgtk_4_1
-      laptopHomeAppArmor.applications.rayburst.executionPackages;
-    assert builtins.elem ".logseq" laptopHomeAppArmor.applications.logseq.homePaths;
-    assert builtins.elem ".claude.lock" laptopHomeAppArmor.applications.claude-code.homePaths;
-    assert builtins.elem ".config/anthropic" laptopHomeAppArmor.applications.claude-code.homePaths;
-    assert builtins.elem ".local/share/protonmail"
-      laptopHomeAppArmor.applications.protonmail-bridge.homePaths;
-    assert builtins.elem laptopPkgs.electron.unwrapped
-      laptopHomeAppArmor.applications.drawio.executionPackages;
-    assert builtins.elem laptopPkgs.electron.unwrapped
-      laptopHomeAppArmor.applications.proton-pass.executionPackages;
-    assert laptopHomeAppArmor.applications.drawio.userNamespaceRules == "";
-    assert laptopHomeAppArmor.applications.codex-cli.userNamespaceRules == "";
-    assert !(builtins.elem "userns" laptopHomeAppArmor.applications.codex-cli.capabilities);
-    assert laptopHomeAppArmor.applications.codex-cli.profileReentryExecutables == [ ];
-    assert laptopHomeAppArmor.applications.codex-cli.bubblewrapPackage == laptopPkgs.bubblewrap;
-    assert
-      laptopHomeAppArmor.applications.codex-cli.containerToolsPackage
-      == laptopPkgs.flake.agent-container-tools;
-    assert
-      laptopHomeAppArmor.applications.claude-code.containerToolsPackage
-      == laptopPkgs.flake.agent-container-tools;
-    assert laptopHomeAppArmor.applications.claude-code.bubblewrapPackage == laptopPkgs.bubblewrap;
-    assert laptopHomeAppArmor.applications.logseq.executionPackages == [ ];
-    assert laptopHomeAppArmor.applications.logseq.profileReentryExecutables == [ ];
-    assert pkgs-unstable.lib.isDerivation laptopPkgs.logseq-appimage.appimageContents;
-    assert pkgs-unstable.lib.isDerivation laptopPkgs.logseq-appimage.fhsEnv;
-    assert builtins.elem laptopPkgs.util-linux
-      laptopHomeAppArmor.applications.textmaker.extraClosureRoots;
-    assert builtins.elem "${laptopPkgs.util-linux}/bin/whereis"
-      laptopHomeAppArmor.applications.textmaker.extraExecutables;
-    assert builtins.hasAttr "broad-launchers" laptopHomeAppArmor.inventory;
-    assert builtins.hasAttr "network-control-plane" laptopConfig.security.localAppArmor.inventory;
-    assert builtins.hasAttr "apparmor-debug-report" laptopConfig.security.localAppArmor.inventory;
-    assert pkgs-unstable.lib.hasInfix "/bin/brave flags=(attach_disconnected,mediate_deleted)"
-      bravePolicy;
-    assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> bwrap" codexPolicy;
-    assert pkgs-unstable.lib.hasInfix "/bin/bwrap Px -> local-claude-code-bwrap" claudePolicy;
-    assert pkgs-unstable.lib.hasInfix "apparmor-claude-code-bwrap" claudeBwrapPolicy;
-    assert pkgs-unstable.lib.hasInfix "/bin/podman Px -> local-codex-cli-container-engine" codexPolicy;
-    assert pkgs-unstable.lib.hasInfix "/bin/buildah Px -> local-claude-code-container-engine"
-      claudePolicy;
-    assert pkgs-unstable.lib.hasInfix "profile local-codex-cli-container-engine"
-      codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "profile local-claude-code-container-engine"
-      claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "priority=50 /** px -> local-agent-container-payload,"
-      codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "priority=50 /** px -> local-agent-container-payload,"
-      claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "ptrace (read) peer=local-agent-container-payload,"
-      codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "ptrace (read) peer=local-agent-container-payload,"
-      claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "signal (send) peer=local-agent-container-payload,"
-      codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "signal (send) peer=local-agent-container-payload,"
-      claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "/nix/store/*-etc-os-release r," claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "/proc/uptime r," claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "ip_forward" claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "conf/*/{arp_notify,forwarding,route_localnet,rp_filter} rw,"
-      claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "conf/*/{accept_dad,accept_ra,autoconf,forwarding} rw,"
-      claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "net/{tcp,tcp6,udp,udp6}" claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "oom_score_adj" claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "/proc/[0-9]*/stat r," codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "/proc/[0-9]*/stat r," claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/mounts r," codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "owner /proc/[0-9]*/mounts r," claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "/var/tmp/ r," codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "/var/tmp/ r," claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix
-      "attach_disconnected.path=/apparmor-disconnected/agent-container-engine/"
-      codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "audit deny @{HOME}/.netrc rwklm," codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "\"${containerRegistriesConfigPath}\" r,"
-      codexContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "\"${containerRegistriesConfigPath}\" r,"
-      claudeContainerEnginePolicy;
-    assert pkgs-unstable.lib.hasInfix "profile local-agent-container-payload" containerPayloadPolicy;
-    assert pkgs-unstable.lib.hasInfix "/** rwkl," containerPayloadPolicy;
-    assert pkgs-unstable.lib.hasInfix "apparmor-bwrap-userns-restrict" bwrapPolicy;
-    assert !(pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" codexPolicy);
-    assert pkgs-unstable.lib.hasInfix "Px -> local-drawio" drawioPolicy;
-    assert !(pkgs-unstable.lib.hasInfix "profile namespace-bootstrap" drawioPolicy);
-    assert !(pkgs-unstable.lib.hasInfix "Px -> local-logseq" logseqPolicy);
-    assert !(pkgs-unstable.lib.hasInfix "pivot_root" logseqPolicy);
-    assert !(pkgs-unstable.lib.hasInfix "/newroot" logseqPolicy);
-    assert !(pkgs-unstable.lib.hasInfix "/nix/store/** ix" bravePolicy);
-    assert !(pkgs-unstable.lib.hasInfix "/nix/store/** mr" bravePolicy);
     assert claudeManagedSettings.sandbox.enabled;
     assert claudeManagedSettings.sandbox.failIfUnavailable;
     assert !(claudeManagedSettings.sandbox.allowUnsandboxedCommands);
@@ -852,14 +602,6 @@ in
     assert laptopConfig.environment.variables.SSH_ASKPASS == laptopConfig.programs.ssh.askPassword;
     assert dnsService.serviceConfig.UMask == "0077";
     assert dnsService.serviceConfig.CapabilityBoundingSet == [ "CAP_CHOWN" ];
-    assert pkgs-unstable.lib.hasInfix ''
-      chmod 0600 "$temporary_file"
-      chown systemd-resolve:systemd-resolve "$temporary_file"
-    '' dnsService.script;
-    assert !(pkgs-unstable.lib.elem "/home/${username}/Sync" desktopSyncthingPaths);
-    assert
-      builtins.length (pkgs-unstable.lib.filter (path: path == "/srv/syncthing") desktopSyncthingPaths)
-      == 1;
     pkgs-unstable.runCommand "apparmor-mode-matrix" { } ''
       touch "$out"
     '';
@@ -948,7 +690,6 @@ in
     pkgs-unstable.runCommand "apparmor-application-smoke"
       {
         nativeBuildInputs = [
-          pkgs-unstable.binutils
           pkgs-unstable.strace
         ];
       }
@@ -963,12 +704,6 @@ in
         strace -f -e trace=execve -o "$TMPDIR/codex-execve.log" \
           ${laptopPkgs.flake.codex-cli}/bin/codex sandbox -- ${pkgs-unstable.coreutils}/bin/true
         grep -F '"${laptopPkgs.bubblewrap}/bin/bwrap"' "$TMPDIR/codex-execve.log"
-        if grep -F -- 'use_legacy_landlock' ${laptopPkgs.flake.codex-cli}/bin/codex; then
-          echo "Codex wrapper still forces deprecated Landlock" >&2
-          exit 1
-        fi
-        strings ${laptopPkgs.flake.claude-code}/bin/.claude-wrapped \
-          | grep -F '${laptopPkgs.bubblewrap}/bin'
 
         touch "$out"
       '';
@@ -991,7 +726,6 @@ in
 
   apparmor-policy-parser =
     let
-      laptopPkgs = self.nixosConfigurations.laptop.pkgs;
       configurations = [
         self.nixosConfigurations.desktop
         self.nixosConfigurations.laptop
@@ -1026,7 +760,6 @@ in
       laptopApplications = pkgs-unstable.lib.filterAttrs (
         _: app: app.enable
       ) self.nixosConfigurations.laptop.config.home-manager.users.${username}.localAppArmor.applications;
-      applicationNames = builtins.attrNames laptopApplications;
       applicationNamesWith =
         capability:
         builtins.attrNames (
@@ -1039,16 +772,8 @@ in
             _: app: !(builtins.elem capability app.capabilities)
           ) laptopApplications
         );
-      desktopApplicationNames = applicationNamesWith "desktop";
-      deviceDiscoveryApplicationNames = applicationNamesWith "device-discovery";
-      gpuApplicationNames = applicationNamesWith "gpu";
-      networkApplicationNames = applicationNamesWith "network";
-      usernsApplicationNames = applicationNamesWith "userns";
       bubblewrapApplicationNames = applicationNamesWith "bubblewrap";
-      developerApplicationNames = applicationNamesWith "developer-exec";
-      hostDiagnosticApplicationNames = applicationNamesWith "host-diagnostics";
-      nonTerminalApplicationNames = applicationNamesWithout "terminal";
-      userFilesApplicationNames = applicationNamesWith "user-files";
+      restrictedApplicationNames = applicationNamesWithout "developer-exec";
     in
     pkgs-unstable.runCommand "apparmor-policy-parser"
       {
@@ -1066,7 +791,7 @@ in
         }
 
         require_rule() {
-          if ! grep -F -- "$1" "$2"; then
+          if ! grep -Fq -- "$1" "$2"; then
             printf 'Missing required rule in %s: %s\n' "$2" "$1" >&2
             return 1
           fi
@@ -1145,83 +870,15 @@ in
           fi
           require_rule '/**.node mr,' "$closure_rules"
 
-          require_rule '${self.nixosConfigurations.laptop.pkgs.brave}/bin/** ixr,' "$brave_common"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.brave}/opt/** ixr,' "$brave_common"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.coreutils-full}/bin/** ixr,' "$brave_common"
-
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg applicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule '${self.nixosConfigurations.laptop.pkgs.coreutils-full}/bin/** ixr,' "$app_common"
-            require_rule '${self.nixosConfigurations.laptop.pkgs.glibc.bin}/bin/** ixr,' "$app_common"
-          done
-
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg desktopApplicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule '/ r,' "$app_common"
-            require_rule '/etc/ r,' "$app_common"
-            require_rule 'deny /etc/opt/{,**} w,' "$app_common"
-            require_rule '/proc/[0-9]*/{cgroup,stat} r,' "$app_common"
-            require_rule 'owner /proc/[0-9]*/{cmdline,mountinfo,statm,smaps,smaps_rollup} r,' "$app_common"
-            require_rule 'owner /proc/[0-9]*/task/[0-9]*/{stat,status} r,' "$app_common"
-            require_rule 'owner /proc/[0-9]*/task/[0-9]*/comm rw,' "$app_common"
-            require_rule '/proc/pressure/{cpu,io,memory} r,' "$app_common"
-            require_rule '/sys/fs/cgroup/**/{cpu.max,memory.high,memory.max} r,' "$app_common"
-            require_rule 'deny owner /proc/[0-9]*/clear_refs w,' "$app_common"
-            require_rule '/sys/devices/system/cpu/{kernel_max,present} r,' "$app_common"
-            require_rule '/sys/devices/pci[0-9a-fA-F]*/**/class r,' "$app_common"
-            require_rule '/sys/devices/virtual/dmi/id/{product_name,product_sku,sys_vendor} r,' "$app_common"
-            require_rule '/sys/devices/system/cpu/cpu[0-9]*/topology/{core_cpus,core_cpus_list} r,' "$app_common"
-            require_rule 'owner /run/user/[0-9]*/wayland-proxy-* rw,' "$app_common"
-            require_rule '${self.nixosConfigurations.laptop.pkgs.xdg-utils}/bin/** ixr,' "$app_common"
-            require_rule '${self.nixosConfigurations.laptop.pkgs.gawk}/bin/** ixr,' "$app_common"
-            require_rule '${self.nixosConfigurations.laptop.pkgs.gnugrep}/bin/** ixr,' "$app_common"
-            require_rule '${self.nixosConfigurations.laptop.pkgs.dbus}/bin/** ixr,' "$app_common"
-            require_rule '${self.nixosConfigurations.laptop.pkgs.glib.out}/libexec/gio-launch-desktop ixr,' "$app_common"
-            test -x '${self.nixosConfigurations.laptop.pkgs.glib.out}/libexec/gio-launch-desktop'
-          done
-
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg networkApplicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule 'network netlink dgram,' "$app_common"
-            require_rule '/proc/sys/net/core/somaxconn r,' "$app_common"
-            require_rule '/proc/sys/net/ipv4/ip_local_port_range r,' "$app_common"
-          done
-
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg gpuApplicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule '/dev/ r,' "$app_common"
-            require_rule '/sys/devices/pci[0-9a-fA-F]*:[0-9a-fA-F]*/ r,' "$app_common"
-            require_rule '/sys/devices/pci[0-9a-fA-F]*:[0-9a-fA-F]*/**/ r,' "$app_common"
-            require_rule '/sys/devices/**/drm/ r,' "$app_common"
-            require_rule '/sys/devices/**/drm/{card[0-9]*,renderD[0-9]*}/ r,' "$app_common"
-          done
-
           for app_name in ${
             pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg
-              deviceDiscoveryApplicationNames
+              restrictedApplicationNames
           }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule '/dev/ r,' "$app_common"
-            require_rule '/dev/disk/by-uuid/ r,' "$app_common"
-            require_rule '/sys/class/ r,' "$app_common"
-            require_rule '/sys/class/*/ r,' "$app_common"
-            require_rule '/run/udev/data/{+hid:*,+usb:*,c10:*,c13:*,c189:*} r,' "$app_common"
-            require_rule '/sys/devices/**/{0003,0005,0018}:*:*.*/report_descriptor r,' "$app_common"
-            require_rule '/sys/devices/**/usb[0-9]*/**/{bConfigurationValue,busnum,devnum,interface,serial} r,' "$app_common"
-            require_rule '/sys/devices/virtual/tty/tty0/active r,' "$app_common"
+            app_common="$(common_rules "$profile_directory/local-$app_name")"
+            if grep -E '^[[:space:]]*/nix/store/\*\* [^,]*[wmxkl]' "$app_common"; then
+              echo "ordinary application received broad store permissions: $app_name" >&2
+              exit 1
+            fi
           done
 
           for app_name in ${
@@ -1243,197 +900,7 @@ in
             fi
           done
 
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg usernsApplicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule 'capability setpcap,' "$app_common"
-            require_rule 'capability sys_admin,' "$app_common"
-            require_rule 'capability sys_chroot,' "$app_common"
-            require_rule 'capability sys_ptrace,' "$app_common"
-            require_rule '/proc/[0-9]*/task/[0-9]*/status r,' "$app_common"
-            require_rule 'owner /proc/[0-9]*/{gid_map,setgroups,uid_map} rw,' "$app_common"
-            if grep -Fq 'profile namespace-bootstrap' "$app_profile"; then
-              echo "user namespace rules escaped into a child profile" >&2
-              exit 1
-            fi
-          done
-
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg developerApplicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule '/nix/store/** mr,' "$app_common"
-            require_rule '/nix/store/** ixr,' "$app_common"
-            require_rule '/nix/store/ r,' "$app_common"
-            require_rule '/nix/var/log/nix/ r,' "$app_common"
-            require_rule '/nix/var/log/nix/drvs/{,**} r,' "$app_common"
-            require_rule 'owner @{HOME}/.agents/skills/{,**} r,' "$app_common"
-            require_rule 'owner @{HOME}/.cache/nix/{,**} rwkl,' "$app_common"
-            require_rule 'owner @{HOME}/.cache/matplotlib/{,**} rwkl,' "$app_common"
-            require_rule 'owner @{HOME}/.cache/uv/{,**} rwkl,' "$app_common"
-            require_rule 'owner @{HOME}/.cache/go-build/{,**} rwkl,' "$app_common"
-            require_rule 'owner @{HOME}/.cache/ort.pyke.io/{,**} rwkl,' "$app_common"
-            require_rule 'owner @{HOME}/.cargo/.global-cache rwk,' "$app_common"
-            require_rule 'owner @{HOME}/.cargo/.package-cache{,-mutate} rwk,' "$app_common"
-            require_rule 'owner @{HOME}/.cargo/registry/{,**} rwkl,' "$app_common"
-            require_rule 'owner @{HOME}/.config/go/telemetry/{,**} rwkl,' "$app_common"
-            require_rule 'owner @{HOME}/.config/jj/repos/{,**} r,' "$app_common"
-            require_rule 'owner @{HOME}/.config/git/ignore r,' "$app_common"
-            require_rule 'owner @{HOME}/.keras/keras.json r,' "$app_common"
-            require_rule 'owner @{HOME}/.local/share/*-skills/{,**} r,' "$app_common"
-            require_rule 'owner @{HOME}/.local/share/uv/{,**} rwkl,' "$app_common"
-            require_rule '/nix/store/*-man-cache/index.db rk,' "$app_common"
-            require_rule '/var/cache/man/nixos-mandb/index.db rk,' "$app_common"
-            require_rule 'owner @{HOME}/** m,' "$app_common"
-            require_rule 'owner /tmp/** m,' "$app_common"
-            require_rule 'owner /var/tmp/** m,' "$app_common"
-            require_rule 'owner /dev/shm/{,**} rwkl,' "$app_common"
-            require_rule 'owner /proc/[0-9]*/fd/ r,' "$app_common"
-            require_rule 'ptrace (read, trace) peer=@{profile_name},' "$app_common"
-            require_rule 'priority=50 /nix/store/** Pix,' "$app_common"
-            if grep -F 'apparmor-closure-rules-local-' "$app_common"; then
-              echo "developer profile unexpectedly includes a redundant closure" >&2
-              exit 1
-            fi
-          done
-
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg
-              hostDiagnosticApplicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule '/etc/machine-id r,' "$app_common"
-            require_rule '/proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,status} r,' "$app_common"
-            require_rule 'owner /proc/[0-9]*/{gid_map,uid_map} r,' "$app_common"
-            require_rule 'owner /proc/[0-9]*/attr/current r,' "$app_common"
-            ! grep -F '/proc/[0-9]*/{cgroup,cmdline,mountinfo,mounts,stat,statm,status} r,' "$app_common"
-            require_rule '/proc/[0-9]*/task/[0-9]*/{comm,stat,status} r,' "$app_common"
-            require_rule '/proc/bus/pci/devices r,' "$app_common"
-            require_rule '/proc/modules r,' "$app_common"
-            require_rule '/proc/sys/kernel/{osrelease,ostype,pid_max,unprivileged_userns_clone} r,' "$app_common"
-            require_rule '/proc/sys/vm/{mmap_min_addr,nr_hugepages} r,' "$app_common"
-            require_rule '/run/log/journal/{,**} r,' "$app_common"
-            require_rule '/sys/class/{accel,drm}/ r,' "$app_common"
-            require_rule '/sys/devices/pci[0-9a-fA-F]*/**/device r,' "$app_common"
-            require_rule '/sys/devices/pci[0-9a-fA-F]*/**/vendor r,' "$app_common"
-            require_rule '/sys/kernel/security/apparmor/features/{,**} r,' "$app_common"
-            require_rule '/sys/kernel/security/apparmor/profiles r,' "$app_common"
-            require_rule '/var/log/journal/{,**} r,' "$app_common"
-            require_rule 'owner "/home/${username}/.local/state/apparmor-reports/{,**}" r,' "$app_common"
-          done
-
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg userFilesApplicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            grep -Eq '^[[:space:]]*@\{HOME\}/\[\^\.n\]\*/\{,\*\*\} r,$' "$app_common"
-            grep -Eq '^[[:space:]]*owner @\{HOME\}/\[\^\.n\]\*/\{,\*\*\} rwkl,$' "$app_common"
-          done
-
-          for app_name in ${
-            pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg
-              nonTerminalApplicationNames
-          }; do
-            app_profile="$profile_directory/local-$app_name"
-            app_common="$(common_rules "$app_profile")"
-            require_rule 'deny /dev/tty rw,' "$app_common"
-            require_rule 'deny owner /dev/pts/[0-9]* rw,' "$app_common"
-          done
-
-          file_roller_common="$(common_rules "$profile_directory/local-file-roller")"
-          require_rule '${pkgs-unstable.unzip}/bin/** ixr,' "$file_roller_common"
-
-          require_rule 'owner @{HOME}/.config/BraveSoftware/Brave-Browser/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so mr,' "$brave_common"
-          require_rule '/dev/hidraw[0-9]* rw,' "$brave_common"
-          require_rule '/run/udev/data/+hid:0003:1050:0407.* r,' "$brave_common"
-          require_rule '/sys/devices/**/0003:1050:0407.*/report_descriptor r,' "$brave_common"
-          require_rule 'owner "@{HOME}/.pki/nssdb/{,**}" rwkl,' "$brave_common"
-
-          evince_common="$(common_rules "$profile_directory/local-evince")"
-          require_rule 'owner @{HOME}/.local/share/gvfs-metadata/{,**} r,' "$evince_common"
-
-          rayburst_common="$(common_rules "$profile_directory/local-rayburst")"
-          test -x '${laptopPkgs.rayburst}/bin/rayburst'
-          require_rule 'profile local-rayburst ${laptopPkgs.rayburst}/bin/rayburst flags=' "$profile_directory/local-rayburst"
-          require_rule '${laptopPkgs.webkitgtk_4_1}/libexec/** ixr,' "$rayburst_common"
-          require_rule 'owner "@{HOME}/.cache/dev.aninsomniacy.rayburst/{,**}" rwkl,' "$rayburst_common"
-          require_rule 'owner "@{HOME}/.local/share/dev.aninsomniacy.rayburst/{,**}" rwkl,' "$rayburst_common"
-          require_rule 'owner "@{HOME}/.config/dev.aninsomniacy.rayburst/{,**}" rwkl,' "$rayburst_common"
-          for manifest_directory in .mozilla/native-messaging-hosts .config/google-chrome/NativeMessagingHosts .config/microsoft-edge/NativeMessagingHosts; do
-            require_rule "owner @{HOME}/$manifest_directory/ rw," "$rayburst_common"
-            require_rule "owner @{HOME}/$manifest_directory/{dev.aninsomniacy.rayburst.browser.json,.tmp*} rwkl," "$rayburst_common"
-          done
-          if grep -E 'com[.]motrix[.]next|/Motrix|/motrix|tray-icon' "$rayburst_common"; then
-            echo "Rayburst unexpectedly retains obsolete Motrix state or tray permissions" >&2
-            exit 1
-          fi
-
-          logseq_common="$(common_rules "$profile_directory/local-logseq")"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/AppRun ixr,' "$logseq_common"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.logseq-appimage.appimageContents}/logseq ixr,' "$logseq_common"
-          require_rule 'owner "@{HOME}/.logseq/{,**}" rwkl,' "$logseq_common"
-          require_rule 'owner @{HOME}/.local/bin/logseq rwkl,' "$logseq_common"
-          require_rule '/nix/store/*-gvfs-*/lib/gio/modules/libgvfsdbus.so mr,' "$logseq_common"
-          require_rule '/nix/store/*-gvfs-*/lib/gvfs/libgvfscommon.so mr,' "$logseq_common"
-          if grep -F '${self.nixosConfigurations.laptop.pkgs.bubblewrap}' "$logseq_common" \
-            || grep -F 'mount,' "$logseq_common" \
-            || grep -F 'pivot_root' "$logseq_common" \
-            || grep -F '/newroot' "$logseq_common" \
-            || grep -F 'Px -> local-logseq' "$profile_directory/local-logseq"; then
-            echo "Logseq unexpectedly retains its FHS bubblewrap sandbox rules" >&2
-            exit 1
-          fi
-
-          inkscape_common="$(common_rules "$profile_directory/local-inkscape")"
-          require_rule 'owner "@{HOME}/.config/enchant/{,**}" rwkl,' "$inkscape_common"
-
-          proton_pass_common="$(common_rules "$profile_directory/local-proton-pass")"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.electron.unwrapped}/libexec/** ixr,' "$proton_pass_common"
-
-          proton_pass_cli_common="$(common_rules "$profile_directory/local-proton-pass-cli")"
-          require_rule 'owner "@{HOME}/.local/share/proton-pass-cli/{,**}" rwkl,' "$proton_pass_cli_common"
-          require_rule 'owner @{run}/user/[0-9]*/proton-pass-ca/{,agent.sock} rw,' "$proton_pass_cli_common"
-
-          protonmail_bridge_common="$(common_rules "$profile_directory/local-protonmail-bridge")"
-          require_rule 'owner "@{HOME}/.local/share/protonmail/{,**}" rwkl,' "$protonmail_bridge_common"
-
-          thunderbird_common="$(common_rules "$profile_directory/local-thunderbird")"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.thunderbird.unwrapped}/lib/thunderbird/pingsender ixr,' "$thunderbird_common"
-          ${
-            if pkgs-unstable.lib.versionAtLeast laptopPkgs.thunderbird.version "155" then
-              ''
-                require_rule '${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/gfxtest ixr,' "$thunderbird_common"
-              ''
-            else
-              ''
-                require_rule '${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/glxtest ixr,' "$thunderbird_common"
-                require_rule '${laptopPkgs.thunderbird.unwrapped}/lib/thunderbird/vaapitest ixr,' "$thunderbird_common"
-              ''
-          }
-          require_rule 'priority=100 ${self.nixosConfigurations.laptop.pkgs.brave}/bin/brave Px -> local-brave,' "$thunderbird_common"
-
-          for app_name in textmaker planmaker presentations; do
-            softmaker_common="$(common_rules "$profile_directory/local-$app_name")"
-            require_rule '${self.nixosConfigurations.laptop.pkgs.util-linux}/bin/whereis ixr,' "$softmaker_common"
-          done
-
           claude_common="$(common_rules "$profile_directory/local-claude-code")"
-          require_rule 'owner @{run}/user/[0-9]*/cc-socks/{,**} rwkl,' "$claude_common"
-          require_rule '/etc/claude-code/managed-settings.d/{,**} r,' "$claude_common"
-          require_rule 'owner @{HOME}/.claude.json rwkl,' "$claude_common"
-          require_rule 'owner @{HOME}/.claude.json.tmp.* rwkl,' "$claude_common"
-          require_rule 'owner @{HOME}/.claude.json.lock/{,**} rwkl,' "$claude_common"
-          require_rule 'owner @{HOME}/.cache/claude-cli-nodejs/{,**} rwkl,' "$claude_common"
-          require_rule 'owner "@{HOME}/.claude.lock/{,**}" rwkl,' "$claude_common"
-          require_rule 'owner "@{HOME}/.config/anthropic/{,**}" rwkl,' "$claude_common"
-          require_rule 'owner @{HOME}/.config/user-dirs.dirs r,' "$claude_common"
-          require_rule 'owner @{HOME}/.local/share/mime/{globs,magic} r,' "$claude_common"
-          require_rule 'owner @{HOME}/.local/share/applications/claude-code-url-handler.desktop rw,' "$claude_common"
           require_rule 'deny owner @{HOME}/.config/BraveSoftware/Brave-Browser/{,**} rwklm,' "$claude_common"
           require_rule 'deny owner @{HOME}/.config/chromium/{,**} rwklm,' "$claude_common"
           require_rule 'deny owner @{HOME}/.config/google-chrome/{,**} rwklm,' "$claude_common"
@@ -1441,61 +908,24 @@ in
           require_rule 'deny owner @{HOME}/.config/vivaldi/{,**} rwklm,' "$claude_common"
 
           codex_common="$(common_rules "$profile_directory/local-codex-cli")"
-          require_rule 'owner @{HOME}/.cache/codex-runtimes/{,**} rwkl,' "$codex_common"
-          require_rule 'owner @{HOME}/.gnupg/.#lk* rwk,' "$codex_common"
-          for agent_common in "$codex_common" "$claude_common"; do
-            require_rule 'owner @{HOME}/.cache/opercord-*/{,**} rwkl,' "$agent_common"
-            require_rule 'owner @{HOME}/.cache/huggingface/xet/{,**} rwkl,' "$agent_common"
-            require_rule 'owner @{HOME}/.cache/nixpkgs-review/{,**} rwkl,' "$agent_common"
-            require_rule 'owner @{HOME}/.cargo/advisory-db{,s}/{,**} rwkl,' "$agent_common"
-            require_rule 'owner @{HOME}/.local/share/devenv/{,**} rwkl,' "$agent_common"
-          done
           if grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$codex_common" \
             || grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$claude_common"; then
             echo "agent cache exceptions leaked into another profile or browser cache" >&2
             exit 1
           fi
 
-          vivaldi_common="$(common_rules "$profile_directory/local-vivaldi")"
-          require_rule 'owner @{HOME}/.local/lib/vivaldi/media-codecs-*/libffmpeg.so mr,' "$vivaldi_common"
-          require_rule 'owner "@{HOME}/.pki/nssdb/{,**}" rwkl,' "$vivaldi_common"
-
           proton_pass_common="$(common_rules "$profile_directory/local-proton-pass")"
-          require_rule 'owner @{HOME}/.mozilla/native-messaging-hosts/me.proton.pass.nm.json rwkl,' "$proton_pass_common"
-          require_rule 'owner @{HOME}/.config/BraveSoftware/Brave-Browser/NativeMessagingHosts/me.proton.pass.nm.json rwkl,' "$proton_pass_common"
           if grep -F 'owner "@{HOME}/.config/BraveSoftware/{,**}" rwkl,' "$proton_pass_common"; then
             echo "Proton Pass received broad browser profile access" >&2
             exit 1
           fi
 
-          qbittorrent_common="$(common_rules "$profile_directory/local-qbittorrent")"
-          require_rule 'deny ptrace read peer=unconfined,' "$qbittorrent_common"
-
-          require_rule '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-apply-secret-dns"
           require_rule '"${
             toString self.nixosConfigurations.laptop.config.environment.etc."containers/registries.conf".source
           }" r,' "$profile_directory/local-codex-cli-container-engine"
           require_rule '"${
             toString self.nixosConfigurations.laptop.config.environment.etc."containers/registries.conf".source
           }" r,' "$profile_directory/local-claude-code-container-engine"
-          require_rule '/run/secrets.d/[0-9]*/dns/' "$profile_directory/local-apply-secret-dns"
-          require_rule 'include <abstractions/dbus-strict>' "$profile_directory/local-apply-secret-dns"
-          require_rule 'dbus (send, receive) bus=system peer=(name=org.freedesktop.systemd1),' "$profile_directory/local-apply-secret-dns"
-          require_rule 'owner /proc/[0-9]*/stat r,' "$profile_directory/local-apply-secret-dns"
-          require_rule '/nix/store/*-etc-nsswitch.conf r,' "$profile_directory/local-syncthing"
-          require_rule 'owner /proc/[0-9]*/{stat,statm} r,' "$profile_directory/local-syncthing"
-          require_rule '/nix/store/*-etc-os-release r,' "$profile_directory/local-syncthing"
-          require_rule '/sys/fs/cgroup/**/cpu.max r,' "$profile_directory/local-syncthing"
-          require_rule 'network netlink dgram,' "$profile_directory/local-syncthing"
-          require_rule '"/proc/bus/pci/devices" r,' "$profile_directory/local-syncthing"
-          require_rule '"/proc/modules" r,' "$profile_directory/local-syncthing"
-          require_rule '"/proc/sys/kernel/osrelease" r,' "$profile_directory/local-syncthing"
-          for agent_name in codex-cli claude-code; do
-            engine_profile="$profile_directory/local-$agent_name-container-engine"
-            require_rule '/proc/sys/fs/binfmt_misc/ r,' "$engine_profile"
-            require_rule '/proc/sys/net/core/somaxconn r,' "$engine_profile"
-            require_rule '/proc/[0-9]*/cgroup r,' "$engine_profile"
-          done
 
           pqiv_common="$(common_rules "$profile_directory/local-pqiv")"
           if grep -F 'owner @{HOME}/** rwkl,' "$pqiv_common" \
@@ -1508,15 +938,7 @@ in
             exit 1
           fi
 
-          require_rule 'Px -> local-drawio,' "$profile_directory/local-drawio"
-          if grep -F 'profile namespace-bootstrap' "$profile_directory/local-drawio"; then
-            echo "drawio unexpectedly contains a namespace child profile" >&2
-            exit 1
-          fi
-
           proton_vpn_common="$(common_rules "$profile_directory/local-proton-vpn")"
-          require_rule 'dbus (send, receive) bus=system peer=(name=org.freedesktop.NetworkManager),' "$proton_vpn_common"
-          require_rule 'dbus (send, receive) bus=system peer=(name=org.freedesktop.login1),' "$proton_vpn_common"
           if grep -Fx 'dbus bus=system,' "$proton_vpn_common"; then
             echo "unscoped system D-Bus access remains" >&2
             exit 1

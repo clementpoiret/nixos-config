@@ -802,34 +802,6 @@ class NixosConfigAgentTest(unittest.TestCase):
 
 
 class NixosConfigAgentUnitTest(unittest.TestCase):
-    def test_display_diff_uses_the_configured_jj_pager(self) -> None:
-        diff = subprocess.CompletedProcess(
-            [], 0, stdout="diff --git a/file b/file\n", stderr=""
-        )
-        review = subprocess.CompletedProcess([], 0)
-        with (
-            mock.patch.object(
-                nixos_config_agent,
-                "run_jj",
-                return_value='["delta", "--side-by-side"]',
-            ),
-            mock.patch.object(
-                nixos_config_agent.subprocess,
-                "run",
-                side_effect=(diff, review),
-            ) as run,
-        ):
-            nixos_config_agent.display_diff(
-                Path("/review-repository"), "from-id", "to-id"
-            )
-
-        diff_call, pager_call = run.call_args_list
-        command = diff_call.args[0]
-        self.assertEqual(command[:3], ["jj", "--no-pager", "--color=never"])
-        self.assertEqual(command[-5:], ["--git", "--from", "from-id", "--to", "to-id"])
-        self.assertEqual(pager_call.args[0], ["delta", "--side-by-side"])
-        self.assertEqual(pager_call.kwargs["input"], diff.stdout)
-
     def test_requires_unconfined_label(self) -> None:
         with self.assertRaisesRegex(
             nixos_config_agent.WorkflowError, "must run unconfined"

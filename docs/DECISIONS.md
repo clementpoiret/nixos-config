@@ -31,6 +31,15 @@ Manager on the same package set and overlays as the system.
 
 Standalone Home Manager flake outputs are intentionally not exposed.
 
+## Verification
+
+Keep checks for runtime compatibility, confinement boundaries, authenticated
+updates, boot retention, and preservation of user work. Use the real parser,
+binaries, or isolated integration fixtures where possible. Avoid duplicating
+configuration literals, release manifests, cosmetic preferences, or retired
+implementation details in tests. Package/profile alignment is checked for every
+enabled application instead of maintaining per-application snapshots.
+
 ## Hardware
 
 Generated `hardware-configuration.nix` files stay in host directories and
