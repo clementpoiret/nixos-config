@@ -74,7 +74,11 @@ Project-level instructions override these.
   implementation is not evidence.
 - Read the actual output, not just the exit code or success message.
 - If repeated attempts produce no new information, change approach.
-- Clean up temp files and processes you started.
+- Keep disk use bounded. Before work that can write gigabytes (datasets, checkpoints, training or benchmark runs, image
+  builds), check free space with `df -h`. Projects under `~/Sync` are replicated by Syncthing, so write generated output
+  only to a sync-ignored directory such as `artifact-staging/` (patterns in `~/Sync/Projects/.syncthing-ignore`), never
+  to tracked or synced paths, and never to `/tmp`, which is RAM-backed. Remove the temp files, outputs, processes,
+  containers, images, and volumes you created once they are no longer needed, unless the project says to keep them.
 
 ## Reporting
 
