@@ -231,10 +231,24 @@ in
 
   dms-application-theming =
     let
+      qtThemeProbe =
+        qtPackages:
+        pkgs-unstable.runCommandCC "qt-theme-${qtPackages.qtbase.version}"
+          {
+            nativeBuildInputs = [ pkgs-unstable.pkg-config ];
+            buildInputs = [ qtPackages.qtbase ];
+          }
+          ''
+            mkdir -p "$out/bin"
+            $CXX -Wall -Wextra -Werror -fPIC ${./qt-theme.cpp} \
+              $(pkg-config --cflags --libs Qt${pkgs-unstable.lib.versions.major qtPackages.qtbase.version}Widgets) \
+              -o "$out/bin/qt-theme"
+          '';
       checkHost =
         hostName:
         let
           host = self.nixosConfigurations.${hostName}.config;
+          hostPkgs = self.nixosConfigurations.${hostName}.pkgs;
           home = host.home-manager.users.${username};
         in
         assert !home.stylix.targets.gtk.colors.enable;
@@ -246,6 +260,8 @@ in
         assert !(home.xdg.configFile ? "Kvantum/kvantum.kvconfig");
         assert home.qt.platformTheme.name == "qtct";
         assert home.qt.style.name == null;
+        assert !(home.home.sessionVariables ? QT_STYLE_OVERRIDE);
+        assert !(host.environment.variables ? QT_STYLE_OVERRIDE);
         assert host.environment.variables.QT_QPA_PLATFORMTHEME == "qt5ct";
         assert host.environment.variables.QT_QPA_PLATFORMTHEME_QT6 == "qt6ct";
         ''
@@ -263,17 +279,32 @@ in
           /* END DMS OVERRIDE */
           EOF
           done
-          mkdir -p "$XDG_DATA_HOME/color-schemes"
-          printf '[Colors:Window]\nBackgroundNormal=18,52,86\n' \
-            > "$XDG_DATA_HOME/color-schemes/DankMatugen.colors"
+          qt_applier=${home.programs.dank-material-shell.package}/share/quickshell/dms/scripts/qt.sh
+          bash "$qt_applier" "$XDG_CONFIG_HOME"
           for qtct in qt5ct qt6ct; do
-            mkdir -p "$XDG_CONFIG_HOME/$qtct"
+            test ! -L "$XDG_CONFIG_HOME/$qtct/$qtct.conf"
             cat > "$XDG_CONFIG_HOME/$qtct/$qtct.conf" <<'EOF'
           [Appearance]
-          style=Fusion
+          style=kvantum
           custom_palette=false
+          icon_theme=rose-pine
+
+          [Fonts]
+          general="Noto Sans,9"
+          fixed="Noto Sans Mono,9"
           EOF
+            chmod u-w "$XDG_CONFIG_HOME/$qtct/$qtct.conf"
           done
+
+          cat > "$HOME/matugen.toml" <<EOF
+          [config]
+          [templates.qt5ct]
+          input_path = '${self.inputs.dms}/quickshell/matugen/templates/qtct-colors.conf'
+          output_path = '$XDG_CONFIG_HOME/qt5ct/colors/matugen.conf'
+          [templates.qt6ct]
+          input_path = '${self.inputs.dms}/quickshell/matugen/templates/qtct-colors.conf'
+          output_path = '$XDG_CONFIG_HOME/qt6ct/colors/matugen.conf'
+          EOF
 
           for mode in true false true; do
             bash ${self.inputs.dms}/quickshell/scripts/gtk.sh "$XDG_CONFIG_HOME" apply "$mode"
@@ -284,14 +315,27 @@ in
             [ "$mode" = true ] || variant="-dark"
             grep -Fx '@define-color accent_color #123456;' \
               "$XDG_DATA_HOME/themes/adw-gtk3$variant/gtk-3.0/gtk.css"
-            bash ${self.inputs.dms}/quickshell/scripts/qt.sh "$XDG_CONFIG_HOME"
+            palette_mode=dark
+            [ "$mode" = true ] || palette_mode=light
+            matugen -c "$HOME/matugen.toml" -m "$palette_mode" color hex '#123456'
+            bash "$qt_applier" "$XDG_CONFIG_HOME"
             for qtct in qt5ct qt6ct; do
               qt_config="$XDG_CONFIG_HOME/$qtct/$qtct.conf"
-              grep -Fx "color_scheme_path=$XDG_DATA_HOME/color-schemes/DankMatugen.colors" "$qt_config"
-              grep -Fx 'custom_palette=true' "$qt_config"
-              grep -Fx 'style=Fusion' "$qt_config"
-              test "$(grep -c '^color_scheme_path=' "$qt_config")" -eq 1
+              test "$(crudini --get "$qt_config" Appearance color_scheme_path)" = "$XDG_CONFIG_HOME/$qtct/colors/matugen.conf"
+              test "$(crudini --get "$qt_config" Appearance custom_palette)" = true
+              test "$(crudini --get "$qt_config" Appearance style)" = Fusion
+              test "$(crudini --get "$qt_config" Appearance icon_theme)" = rose-pine
+              test "$(crudini --get "$qt_config" Fonts general)" = '"Noto Sans,9"'
+              test ! -L "$qt_config"
+              test -w "$qt_config"
+              test "$(grep -c '^[[:space:]]*color_scheme_path[[:space:]]*=' "$qt_config")" -eq 1
             done
+            QT_QPA_PLATFORMTHEME=qt5ct \
+              QT_PLUGIN_PATH=${hostPkgs.libsForQt5.qt5ct}/${hostPkgs.libsForQt5.qtbase.qtPluginPrefix}:${hostPkgs.libsForQt5.qtbase}/${hostPkgs.libsForQt5.qtbase.qtPluginPrefix} \
+              ${qtThemeProbe hostPkgs.libsForQt5}/bin/qt-theme qt5ct
+            QT_QPA_PLATFORMTHEME=qt6ct \
+              QT_PLUGIN_PATH=${hostPkgs.qt6Packages.qt6ct}/${hostPkgs.qt6Packages.qtbase.qtPluginPrefix}:${hostPkgs.qt6Packages.qtbase}/${hostPkgs.qt6Packages.qtbase.qtPluginPrefix} \
+              ${qtThemeProbe hostPkgs.qt6Packages}/bin/qt-theme qt6ct
           done
           cmp ${home.xdg.configFile."gtk-3.0/settings.ini".source} "$XDG_CONFIG_HOME/gtk-3.0/settings.ini"
           cmp ${home.xdg.configFile."gtk-4.0/settings.ini".source} "$XDG_CONFIG_HOME/gtk-4.0/settings.ini"
@@ -300,11 +344,16 @@ in
     pkgs-unstable.runCommand "dms-application-theming"
       {
         nativeBuildInputs = with pkgs-unstable; [
-          libsForQt5.qt5ct
-          qt6Packages.qt6ct
+          crudini
+          matugen
         ];
       }
       ''
+        export QT_QPA_PLATFORM=offscreen
+        export LC_ALL=C.UTF-8
+        export FONTCONFIG_FILE=${pkgs-unstable.makeFontsConf { fontDirectories = [ ]; }}
+        export XDG_RUNTIME_DIR="$TMPDIR/runtime"
+        mkdir -m 0700 "$XDG_RUNTIME_DIR"
         ${checkHost "desktop"}
         ${checkHost "laptop"}
         touch "$out"

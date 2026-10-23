@@ -72,11 +72,15 @@
   Verified both hosts with
   `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.dms-application-theming`,
   which runs upstream apply/patch against writable copies of packaged adw-gtk3.
-- Keep `stylix.targets.qt.enable = false` and qtct/Kvantum settings unmanaged:
-  DMS rewrites qtct files with `sed -i`, replacing Home Manager symlinks with
-  regular files that block later activation. Keep the Qt platform themes on
-  qt5ct/qt6ct rather than GTK passthrough; install Kvantum's plugins without
-  forcing `QT_STYLE_OVERRIDE`, so existing selections remain available.
+- Keep `stylix.targets.qt.enable = false` and qtct/Kvantum files free of Home
+  Manager symlinks: DMS replaces qtct files, which would block later activation.
+  The activation hook and packaged DMS Qt action select Fusion and each qtct's
+  native `colors/matugen.conf`; standard qtct cannot load KDE-only palettes such
+  as `DankMatugen.colors`. Legacy qtct files can still be read-only regular files,
+  so the updater makes them writable before merging settings. Keep qt5ct/qt6ct
+  platform themes and leave `QT_STYLE_OVERRIDE` unset. The theming check above
+  verifies both Qt palettes in light/dark modes; keep its probes in separate
+  derivations because Nix's Qt hooks reject mixed major versions.
 
 # AppArmor
 
