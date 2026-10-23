@@ -9,18 +9,20 @@ multi-system abstraction yet.
 
 ## Inputs
 
-The root system package set follows `nixpkgs-unstable`.
+The root system package set follows `nixos-unstable`. App and tool flakes follow
+that same input, including Niri's package-set inputs; its source remains pinned
+independently. Niri's required libdisplay-info 0.2 ABI is packaged locally with
+the host toolchain rather than imported from stable.
 
-`nixpkgs-stable` is kept for selected tools that are safer or more reliable on
-a stable branch.
+`nixpkgs-stable` and `nixpkgs-master` remain exposed as `pkgs.stable` and
+`pkgs.master` for explicit per-package fallbacks. Neither is used by default.
+For a flake-packaged application, switch its `inputs.nixpkgs.follows` to
+`nixpkgs-stable` or `nixpkgs-master` instead; keep any exact-path AppArmor helper
+registrations aligned with the application's package set.
 
-`nixpkgs-master` is intentionally exposed as `pkgs.master`. Keep it available
-as an explicit emergency escape hatch when a fix exists on master but has not
-reached unstable.
-
-Most app and tool flakes should follow the root `nixpkgs` input. Exceptions are
-allowed for boot-critical or upstream-sensitive flakes where keeping an upstream
-pin reduces upgrade risk.
+CachyOS retains its own pinned nixpkgs input and `overlays.pinned` to preserve
+the kernel derivations published by its binary cache. Do not make it follow
+the root package set.
 
 ## Home Manager
 

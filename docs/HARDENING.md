@@ -152,10 +152,10 @@ The application inventory covers:
 
 - untrusted files and documents: File Roller, Evince, mpv, pqiv, Inkscape,
   Draw.io, Zotero, Logseq, and the three SoftMaker applications;
-- browsers and network clients: Brave, Glide, Mullvad Browser, Vivaldi,
+- browsers and network clients: Brave, Mullvad Browser, Vivaldi,
   Thunderbird, Proton Mail Bridge, Proton Pass and its CLI, Proton VPN,
   qBittorrent, Rayburst, and Deezer;
-- development tools: Codex Desktop and CLI, and Claude Code.
+- development tools: Codex CLI and Claude Code.
 
 Application attachments use their exact Nix store executables. Transitive
 package closures receive only read and library-mapping permissions; execution

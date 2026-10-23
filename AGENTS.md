@@ -43,6 +43,8 @@
   the input flake's independently built package. Mesa loads from `/run/opengl-driver`
   and can require a newer glibc. The `niri-mesa-runtime` flake check exercises this
   dynamic loading boundary without a GPU; a successful host build alone misses it.
+  Unstable removed `libdisplay-info_0_2`; its local ABI compatibility override was
+  verified with `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.libdisplay-info_0_2`.
 - Keep CachyOS on the personal flake's `release` branch, own nixpkgs input, and
   `overlays.pinned`. Its `linuxPackages-cachyos-latest-lto-zen4` already supplies
   LLVM/VirtualBox module fixes; `host-cpu-optimizations` verifies both hosts use

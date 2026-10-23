@@ -25,7 +25,6 @@
     # ./nushell/nushell.nix # shell
     ./nvim/nvim.nix # neovim editor
     ./packages.nix # other packages
-    ./pi.nix # agent
     ./sops.nix # secrets mgmt
     ./stylix.nix # ricing
     ./ssh.nix # ssh

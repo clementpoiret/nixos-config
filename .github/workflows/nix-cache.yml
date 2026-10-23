@@ -240,6 +240,7 @@ jobs:
             --no-update-lock-file \
             --print-build-logs \
             --keep-going \
+            .#checks.x86_64-linux.nixpkgs-inputs \
             .#checks.x86_64-linux.proton-package-updates \
             .#checks.x86_64-linux.proton-package-channels \
             .#checks.x86_64-linux.binary-release-signatures \

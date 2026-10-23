@@ -2,7 +2,7 @@
   description = "Clement's nixos configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
 
@@ -28,7 +28,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    linkctl.url = "github:clementpoiret/linkctl";
+    linkctl = {
+      url = "github:clementpoiret/linkctl";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     lumen = {
       url = "github:jnsahaj/lumen";
@@ -38,19 +41,8 @@
     niri = {
       # url = "github:sodiboo/niri-flake";
       url = "github:sodiboo/niri-flake/e43ef13f23c2c7ae5b10e842745cb345faff4f40"; # 26.04
-      # Match the package set built by niri.cachix.org.
-      inputs.nixpkgs.url = "github:NixOS/nixpkgs/0726a0ecb6d4e08f6adced58726b95db924cef57";
-    };
-
-    bash-env-json = {
-      url = "github:tesujimath/bash-env-json/main";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    glide-browser = {
-      url = "github:glide-browser/glide.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
+      inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
     sops-nix = {
@@ -86,41 +78,25 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    antigravity = {
-      url = "github:Hy4ri/antigravity-flake";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-    };
     claude-code = {
       url = "github:sadjow/claude-code-nix";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     codex-cli = {
       url = "github:sadjow/codex-cli-nix";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     opencode = {
       url = "github:anomalyco/opencode";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    t3code = {
-      url = "github:clementpoiret/t3code-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     clementpoiret-skills = {
       url = "github:clementpoiret/skills";
       flake = false;
     };
-    codex-desktop-linux = {
-      url = "github:ilysenko/codex-desktop-linux";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-    };
-    pi = {
-      url = "github:lukasl-dev/pi.nix";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-    };
-
     herdr = {
       url = "github:herdrdev/herdr/v0.9.5";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # orion-browser = {
@@ -138,12 +114,9 @@
     {
       self,
 
-      antigravity,
-      bash-env-json,
       # bibli-ls,
       claude-code,
       codex-cli,
-      glide-browser,
       # helium,
       herdr,
       home-manager,
@@ -173,7 +146,7 @@
         inherit system;
         config.allowUnfree = true;
       };
-      agentContainerTools = pkgs-stable.callPackage ./pkgs/agent-container-tools { };
+      agentContainerTools = pkgs-unstable.callPackage ./pkgs/agent-container-tools { };
       wrapAgent =
         name: upstream:
         upstream.overrideAttrs (oldAttrs: {
@@ -185,13 +158,9 @@
         });
       pkgs-flake = {
         agent-container-tools = agentContainerTools;
-        antigravity-cli = antigravity.packages.${system}.antigravity-cli;
-        antigravity-ide = antigravity.packages.${system}.antigravity-ide;
-        bash-env-json = bash-env-json.packages.${system}.default;
         # bibli-ls = bibli-ls.packages.${system}.default;
         claude-code = wrapAgent "claude" claude-code.packages.${system}.default;
         codex-cli = wrapAgent "codex" codex-cli.packages.${system}.default;
-        glide-browser = glide-browser.packages.${system}.default;
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
         lumen = lumen.packages.${system}.lumen;
@@ -205,7 +174,7 @@
 
       customOverlays = [
         (final: prev: {
-          # Keep master as an explicit escape hatch for fixes not yet in unstable.
+          # Keep alternate package sets available for explicit per-package fallbacks.
           master = pkgs-master;
           stable = pkgs-stable;
           flake = pkgs-flake;
@@ -224,7 +193,7 @@
           });
 
           # The pinned niri-flake package still requires libdisplay-info 0.2.
-          libdisplay-info_0_2 = pkgs-stable.libdisplay-info_0_2;
+          libdisplay-info_0_2 = final.callPackage ./pkgs/libdisplay-info_0_2 { };
         })
         niri.overlays.niri
         nix-cachyos-kernel.overlays.pinned
@@ -252,9 +221,9 @@
     {
       overlays.default = selfPkgs.overlay;
 
-      formatter.${system} = pkgs-stable.writeShellApplication {
+      formatter.${system} = pkgs-unstable.writeShellApplication {
         name = "nixfmt-tree";
-        runtimeInputs = with pkgs-stable; [
+        runtimeInputs = with pkgs-unstable; [
           findutils
           nixfmt
         ];
@@ -350,8 +319,8 @@
         };
 
       devShells.${system} = {
-        default = pkgs-stable.mkShellNoCC {
-          packages = with pkgs-stable; [
+        default = pkgs-unstable.mkShellNoCC {
+          packages = with pkgs-unstable; [
             deadnix
             nil
             nixfmt
@@ -362,10 +331,8 @@
         ml-rocm =
           let
             python = pkgs-unstable.python312;
-            # JAX ROCm plugin runtime libraries. Use the stable input here
-            # because the current unstable/master MIOpen output is not cached,
-            # while stable MIOpen 7.2.3 is available from cache.nixos.org.
-            jaxNixRocmLibs = with pkgs-unstable.stable.rocmPackages; [
+            # Keep JAX's ROCm libraries on the same package set as the diagnostics.
+            jaxNixRocmLibs = with pkgs-unstable.rocmPackages; [
               hipblaslt
               hipfft
               miopen

@@ -30,16 +30,6 @@ in
     '';
 
     extraEnv = ''
-      # To source env variables
-      # from https://github.com/tesujimath/bash-env-nushell/blob/main/bash-env.nu
-      use parse-env.nu [parseenv]
-
-      # Source /etc/set-environment to get environment variables
-      parseenv /etc/set-environment | load-env
-
-      # Same thing but for session variables set using home-manager
-      parseenv ${profileDirectory}/etc/profile.d/hm-session-vars.sh | load-env
-
       # Fixes Micromamba and Aider
       $env.GIT_PYTHON_GIT_EXECUTABLE = "${profileDirectory}/bin/git"
     '';
@@ -80,7 +70,6 @@ in
 
   home = {
     packages = with pkgs; [
-      flake.bash-env-json
       jq
       nufmt
       nushellPlugins.query
@@ -102,9 +91,6 @@ in
 
     # Custom scripts
     file = {
-      ".config/nushell/scripts/parse-env.nu" = {
-        source = ./scripts/parse-env.nu;
-      };
       # ".config/nushell/completions/jj.nu" = {
       #   source = ./completions/jj.nu;
       # };

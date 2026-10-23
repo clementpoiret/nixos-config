@@ -69,7 +69,7 @@ read/write access to bounded Nix, uv, Go, Cargo, and runtime caches; read/shared
 and bounded access to their own file-descriptor and thread-name metadata.
 Codex CLI and Claude Code additionally share a named development-cache allow-list for observed package-manager, build,
 model, and project caches. The Hugging Face grant covers `~/.cache/huggingface/xet` only; its token files and browser
-caches are outside this allow-list. Codex Desktop does not inherit these agent-specific additions.
+caches are outside this allow-list.
 
 Applications opt into typed capabilities only when needed:
 
@@ -219,15 +219,14 @@ local-file-roller       local-evince              local-mpv
 local-pqiv              local-inkscape            local-drawio
 local-zotero            local-logseq              local-textmaker
 local-planmaker         local-presentations       local-brave
-local-glide             local-mullvad-browser     local-vivaldi
+local-mullvad-browser   local-vivaldi
 local-thunderbird       local-protonmail-bridge   local-proton-pass
 local-proton-pass-cli   local-proton-vpn          local-qbittorrent
 local-rayburst          local-deezer              local-codex-cli
-local-claude-code       local-codex-desktop
+local-claude-code
 ```
 
-`local-codex-desktop` is conditional on the single Codex Desktop derivation actually installed by Home Manager. Its
-assertion prevents package/profile drift. Font and theme modules register their asset packages through
+Font and theme modules register their asset packages through
 `localAppArmor.sessionReadPackages` instead of granting the entire Home Manager package set extra permissions.
 
 Rayburst replaces Motrix Next and uses `dev.aninsomniacy.rayburst` for its application state. Upstream does not migrate

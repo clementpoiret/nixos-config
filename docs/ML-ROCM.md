@@ -20,11 +20,15 @@ provides Python 3.12, `uv`, ROCm diagnostics, dGPU selection, and the system
 library path needed by common manylinux wheels on NixOS.
 
 The JAX ROCm plugin needs local ROCm shared libraries. `.#ml-rocm` provides
-those from the `nixpkgs-stable` ROCm package set because stable `miopen-7.2.3`
-is available from `cache.nixos.org`; the matching unstable/master MIOpen output
-was not cached for this flake revision. The first shell entry may therefore
-download a large cached ROCm runtime closure, but it should not compile MIOpen
-locally.
+those from the same `nixos-unstable` package set as its diagnostics. The first
+shell entry can download a large ROCm runtime closure. Check substitution
+availability before updating: a missing MIOpen cache entry can require an
+expensive local build. Revalidate the GPU workloads below after changing the
+ROCm package set; the recorded wheel tests predate this package-set migration.
+
+```bash
+nix build --dry-run --no-link --no-update-lock-file .#devShells.x86_64-linux.ml-rocm
+```
 
 ## Validate ROCm
 

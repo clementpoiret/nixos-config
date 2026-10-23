@@ -68,6 +68,24 @@ let
   };
 in
 {
+  nixpkgs-inputs =
+    let
+      inherit (self) inputs;
+      sharedInputs = builtins.attrValues (builtins.removeAttrs inputs [ "nix-cachyos-kernel" ]);
+      packageSources = map (input: input.outPath) [
+        inputs.nixpkgs
+        inputs.nixpkgs-stable
+        inputs.nixpkgs-master
+      ];
+    in
+    assert builtins.all (
+      input: !(input ? inputs.nixpkgs) || builtins.elem input.inputs.nixpkgs.outPath packageSources
+    ) sharedInputs;
+    assert builtins.elem inputs.niri.inputs.nixpkgs-stable.outPath packageSources;
+    pkgs-unstable.runCommand "nixpkgs-inputs" { } ''
+      touch "$out"
+    '';
+
   collabora-font-cache =
     let
       collabora = self.packages.${pkgs-unstable.stdenv.hostPlatform.system}.collabora-desktop-bin;
@@ -745,15 +763,14 @@ in
     assert laptopHomeAppArmor.applications.codex-cli.userNamespaceRules == "";
     assert !(builtins.elem "userns" laptopHomeAppArmor.applications.codex-cli.capabilities);
     assert laptopHomeAppArmor.applications.codex-cli.profileReentryExecutables == [ ];
-    assert laptopHomeAppArmor.applications.codex-cli.bubblewrapPackage == laptopPkgs.stable.bubblewrap;
+    assert laptopHomeAppArmor.applications.codex-cli.bubblewrapPackage == laptopPkgs.bubblewrap;
     assert
       laptopHomeAppArmor.applications.codex-cli.containerToolsPackage
       == laptopPkgs.flake.agent-container-tools;
     assert
       laptopHomeAppArmor.applications.claude-code.containerToolsPackage
       == laptopPkgs.flake.agent-container-tools;
-    assert
-      laptopHomeAppArmor.applications.claude-code.bubblewrapPackage == laptopPkgs.stable.bubblewrap;
+    assert laptopHomeAppArmor.applications.claude-code.bubblewrapPackage == laptopPkgs.bubblewrap;
     assert laptopHomeAppArmor.applications.logseq.executionPackages == [ ];
     assert laptopHomeAppArmor.applications.logseq.profileReentryExecutables == [ ];
     assert pkgs-unstable.lib.isDerivation laptopPkgs.logseq-appimage.appimageContents;
@@ -945,13 +962,13 @@ in
         ${laptopPkgs.logseq-appimage}/bin/logseq --help >/dev/null
         strace -f -e trace=execve -o "$TMPDIR/codex-execve.log" \
           ${laptopPkgs.flake.codex-cli}/bin/codex sandbox -- ${pkgs-unstable.coreutils}/bin/true
-        grep -F '"${laptopPkgs.stable.bubblewrap}/bin/bwrap"' "$TMPDIR/codex-execve.log"
+        grep -F '"${laptopPkgs.bubblewrap}/bin/bwrap"' "$TMPDIR/codex-execve.log"
         if grep -F -- 'use_legacy_landlock' ${laptopPkgs.flake.codex-cli}/bin/codex; then
           echo "Codex wrapper still forces deprecated Landlock" >&2
           exit 1
         fi
         strings ${laptopPkgs.flake.claude-code}/bin/.claude-wrapped \
-          | grep -F '${laptopPkgs.stable.bubblewrap}/bin'
+          | grep -F '${laptopPkgs.bubblewrap}/bin'
 
         touch "$out"
       '';
@@ -1080,7 +1097,7 @@ in
           bwrap_policy="$profile_directory/bwrap"
           bwrap_profile="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-bwrap-userns-restrict\)"/\1/p' "$bwrap_policy")"
           test -r "$bwrap_profile"
-          require_rule 'profile bwrap ${self.nixosConfigurations.laptop.pkgs.stable.bubblewrap}/bin/bwrap flags=(attach_disconnected,mediate_deleted)' "$bwrap_profile"
+          require_rule 'profile bwrap ${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/bwrap flags=(attach_disconnected,mediate_deleted)' "$bwrap_profile"
           require_rule 'allow userns,' "$bwrap_profile"
           require_rule 'allow mount,' "$bwrap_profile"
           require_rule 'allow pivot_root,' "$bwrap_profile"
@@ -1097,7 +1114,7 @@ in
           require_rule 'allow pix /** -> &local-claude-code-bwrap-payload,' "$claude_bwrap_profile"
           require_rule 'allow capability sys_admin,' "$claude_bwrap_profile"
           if grep -F 'audit deny capability,' "$claude_bwrap_profile" \
-            || grep -F 'profile local-claude-code-bwrap ${self.nixosConfigurations.laptop.pkgs.stable.bubblewrap}/bin/bwrap' "$claude_bwrap_profile"; then
+            || grep -F 'profile local-claude-code-bwrap ${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/bwrap' "$claude_bwrap_profile"; then
             echo "Claude Bubblewrap compatibility profile is not narrowly named" >&2
             exit 1
           fi
@@ -1217,7 +1234,7 @@ in
             if [ "$app_name" = claude-code ]; then
               bwrap_target=local-claude-code-bwrap
             fi
-            require_rule "priority=100 ${self.nixosConfigurations.laptop.pkgs.stable.bubblewrap}/bin/bwrap Px -> $bwrap_target," "$app_profile"
+            require_rule "priority=100 ${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/bwrap Px -> $bwrap_target," "$app_profile"
             if grep -F 'allow mount,' "$app_common" \
               || grep -F 'allow pivot_root,' "$app_common" \
               || grep -F 'capability sys_admin,' "$app_common"; then
@@ -1433,9 +1450,7 @@ in
             require_rule 'owner @{HOME}/.cargo/advisory-db{,s}/{,**} rwkl,' "$agent_common"
             require_rule 'owner @{HOME}/.local/share/devenv/{,**} rwkl,' "$agent_common"
           done
-          codex_desktop_common="$(common_rules "$profile_directory/local-codex-desktop")"
-          if grep -F 'owner @{HOME}/.cache/huggingface/xet/{,**} rwkl,' "$codex_desktop_common" \
-            || grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$codex_common" \
+          if grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$codex_common" \
             || grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$claude_common"; then
             echo "agent cache exceptions leaked into another profile or browser cache" >&2
             exit 1

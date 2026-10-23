@@ -672,10 +672,9 @@ has decrypted the relevant values.
 
 ## Notes
 
-Active app and tool flakes should follow the root `nixpkgs` input when that is
-compatible with the upstream flake. Boot-critical or upstream-sensitive flakes
-may keep their own `nixpkgs` pin to reduce upgrade risk.
+Active app and tool flakes follow the root `nixos-unstable` input. CachyOS keeps
+its own pinned nixpkgs input to match its published kernel cache.
 
-`pkgs.master` is intentionally exposed through the overlay as an emergency
-escape hatch when a fix is available on `nixpkgs/master` but has not reached
-`nixpkgs-unstable` yet.
+`pkgs.stable` and `pkgs.master` remain available through the overlay as explicit
+per-package escape hatches; neither is used by default. See `docs/DECISIONS.md`
+for flake-input fallbacks and the AppArmor helper-path requirement.

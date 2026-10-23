@@ -1,6 +1,4 @@
 {
-  config,
-  inputs,
   lib,
   pkgs,
   ...
@@ -86,27 +84,8 @@ let
     extraExecutables = [ "${pkgs.util-linux}/bin/whereis" ];
     homePaths = [ "SoftMaker" ];
   };
-
-  codexDesktopPackages = builtins.filter (
-    package: lib.hasPrefix "codex-desktop-" (lib.getName package)
-  ) config.home.packages;
-  codexDesktopPackage =
-    if builtins.length codexDesktopPackages == 1 then builtins.head codexDesktopPackages else null;
-  t3codePackages = inputs.t3code.packages.${pkgs.stdenv.hostPlatform.system};
-  t3codeRuntimeOptions = {
-    enableCodex = true;
-    enableClaude = true;
-    enableJujutsu = true;
-    codex = pkgs.flake.codex-cli;
-    claude-code = pkgs.flake.claude-code;
-    jujutsu = pkgs.jujutsu;
-  };
 in
 {
-  imports = [
-    inputs.codex-desktop-linux.homeManagerModules.default
-  ];
-
   home.packages = (
     with pkgs;
     [
@@ -232,8 +211,6 @@ in
       # Browsers
       brave # Privacy-focused web browser
       # firefox-devedition # Firefox Developer Edition
-      # glide.glide-browser # Keyboard-focused browser
-      # flake.glide-browser # Keyboard-focused browser
       # flake.helium
       mullvad-browser
       # flake.orion-browser
@@ -284,13 +261,9 @@ in
       # Miscellaneous
       # anytype
       bibiman # Bibliography management CLI
-      # flake.antigravity-cli
-      # flake.antigravity-ide
       flake.claude-code
       flake.codex-cli
       flake.opencode
-      (t3codePackages.t3code.override t3codeRuntimeOptions)
-      (t3codePackages.t3code-desktop.override t3codeRuntimeOptions)
       deezer-enhanced
       dstask
       # flake.gemini-cli # Gemini protocol client
@@ -308,32 +281,6 @@ in
       yubikey-manager # Manage yubikeys :)
     ]
   );
-
-  programs.codexDesktopLinux = {
-    enable = true;
-    # remoteControl = {
-    #   enable = true;
-    #   package = pkgs.flake.codex-cli;
-    # };
-    # remoteMobileControl.enable = true;
-    linuxFeatures = [
-      "appshots"
-      "remote-control-ui"
-      "remote-mobile-control"
-      "node-repl-reaper"
-    ];
-    # cliPackage = pkgs.flake.codex-cli;
-  };
-
-  assertions = [
-    {
-      assertion = builtins.length codexDesktopPackages == 1;
-      message = ''
-        programs.codexDesktopLinux must install exactly one codex-desktop package;
-        found ${toString (builtins.length codexDesktopPackages)} candidates.
-      '';
-    }
-  ];
 
   localAppArmor = {
     applications = {
@@ -447,17 +394,6 @@ in
         sensitiveAccess = [ "credential-broker" ];
         elevatedAccessRationale = "Brave uses the desktop secret-service broker for user-approved credentials.";
       };
-      # glide = {
-      #   package = pkgs.flake.glide-browser;
-      #   executable = "bin/glide";
-      #   capabilities = browserCapabilities;
-      #   homePaths = [
-      #     ".cache/glide"
-      #     ".config/glide"
-      #   ];
-      #   sensitiveAccess = [ "credential-broker" ];
-      #   elevatedAccessRationale = "Glide uses the desktop secret-service broker for user-approved credentials.";
-      # };
       mullvad-browser = {
         package = pkgs.mullvad-browser;
         executable = "bin/mullvad-browser";
@@ -644,7 +580,7 @@ in
           "terminal"
           "user-files"
         ];
-        bubblewrapPackage = pkgs.stable.bubblewrap;
+        bubblewrapPackage = pkgs.bubblewrap;
         containerToolsPackage = pkgs.flake.agent-container-tools;
         homePaths = [ ".codex" ];
         extraRules = ''
@@ -676,7 +612,7 @@ in
           "terminal"
           "user-files"
         ];
-        bubblewrapPackage = pkgs.stable.bubblewrap;
+        bubblewrapPackage = pkgs.bubblewrap;
         containerToolsPackage = pkgs.flake.agent-container-tools;
         homePaths = [
           ".claude"
@@ -711,32 +647,6 @@ in
           "ssh-identities"
         ];
         elevatedAccessRationale = "Claude Code needs developer execution, its state, reviewed source trees, and the configured SSH/GPG brokers.";
-      };
-    }
-    // lib.optionalAttrs (codexDesktopPackage != null) {
-      codex-desktop = {
-        package = codexDesktopPackage;
-        executable = "bin/codex-desktop";
-        capabilities = electronCapabilities ++ [
-          "audio"
-          "developer-exec"
-          "host-diagnostics"
-          "terminal"
-          "user-files"
-        ];
-        homePaths = [
-          ".codex"
-          ".config/Codex"
-          ".config/codex-desktop"
-        ];
-        sensitiveAccess = [
-          "gpg-agent"
-          "nixos-config-writable"
-          "ssh-config"
-          "ssh-control"
-          "ssh-identities"
-        ];
-        elevatedAccessRationale = "Codex Desktop needs developer execution, its state, reviewed source trees, and the configured SSH/GPG brokers.";
       };
     };
 
@@ -791,6 +701,4 @@ in
       };
     };
   };
-
-  systemd.user.services.codex-remote-control.Install.WantedBy = lib.mkForce [ ];
 }

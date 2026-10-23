@@ -10,7 +10,7 @@
   programs.helix = {
     enable = true;
     defaultEditor = true;
-    package = pkgs.stable.helix;
+    package = pkgs.helix;
 
     # TODO: Ltex-ls-plus
     # TODO: simple-completion-language-server
