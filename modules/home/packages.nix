@@ -384,8 +384,10 @@ in
           /dev/hidraw[0-9]* rw,
           /run/udev/data/+hid:0003:1050:0407.* r,
           /sys/devices/**/0003:1050:0407.*/report_descriptor r,
+          /dev/ttyUSB[0-9]* rw,
+          /run/udev/data/c188:[0-9]* r,
         '';
-        extraRulesRationale = "Brave maps its downloaded Widevine CDM and directly accesses raw-HID FIDO authenticators such as YubiKeys.";
+        extraRulesRationale = "Brave maps its downloaded Widevine CDM, accesses raw-HID FIDO authenticators such as YubiKeys, and uses USB serial adapters through Web Serial subject to device ACLs.";
         homePaths = [
           ".cache/BraveSoftware"
           ".config/BraveSoftware"

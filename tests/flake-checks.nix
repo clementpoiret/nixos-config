@@ -327,6 +327,44 @@ in
         touch "$out"
       '';
 
+  sonoff-serial-access =
+    let
+      ruleDirectories =
+        map (host: self.nixosConfigurations.${host}.config.environment.etc."udev/rules.d".source)
+          [
+            "desktop"
+            "laptop"
+          ];
+    in
+    pkgs-unstable.runCommand "sonoff-serial-access"
+      {
+        nativeBuildInputs = with pkgs-unstable; [
+          jq
+          systemd
+          umockdev
+        ];
+      }
+      ''
+        export SYSTEMD_LOG_LEVEL=err
+        sed 's/A: product=Sonoff Zigbee 3.0 USB Dongle Plus/A: product=CP2102 USB to UART Bridge Controller/' \
+          ${./sonoff-serial.umockdev} > generic-serial.umockdev
+
+        for rules in ${pkgs-unstable.lib.escapeShellArgs ruleDirectories}; do
+          umockdev-run --device=${./sonoff-serial.umockdev} -- \
+            udevadm test --json=short --action=add --resolve-names=never \
+              --extra-rules-dir="$rules" /sys/devices/usb1/1-1/ttyUSB0 > sonoff.json
+          jq -e '(.currentTags | index("uaccess") != null) and
+            any(.queuedCommands[]; .type == "builtin" and .command == "uaccess")' sonoff.json
+
+          umockdev-run --device=generic-serial.umockdev -- \
+            udevadm test --json=short --action=add --resolve-names=never \
+              --extra-rules-dir="$rules" /sys/devices/usb1/1-1/ttyUSB0 > generic.json
+          jq -e '(.currentTags | index("uaccess") == null) and
+            all(.queuedCommands[]?; .command != "uaccess")' generic.json
+        done
+        touch "$out"
+      '';
+
   host-cpu-optimizations =
     let
       desktopPkgs = self.nixosConfigurations.desktop.pkgs;
@@ -846,6 +884,8 @@ in
 
           brave_common="$(common_rules "$profile_directory/local-brave")"
           test -r "$brave_common"
+          require_rule '/dev/ttyUSB[0-9]* rw,' "$brave_common"
+          require_rule '/run/udev/data/c188:[0-9]* r,' "$brave_common"
           session_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-session-read-only\)"/\1/p' "$brave_common")"
           test -r "$session_rules"
           session_closure_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-closure-rules-local-session-read-only\)"/\1/p' "$session_rules")"
@@ -933,6 +973,7 @@ in
             || grep -F '/run/user/[0-9]*/{,**}' "$pqiv_common" \
             || grep -F 'include <abstractions/nameservice>' "$pqiv_common" \
             || grep -F 'include <abstractions/audio>' "$pqiv_common" \
+            || grep -F '/dev/ttyUSB[0-9]* rw,' "$pqiv_common" \
             || grep -F '/dev/video[0-9]* rw,' "$pqiv_common"; then
             echo "minimal desktop capability set leaked broad host access" >&2
             exit 1

@@ -1,0 +1,14 @@
+P: /devices/usb1/1-1
+E: DEVTYPE=usb_device
+E: SUBSYSTEM=usb
+A: idVendor=10c4
+A: idProduct=ea60
+A: manufacturer=ITead
+A: product=Sonoff Zigbee 3.0 USB Dongle Plus
+
+P: /devices/usb1/1-1/ttyUSB0
+N: ttyUSB0
+E: SUBSYSTEM=tty
+E: MAJOR=188
+E: MINOR=0
+A: dev=188:0

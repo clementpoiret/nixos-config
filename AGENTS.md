@@ -85,6 +85,14 @@
   VM test exercises the actual service command, and the mode-matrix check covers
   both host registries without granting wildcard store execution.
 
+# USB serial devices
+
+- Sonoff's CP210x USB IDs are shared with generic adapters: match its manufacturer
+  and product too. Keep its `uaccess` tag before `73-seat-late.rules`; NixOS writes
+  `services.udev.extraRules` to `99-local.rules`, too late to queue session ACLs.
+  Verified both hosts with `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.sonoff-serial-access`,
+  using simulated Sonoff and generic CP210x devices without accessing real hardware.
+
 # Syncthing
 
 - Keep the laptop-only `RestrictSUIDSGID` exception: Syncthing preserves existing
