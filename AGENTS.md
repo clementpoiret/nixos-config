@@ -39,6 +39,10 @@
   `modules/core/bootloader.nix`: bootloader versions multiply retained generations
   and their specialisations. See `docs/MEASURED-BOOT.md` for the verified NH error
   diagnostic; successful host builds do not exercise the live TPM policy update.
+- Nixpkgs removed `boot.initrd.systemd.enable` with scripted initrd; omit it even
+  when setting it to true. Keep `boot.initrd.systemd.tpm2.enable` for TPM unlocking.
+  Both host toplevels and initrds were evaluated with nixpkgs `3ec636362e18`;
+  removing the flag also leaves their derivations unchanged on the existing pin.
 - Build Niri's pinned source through the host overlay (`prev.niri-unstable`), not
   the input flake's independently built package. Mesa loads from `/run/opengl-driver`
   and can require a newer glibc. The `niri-mesa-runtime` flake check exercises this

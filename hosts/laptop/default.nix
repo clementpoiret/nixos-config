@@ -74,10 +74,7 @@
 
   boot = {
     initrd = {
-      systemd = {
-        enable = true;
-        tpm2.enable = true;
-      };
+      systemd.tpm2.enable = true;
 
       luks.devices = {
         # Pass TRIM through both encrypted SSDs; this exposes block allocation patterns.

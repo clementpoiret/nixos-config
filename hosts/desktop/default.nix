@@ -18,10 +18,7 @@
 
   boot = {
     initrd = {
-      systemd = {
-        enable = true;
-        tpm2.enable = true;
-      };
+      systemd.tpm2.enable = true;
 
       luks.devices = {
         "luks-57594530-d51d-466c-98ae-b046c1413d0b".crypttabExtraOpts = [
