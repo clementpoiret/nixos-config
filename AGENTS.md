@@ -112,6 +112,10 @@
 - Keep the Proton Pass CA signing socket separate from the forwarded OpenSSH
   agent. Proton Pass CLI 2.4.2 cannot sign FIDO identities or enforce OpenSSH
   destination constraints; the YubiKey forwarding restrictions depend on OpenSSH.
+- Niri's Home Manager GNOME Keyring service must stay secrets-only. The NixOS
+  GNOME Keyring module supplies D-Bus, portal, PAM, and IPC-locking integration;
+  it does not replace the Home Manager session service. Verified with
+  `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.credential-forwarding`.
 
 # Jujutsu synchronization
 

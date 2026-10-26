@@ -29,7 +29,10 @@ in
     dbus = {
       enable = true;
       implementation = "broker";
-      packages = [ pkgs.gnome-keyring ];
+    };
+    gnome = {
+      gnome-online-accounts.enable = true;
+      gnome-keyring.enable = true;
     };
     # Support both the checked-in nixpkgs and the CI dependency update.
     journald =
@@ -49,6 +52,8 @@ in
     };
     #fstrim.enable = true;
   };
+
+  environment.systemPackages = [ pkgs.gnome-control-center ];
 
   services.syncthing = {
     enable = true;
