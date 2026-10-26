@@ -98,6 +98,10 @@
       url = "github:herdrdev/herdr/v0.9.5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hylki = {
+      url = "github:clementpoiret/hylki";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # orion-browser = {
     #   url = "github:dokokitsune/orion-browser-flake";
@@ -120,6 +124,7 @@
       # helium,
       herdr,
       home-manager,
+      hylki,
       lumen,
       # orion-browser,
       niri,
@@ -163,6 +168,7 @@
         codex-cli = wrapAgent "codex" codex-cli.packages.${system}.default;
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
+        hylki = hylki.packages.${system}.default;
         lumen = lumen.packages.${system}.lumen;
         opencode = opencode.packages.${system}.default.overrideAttrs {
           # Upstream's source filter omits script/native-arch.ts, used by the CLI build.

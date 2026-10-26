@@ -524,6 +524,26 @@
         "type": "github"
       }
     },
+    "hylki": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792998945,
+        "narHash": "sha256-eCf2u6q70ZrQncOMyAxcrv1jeEXXHAUP7yeY3otA2sk=",
+        "owner": "clementpoiret",
+        "repo": "hylki",
+        "rev": "7f5e14a9bb43f2600eecba3dbd394bbc82daf216",
+        "type": "github"
+      },
+      "original": {
+        "owner": "clementpoiret",
+        "repo": "hylki",
+        "type": "github"
+      }
+    },
     "lanzaboote": {
       "inputs": {
         "crane": "crane",
@@ -848,6 +868,7 @@
         "ghosttyshaders": "ghosttyshaders",
         "herdr": "herdr",
         "home-manager": "home-manager",
+        "hylki": "hylki",
         "lanzaboote": "lanzaboote",
         "linkctl": "linkctl",
         "lumen": "lumen",

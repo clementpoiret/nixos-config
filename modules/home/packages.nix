@@ -146,6 +146,7 @@ in
       # Networking
       aria2 # Multi-source command-line download utility
       dnsutils # DNS lookup utilities (dig, host, nslookup)
+      flake.hylki # GNOME-native email client
       rayburst # Download manager
       protonmail-desktop-beta
       protonmail-bridge
