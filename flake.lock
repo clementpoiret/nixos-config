@@ -526,20 +526,38 @@
     },
     "hylki": {
       "inputs": {
+        "hylki-src": "hylki-src",
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1792998945,
-        "narHash": "sha256-eCf2u6q70ZrQncOMyAxcrv1jeEXXHAUP7yeY3otA2sk=",
+        "lastModified": 1793092903,
+        "narHash": "sha256-dys/YN8RnsZkiMQn7X0FVEU0tuNyM6mnF9+SeOQ0Mb4=",
         "owner": "clementpoiret",
-        "repo": "hylki",
-        "rev": "7f5e14a9bb43f2600eecba3dbd394bbc82daf216",
+        "repo": "hylki-flake",
+        "rev": "f7eaa11159b21e58e1950dc43a1db869b636bc2f",
         "type": "github"
       },
       "original": {
         "owner": "clementpoiret",
+        "repo": "hylki-flake",
+        "type": "github"
+      }
+    },
+    "hylki-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792882799,
+        "narHash": "sha256-1DFvzFbcDwq0rsOexGFISu0k+sTcKACKqSjlWE4n0M0=",
+        "owner": "hyprlab",
+        "repo": "hylki",
+        "rev": "78dc96a1acc85a368e667087cb422b7f1b500585",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hyprlab",
+        "ref": "v1.45.3",
         "repo": "hylki",
         "type": "github"
       }

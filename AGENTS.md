@@ -67,6 +67,12 @@
   includes the build scripts. Verified with
   `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.flake.opencode`.
 
+# CI caching
+
+- Add explicitly cached applications to `mkHostEntries` in `flake.nix`, not only
+  the workflow's watched build targets: the per-host Cachix pins retain those roots.
+  Hylki's membership in both host roots was verified by Nix evaluation.
+
 # Application theming
 
 - DMS's GTK apply script refuses Home Manager-managed `gtk.css` symlinks.

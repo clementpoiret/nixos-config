@@ -99,7 +99,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hylki = {
-      url = "github:clementpoiret/hylki";
+      url = "github:clementpoiret/hylki-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -267,6 +267,10 @@
               {
                 name = "${hostName}-herdr";
                 path = cfg.pkgs.flake.herdr;
+              }
+              {
+                name = "${hostName}-hylki";
+                path = cfg.pkgs.flake.hylki;
               }
               {
                 name = "${hostName}-niri";
