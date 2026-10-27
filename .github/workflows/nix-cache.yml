@@ -297,14 +297,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          cachix watch-exec clementpoiret -- \
-            nix build \
-              --no-link \
-              --no-update-lock-file \
-              --print-build-logs \
-              ".#cache-root-${{ matrix.host }}" \
-              ".#nixosConfigurations.${{ matrix.host }}.pkgs.flake.herdr" \
-              ".#nixosConfigurations.${{ matrix.host }}.pkgs.flake.hylki"
+          nix build \
+            --no-link \
+            --no-update-lock-file \
+            --print-build-logs \
+            ".#cache-root-${{ matrix.host }}" \
+            ".#nixosConfigurations.${{ matrix.host }}.pkgs.flake.herdr" \
+            ".#nixosConfigurations.${{ matrix.host }}.pkgs.flake.hylki"
 
           root="$(
             nix build \
@@ -314,6 +313,20 @@ jobs:
               ".#cache-root-${{ matrix.host }}"
           )"
 
+          nix path-info --recursive "$root" > cache-closure
+          nix eval \
+            --no-update-lock-file \
+            --json \
+            ".#nixosConfigurations.${{ matrix.host }}.config.boot.kernelPackages.kernel" \
+            --apply 'kernel: map (output: toString (builtins.getAttr output kernel)) kernel.outputs' \
+            | jq -r '.[]' > kernel-outputs
+
+          if grep -Fxf kernel-outputs cache-closure; then
+            echo "Kernel outputs belong in nixos-cachyos-kernels, not clementpoiret" >&2
+            exit 1
+          fi
+
+          cachix push clementpoiret "$root"
           cachix pin clementpoiret "host-optimized-${{ matrix.host }}" "$root" --keep-revisions 1
 
       - name: Build host configuration

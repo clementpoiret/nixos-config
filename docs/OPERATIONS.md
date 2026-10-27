@@ -130,9 +130,16 @@ cache-scoped write token for the private `clementpoiret` Cachix cache. The
 workflow fails before building if this secret is unavailable. Keep the cache
 private because the curated host outputs include the non-redistributable
 VirtualBox Extension Pack. Existing paths are pulled from configured binary
-caches; newly built curated outputs are uploaded and the current optimized
-roots are pinned in Cachix. Complete host configurations are built for
-validation without being watched or pinned by Cachix.
+caches; curated runtime closures are uploaded and the current optimized
+roots are pinned in Cachix. Kernel outputs are maintained in
+`nixos-cachyos-kernels` rather than uploaded here. External module packages are
+cached individually instead of the aggregate modules trees, which reference the
+kernel. CI rejects curated closures containing kernel outputs before uploading.
+CI does not watch builds for uploads; complete host configurations are built only
+for validation.
+The next successful host builds replace the old kernel-containing pins;
+previously uploaded copies still require Cachix garbage collection or manual
+deletion to reclaim storage.
 
 ## Hardening changes
 

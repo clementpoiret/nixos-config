@@ -70,8 +70,13 @@
 # CI caching
 
 - Add explicitly cached applications to `mkHostEntries` in `flake.nix`, not only
-  the workflow's watched build targets: the per-host Cachix pins retain those roots.
+  the workflow's build targets: the per-host Cachix pins retain those roots.
   Hylki's membership in both host roots was verified by Nix evaluation.
+- Cachix pushes recursive closures: keep kernel outputs and aggregate modules
+  trees out of host roots, caching `boot.extraModulePackages` individually instead.
+  Push roots explicitly rather than watching build dependencies. Both host roots
+  were built and their runtime closures verified kernel-free; CI checks all kernel
+  outputs before uploading or pinning.
 
 # Application theming
 

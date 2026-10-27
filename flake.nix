@@ -248,7 +248,6 @@
             hostName:
             let
               cfg = self.nixosConfigurations.${hostName};
-              kernel = cfg.config.boot.kernelPackages.kernel;
               virtualbox =
                 pkgs-unstable.lib.findFirst (package: pkgs-unstable.lib.getName package == "virtualbox")
                   (throw "virtualbox is missing from ${hostName} environment.systemPackages")
@@ -288,23 +287,12 @@
                 name = "${hostName}-virtualbox-extpack";
                 path = virtualboxExtensionPack;
               }
-              {
-                name = "${hostName}-kernel";
-                path = kernel.out;
-              }
-              {
-                name = "${hostName}-kernel-dev";
-                path = kernel.dev;
-              }
-              {
-                name = "${hostName}-kernel-modules";
-                path = kernel.modules;
-              }
-              {
-                name = "${hostName}-modules-tree";
-                path = cfg.config.system.modulesTree;
-              }
             ]
+            # The aggregate modules tree would pull the cached kernel into this closure.
+            ++ map (package: {
+              name = "${hostName}-${pkgs-unstable.lib.getName package}";
+              path = package;
+            }) cfg.config.boot.extraModulePackages
             ++ pkgs-unstable.lib.optional (hostName == "desktop") {
               name = "desktop-nvidia-settings";
               path = cfg.config.hardware.nvidia.package.settings;
