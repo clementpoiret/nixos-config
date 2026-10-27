@@ -31,7 +31,7 @@
         User = "clementpoiret";
         BindInterface = "wg-rhizome";
         ConnectTimeout = 10;
-        # Never reuse a connection established over the old management path.
+        # Require a fresh connection through the manually started tunnel.
         ControlMaster = "no";
         ControlPersist = "no";
         ControlPath = "none";

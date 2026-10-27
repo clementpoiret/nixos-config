@@ -618,7 +618,7 @@ NIXOS_INSTALL_BOOTLOADER=1 \
 
 ## Rhizome VPS management
 
-Only the laptop enrolls in `wg-rhizome`; the existing Opercord `wg0` and personal Tailscale connections are independent. The VPS tunnel is off at boot and is never started automatically by SSH:
+Only the laptop enrolls in `wg-rhizome`; the existing Opercord `wg0` and personal Tailscale connections are independent. The laptop's VPS tunnel is off at boot and is never started automatically by SSH:
 
 ```sh
 run0 -- systemctl start wg-quick-wg-rhizome.service
@@ -627,9 +627,9 @@ ssh internalvps
 run0 -- systemctl stop wg-quick-wg-rhizome.service
 ```
 
-`hosts/laptop/internal-vps.nix` routes only `10.78.0.1/32` to the VPS and pins its existing SSH host identity. The SSH alias binds to the tunnel and disables connection multiplexing, so it cannot fall back to the public/Tailscale route when the tunnel is stopped. DNS/default routes are unchanged. Apply the host configuration before using these commands; do not enable the tunnel unit.
+`hosts/laptop/internal-vps.nix` routes only `10.78.0.1/32` to the VPS and pins its SSH host identity. The SSH alias binds to the tunnel and disables connection multiplexing, so it cannot connect when the tunnel is stopped. DNS/default routes are unchanged. Do not enable the tunnel unit.
 
-The root-owned private key must exist at `/etc/wireguard/wg-rhizome.key` with mode `0600` before starting the service. Generate it on this device, back it up directly in your password manager, and enroll only its public key. Never reuse the Opercord key. Follow the server repository's `README.md` for enrollment/revocation and `docs/operations.md` for the staged cutover; retain the existing Tailscale SSH connection until WireGuard has been tested.
+The root-owned private key must exist at `/etc/wireguard/wg-rhizome.key` with mode `0600` before starting the service. Generate it on this device, back it up directly in your password manager, and enroll only its public key. Never reuse the Opercord key. Follow the server repository's `README.md` for enrollment/revocation and `docs/operations.md` for deployment, timed network rollback, and recovery. The VPS has no Tailscale management path.
 
 ## Common Commands
 

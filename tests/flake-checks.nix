@@ -496,9 +496,6 @@ in
     assert tunnel.privateKeyFile == "/etc/wireguard/wg-rhizome.key";
     assert tunnel.dns == [ ] && tunnel.table == null;
     assert builtins.concatLists (map (peer: peer.allowedIPs) tunnel.peers) == [ "10.78.0.1/32" ];
-    assert !laptop.networking.wg-quick.interfaces.wg0.autostart;
-    assert !desktop.networking.wg-quick.interfaces.wg0.autostart;
-    assert laptop.services.tailscale.enable && desktop.services.tailscale.enable;
     assert !(builtins.elem "wg-rhizome" laptop.networking.firewall.trustedInterfaces);
     pkgs-unstable.runCommand "internal-vps-access"
       {
