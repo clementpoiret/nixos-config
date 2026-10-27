@@ -128,6 +128,13 @@
   it does not replace the Home Manager session service. Verified with
   `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.credential-forwarding`.
 
+# VPS management
+
+- Keep `hosts/laptop/internal-vps.nix` laptop-only and `wg-rhizome` manual-only,
+  separate from Opercord's `wg0` and personal Tailscale. The VPS peer registry
+  lives in `nixos-server-config/nixos/wireguard-peers.nix`; private keys stay out
+  of Nix. Verified with `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.internal-vps-access`.
+
 # Jujutsu synchronization
 
 - Promotion accepts a linear stack rooted at the exact protected baseline, with

@@ -7,6 +7,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./internal-vps.nix
     ./rocm.nix
     ./../../modules/core
     ./../../modules/features/bluetooth.nix

@@ -479,6 +479,50 @@ in
       touch "$out"
     '';
 
+  internal-vps-access =
+    let
+      laptop = self.nixosConfigurations.laptop.config;
+      desktop = self.nixosConfigurations.desktop.config;
+      tunnel = laptop.networking.wg-quick.interfaces.wg-rhizome;
+      service = laptop.systemd.services.wg-quick-wg-rhizome;
+      sshConfig = laptop.home-manager.users.${username}.home.file.".ssh/config".source;
+      noAutomaticDependency =
+        unit: !(builtins.elem "wg-quick-wg-rhizome.service" (unit.wants ++ unit.requires));
+    in
+    assert !(desktop.networking.wg-quick.interfaces ? wg-rhizome);
+    assert !tunnel.autostart && service.wantedBy == [ ] && service.requiredBy == [ ];
+    assert pkgs-unstable.lib.all noAutomaticDependency (builtins.attrValues laptop.systemd.services);
+    assert tunnel.privateKey == null && !tunnel.generatePrivateKeyFile;
+    assert tunnel.privateKeyFile == "/etc/wireguard/wg-rhizome.key";
+    assert tunnel.dns == [ ] && tunnel.table == null;
+    assert builtins.concatLists (map (peer: peer.allowedIPs) tunnel.peers) == [ "10.78.0.1/32" ];
+    assert !laptop.networking.wg-quick.interfaces.wg0.autostart;
+    assert !desktop.networking.wg-quick.interfaces.wg0.autostart;
+    assert laptop.services.tailscale.enable && desktop.services.tailscale.enable;
+    assert !(builtins.elem "wg-rhizome" laptop.networking.firewall.trustedInterfaces);
+    pkgs-unstable.runCommand "internal-vps-access"
+      {
+        nativeBuildInputs = [
+          pkgs-unstable.openssh_hpn
+          pkgs-unstable.gnugrep
+        ];
+      }
+      ''
+        export HOME="$TMPDIR/home"
+        mkdir -p "$HOME"
+        ssh -G -F ${sshConfig} internalvps > effective-ssh-config
+        grep -Fx 'hostname 10.78.0.1' effective-ssh-config
+        grep -Fx 'hostkeyalias internalvps' effective-ssh-config
+        grep -Fx 'bindinterface wg-rhizome' effective-ssh-config
+        grep -Fx 'controlmaster false' effective-ssh-config
+        grep -Fx 'controlpersist no' effective-ssh-config
+        # OpenSSH omits ControlPath from -G output when it is set to none.
+        if grep -q '^controlpath ' effective-ssh-config; then
+          exit 1
+        fi
+        touch "$out"
+      '';
+
   credential-forwarding =
     let
       desktopConfig = self.nixosConfigurations.desktop.config;
