@@ -103,6 +103,11 @@
   `pkgs.systemd`: NixOS customizes the package used by unit PATHs. The DNS writer
   VM test exercises the actual service command, and the mode-matrix check covers
   both host registries without granting wildcard store execution.
+- Container-engine policies must read the enabled `environment.etc` sources with
+  targets under `containers/`: `/etc` permissions do not cover their store-backed
+  symlink targets. Podman 6 uses drop-ins and omits empty registry settings.
+  Full flake evaluation was verified on the pinned nixpkgs and `31ecbaca1bde`;
+  both container-engine profiles were also parsed against the latter.
 
 # USB serial devices
 

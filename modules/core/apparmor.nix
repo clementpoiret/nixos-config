@@ -265,12 +265,15 @@ let
       "os-release"
     ]
   );
-  containerRegistriesConfig = lib.attrByPath [
-    "environment"
-    "etc"
-    "containers/registries.conf"
-    "source"
-  ] null config;
+  containerConfigSources = lib.unique (
+    map (entry: entry.source) (
+      builtins.attrValues (
+        lib.filterAttrs (
+          _: entry: entry.enable && lib.hasPrefix "containers/" entry.target
+        ) config.environment.etc
+      )
+    )
+  );
   userEnvironmentReadRoots = lib.optional (
     username != null
     && lib.hasAttrByPath [
@@ -804,9 +807,9 @@ let
           priority=100 / ix,
           /etc/{,group,hosts,host.conf,login.defs,nsswitch.conf,passwd,resolv.conf,subgid,subuid} r,
           /etc/containers/{,**} r,
-          ${lib.optionalString (containerRegistriesConfig != null) ''
-            ${quotePath (toString containerRegistriesConfig)} r,
-          ''}
+          ${lib.concatMapStrings (source: ''
+            ${quotePath (toString source)} r,
+          '') containerConfigSources}
           /nix/store/*-etc-os-release r,
           /nix/store/*-login.defs r,
           /nix/store/*-policy/{,**} r,

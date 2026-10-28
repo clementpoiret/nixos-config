@@ -854,15 +854,31 @@ in
 
   apparmor-policy-parser =
     let
+      containerConfigHost = appArmorTestHosts.enforce.extendModules {
+        modules = [
+          {
+            virtualisation.containers.registries.settings.registry = [
+              { location = "registry.example.test"; }
+            ];
+            environment.etc.container-storage-drop-in = {
+              target = "containers/storage.conf.d/90-local.conf";
+              text = ''
+                [storage.options.overlay]
+                mountopt = "nodev"
+              '';
+            };
+          }
+        ];
+      };
       configurations = [
         self.nixosConfigurations.desktop
         self.nixosConfigurations.laptop
-        appArmorTestHosts.enforce
+        containerConfigHost
       ];
       profileDirectories = map (
         configuration: configuration.config.environment.etc."apparmor.d".source
       ) configurations;
-      enforceProfileDirectory = appArmorTestHosts.enforce.config.environment.etc."apparmor.d".source;
+      enforceProfileDirectory = containerConfigHost.config.environment.etc."apparmor.d".source;
       complainProfileDirectory = appArmorTestHosts.complain.config.environment.etc."apparmor.d".source;
       includeDirectories = pkgs-unstable.lib.unique (
         builtins.concatMap (
@@ -902,6 +918,21 @@ in
         );
       bubblewrapApplicationNames = applicationNamesWith "bubblewrap";
       restrictedApplicationNames = applicationNamesWithout "developer-exec";
+      containerConfigChecks = pkgs-unstable.lib.concatMapStrings (
+        configuration:
+        let
+          entries = pkgs-unstable.lib.filterAttrs (
+            _: entry: entry.enable && pkgs-unstable.lib.hasPrefix "containers/" entry.target
+          ) configuration.config.environment.etc;
+          directory = configuration.config.environment.etc."apparmor.d".source;
+        in
+        pkgs-unstable.lib.concatMapStrings (entry: ''
+          require_rule ${pkgs-unstable.lib.escapeShellArg ''"${toString entry.source}" r,''} \
+            ${directory}/local-codex-cli-container-engine
+          require_rule ${pkgs-unstable.lib.escapeShellArg ''"${toString entry.source}" r,''} \
+            ${directory}/local-claude-code-container-engine
+        '') (builtins.attrValues entries)
+      ) configurations;
     in
     pkgs-unstable.runCommand "apparmor-policy-parser"
       {
@@ -1050,13 +1081,6 @@ in
             exit 1
           fi
 
-          require_rule '"${
-            toString self.nixosConfigurations.laptop.config.environment.etc."containers/registries.conf".source
-          }" r,' "$profile_directory/local-codex-cli-container-engine"
-          require_rule '"${
-            toString self.nixosConfigurations.laptop.config.environment.etc."containers/registries.conf".source
-          }" r,' "$profile_directory/local-claude-code-container-engine"
-
           pqiv_common="$(common_rules "$profile_directory/local-pqiv")"
           if grep -F 'owner @{HOME}/** rwkl,' "$pqiv_common" \
             || grep -F '/proc/{,**}' "$pqiv_common" \
@@ -1084,6 +1108,8 @@ in
               --Include "$profile_directory" ${includeArguments} "$policy"
           done
         done
+
+        ${containerConfigChecks}
 
         enforce_brave_common="$(common_rules ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-brave)"
         complain_brave_common="$(common_rules ${pkgs-unstable.lib.escapeShellArg complainProfileDirectory}/local-brave)"
