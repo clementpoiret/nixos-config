@@ -66,6 +66,12 @@
   upstream Nix source filter omits. Keep the full-source override until that filter
   includes the build scripts. Verified with
   `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.flake.opencode`.
+- OpenCode's rolling source can change `bun.lock` before its Nix hash bot catches
+  up. Keep its source pinned and use upstream `nix/hashes.json`, not automatic
+  acceptance of reported hashes. `pkgs/update-opencode.py` advances only to newer
+  stable release versions: the shared repository also publishes v1 releases, so
+  GitHub's `releases/latest` can point below the installed v2 version. The verified
+  source pin is treated as 2.2.0 until a newer stable release is available.
 
 # CI caching
 

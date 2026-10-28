@@ -163,6 +163,17 @@ in
         touch "$out"
       '';
 
+  opencode-package-updates =
+    pkgs-unstable.runCommand "opencode-package-updates"
+      {
+        nativeBuildInputs = [ pkgs-unstable.python3 ];
+        OPENCODE_UPDATER_SOURCE = ../pkgs/update-opencode.py;
+      }
+      ''
+        python ${./test_update_opencode.py}
+        touch "$out"
+      '';
+
   measured-boot-retention =
     let
       excessiveRetentionHost = self.nixosConfigurations.laptop.extendModules {
