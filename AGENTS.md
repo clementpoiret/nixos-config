@@ -103,6 +103,22 @@
   verifies both Qt palettes in light/dark modes; keep its probes in separate
   derivations because Nix's Qt hooks reject mixed major versions.
 
+# Niri desktop portals
+
+- GNOME Control Center supplies the D-Bus GlobalShortcutsProvider, which Ghostty's
+  global keybindings can activate even outside GNOME. Keep Niri's GlobalShortcuts
+  portal set to `none` without disabling Online Accounts or the keyring; GNOME
+  still provides screen sharing. Both hosts' generated configuration was verified
+  with `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.niri-desktop-portals`.
+  An isolated portal session also confirmed that GlobalShortcuts is not advertised.
+- The reusable terminal needs its own Ghostty `--class` so GTK single-instance
+  mode does not share the normal terminal's identity. Its helper uses workspace
+  IDs through Niri's JSON IPC: CLI workspace numbers are per-monitor and cannot
+  reliably summon a window across outputs. Parking uses a dynamic empty workspace,
+  not a named workspace that would change the initial workspace at login.
+  Both generated Niri configs and the helper tests were verified with
+  `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.niri-scratch-terminal`.
+
 # AppArmor
 
 - Confined systemd services must allow `config.systemd.package`, not just

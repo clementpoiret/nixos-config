@@ -31,8 +31,6 @@
 
       confirm-close-surface = false;
 
-      quick-terminal-screen = "mouse";
-
       # Render on terminal updates on the laptop; animate only while focused elsewhere.
       custom-shader-animation = host != "laptop";
       custom-shader = "./shaders/cursor_warp.glsl";
@@ -45,7 +43,6 @@
       notify-on-command-finish-after = "30s";
 
       keybind = [
-        "global:alt+enter=toggle_quick_terminal"
         "cmd+shift+w=close_surface"
       ];
     };

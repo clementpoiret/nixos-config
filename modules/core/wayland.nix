@@ -80,11 +80,13 @@ in
     xdgOpenUsePortal = true;
     configPackages = [ pkgs.niri-host ];
 
-    config.common = {
+    config.niri = {
       default = [
         "gtk"
         "gnome"
       ];
+      # GNOME's shortcut provider requires GNOME Shell, not just Online Accounts.
+      "org.freedesktop.impl.portal.GlobalShortcuts" = [ "none" ];
       "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
       "org.freedesktop.impl.portal.Screenshot" = [ "gnome" ];
       "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];

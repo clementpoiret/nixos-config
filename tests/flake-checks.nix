@@ -240,6 +240,87 @@ in
         touch "$out"
       '';
 
+  niri-desktop-portals =
+    let
+      checkHost =
+        hostName:
+        let
+          config = self.nixosConfigurations.${hostName}.config;
+          portals = config.xdg.portal.config.niri;
+          portalConfig = config.environment.etc."xdg/xdg-desktop-portal/niri-portals.conf".source;
+        in
+        assert portals.default == "gtk;gnome";
+        assert portals."org.freedesktop.impl.portal.GlobalShortcuts" == "none";
+        assert portals."org.freedesktop.impl.portal.ScreenCast" == "gnome";
+        assert portals."org.freedesktop.impl.portal.Screenshot" == "gnome";
+        assert portals."org.freedesktop.impl.portal.Secret" == "gnome-keyring";
+        assert config.services.gnome.gnome-online-accounts.enable;
+        assert config.services.gnome.gnome-keyring.enable;
+        ''
+          grep -Fx 'org.freedesktop.impl.portal.GlobalShortcuts=none' ${portalConfig}
+          grep -Fx 'org.freedesktop.impl.portal.ScreenCast=gnome' ${portalConfig}
+          grep -Fx 'org.freedesktop.impl.portal.Screenshot=gnome' ${portalConfig}
+          grep -Fx 'org.freedesktop.impl.portal.Secret=gnome-keyring' ${portalConfig}
+        '';
+    in
+    pkgs-unstable.runCommand "niri-desktop-portals"
+      {
+        nativeBuildInputs = [ pkgs-unstable.gnugrep ];
+      }
+      ''
+        ${checkHost "desktop"}
+        ${checkHost "laptop"}
+        touch "$out"
+      '';
+
+  niri-scratch-terminal =
+    let
+      checkHost =
+        hostName:
+        let
+          host = self.nixosConfigurations.${hostName}.config;
+          home = host.home-manager.users.${username};
+          settings = home.programs.niri.settings;
+          command = builtins.head settings.binds."Alt+T".action.spawn;
+          scratchRules = builtins.filter (
+            rule:
+            builtins.any (
+              match: (match.app-id or null) == "^com\\.mitchellh\\.ghostty\\.scratchpad$"
+            ) rule.matches
+          ) settings.window-rules;
+          scratchRule = builtins.head scratchRules;
+          niriConfig = home.xdg.configFile."niri-config".source;
+        in
+        assert !settings.binds."Alt+T".repeat;
+        assert
+          settings.binds."Mod+T".action.spawn == [
+            "ghostty"
+            "+new-window"
+          ];
+        assert builtins.length scratchRules == 1;
+        assert scratchRule.open-floating && scratchRule.open-focused;
+        assert scratchRule.default-column-width.proportion == 0.8;
+        assert scratchRule.default-window-height.proportion == 0.5;
+        assert
+          !(builtins.any (pkgs-unstable.lib.hasPrefix "global:") home.programs.ghostty.settings.keybind);
+        ''
+          bash -n ${command}
+          grep -F 'Alt+T' ${niriConfig}
+          grep -F 'com\\.mitchellh\\.ghostty\\.scratchpad' ${niriConfig}
+        '';
+    in
+    pkgs-unstable.runCommand "niri-scratch-terminal"
+      {
+        nativeBuildInputs = [ pkgs-unstable.python3 ];
+        NIRI_SCRATCH_TERMINAL_SOURCE = ../modules/home/niri-scratch-terminal.py;
+      }
+      ''
+        python ${./test_niri_scratch_terminal.py}
+        ${checkHost "desktop"}
+        ${checkHost "laptop"}
+        touch "$out"
+      '';
+
   dms-application-theming =
     let
       qtThemeProbe =

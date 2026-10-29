@@ -29,6 +29,17 @@ let
     inputs.niri.lib.internal."validated-config-for" pkgs pkgs.niri-baseline
       config.programs.niri.finalConfig;
 
+  scratchTerminalAppId = "com.mitchellh.ghostty.scratchpad";
+  scratchTerminal = pkgs.writeShellApplication {
+    name = "niri-scratch-terminal";
+    runtimeInputs = [ pkgs.python3 ];
+    text = ''
+      exec python3 ${./niri-scratch-terminal.py} \
+        ${lib.escapeShellArg scratchTerminalAppId} \
+        ${lib.getExe pkgs.ghostty-host}
+    '';
+  };
+
   displayPowerMode = pkgs.writeShellApplication {
     name = "niri-display-power-mode";
     runtimeInputs = [
@@ -210,6 +221,18 @@ in
       screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
       # animations = [ ];
       window-rules = [
+        {
+          matches = [ { app-id = "^${lib.escapeRegex scratchTerminalAppId}$"; } ];
+          open-floating = true;
+          open-focused = true;
+          default-column-width.proportion = 0.8;
+          default-window-height.proportion = 0.5;
+          default-floating-position = {
+            x = 0;
+            y = 0;
+            relative-to = "top";
+          };
+        }
         {
           matches = [
             {
@@ -539,6 +562,10 @@ in
           "ghostty"
           "+new-window"
         ];
+        "Alt+T" = {
+          repeat = false;
+          action.spawn = [ (lib.getExe scratchTerminal) ];
+        };
         "Mod+B".action.spawn = [
           "runapp"
           "brave"
