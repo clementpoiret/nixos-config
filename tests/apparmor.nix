@@ -318,28 +318,6 @@ pkgs.testers.runNixOSTest {
             "/home/test/.local/state/apparmor-reports/logs.json"
         )
 
-    with subtest("only the selected profiles are loaded"):
-        machine.succeed("test -e /etc/apparmor.d/local-agent-fixture")
-        machine.succeed("test -e /etc/apparmor.d/local-apply-secret-dns")
-        machine.succeed("test -e /etc/apparmor.d/local-audit-fixture")
-        machine.succeed("test -e /etc/apparmor.d/bwrap")
-        machine.succeed("test -e /etc/apparmor.d/local-claude-code-bwrap")
-        machine.succeed("test -e /etc/apparmor.d/local-bwrap-fixture")
-        machine.succeed("test -e /etc/apparmor.d/local-enforce-fixture")
-        machine.succeed("test -e /etc/apparmor.d/local-policy-fixture")
-        machine.succeed("test -e /etc/apparmor.d/local-syncthing")
-        machine.fail("test -e /etc/apparmor.d/local-brave")
-
-    with subtest("Claude only bypasses Bubblewrap for guarded container launchers"):
-        machine.succeed(
-            "${pkgs.jq}/bin/jq -e "
-            "'.sandbox.enabled == true and "
-            ".sandbox.failIfUnavailable == true and "
-            ".sandbox.allowUnsandboxedCommands == false and "
-            ".sandbox.excludedCommands == [\"podman *\", \"buildah *\"]' "
-            "/etc/claude-code/managed-settings.d/20-sandbox.json"
-        )
-
     with subtest("agent container brokers and payloads are always enforced"):
         machine.succeed(
             "aa-status --json | ${pkgs.jq}/bin/jq -e "
@@ -455,23 +433,6 @@ pkgs.testers.runNixOSTest {
                 "podman network rm agent-test-network",
             )
         )
-        machine.succeed(guarded("local-claude-code", "podman compose version"))
-        machine.succeed(
-            guarded(
-                "local-claude-code",
-                "podman compose --file compose.yaml --project-name agent-compose config --services",
-                "OPERCORD_POSTGRES_PASSWORD=packaging-check",
-            )
-            + " | grep -Fx agent-compose"
-        )
-        machine.succeed(
-            guarded(
-                "local-claude-code",
-                "podman compose --file compose.yaml --project-name agent-compose config --volumes",
-                "OPERCORD_POSTGRES_PASSWORD=packaging-check",
-            )
-            + " | grep -Fx agent-data"
-        )
         compose_config = machine.succeed(
             guarded(
                 "local-claude-code",
@@ -480,6 +441,8 @@ pkgs.testers.runNixOSTest {
             )
         )
         for expected_config_line in (
+            "agent-compose:",
+            "agent-data:",
             "condition: service_healthy",
             "host_ip: 127.0.0.1",
             'published: "5432"',

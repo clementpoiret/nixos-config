@@ -250,7 +250,7 @@ jobs:
             .#checks.x86_64-linux.proton-package-updates \
             .#checks.x86_64-linux.opencode-package-updates \
             .#checks.x86_64-linux.binary-release-signatures \
-            .#checks.x86_64-linux.host-cpu-optimizations \
+            .#checks.x86_64-linux.cached-kernel \
             .#checks.x86_64-linux.internal-vps-access \
             .#checks.x86_64-linux.apparmor-mode-matrix \
             .#checks.x86_64-linux.apparmor-policy-parser \

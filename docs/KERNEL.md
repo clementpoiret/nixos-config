@@ -96,9 +96,9 @@ let
 in
 ```
 
-Restoring these overrides requires a custom kernel build. Update the kernel
-assertions in `host-cpu-optimizations` in `tests/flake-checks.nix` to check the
-restored policy rather than equality with the cached preset, and update the
-active baseline in `HARDENING.md`.
+Restoring these overrides requires a custom kernel build. Update the
+`cached-kernel` check in `tests/flake-checks.nix` to check the restored policy
+rather than equality with the cached preset, and update the active baseline in
+`HARDENING.md`.
 Keep the `kernelModuleSignOverride` wrapper: a custom kernel build does not
 repair package installers that skip Kbuild's signing step.

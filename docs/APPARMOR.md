@@ -355,11 +355,13 @@ nix flake check --no-update-lock-file
 ```
 
 The mode matrix verifies states, overrides, invalid descriptors, package/profile alignment, and systemd attachments.
-The parser check parses every desktop, laptop, and all-enforced policy, checks executable paths, and protects
-read-only closures, namespace privilege separation, and credential boundaries without snapshotting every capability rule.
-The VM enforces a generic service fixture including runtime metadata, the exact DNS-secret boundary, and a
-running Syncthing service. It also exercises shared developer caches and metadata while retaining the GPG private-key
-and protected-configuration boundaries.
+The parser check parses every desktop, laptop, and all-enforced policy, checks executable paths and container
+configuration sources, and verifies that read-only closures grant no writes or execution, ordinary applications get no
+broad store access, and Bubblewrap setup privileges stay in the Bubblewrap profiles. Exact rules are not snapshotted;
+the VM exercises their effect instead. It enforces a generic service fixture including runtime metadata, the exact
+DNS-secret boundary, and a running Syncthing service. It also exercises Bubblewrap namespace brokering, guarded
+containers, shared developer caches and metadata, and the credential, GPG private-key, and protected-configuration
+boundaries.
 
 The parser may warn that its kernel interface or cache is unavailable in the Nix build sandbox. That warning is expected
 when the command succeeds; it uses `--skip-kernel-load` to validate syntax and includes without changing the running

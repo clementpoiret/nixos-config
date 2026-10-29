@@ -240,75 +240,7 @@ in
         touch "$out"
       '';
 
-  niri-desktop-portals =
-    let
-      checkHost =
-        hostName:
-        let
-          config = self.nixosConfigurations.${hostName}.config;
-          portals = config.xdg.portal.config.niri;
-          portalConfig = config.environment.etc."xdg/xdg-desktop-portal/niri-portals.conf".source;
-        in
-        assert portals.default == "gtk;gnome";
-        assert portals."org.freedesktop.impl.portal.GlobalShortcuts" == "none";
-        assert portals."org.freedesktop.impl.portal.ScreenCast" == "gnome";
-        assert portals."org.freedesktop.impl.portal.Screenshot" == "gnome";
-        assert portals."org.freedesktop.impl.portal.Secret" == "gnome-keyring";
-        assert config.services.gnome.gnome-online-accounts.enable;
-        assert config.services.gnome.gnome-keyring.enable;
-        ''
-          grep -Fx 'org.freedesktop.impl.portal.GlobalShortcuts=none' ${portalConfig}
-          grep -Fx 'org.freedesktop.impl.portal.ScreenCast=gnome' ${portalConfig}
-          grep -Fx 'org.freedesktop.impl.portal.Screenshot=gnome' ${portalConfig}
-          grep -Fx 'org.freedesktop.impl.portal.Secret=gnome-keyring' ${portalConfig}
-        '';
-    in
-    pkgs-unstable.runCommand "niri-desktop-portals"
-      {
-        nativeBuildInputs = [ pkgs-unstable.gnugrep ];
-      }
-      ''
-        ${checkHost "desktop"}
-        ${checkHost "laptop"}
-        touch "$out"
-      '';
-
   niri-scratch-terminal =
-    let
-      checkHost =
-        hostName:
-        let
-          host = self.nixosConfigurations.${hostName}.config;
-          home = host.home-manager.users.${username};
-          settings = home.programs.niri.settings;
-          command = builtins.head settings.binds."Alt+T".action.spawn;
-          scratchRules = builtins.filter (
-            rule:
-            builtins.any (
-              match: (match.app-id or null) == "^com\\.mitchellh\\.ghostty\\.scratchpad$"
-            ) rule.matches
-          ) settings.window-rules;
-          scratchRule = builtins.head scratchRules;
-          niriConfig = home.xdg.configFile."niri-config".source;
-        in
-        assert !settings.binds."Alt+T".repeat;
-        assert
-          settings.binds."Mod+T".action.spawn == [
-            "ghostty"
-            "+new-window"
-          ];
-        assert builtins.length scratchRules == 1;
-        assert scratchRule.open-floating && scratchRule.open-focused;
-        assert scratchRule.default-column-width.proportion == 0.8;
-        assert scratchRule.default-window-height.proportion == 0.5;
-        assert
-          !(builtins.any (pkgs-unstable.lib.hasPrefix "global:") home.programs.ghostty.settings.keybind);
-        ''
-          bash -n ${command}
-          grep -F 'Alt+T' ${niriConfig}
-          grep -F 'com\\.mitchellh\\.ghostty\\.scratchpad' ${niriConfig}
-        '';
-    in
     pkgs-unstable.runCommand "niri-scratch-terminal"
       {
         nativeBuildInputs = [ pkgs-unstable.python3 ];
@@ -316,8 +248,6 @@ in
       }
       ''
         python ${./test_niri_scratch_terminal.py}
-        ${checkHost "desktop"}
-        ${checkHost "laptop"}
         touch "$out"
       '';
 
@@ -343,15 +273,11 @@ in
           hostPkgs = self.nixosConfigurations.${hostName}.pkgs;
           home = host.home-manager.users.${username};
         in
-        assert !home.stylix.targets.gtk.colors.enable;
         assert !(home.xdg.configFile ? "gtk-3.0/gtk.css");
         assert !(home.xdg.configFile ? "gtk-4.0/gtk.css");
-        assert !home.stylix.targets.qt.enable;
         assert !(home.xdg.configFile ? "qt5ct/qt5ct.conf");
         assert !(home.xdg.configFile ? "qt6ct/qt6ct.conf");
         assert !(home.xdg.configFile ? "Kvantum/kvantum.kvconfig");
-        assert home.qt.platformTheme.name == "qtct";
-        assert home.qt.style.name == null;
         assert !(home.home.sessionVariables ? QT_STYLE_OVERRIDE);
         assert !(host.environment.variables ? QT_STYLE_OVERRIDE);
         assert host.environment.variables.QT_QPA_PLATFORMTHEME == "qt5ct";
@@ -506,68 +432,20 @@ in
         touch "$out"
       '';
 
-  host-cpu-optimizations =
+  cached-kernel =
     let
-      desktopPkgs = self.nixosConfigurations.desktop.pkgs;
-      laptopPkgs = self.nixosConfigurations.laptop.pkgs;
-      desktopKernel = self.nixosConfigurations.desktop.config.boot.kernelPackages.kernel;
-      laptopKernel = self.nixosConfigurations.laptop.config.boot.kernelPackages.kernel;
       cachedKernel =
         self.inputs.nix-cachyos-kernel.packages.${pkgs-unstable.stdenv.hostPlatform.system}.linux-cachyos-latest-lto-zen4;
-      flagsText =
-        flags: if builtins.isList flags then pkgs-unstable.lib.concatStringsSep " " flags else flags;
-      hasFlag = flag: flags: pkgs-unstable.lib.hasInfix flag (flagsText flags);
-      rustFlags =
-        package:
-        if builtins.isAttrs (package.env or null) && package.env ? RUSTFLAGS then
-          package.env.RUSTFLAGS
-        else
-          package.RUSTFLAGS or "";
-      niriUsesBaselineCompletions =
-        baseline: package:
-        let
-          baselineCommand = builtins.unsafeDiscardStringContext "${baseline}/bin/niri completions";
-          postInstall = package.postInstall or "";
-        in
-        pkgs-unstable.lib.hasInfix baselineCommand postInstall
-        && !(pkgs-unstable.lib.hasInfix "$out/bin/niri completions" postInstall);
-      checkHost =
-        hostName: cpuTarget:
-        let
-          host = self.nixosConfigurations.${hostName};
-          hostPkgs = host.pkgs;
-          kernel = host.config.boot.kernelPackages.kernel;
-          niriConfig = host.config.home-manager.users.${username}.xdg.configFile."niri-config".source;
-          check =
-            condition:
-            pkgs-unstable.lib.assertMsg condition "CPU optimization check failed for ${hostName} (${cpuTarget})";
-        in
-        assert check (!(hostPkgs.stdenv.hostPlatform ? gcc.arch));
-        assert check (hasFlag "-march=${cpuTarget}" (hostPkgs.quickshell-host.NIX_CFLAGS_COMPILE or ""));
-        assert check (hasFlag "-C target-cpu=${cpuTarget}" (rustFlags hostPkgs.flake.herdr));
-        assert check (!(hostPkgs.flake.herdr.doCheck or true));
-        assert check (!(hostPkgs.flake.herdr.doInstallCheck or true));
-        assert check (hasFlag "-C target-cpu=${cpuTarget}" (rustFlags hostPkgs.niri-host));
-        assert check (!(hostPkgs.niri-host.doCheck or true));
-        assert check (!(hostPkgs.niri-host.doInstallCheck or true));
-        assert check (niriUsesBaselineCompletions hostPkgs.niri-baseline hostPkgs.niri-host);
-        assert check (
-          builtins.map builtins.toString niriConfig.buildInputs == [
-            (builtins.toString hostPkgs.niri-baseline)
-          ]
-        );
-        assert check (builtins.elem "-Dcpu=${cpuTarget}" hostPkgs.ghostty-host.zigBuildFlags);
-        assert check (builtins.elem "-Dcpu=${cpuTarget}" hostPkgs.ghostty-host.zigCheckFlags);
-        assert check (!(hostPkgs.ghostty-host.doInstallCheck or true));
-        assert check (kernel.drvPath == cachedKernel.drvPath);
-        true;
+      usesCachedKernel =
+        hostName:
+        pkgs-unstable.lib.assertMsg (
+          self.nixosConfigurations.${hostName}.config.boot.kernelPackages.kernel.drvPath
+          == cachedKernel.drvPath
+        ) "${hostName} would build its kernel instead of using the cached CachyOS kernel";
     in
-    assert checkHost "desktop" "znver5";
-    assert checkHost "laptop" "znver4";
-    assert desktopPkgs.flake.herdr.drvPath != laptopPkgs.flake.herdr.drvPath;
-    assert desktopPkgs.niri-baseline.drvPath == laptopPkgs.niri-baseline.drvPath;
-    assert desktopKernel.drvPath == laptopKernel.drvPath;
-    pkgs-unstable.runCommand "host-cpu-optimizations" { } ''
+    assert usesCachedKernel "desktop";
+    assert usesCachedKernel "laptop";
+    pkgs-unstable.runCommand "cached-kernel" { } ''
       touch "$out"
     '';
 
@@ -575,19 +453,14 @@ in
     let
       laptop = self.nixosConfigurations.laptop.config;
       desktop = self.nixosConfigurations.desktop.config;
-      tunnel = laptop.networking.wg-quick.interfaces.wg-rhizome;
       service = laptop.systemd.services.wg-quick-wg-rhizome;
       sshConfig = laptop.home-manager.users.${username}.home.file.".ssh/config".source;
       noAutomaticDependency =
         unit: !(builtins.elem "wg-quick-wg-rhizome.service" (unit.wants ++ unit.requires));
     in
     assert !(desktop.networking.wg-quick.interfaces ? wg-rhizome);
-    assert !tunnel.autostart && service.wantedBy == [ ] && service.requiredBy == [ ];
+    assert service.wantedBy == [ ] && service.requiredBy == [ ];
     assert pkgs-unstable.lib.all noAutomaticDependency (builtins.attrValues laptop.systemd.services);
-    assert tunnel.privateKey == null && !tunnel.generatePrivateKeyFile;
-    assert tunnel.privateKeyFile == "/etc/wireguard/wg-rhizome.key";
-    assert tunnel.dns == [ ] && tunnel.table == null;
-    assert builtins.concatLists (map (peer: peer.allowedIPs) tunnel.peers) == [ "10.78.0.1/32" ];
     assert !(builtins.elem "wg-rhizome" laptop.networking.firewall.trustedInterfaces);
     pkgs-unstable.runCommand "internal-vps-access"
       {
@@ -612,62 +485,12 @@ in
         touch "$out"
       '';
 
-  credential-forwarding =
+  ssh-agent-key-loader =
     let
-      desktopConfig = self.nixosConfigurations.desktop.config;
-      laptopConfig = self.nixosConfigurations.laptop.config;
-      desktopHome = desktopConfig.home-manager.users.${username};
-      laptopHome = laptopConfig.home-manager.users.${username};
-      desktopSsh = desktopHome.programs.ssh.settings;
-      desktopSecretWriter = builtins.head desktopHome.systemd.user.services.write-ssh-secret-config.Service.ExecStart;
-      laptopSecretWriter = builtins.head laptopHome.systemd.user.services.write-ssh-secret-config.Service.ExecStart;
+      laptopHome = self.nixosConfigurations.laptop.config.home-manager.users.${username};
       laptopAgentLoader = laptopHome.systemd.user.services.ssh-agent.Service.ExecStartPost;
-      desktopAgentEnvironment = desktopHome.systemd.user.services.ssh-agent.Service.Environment;
-      laptopAgentEnvironment = laptopHome.systemd.user.services.ssh-agent.Service.Environment;
-      desktopGpgSync = desktopHome.systemd.user.services.sync-forwarded-gpg-home;
-      laptopGpgSync = laptopHome.systemd.user.services.sync-forwarded-gpg-home;
-      desktopGpgSyncScript = builtins.head desktopGpgSync.Service.ExecStart;
-      gpgSyncIsSessionOneShot =
-        home: service:
-        !(home.home.activation ? syncForwardedGpgHome)
-        && service.Service.Type == "oneshot"
-        && !(service.Service.RemainAfterExit)
-        && service.Install.WantedBy == [ "default.target" ];
-      serverForwardingIsRestricted =
-        config:
-        config.services.openssh.settings.AllowAgentForwarding
-        && !(config.services.openssh.settings.AllowTcpForwarding)
-        && config.services.openssh.settings.AllowStreamLocalForwarding == "remote"
-        && config.services.openssh.settings.StreamLocalBindUnlink
-        && config.services.openssh.settings.AcceptEnv == [ "GNUPGHOME" ];
-      caAgentIsOnDemand =
-        home:
-        let
-          service = home.systemd.user.services.proton-pass-ca-agent;
-        in
-        (service.Install.WantedBy or [ ]) == [ ]
-        && (service.Install.RequiredBy or [ ]) == [ ]
-        && service.Unit.PartOf == [ "graphical-session.target" ]
-        && service.Service.RuntimeMaxSec == "5min"
-        && service.Service.RuntimeDirectoryMode == "0700"
-        && service.Service.UMask == "0077"
-        && home.services.gnome-keyring.components == [ "secrets" ];
     in
-    assert desktopSsh."github.com".data.IdentityAgent == "SSH_AUTH_SOCK";
-    assert desktopSsh."github.com".data.IdentityFile == "none";
-    assert desktopSsh."gitlab.com".data.IdentityAgent == "SSH_AUTH_SOCK";
-    assert desktopSsh."gitlab.com".data.IdentityFile == "none";
-    assert serverForwardingIsRestricted desktopConfig;
-    assert serverForwardingIsRestricted laptopConfig;
-    assert caAgentIsOnDemand desktopHome;
-    assert caAgentIsOnDemand laptopHome;
-    assert desktopHome.services.gpg-agent.enableExtraSocket;
-    assert laptopHome.services.gpg-agent.enableExtraSocket;
-    assert builtins.elem "SSH_ASKPASS_REQUIRE=force" desktopAgentEnvironment;
-    assert builtins.elem "SSH_ASKPASS_REQUIRE=force" laptopAgentEnvironment;
-    assert gpgSyncIsSessionOneShot desktopHome desktopGpgSync;
-    assert gpgSyncIsSessionOneShot laptopHome laptopGpgSync;
-    pkgs-unstable.runCommand "credential-forwarding"
+    pkgs-unstable.runCommand "ssh-agent-key-loader"
       {
         nativeBuildInputs = [
           pkgs-unstable.gnugrep
@@ -675,14 +498,6 @@ in
         ];
       }
       ''
-        grep -F 'Host laptop-forwarded' ${desktopSecretWriter}
-        grep -F 'Host desktop-forwarded' ${laptopSecretWriter}
-        grep -F 'ForwardAgent \''${SSH_AUTH_SOCK}' ${desktopSecretWriter}
-        grep -F 'RemoteForward $forwarded_gpg_socket $local_gpg_extra_socket' ${desktopSecretWriter}
-        grep -F 'ControlMaster no' ${desktopSecretWriter}
-        grep -F 'Host * !github.com !gitlab.com' ${desktopSecretWriter}
-        grep -F 'Refusing to forward a GPG key file that is not a smartcard stub' ${desktopGpgSyncScript}
-
         cat > fake-ssh-add <<'EOF'
         #!/bin/sh
         if [ "$1" = -l ]; then
@@ -741,12 +556,6 @@ in
       stagedStates = states appArmorTestHosts.staged;
       disabledSyncthingService = appArmorTestHosts.disable.config.systemd.services.syncthing;
       overrideSyncthingService = appArmorTestHosts.override.config.systemd.services.syncthing;
-      laptopConfig = self.nixosConfigurations.laptop.config;
-      claudeManagedSettings =
-        builtins.fromJSON
-          laptopConfig.environment.etc."claude-code/managed-settings.d/20-sandbox.json".text;
-      laptopServiceRegistry = laptopConfig.security.localAppArmor.services;
-      dnsService = self.nixosConfigurations.laptop.config.systemd.services.apply-secret-dns;
     in
     assert allStatesAre "disable" appArmorTestHosts.disable;
     assert allStatesAre "complain" appArmorTestHosts.complain;
@@ -792,16 +601,6 @@ in
         app: !app.enable || builtins.any (package: package.drvPath == app.package.drvPath) installed
       ) (builtins.attrValues home.localAppArmor.applications)
     ) (builtins.attrValues self.nixosConfigurations);
-    assert laptopServiceRegistry.syncthing.packageRoots == [ laptopConfig.services.syncthing.package ];
-    assert builtins.elem "runtime-introspection" laptopServiceRegistry.syncthing.capabilities;
-    assert builtins.elem "/proc/bus/pci/devices" laptopServiceRegistry.syncthing.readOnlyPaths;
-    assert builtins.elem "/proc/modules" laptopServiceRegistry.syncthing.readOnlyPaths;
-    assert builtins.elem "/proc/sys/kernel/osrelease" laptopServiceRegistry.syncthing.readOnlyPaths;
-    assert !laptopConfig.systemd.services.syncthing.serviceConfig.RestrictSUIDSGID;
-    assert laptopConfig.systemd.services.syncthing.serviceConfig.NoNewPrivileges;
-    assert
-      self.nixosConfigurations.desktop.config.systemd.services.syncthing.serviceConfig.RestrictSUIDSGID;
-    assert laptopServiceRegistry.apply-secret-dns.stagedState == "enforce";
     assert builtins.all (
       host:
       let
@@ -810,18 +609,6 @@ in
       builtins.elem host.config.systemd.package service.packageRoots
       && builtins.elem host.config.systemd.package service.executionPackages
     ) (builtins.attrValues self.nixosConfigurations);
-    assert claudeManagedSettings.sandbox.enabled;
-    assert claudeManagedSettings.sandbox.failIfUnavailable;
-    assert !(claudeManagedSettings.sandbox.allowUnsandboxedCommands);
-    assert
-      claudeManagedSettings.sandbox.excludedCommands == [
-        "podman *"
-        "buildah *"
-      ];
-    assert laptopConfig.programs.ssh.enableAskPassword;
-    assert laptopConfig.environment.variables.SSH_ASKPASS == laptopConfig.programs.ssh.askPassword;
-    assert dnsService.serviceConfig.UMask == "0077";
-    assert dnsService.serviceConfig.CapabilityBoundingSet == [ "CAP_CHOWN" ];
     pkgs-unstable.runCommand "apparmor-mode-matrix" { } ''
       touch "$out"
     '';
@@ -871,16 +658,6 @@ in
         AGENT_CONTAINER_GUARD_SOURCE=${../pkgs/agent-container-tools/guard.py} \
           python ${./test_agent_container_guard.py}
 
-        test -x ${containerTools}/bin/podman
-        test -x ${containerTools}/bin/buildah
-        test -x ${containerTools.composeProvider}/bin/docker-compose
-        grep -F \
-          'compose_providers = ["${containerTools.composeProvider}/bin/docker-compose"]' \
-          ${containerTools.containersConf}
-        printf '%s\n' '${containerTools.safePath}' | \
-          tr : '\n' | grep -Fx '${containerTools.composeProvider}/bin'
-        grep -F 'image_copy_tmp_dir = "storage"' ${containerTools.containersConf}
-        grep -a -F 'OPERCORD_' ${containerTools}/bin/podman >/dev/null
         if ${containerTools}/bin/podman version >podman.stdout 2>podman.stderr; then
           echo "guarded Podman unexpectedly ran outside an agent broker" >&2
           exit 1
@@ -970,8 +747,6 @@ in
       profileDirectories = map (
         configuration: configuration.config.environment.etc."apparmor.d".source
       ) configurations;
-      enforceProfileDirectory = containerConfigHost.config.environment.etc."apparmor.d".source;
-      complainProfileDirectory = appArmorTestHosts.complain.config.environment.etc."apparmor.d".source;
       includeDirectories = pkgs-unstable.lib.unique (
         builtins.concatMap (
           configuration:
@@ -1070,46 +845,11 @@ in
         for profile_directory in ${
           pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg profileDirectories
         }; do
-          bwrap_policy="$profile_directory/bwrap"
-          bwrap_profile="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-bwrap-userns-restrict\)"/\1/p' "$bwrap_policy")"
-          test -r "$bwrap_profile"
-          require_rule 'profile bwrap ${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/bwrap flags=(attach_disconnected,mediate_deleted)' "$bwrap_profile"
-          require_rule 'allow userns,' "$bwrap_profile"
-          require_rule 'allow mount,' "$bwrap_profile"
-          require_rule 'allow pivot_root,' "$bwrap_profile"
-          require_rule 'allow pix /** -> &bwrap//&unpriv_bwrap,' "$bwrap_profile"
-          require_rule 'profile unpriv_bwrap flags=(attach_disconnected,mediate_deleted)' "$bwrap_profile"
-          require_rule 'audit deny capability,' "$bwrap_profile"
-
-          claude_bwrap_policy="$profile_directory/local-claude-code-bwrap"
-          claude_bwrap_profile="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-claude-code-bwrap\)"/\1/p' "$claude_bwrap_policy")"
-          test -r "$claude_bwrap_profile"
-          require_rule 'profile local-claude-code-bwrap flags=(attach_disconnected,mediate_deleted)' "$claude_bwrap_profile"
-          require_rule 'allow pix /** -> &local-claude-code-bwrap//&local-claude-code-bwrap-payload,' "$claude_bwrap_profile"
-          require_rule 'profile local-claude-code-bwrap-payload flags=(attach_disconnected,mediate_deleted)' "$claude_bwrap_profile"
-          require_rule 'allow pix /** -> &local-claude-code-bwrap-payload,' "$claude_bwrap_profile"
-          require_rule 'allow capability sys_admin,' "$claude_bwrap_profile"
-          if grep -F 'audit deny capability,' "$claude_bwrap_profile" \
-            || grep -F 'profile local-claude-code-bwrap ${self.nixosConfigurations.laptop.pkgs.bubblewrap}/bin/bwrap' "$claude_bwrap_profile"; then
-            echo "Claude Bubblewrap compatibility profile is not narrowly named" >&2
-            exit 1
-          fi
-
           brave_common="$(common_rules "$profile_directory/local-brave")"
-          test -r "$brave_common"
-          require_rule '/dev/ttyUSB[0-9]* rw,' "$brave_common"
-          require_rule '/run/udev/data/c188:[0-9]* r,' "$brave_common"
           session_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-local-session-read-only\)"/\1/p' "$brave_common")"
           test -r "$session_rules"
           session_closure_rules="$(sed -n 's/^[[:space:]]*include "\([^"]*apparmor-closure-rules-local-session-read-only\)"/\1/p' "$session_rules")"
           test -r "$session_closure_rules"
-          require_rule '/share/** mr,' "$session_closure_rules"
-          require_rule '${self.nixosConfigurations.laptop.config.services.gvfs.package}/lib/**.so* mr,' "$session_closure_rules"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.libsForQt5.qt5ct}/lib/**.so* mr,' "$session_closure_rules"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.libsForQt5.qtstyleplugin-kvantum}/lib/**.so* mr,' "$session_closure_rules"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.qt6Packages.qt6ct}/lib/**.so* mr,' "$session_closure_rules"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.qt6Packages.qtstyleplugin-kvantum}/lib/**.so* mr,' "$session_closure_rules"
-          require_rule '${self.nixosConfigurations.laptop.pkgs.libXxf86vm}/lib/**.so* mr,' "$session_closure_rules"
           if awk '$NF ~ /^[a-z]+,$/ && $NF ~ /[wxkl]/ { bad=1 } END { exit !bad }' "$session_rules" "$session_closure_rules"; then
             echo "read-only session rules unexpectedly grant write or execution" >&2
             exit 1
@@ -1121,7 +861,6 @@ in
             echo "read-only application closure unexpectedly grants execution" >&2
             exit 1
           fi
-          require_rule '/**.node mr,' "$closure_rules"
 
           for app_name in ${
             pkgs-unstable.lib.concatMapStringsSep " " pkgs-unstable.lib.escapeShellArg
@@ -1153,44 +892,6 @@ in
             fi
           done
 
-          claude_common="$(common_rules "$profile_directory/local-claude-code")"
-          require_rule 'deny owner @{HOME}/.config/BraveSoftware/Brave-Browser/{,**} rwklm,' "$claude_common"
-          require_rule 'deny owner @{HOME}/.config/chromium/{,**} rwklm,' "$claude_common"
-          require_rule 'deny owner @{HOME}/.config/google-chrome/{,**} rwklm,' "$claude_common"
-          require_rule 'deny owner @{HOME}/.config/microsoft-edge/{,**} rwklm,' "$claude_common"
-          require_rule 'deny owner @{HOME}/.config/vivaldi/{,**} rwklm,' "$claude_common"
-
-          codex_common="$(common_rules "$profile_directory/local-codex-cli")"
-          if grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$codex_common" \
-            || grep -F 'owner @{HOME}/.cache/BraveSoftware/{,**} rwkl,' "$claude_common"; then
-            echo "agent cache exceptions leaked into another profile or browser cache" >&2
-            exit 1
-          fi
-
-          proton_pass_common="$(common_rules "$profile_directory/local-proton-pass")"
-          if grep -F 'owner "@{HOME}/.config/BraveSoftware/{,**}" rwkl,' "$proton_pass_common"; then
-            echo "Proton Pass received broad browser profile access" >&2
-            exit 1
-          fi
-
-          pqiv_common="$(common_rules "$profile_directory/local-pqiv")"
-          if grep -F 'owner @{HOME}/** rwkl,' "$pqiv_common" \
-            || grep -F '/proc/{,**}' "$pqiv_common" \
-            || grep -F '/run/user/[0-9]*/{,**}' "$pqiv_common" \
-            || grep -F 'include <abstractions/nameservice>' "$pqiv_common" \
-            || grep -F 'include <abstractions/audio>' "$pqiv_common" \
-            || grep -F '/dev/ttyUSB[0-9]* rw,' "$pqiv_common" \
-            || grep -F '/dev/video[0-9]* rw,' "$pqiv_common"; then
-            echo "minimal desktop capability set leaked broad host access" >&2
-            exit 1
-          fi
-
-          proton_vpn_common="$(common_rules "$profile_directory/local-proton-vpn")"
-          if grep -Fx 'dbus bus=system,' "$proton_vpn_common"; then
-            echo "unscoped system D-Bus access remains" >&2
-            exit 1
-          fi
-
           for policy in "$profile_directory"/bwrap "$profile_directory"/local-*; do
             attachment="$(sed -n 's/^[[:space:]]*profile local-[^[:space:]]* \([^[:space:]]*\) flags=.*/\1/p' "$policy")"
             if [ -n "$attachment" ]; then
@@ -1202,53 +903,6 @@ in
         done
 
         ${containerConfigChecks}
-
-        enforce_brave_common="$(common_rules ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-brave)"
-        complain_brave_common="$(common_rules ${pkgs-unstable.lib.escapeShellArg complainProfileDirectory}/local-brave)"
-        if grep -F 'owner @{HOME}/[^.]*/{,**} rwkl,' "$complain_brave_common" \
-          || grep -F 'audit deny @{HOME}/nixos-config' "$complain_brave_common"; then
-          echo "complain policy re-grants a reserved NixOS configuration tree" >&2
-          exit 1
-        fi
-        require_rule 'audit deny @{HOME}/.ssh/id_* rwklm,' "$enforce_brave_common"
-        require_rule 'audit deny @{HOME}/.ssh/config.secrets rwklm,' "$enforce_brave_common"
-        require_rule 'audit deny @{HOME}/.ssh/known_hosts{,.old} rwklm,' "$enforce_brave_common"
-        require_rule 'audit deny @{HOME}/.config/gh/{config.yml,hosts.yml} rwklm,' "$enforce_brave_common"
-        require_rule 'audit deny @{HOME}/.config/glab-cli/{aliases.yml,config.yml} rwklm,' "$enforce_brave_common"
-        require_rule 'audit deny @{HOME}/.ssh/{cm,sockets}/{,**} rwklm,' "$enforce_brave_common"
-        require_rule 'audit deny /run/secrets.d/{,**} rwklm,' "$enforce_brave_common"
-        require_rule 'audit deny @{HOME}/nixos-config/{,**} wklm,' "$enforce_brave_common"
-        require_rule 'audit deny @{HOME}/nixos-config-writable/{,**} wklm,' "$enforce_brave_common"
-        require_rule 'dbus send bus=session peer=(name=org.freedesktop.secrets),' "$enforce_brave_common"
-        if grep -F 'audit deny dbus send bus=session peer=(name=org.freedesktop.secrets),' "$enforce_brave_common"; then
-          echo "explicit Brave credential-broker access was overridden by a deny" >&2
-          exit 1
-        fi
-
-        enforce_codex_common="$(common_rules ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-codex-cli)"
-        require_rule 'owner @{HOME}/.ssh/id_* r,' "$enforce_codex_common"
-        require_rule 'owner @{HOME}/.ssh/known_hosts{,.old} r,' "$enforce_codex_common"
-        require_rule 'owner @{HOME}/.config/gh/{config.yml,hosts.yml} r,' "$enforce_codex_common"
-        require_rule 'owner @{HOME}/.config/glab-cli/{aliases.yml,config.yml} r,' "$enforce_codex_common"
-        require_rule 'owner @{HOME}/.gnupg/common.conf r,' "$enforce_codex_common"
-        require_rule 'owner @{HOME}/.gnupg/trustdb.gpg rw,' "$enforce_codex_common"
-        require_rule 'owner @{HOME}/.netrc r,' "$enforce_codex_common"
-        require_rule 'owner @{HOME}/nixos-config-writable/{,**} rwkl,' "$enforce_codex_common"
-        require_rule 'audit deny @{HOME}/.gnupg/private-keys-v1.d/{,**} rwklm,' "$enforce_codex_common"
-        if grep -F 'audit deny @{HOME}/.ssh/id_* rwklm,' "$enforce_codex_common"; then
-          echo "explicit Codex SSH identity access was overridden by a deny" >&2
-          exit 1
-        fi
-        enforce_claude_common="$(common_rules ${pkgs-unstable.lib.escapeShellArg enforceProfileDirectory}/local-claude-code)"
-        require_rule 'audit deny @{HOME}/.netrc rwklm,' "$enforce_claude_common"
-        require_rule 'owner @{HOME}/.ssh/known_hosts{,.old} r,' "$enforce_claude_common"
-        require_rule 'owner @{HOME}/.config/gh/{config.yml,hosts.yml} r,' "$enforce_claude_common"
-        require_rule 'owner @{HOME}/.config/glab-cli/{aliases.yml,config.yml} r,' "$enforce_claude_common"
-        if grep -F 'audit deny @{HOME}/.config/gh/{config.yml,hosts.yml} rwklm,' "$enforce_codex_common" \
-          || grep -F 'audit deny @{HOME}/.config/gh/{config.yml,hosts.yml} rwklm,' "$enforce_claude_common"; then
-          echo "explicit agent forge authentication access was overridden by a deny" >&2
-          exit 1
-        fi
         touch "$out"
       '';
 

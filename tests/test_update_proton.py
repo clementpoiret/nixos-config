@@ -67,6 +67,26 @@ def package_path(root, package):
     return root / "pkgs" / package / filename
 
 
+def write_packages(root):
+    for package in PACKAGES:
+        path = package_path(root, package)
+        path.parent.mkdir(parents=True)
+        path.write_text(package_text(package))
+
+
+def served_feeds(metadata, verify_bridge_feed=None):
+    responses = {PACKAGES[package][0]: json.dumps(item).encode() for package, item in metadata.items()}
+    bridge_feed_url, bridge_binary_url = PACKAGES["protonmail-bridge"]
+    responses[bridge_feed_url + ".sig"] = b"feed-signature"
+    responses[bridge_binary_url.format(version="2.0.0") + ".sig"] = b"binary-signature"
+    fetch = Mock(side_effect=lambda url, **_: io.BytesIO(responses[url]))
+    return patch.dict(
+        updater["update_packages"].__globals__,
+        urlopen=fetch,
+        verify_bridge_feed=verify_bridge_feed or Mock(),
+    )
+
+
 class ProtonUpdateTests(unittest.TestCase):
     def test_selects_highest_stable_version_for_each_desktop_package(self):
         for package in PACKAGES:
@@ -215,10 +235,7 @@ class ProtonUpdateTests(unittest.TestCase):
         for invalid_source in ("cli", "beta"):
             with self.subTest(source=invalid_source), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
-                for package in PACKAGES:
-                    path = package_path(root, package)
-                    path.parent.mkdir(parents=True)
-                    path.write_text(package_text(package))
+                write_packages(root)
                 metadata = {package: feed(package) for package in PACKAGES}
                 if invalid_source == "cli":
                     metadata["proton-pass-cli"]["passCliVersions"]["urls"]["linux"]["x86_64"]["hash"] = "invalid"
@@ -228,12 +245,7 @@ class ProtonUpdateTests(unittest.TestCase):
                     beta["File"][0]["Sha512CheckSum"] = "invalid"
                     metadata["protonmail-desktop"]["Releases"].append(beta)
                     error = "Invalid sha512 checksum"
-                responses = {PACKAGES[package][0]: json.dumps(item).encode() for package, item in metadata.items()}
-                bridge_feed_url, bridge_binary_url = PACKAGES["protonmail-bridge"]
-                responses[bridge_feed_url + ".sig"] = b"feed-signature"
-                responses[bridge_binary_url.format(version="2.0.0") + ".sig"] = b"binary-signature"
-                fetch = Mock(side_effect=lambda url, **_: io.BytesIO(responses[url]))
-                with patch.dict(updater["update_packages"].__globals__, urlopen=fetch, verify_bridge_feed=Mock()):
+                with served_feeds(metadata):
                     with self.assertRaisesRegex(ValueError, error):
                         updater["update_packages"](root)
                 for package in PACKAGES:
@@ -242,19 +254,11 @@ class ProtonUpdateTests(unittest.TestCase):
     def test_updates_all_packages_and_channels_and_is_idempotent(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for package in PACKAGES:
-                path = package_path(root, package)
-                path.parent.mkdir(parents=True)
-                path.write_text(package_text(package))
+            write_packages(root)
             metadata = {package: feed(package) for package in PACKAGES}
             for package, category in BETA_CATEGORIES.items():
                 metadata[package]["Releases"].append(release(package, "3.0.0", category))
-            responses = {PACKAGES[package][0]: json.dumps(item).encode() for package, item in metadata.items()}
-            bridge_feed_url, bridge_binary_url = PACKAGES["protonmail-bridge"]
-            responses[bridge_feed_url + ".sig"] = b"feed-signature"
-            responses[bridge_binary_url.format(version="2.0.0") + ".sig"] = b"binary-signature"
-            fetch = Mock(side_effect=lambda url, **_: io.BytesIO(responses[url]))
-            with patch.dict(updater["update_packages"].__globals__, urlopen=fetch, verify_bridge_feed=Mock()):
+            with served_feeds(metadata):
                 updater["update_packages"](root)
                 updated = {package: package_path(root, package).read_text() for package in PACKAGES}
                 updater["update_packages"](root)
@@ -270,15 +274,10 @@ class ProtonUpdateTests(unittest.TestCase):
     def test_rejects_unverified_bridge_metadata_before_writing_packages(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for package in PACKAGES:
-                path = package_path(root, package)
-                path.parent.mkdir(parents=True)
-                path.write_text(package_text(package))
-            responses = {url: json.dumps(feed(package)).encode() for package, (url, _) in PACKAGES.items()}
-            responses[PACKAGES["protonmail-bridge"][0] + ".sig"] = b"invalid-signature"
-            fetch = Mock(side_effect=lambda url, **_: io.BytesIO(responses[url]))
+            write_packages(root)
+            metadata = {package: feed(package) for package in PACKAGES}
             verify = Mock(side_effect=subprocess.CalledProcessError(1, "gpgv"))
-            with patch.dict(updater["update_packages"].__globals__, urlopen=fetch, verify_bridge_feed=verify):
+            with served_feeds(metadata, verify_bridge_feed=verify):
                 with self.assertRaises(subprocess.CalledProcessError):
                     updater["update_packages"](root)
             verify.assert_called_once()

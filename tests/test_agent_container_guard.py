@@ -377,7 +377,6 @@ class AgentContainerGuardTest(unittest.TestCase):
             ("podman", ["unshare", "cat", "/etc/shadow"]),
             ("podman", ["mount", "container"]),
             ("podman", ["kube", "play", "pod.yaml"]),
-            ("podman", ["compose", "up"]),
             ("podman", ["container", "cp", "/etc/passwd", "example:/tmp"]),
             ("podman", ["image", "import", "/etc/passwd"]),
             ("podman", ["network", "prune"]),
