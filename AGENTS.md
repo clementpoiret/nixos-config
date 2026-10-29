@@ -3,6 +3,8 @@
 - Follow the verification policy in `docs/DECISIONS.md`: checks run real binaries, parsers, or fixtures, or assert
   properties derived across the configuration. Do not restate option values a module sets; record here why a setting
   must stay instead.
+- Temporary tests are allowed to reproduce issues and probe behavior. Once they pass, delete them unless they protect
+  critical system functionality or security, or cover especially tricky behavior that warrants regression protection.
 
 # Dependency updates
 
@@ -18,12 +20,9 @@
   through Electron's ASAR resolver, exercises this.
 - Bridge's Go executable segfaults after patchelf 0.19.2. Keep the package-local 0.15.2 pin, its runtime version install
   check, and DEB signature verification.
-- Khal's Sphinx hook reads `sphinxBuilders` as a scalar even with structured attributes: keep `"html man"`, not a list,
-  so the declared man output is produced.
 - Zotero's Gecko major must match `GECKO_VERSION_LINUX` in `app/config.sh` of `pkgs.zotero.src`; flake evaluation does
-  not catch a mismatch. Its runtime is nixpkgs' private, end-of-life `firefox-esr-140-bin.nix` (the old
-  `firefox-esr-153-unwrapped` override is rejected): keep the insecure-package exception in `modules/core/system.nix`
-  version-specific. After changing it, build
+  not catch a mismatch. Its runtime is nixpkgs' private, end-of-life `firefox-esr-140-bin.nix`; keep the insecure-package
+  exception in `modules/core/system.nix` version-specific. After changing it, build
   `nix build --no-link --no-update-lock-file .#nixosConfigurations.laptop.pkgs.zotero` (verified), both host toplevels,
   and `apparmor-policy-parser`.
 - Rayburst's Tauri state is `dev.aninsomniacy.rayburst` and its native browser host `dev.aninsomniacy.rayburst.browser`.
@@ -37,17 +36,12 @@
 - Build Niri's pinned source through the host overlay (`prev.niri-unstable`), not the input flake's package: Mesa loads
   from `/run/opengl-driver` and can require a newer glibc. Only `niri-mesa-runtime` exercises this; host builds miss it.
   The local `libdisplay-info_0_2` ABI override replaces the version unstable removed.
-- Keep CachyOS on the personal flake's `release` branch with its own nixpkgs input and `overlays.pinned`;
-  `linuxPackages-cachyos-latest-lto-zen4` already carries the LLVM/VirtualBox module fixes, and `cached-kernel` checks
-  both hosts use that exact derivation. GitHub runners ignore NixOS `nix.settings`, so both build jobs need the kernel
-  cache in `cachix-action.extraPullNames`. Reuse the kernel flake's `kernelModuleSignOverride` for custom kernel package
-  sets: it signs external modules after stripping and supplies the `.ko.cer` files the modules-tree aggregator needs.
-  See `docs/KERNEL.md` for the custom recipe and its stale `kcfi` symbol pitfall.
-- OpenCode's CLI build imports `script/native-arch.ts`, which upstream's Nix source filter omits; keep the full-source
-  override until the filter includes it. Its `bun.lock` can change before upstream's hash bot catches up, so keep the
-  source pinned and use upstream `nix/hashes.json`, never auto-accepted hashes. The shared repository also publishes v1
-  releases, so `releases/latest` can be older than the installed v2; `pkgs/update-opencode.py` only advances to newer
-  stable releases.
+- Preserve CachyOS's `release` input, independent nixpkgs, and `overlays.pinned` to keep cache compatibility. GitHub
+  runners need the kernel cache in `cachix-action.extraPullNames`; NixOS `nix.settings` do not apply there.
+  Custom kernels need `kernelModuleSignOverride` to sign stripped modules and emit `.ko.cer` files. See `docs/KERNEL.md`.
+- OpenCode's `bun.lock` can change before upstream's hash bot catches up, so keep the source pinned and use upstream
+  `nix/hashes.json`, never auto-accepted hashes. The shared repository also publishes v1 releases, so `releases/latest`
+  can be older than the installed v2; `pkgs/update-opencode.py` only advances to newer stable releases.
 - Ghostty's flake install check validates launcher paths without executing Ghostty; keep it enabled for host-optimized
   builds on generic CI runners. Its documentation and resource generators use the build CPU, independently of `-Dcpu`
   (verified in the upstream build sources).
@@ -63,7 +57,7 @@
 # Application theming
 
 - DMS plugin QML dependencies belong in its package's `extraQtPackages`, not only `home.packages`, so the launcher
-  exports their import paths. QtWebSockets loading through the configured DMS launcher was verified for both hosts.
+  exports their import paths.
 - DMS's GTK apply script refuses Home Manager-managed `gtk.css` symlinks. Keep
   `stylix.targets.gtk.colors.enable = false` and `gtk.gtk4.theme = null`, since any GTK4 theme makes Home Manager
   generate `gtk.css`; DMS owns the stylesheets while Stylix keeps fonts and cursors.
@@ -131,8 +125,3 @@
   preserving change IDs.
 - Fetching a rewritten imported `agent-base` can rebase the writable working change. Keep working-copy updates enabled
   for these fetches and use the current `@` for the following rebase: the pre-fetch commit ID can be obsolete.
-
-# Tests
-
-- Temporary tests are allowed to reproduce issues and probe behavior. Once they pass, delete them unless they protect
-  critical system functionality or security, or cover especially tricky behavior that warrants regression protection.

@@ -33,19 +33,24 @@ Standalone Home Manager flake outputs are intentionally not exposed.
 
 ## Verification
 
-Keep checks for runtime compatibility, confinement boundaries, authenticated
-updates, boot retention, and preservation of user work. Use the real parser,
-binaries, or isolated integration fixtures where possible. Avoid duplicating
-configuration literals, release manifests, cosmetic preferences, or retired
-implementation details in tests. Package/profile alignment is checked for every
-enabled application instead of maintaining per-application snapshots.
+Temporary tests may reproduce issues and probe behavior. Once they pass, remove
+them unless they protect critical system functionality, security, or user work,
+or cover especially tricky behavior that warrants lasting regression protection.
+Examples include boot retention, confinement boundaries, authenticated updates,
+and runtime compatibility that host builds cannot exercise.
+
+Use real parsers, binaries, or isolated integration fixtures where possible.
+Avoid duplicating configuration literals, release manifests, cosmetic
+preferences, or retired implementation details in tests. Package/profile
+alignment is checked for every enabled application instead of maintaining
+per-application snapshots.
 
 ## Hardware
 
 Generated `hardware-configuration.nix` files stay in host directories and
 should remain mostly generated hardware facts.
 
-Host facts declare CPU targets and kernel tick/lazy-RCU tuning. Shared modules
+Host facts declare CPU targets and lazy-RCU policy. Shared modules
 consume these values directly, so adding a host does not require hostname
 dispatch in the CPU or kernel modules. Fan control, ambient-light settings, and
 location policy belong in the host entrypoint.
@@ -62,8 +67,9 @@ store. Use runtime secret paths from `config.sops.secrets.*.path`.
 ## Operations
 
 `.github/workflows/nix-cache.yml` builds and caches the configurations on pushes
-to `main`, weekly schedules, and manual dispatch. Scheduled and manual runs also
-update pinned releases and the lockfile. Local checks remain available through
+to `main`, scheduled runs, and manual dispatch. See
+[OPERATIONS.md](OPERATIONS.md#continuous-integration-and-cachix) for the schedule,
+dependency updates, and cache boundaries. Local checks remain available through
 the flake's `checks.x86_64-linux` outputs.
 
 ## Hardening ownership

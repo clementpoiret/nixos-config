@@ -11,6 +11,8 @@ by default through `ROCR_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`, and
 
 ## Enter the environment
 
+Run these commands from the repository root:
+
 ```bash
 nix develop .#ml-rocm
 ```
@@ -40,9 +42,16 @@ clinfo | rg 'Device Name|Device Version|OpenCL'
 
 ## Temporary uv environment
 
+Use persistent storage: `/tmp` is RAM-backed, and GPU wheels and their unpacked
+environments can consume several GiB. Check available space before installing.
+
 ```bash
-tmp="$(mktemp -d)"
-cd "$tmp"
+repo_root="$PWD"
+scratch_root="$HOME/.cache/ml-rocm"
+df -h "$HOME"
+mkdir -p "$scratch_root"
+scratch_dir="$(mktemp -d "$scratch_root/session.XXXXXXXX")"
+cd "$scratch_dir"
 
 uv venv --python python3.12
 uv pip install torch torchvision --index-url "$PYTORCH_ROCM_INDEX_URL"
@@ -72,7 +81,7 @@ print((x @ x).mean().item())
 PY
 ```
 
-The tested wheel set was:
+Earlier wheel validation used:
 
 - `torch==2.12.1+rocm7.2`
 - `torchvision==0.27.1+rocm7.2`
@@ -88,20 +97,14 @@ Install JAX from the official ROCm local extra:
 uv pip install --upgrade "jax[rocm7-local]"
 ```
 
-The JAX plugin still rejects native `gfx1102`, so scope the gfx override to JAX
-commands:
+The recorded JAX stack rejects native `gfx1102`. Scope its gfx override to the
+validation command:
 
 ```bash
-export HSA_OVERRIDE_GFX_VERSION=11.0.0
+HSA_OVERRIDE_GFX_VERSION=11.0.0 python "$repo_root/templates/ml-rocm-uv/jax-smoke.py"
 ```
 
-Validate JAX:
-
-```bash
-python /home/clementpoiret/nixos-config/templates/ml-rocm-uv/jax-smoke.py
-```
-
-The tested JAX stack was:
+Earlier JAX validation used:
 
 - `jax==0.10.2`
 - `jaxlib==0.10.2`
@@ -111,6 +114,15 @@ The tested JAX stack was:
 It reported `backend: gpu`, `devices: [RocmDevice(id=0)]`, and completed a
 1024x1024 matrix multiply on the dGPU.
 
-Keep `HSA_OVERRIDE_GFX_VERSION=11.0.0` scoped to JAX commands unless another
-framework explicitly needs it. The ROCm runtime and PyTorch both detect the
-dGPU as `gfx1102` directly.
+Do not export the override for the whole shell: the ROCm runtime and PyTorch
+detect the dGPU as `gfx1102` directly.
+
+## Clean up
+
+After testing, remove only the scratch environment created above:
+
+```bash
+deactivate
+cd "$repo_root"
+rm -r -- "$scratch_dir"
+```

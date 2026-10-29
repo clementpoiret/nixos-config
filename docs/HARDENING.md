@@ -46,7 +46,7 @@ replacement; do not improvise keyslot removal outside it.
 
 ## Known audit gaps
 
-These findings are documented but intentionally not changed by this refactor:
+These security issues remain unresolved:
 
 - PAM treats U2F as an alternative to the password, while the mapping file is
   enrolled under the user's writable `~/.config/Yubico/u2f_keys`. A compromised
@@ -59,12 +59,12 @@ These findings are documented but intentionally not changed by this refactor:
   administrative access outside run0. Remove that group, use a per-user daemon,
   or constrain system-daemon authorization if run0 is meant to be the only
   elevation path.
-Lower-priority user-session issues also remain outside this refactor: the
-archive extraction helper does not safely preserve arbitrary filenames, the
-Helix Markdown formatter executes unpinned `uvx` packages, Syncthing's
-loopback GUI has no explicit authentication, the qutepocket userscript writes
-unescaped page titles to the qutebrowser command FIFO, and the suspend helper
-uses a predictable PID file in `/tmp`.
+
+Lower-priority user-session issues include unsafe filename handling in the
+archive extraction helper, unpinned `uvx` packages in Helix's Markdown formatter,
+an unauthenticated Syncthing loopback GUI, unescaped page titles sent to the
+qutebrowser command FIFO by qutepocket, and a predictable suspend-helper PID
+file in `/tmp`.
 
 ## Intentional compatibility choices
 
@@ -113,135 +113,22 @@ Do not apply a broad module blacklist without first inventorying `lsmod`,
 
 `modules/core/apparmor.nix` owns the policy generator. Applications register
 beside their Home Manager packages, while services register beside their NixOS
-units. The complete capability model, mode reference, testing commands,
-policy-editing recipes, and rollback procedure are in
-[APPARMOR.md](APPARMOR.md).
+units. Workload profiles use a staged learning policy by default; the narrow
+DNS helper is enforced. Required Bubblewrap and agent-container infrastructure
+profiles remain enforced even when workload mode is `complain` or `disable`.
 
-A typical configuration is:
+Enforced workloads deny undeclared access to credentials and protected
+configuration trees. Developer profiles deliberately have broader execution
+rights; staged or complain-mode profiles are not a complete malicious-agent
+boundary. Systemd sandboxing and Unix permissions remain independent layers.
 
-```nix
-security.localAppArmor = {
-  mode = "staged";
-  debug = {
-    enable = true;
-    path = "~/.local/state/apparmor-reports";
-  };
-  profileOverrides.local-syncthing = "enforce";
-};
-```
-
-The debug timer writes a private cumulative JSON report every 30 minutes and keeps one archive per boot. It covers all
-AppArmor profiles so failures outside the locally generated set are visible during hardening work; see
-[APPARMOR.md](APPARMOR.md#automatic-debug-reports) for output layout, manual triggering, and retention details.
-
-The complete modes are active configuration, not commented examples:
-
-| Mode | Result |
-|---|---|
-| `staged` | Enforce `local-apply-secret-dns`; load every other managed profile in complain mode |
-| `disable` | Keep all policy definitions evaluable, but load none and omit systemd AppArmor attachments |
-| `complain` | Load every managed profile in complain mode |
-| `enforce` | Enforce every managed profile |
-
-`profileOverrides` accepts `disable`, `complain`, or `enforce` for any managed
-profile and always wins over the selected mode. Unknown names fail evaluation.
-AppArmor remains enabled when the local mode is `disable`, so upstream or
-future service profiles are not silently disabled with the local set.
-
-The application inventory covers:
-
-- untrusted files and documents: File Roller, Evince, mpv, pqiv, Inkscape,
-  Draw.io, Zotero, Logseq, and the three SoftMaker applications;
-- browsers and network clients: Brave, Mullvad Browser, Vivaldi,
-  Thunderbird, Proton Mail Bridge, Proton Pass and its CLI, Proton VPN,
-  qBittorrent, Rayburst, and Deezer;
-- development tools: Codex CLI and Claude Code.
-
-Application attachments use their exact Nix store executables. Transitive
-package closures receive only read and library-mapping permissions; execution
-is limited to direct package outputs and explicitly registered helper packages
-or paths for ordinary profiles. Applications opt into typed desktop, IPC,
-network, device, namespace, terminal, and user-file capabilities. Development-agent
-profiles deliberately allow inherited execution and executable mappings across
-the immutable store, non-hidden project trees, and temporary build trees. This supports `uv`,
-Python native extensions, Go, Rust, and ephemeral Nix environments without a
-stale tool manifest; known managed applications still transition into their
-own loaded profiles.
-
-Shared desktop compatibility rules cover bounded runtime metadata and the
-configured GTK/Qt/GVFS plugin set for every GUI profile. Network and user
-namespace rules are likewise emitted from capabilities, while workload-specific
-state paths and sandbox launchers remain explicit registrations. Logseq runs its
-extracted payload against an immutable library tree without runtime mounts, while
-Codex CLI and Claude Code use exact-path Bubblewrap transitions. Codex uses the
-shared, always-enforced upstream broker, which owns namespace and mount setup and
-then stacks an `unpriv_bwrap` child profile that strips capabilities from sandboxed
-commands. Claude uses a dedicated always-enforced derivative whose payload permits
-`CAP_SYS_ADMIN` only so its seccomp helper can configure a nested user namespace;
-the capability is not granted to the Claude workload profile or the shared broker
-payload. Claude additionally has a fail-closed managed sandbox policy. Development
-agents separately opt into read-only host diagnostics; journals and cross-process
-metadata are not part of the ordinary desktop or runtime-introspection baseline.
-
-Codex CLI and Claude Code also receive guarded Podman/Buildah launchers. Exact
-launcher paths enter always-enforced per-agent engine brokers, container payloads
-enter a shared enforced payload profile, and each agent uses separate rootless
-storage and runtime trees. Claude's managed sandbox statically excludes only these
-launcher command names from Bubblewrap so their outer-profile broker transitions
-remain reachable, while arbitrary unsandboxed commands stay disabled. The guard
-confines host path arguments to the current workspace, blocks
-namespace/device/capability/security overrides, scrubs the host environment, and
-closes inherited file descriptors. See
-[Guarded agent containers](APPARMOR.md#guarded-agent-containers) for supported
-commands and the remaining literal-Nix-store-path limitation.
-
-Mode-aware decisions protect SOPS/age keys and decrypted secrets, forge CLI
-authentication, SSH identities/config/known-host records/control sockets, GPG
-private keys and agent sockets, mail authentication, Secret Service/keyring
-channels, the U2F mapping, and common password-store locations. Credential groups
-remain denied unless the individual application explicitly registers access; being
-a development tool is not a blanket exception. Complain profiles omit these
-explicit denies; enforced profiles add and VM-test them. The same boundary
-protects `~/nixos-config`, while the agent profiles alone receive the separately
-reviewed `~/nixos-config-writable` tree.
-
-Syncthing is always configured at `/home/clementpoiret/Sync`. On the desktop,
-both that logical path and `/srv/syncthing` are authorized because `~/Sync` is
-a symlink to the encrypted mount and AppArmor/systemd may mediate the canonical
-target. Its systemd unit uses a read-only home and system image with only those
-roots writable. The DNS helper has a narrow enforced profile, an explicit
-`CAP_CHOWN` ceiling, and atomically installs a `0600` drop-in owned by
-`systemd-resolve`.
-
-The checked inventories explicitly leave broad launchers and privileged
-administrators unconfined, and defer network control-plane, virtualization,
-desktop-session broker, and host-management services to workload-specific
-threat models. This covers shells, terminals, file managers, editors, agents,
-NetworkManager/resolved/chrony/sshd/Tailscale, general-purpose Podman/libvirt, greetd/D-Bus/
-portals/keyrings/PipeWire/Bluetooth/PCSC, and hardware or GPU management
-daemons. Generic profiles for those classes would either transitively confine
-unrelated work or require misleadingly broad authority. Existing systemd
-sandboxing and subsystem controls still apply.
-
-### Promotion workflow
-
-Promote one profile at a time. Exercise its file-open/save/export paths,
-desktop portals, audio/video, hardware acceleration, network behavior, and
-child processes before enforcement:
-
-```bash
-run0 -- journalctl -b --grep 'apparmor="DENIED"'
-run0 -- aa-status
-nix build .#checks.x86_64-linux.apparmor-policy-parser
-nix build .#checks.x86_64-linux.apparmor-vm
-```
-
-Set a single override to `enforce`, rebuild both hosts, and repeat the workload
-and journal review. Use `complain` to continue learning or `disable` to unload a
-problem profile; do not add broad `/nix/store/**` execution rules to ordinary
-profiles to silence denials. Immutable-store compatibility reads remain
-non-executable outside the explicit `developer-exec` capability, while direct
-execution manifests keep ordinary package upgrades reviewable.
+[APPARMOR.md](APPARMOR.md) is the authoritative reference for
+[modes](APPARMOR.md#modes), capabilities and exceptions, guarded containers,
+[verification](APPARMOR.md#verify-a-policy-change),
+[debug reports](APPARMOR.md#automatic-debug-reports), and
+[promotion and recovery](APPARMOR.md#promote-and-recover). Promote one workload
+at a time after testing its complete intended workflow. Recover with a narrow
+profile override, not by disabling AppArmor or adding broad execution grants.
 
 ## Deployment and recovery
 

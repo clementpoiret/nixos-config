@@ -1,7 +1,7 @@
 # Secure Boot, Measured Boot, and TPM Unlock
 
-This runbook covers the laptop's migration to Lanzaboote measured boot with
-TPM2-and-PIN unlocking for both LUKS2 containers. It also covers normal
+This runbook covers initial enrollment of Lanzaboote measured boot with
+TPM2-and-PIN unlocking for both laptop LUKS2 containers. It also covers normal
 operation, firmware changes, TPM clearing, motherboard replacement, and
 recovery.
 
@@ -20,6 +20,11 @@ enrollment.
 
 Measured boot and `systemd-pcrlock` are still experimental. Never rely on the
 TPM slot as the only unlock method.
+
+For an already configured laptop, use [routine operation](#routine-operation),
+[TPM or motherboard recovery](#tpm-clear-or-motherboard-replacement), or
+[installer recovery](#emergency-recovery-from-a-nixos-installer). Follow
+[initial enrollment](#initial-enrollment) only when provisioning the unlock policy.
 
 ## Repository state and ownership
 
@@ -68,7 +73,9 @@ to power-off: mounted LUKS volume keys remain available to the running kernel.
 Hibernation remains protected because this host's swapfile is on encrypted
 root storage.
 
-## Phase 1: prepare recovery material
+## Initial enrollment
+
+### Prepare recovery material
 
 Do not change a keyslot until a current NixOS installer and encrypted offline
 storage are available.
@@ -80,7 +87,7 @@ ROOT_LUKS=/dev/disk/by-uuid/4b1c13e3-af35-4286-b534-674ca54de75a
 HOME_LUKS=/dev/disk/by-uuid/5ee5fadf-22f0-4a53-a33d-63e22931255f
 ```
 
-### Verify LUKS2 and TPM support
+#### Verify LUKS2 and TPM support
 
 ```bash
 for device in "$ROOT_LUKS" "$HOME_LUKS"; do
@@ -96,7 +103,7 @@ device such as `/dev/tpmrm0`, and the support check must print `yes`. Stop if
 any check fails. Converting LUKS1 is an offline metadata migration and is not
 part of this runbook.
 
-### Back up both LUKS headers
+#### Back up both LUKS headers
 
 A header backup protects LUKS metadata and keyslots, not filesystem data.
 
@@ -117,7 +124,7 @@ An old header backup plus a passphrase valid when it was created can restore
 that removed passphrase, so retire these pre-migration images after verified
 post-migration backups exist.
 
-### Add and test unique recovery keys
+#### Add and test unique recovery keys
 
 Enroll a different generated recovery key into each volume. Label and record
 each key before continuing; do not keep the only copy on this laptop.
@@ -146,7 +153,7 @@ run0 -- cryptsetup open \
 Enter the corresponding recovery key at each prompt. Keep the old shared
 passphrase until the entire TPM path has survived a real reboot.
 
-### Back up the Secure Boot PKI
+#### Back up the Secure Boot PKI
 
 `/var/lib/sbctl` contains private platform signing keys. Copy the directory to
 encrypted offline storage without putting it in the Nix store or this
@@ -156,10 +163,10 @@ Losing the PKI does not immediately make an already signed generation
 unbootable while its public key remains enrolled in firmware, but it prevents
 signing future generations and complicates firmware or motherboard recovery.
 
-## Phase 2: establish Secure Boot
+### Establish Secure Boot
 
-If Secure Boot is already enabled and healthy, verify it and continue to phase
-3:
+If Secure Boot is already enabled and healthy, verify it and continue to
+[configure measured boot and TPM unlock](#configure-measured-boot-and-tpm-unlock):
 
 ```bash
 bootctl status
@@ -205,20 +212,18 @@ firmware certificates alongside the owner keys. Do not switch to an
 owner-key-only policy without auditing every Option ROM and the firmware update
 path.
 
-## Phase 3: configure measured boot and TPM unlock
+### Configure measured boot and TPM unlock
 
-### Add laptop policy
+#### Review laptop policy
 
-Merge the following settings into the existing `boot` attribute set in
-`hosts/laptop/default.nix`:
+Confirm the following effective policy before enrollment. TPM and PCR settings
+live in `hosts/laptop/default.nix`; `configurationLimit` is shared in
+`modules/core/bootloader.nix`. Do not duplicate existing definitions.
 
 ```nix
 boot = {
   initrd = {
-    systemd = {
-      enable = true;
-      tpm2.enable = true;
-    };
+    systemd.tpm2.enable = true;
 
     luks.devices = {
       "luks-4b1c13e3-af35-4286-b534-674ca54de75a".crypttabExtraOpts = [
@@ -265,7 +270,7 @@ Do not enable `boot.lanzaboote.measuredBoot.autoCryptenroll` for this setup.
 The pinned module accepts only one device and its automatic enrollment command
 does not request a PIN; this laptop has two volumes and requires TPM plus PIN.
 
-### Build and boot the policy generation
+#### Build and boot the policy generation
 
 ```bash
 nix flake check --no-build --no-update-lock-file
@@ -290,7 +295,7 @@ systemctl status systemd-pcrlock-make-policy.service
 
 Resolve any failed PCR-lock service before enrollment.
 
-### Enroll both volumes with TPM plus PIN
+#### Enroll both volumes with TPM plus PIN
 
 Keep both recovery keys physically available. Enroll one device at a time:
 
@@ -327,7 +332,7 @@ run0 -- cryptsetup luksDump "$ROOT_LUKS"
 run0 -- cryptsetup luksDump "$HOME_LUKS"
 ```
 
-### Reboot-test before removing anything
+#### Reboot-test before removing anything
 
 ```bash
 run0 -- reboot
@@ -348,7 +353,7 @@ journalctl -b -u 'systemd-cryptsetup@*'
 Do not remove the shared passphrase unless both volumes unlocked, Secure Boot
 is enabled, both recovery keys were tested, and a recovery installer is ready.
 
-### Remove the old shared passphrase
+#### Remove the old shared passphrase
 
 `luksRemoveKey` removes the slot matching the credential entered at its prompt.
 Enter the old shared passphrase, not the TPM PIN or recovery key:
@@ -358,9 +363,9 @@ run0 -- cryptsetup luksRemoveKey "$ROOT_LUKS"
 run0 -- cryptsetup luksRemoveKey "$HOME_LUKS"
 ```
 
-Confirm the old passphrase fails by repeating the `cryptsetup open
---test-passphrase --disable-external-tokens --tries 1` tests from phase 1, then
-retest both recovery keys and inspect both `luksDump` outputs.
+Confirm the old passphrase fails by repeating the
+[recovery-key tests](#add-and-test-unique-recovery-keys) with that passphrase,
+then retest both recovery keys and inspect both `luksDump` outputs.
 
 Create new header backups:
 

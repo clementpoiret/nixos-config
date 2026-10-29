@@ -53,6 +53,8 @@ The review gate becomes an AppArmor security boundary only after the relevant ag
 complain mode, AppArmor intentionally permits policy violations, so the separate clone is a workflow safeguard rather
 than an OS-level write barrier. Do not promote an agent profile until its enforced workflow passes the documented tests.
 
+Before promotion, validate the writable checkout:
+
 ```bash
 nix develop
 nix fmt
@@ -61,9 +63,11 @@ nix build .#checks.x86_64-linux.laptop-toplevel
 nix build .#checks.x86_64-linux.desktop-toplevel
 ```
 
-Use run0 elevation and test before switching the current host:
+After promotion, activate from the protected checkout. Use run0 elevation and
+test before switching the current host:
 
 ```bash
+cd ~/nixos-config
 nixos-rebuild test --flake .#laptop --elevate=run0
 nixos-rebuild switch --flake .#laptop --elevate=run0
 ```
@@ -120,10 +124,12 @@ Prefer one input or one related input group per update when debugging breakage.
 ## Continuous Integration and Cachix
 
 The GitHub Actions workflow evaluates every flake check and builds selected shared
-checks plus both host toplevels on pushes to `main`. Every
-Sunday it updates Herdr and Superfile to their latest stable release tags,
-updates all flake inputs, builds the updated checks, and pushes the verified
-`flake.nix` and `flake.lock` directly to `main`.
+checks plus both host toplevels on pushes to `main`. Scheduled runs occur on
+Wednesday and Sunday at 03:17 in `Europe/Paris`; manual dispatch uses the same
+update workflow. These runs update Ghostty, Herdr, Superfile, Logseq, Proton
+packages, Brave, and OpenCode release pins, plus all flake inputs. After the
+checks and both host builds succeed, the allowlisted dependency files are
+committed and pushed directly to `main`.
 
 Configure a repository Actions secret named `CACHIX_AUTH_TOKEN` with a
 cache-scoped write token for the private `clementpoiret` Cachix cache. The
@@ -137,14 +143,11 @@ cached individually instead of the aggregate modules trees, which reference the
 kernel. CI rejects curated closures containing kernel outputs before uploading.
 CI does not watch builds for uploads; complete host configurations are built only
 for validation.
-The next successful host builds replace the old kernel-containing pins;
-previously uploaded copies still require Cachix garbage collection or manual
-deletion to reclaim storage.
 
 ## Hardening changes
 
-Follow [HARDENING.md](HARDENING.md) for boot-first deployment, the recovery
-specialisation, runtime checks, and optional strict controls. USBGuard has a
+Follow [HARDENING.md](HARDENING.md) for security runtime checks, recovery
+requirements, and optional strict controls. USBGuard has a
 separate cold-boot rollout in [USBGUARD.md](USBGUARD.md). Laptop Secure Boot,
 measured boot, TPM enrollment, firmware updates, and motherboard replacement
 are covered by [MEASURED-BOOT.md](MEASURED-BOOT.md).

@@ -35,14 +35,10 @@ Use `.#desktop` for the desktop host.
 
 ## Existing Machine
 
-For a machine that already boots this configuration:
-
-```bash
-nix flake check --no-build --no-update-lock-file
-nix build .#nixosConfigurations.$(hostname).config.system.build.toplevel
-nixos-rebuild test --flake . --elevate=run0
-nixos-rebuild switch --flake . --elevate=run0
-```
+For a machine that already boots this configuration, follow
+[OPERATIONS.md](OPERATIONS.md) for reviewed updates, builds, activation, and
+rollback. Kernel, bootloader, initrd, filesystem, hibernation, and GPU-driver
+changes use its [boot-first workflow](OPERATIONS.md#riskier-changes).
 
 ## Secrets
 

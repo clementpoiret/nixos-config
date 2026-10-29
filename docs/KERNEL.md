@@ -10,29 +10,23 @@ and `framework_laptop` after stripping when their installers skip Kbuild's
 signing step, producing the `.ko.cer` certificates Nixpkgs' module-tree
 aggregator needs. Do not duplicate these signing overrides locally.
 
-## Differences from the custom kernel
+## Cached preset
 
-| Setting | Previous custom kernel | Cached preset |
-| --- | --- | --- |
-| Compiler / CPU | Clang ThinLTO / Zen 4 | Same |
-| KCFI request | `true` (ineffective; see below) | `false` |
-| Timer frequency | Laptop: 300 Hz; desktop: 500 Hz | 1000 Hz on both |
-| Tickless mode | `idle` (`NO_HZ_IDLE`) | `full` (`NO_HZ_FULL`) |
-| Transparent huge pages | `madvise` by default | `always` by default |
+| Setting | Value |
+| --- | --- |
+| Compiler / CPU | Clang ThinLTO / Zen 4 |
+| KCFI | Disabled (`CONFIG_CFI` is not set) |
+| Timer frequency | 1000 Hz on both hosts |
+| Tickless mode | Full (`NO_HZ_FULL`) |
+| Transparent huge pages | Compiled default: `always`; boot parameter: `madvise` |
 
 Full tickless support does not by itself isolate CPUs or enable `nohz_full`
 on them. The existing `transparent_hugepage=madvise` boot parameter preserves
 the runtime huge-page policy despite the preset's compiled default.
-EEVDF, full dynamic preemption, harder compiler optimizations, no forced
-performance governor, `bbr3 = false`, and automatic module selection are
-unchanged. SCX/LAVD remains enabled separately and supersedes EEVDF while
-the SCX scheduler is active.
+SCX/LAVD remains enabled separately and supersedes EEVDF while the SCX
+scheduler is active.
 
-The previous laptop kernel's generated config and the cached preset both
-have `CONFIG_CFI` disabled. The flake's `kcfi` helper still sets the old
-`CFI_CLANG` symbols, while these kernel versions use `CONFIG_CFI`; requesting
-`kcfi = true` did not enable it. Restoring the old recipe alone does not
-restore CFI protection: verify the generated config, not just that argument.
+## Using the binary cache
 
 The cache URL and signing key are configured in `modules/core/system.nix`.
 They must be active in the Nix daemon before it can substitute from the new
@@ -51,7 +45,13 @@ Then install a boot generation following
 [HARDENING.md](HARDENING.md#deployment-and-recovery), without switching the
 running kernel.
 
-## Restore the custom kernel
+## Optional custom kernel
+
+Use this recipe only when deliberately replacing the cached preset with a local
+kernel build. The `hzTicks` facts are consumed here, not by the active preset.
+The flake's `kcfi` helper targets older `CFI_CLANG` symbols; setting
+`kcfi = true` alone does not enable `CONFIG_CFI`. Verify the generated config
+before claiming CFI protection.
 
 In `modules/core/hardware.nix`, insert this `let` block between the module
 arguments (`}:`) and its returned attribute set (`{`), then replace
@@ -96,7 +96,7 @@ let
 in
 ```
 
-Restoring these overrides requires a custom kernel build. Update the
+Applying these overrides requires a custom kernel build. Update the
 `cached-kernel` check in `tests/flake-checks.nix` to check the restored policy
 rather than equality with the cached preset, and update the active baseline in
 `HARDENING.md`.

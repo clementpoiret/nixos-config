@@ -6,6 +6,10 @@ Both hosts retain four CachyOS generations in the boot menu. The `latest-nixos`
 kernel specialisation is retired, including entries embedded in older retained
 generations. See `MEASURED-BOOT.md` for the PCR policy budget and installer cleanup.
 
+Both hosts use the unmodified cached CachyOS LTO Zen4 preset, with a 1000 Hz
+timer. The `hzTicks` facts apply only to the optional custom-kernel recipe, not
+the active preset. See [KERNEL.md](KERNEL.md) for compiled and runtime policy.
+
 Niri's source remains pinned, but its baseline and CPU-optimized binaries are built
 with the host package set. They dynamically load Mesa from `/run/opengl-driver`,
 so a prebuilt Niri from an older package set can fail at login with
@@ -28,7 +32,7 @@ Desktop workstation with an MSI MAG X870E Tomahawk WiFi motherboard, Ryzen 9
 
 Local host policy includes:
 
-- CachyOS latest LTO Zen4 kernel with 500 Hz tuning and AMD P-State active mode.
+- AMD P-State active mode.
 - `facts.nix` selects `znver5` for host-optimized applications and leaves lazy RCU
   at its kernel default.
 - Power Profiles Daemon defaults to Balanced, while LAVD Autopilot remains the
@@ -95,8 +99,8 @@ keyboard/module access rules, AMD common defaults, and power profile defaults.
 
 Local host policy includes:
 
-- CachyOS latest LTO Zen4 kernel with laptop-specific 300 Hz and lazy RCU tuning.
-- `facts.nix` selects `znver4` for host-optimized applications and records kernel tuning.
+- Lazy RCU enabled through the `rcutree.enable_rcu_lazy=1` boot parameter.
+- `facts.nix` selects `znver4` for host-optimized applications.
 - Fan control, ambient-light adjustment, and city-level location policy live in `default.nix`.
 - LAVD Autopower follows the active platform power profile when selecting its
   power mode, CPU preference order, and core-compaction policy.
