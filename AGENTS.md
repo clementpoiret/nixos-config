@@ -57,6 +57,10 @@
   and use upstream `nix/hashes.json`, never auto-accepted hashes. The shared repository
   also publishes v1 releases, so `releases/latest` can be older than the installed v2;
   `pkgs/update-opencode.py` only advances to newer stable releases.
+- Ghostty's flake install check validates launcher paths without executing Ghostty;
+  keep it enabled for host-optimized builds on generic CI runners. Its documentation
+  and resource generators use the build CPU, independently of `-Dcpu` (verified in
+  the upstream build sources).
 
 # CI caching
 

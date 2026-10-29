@@ -70,6 +70,7 @@ jobs:
             fi
           }
 
+          update_release_input ghostty-org/ghostty
           update_release_input herdrdev/herdr
           update_release_input yorukot/superfile
 

@@ -74,16 +74,13 @@ in
           # Use the baseline package only to generate architecture-independent completions.
           postInstall = replaceNiriCompletionGenerator niriBaseline (old.postInstall or "");
         });
-        ghosttyHost = prev.ghostty.overrideAttrs (old: {
-          # The version check executes the installed binary, which generic
-          # GitHub runners may not support after host CPU optimization.
-          doInstallCheck = false;
+        ghosttyHost = prev.flake.ghostty.overrideAttrs (old: {
           zigBuildFlags = replaceGhosttyCpu old.zigBuildFlags;
-          zigCheckFlags = replaceGhosttyCpu old.zigCheckFlags;
         });
       in
       {
         flake = prev.flake // {
+          ghostty = ghosttyHost;
           herdr = herdrHost;
         };
 

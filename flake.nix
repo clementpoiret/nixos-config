@@ -68,6 +68,11 @@
       url = "github:AvengeMedia/dank-greeter";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    ghostty = {
+      url = "github:ghostty-org/ghostty/v1.4.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
     ghosttyshaders = {
       url = "github:sahaj-b/ghostty-cursor-shaders";
       flake = false;
@@ -121,6 +126,7 @@
       # bibli-ls,
       claude-code,
       codex-cli,
+      ghostty,
       # helium,
       herdr,
       home-manager,
@@ -166,6 +172,7 @@
         # bibli-ls = bibli-ls.packages.${system}.default;
         claude-code = wrapAgent "claude" claude-code.packages.${system}.default;
         codex-cli = wrapAgent "codex" codex-cli.packages.${system}.default;
+        ghostty = ghostty.packages.${system}.ghostty-releasefast;
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
         hylki = hylki.packages.${system}.default;
