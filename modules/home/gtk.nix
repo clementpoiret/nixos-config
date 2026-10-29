@@ -78,7 +78,10 @@ in
   '';
 
   programs.dank-material-shell.package =
-    options.programs.dank-material-shell.package.default.overrideAttrs
+    (options.programs.dank-material-shell.package.default.override {
+      # The Home Assistant plugin imports QtWebSockets at runtime.
+      extraQtPackages = [ pkgs.qt6.qtwebsockets ];
+    }).overrideAttrs
       (oldAttrs: {
         postInstall = oldAttrs.postInstall + ''
           # Standard qtct needs native palettes, not DMS's KDE color scheme.
