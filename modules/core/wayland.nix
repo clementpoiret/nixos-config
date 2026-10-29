@@ -85,8 +85,8 @@ in
         "gtk"
         "gnome"
       ];
-      # GNOME's shortcut provider requires GNOME Shell, not just Online Accounts.
-      "org.freedesktop.impl.portal.GlobalShortcuts" = [ "none" ];
+      # GNOME's shortcut provider requires GNOME Shell; niri binds press shortcuts instead.
+      "org.freedesktop.impl.portal.GlobalShortcuts" = [ pkgs.niri-shortcuts-portal.portalName ];
       "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
       "org.freedesktop.impl.portal.Screenshot" = [ "gnome" ];
       "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
@@ -95,6 +95,7 @@ in
     extraPortals = [
       pkgs.xdg-desktop-portal-gtk
       pkgs.xdg-desktop-portal-gnome
+      pkgs.niri-shortcuts-portal
     ];
   };
 }

@@ -240,14 +240,48 @@ in
         touch "$out"
       '';
 
-  niri-scratch-terminal =
-    pkgs-unstable.runCommand "niri-scratch-terminal"
+  niri-shortcuts-portal =
+    let
+      host = self.nixosConfigurations.laptop;
+      hostPkgs = host.pkgs;
+      home = host.config.home-manager.users.${username};
+      portals = pkgs-unstable.symlinkJoin {
+        name = "xdg-desktop-portals";
+        paths = host.config.xdg.portal.extraPortals;
+      };
+    in
+    pkgs-unstable.runCommand "niri-shortcuts-portal"
       {
-        nativeBuildInputs = [ pkgs-unstable.python3 ];
-        NIRI_SCRATCH_TERMINAL_SOURCE = ../modules/home/niri-scratch-terminal.py;
+        nativeBuildInputs = [
+          hostPkgs.dbus
+          (hostPkgs.python3.withPackages (ps: [ ps.dbus-fast ]))
+          # Registering an app ID requires its desktop file, whose TryExec must resolve.
+          home.programs.ghostty.package
+        ];
+        NIRI_BIND_COMMAND = builtins.toJSON home.programs.niri.settings.binds."Alt+T".action.spawn;
+        XDG_DESKTOP_PORTAL = "${hostPkgs.xdg-desktop-portal}/libexec/xdg-desktop-portal";
       }
       ''
-        python ${./test_niri_scratch_terminal.py}
+        # The private bus below runs Exec= directly; the session bus asks systemd instead.
+        for service in ${hostPkgs.niri-shortcuts-portal}/share/dbus-1/services/*.service; do
+          unit=$(sed -n 's/^SystemdService=//p' "$service")
+          if [ -n "$unit" ]; then
+            test -e "${host.config.environment.etc."systemd/user".source}/$unit"
+          fi
+        done
+
+        export HOME="$TMPDIR" XDG_CURRENT_DESKTOP=niri XDG_RUNTIME_DIR="$TMPDIR/runtime"
+        # Activate only the shortcuts backend, since the GTK and GNOME ones need a display.
+        export XDG_DATA_DIRS=${hostPkgs.niri-shortcuts-portal}/share:${home.programs.ghostty.package}/share
+        # The frontend reads both portal definitions and portals.conf from this directory.
+        export XDG_DESKTOP_PORTAL_DIR="$TMPDIR/portals"
+        mkdir -p "$XDG_RUNTIME_DIR" "$XDG_DESKTOP_PORTAL_DIR"
+        chmod 0700 "$XDG_RUNTIME_DIR"
+        ln -s ${portals}/share/xdg-desktop-portal/portals/*.portal "$XDG_DESKTOP_PORTAL_DIR"
+        ln -s ${host.config.environment.etc."xdg/xdg-desktop-portal/niri-portals.conf".source} \
+          "$XDG_DESKTOP_PORTAL_DIR/niri-portals.conf"
+        dbus-run-session --config-file=${hostPkgs.dbus}/share/dbus-1/session.conf -- \
+          python ${./test_niri_shortcuts_portal.py}
         touch "$out"
       '';
 

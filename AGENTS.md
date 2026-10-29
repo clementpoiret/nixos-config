@@ -86,13 +86,23 @@
 # Niri desktop
 
 - GNOME Control Center provides the D-Bus GlobalShortcutsProvider, which Ghostty's
-  global keybindings can activate even outside GNOME. Keep Niri's GlobalShortcuts
-  portal set to `none` without disabling Online Accounts or the keyring; GNOME still
-  provides screen sharing.
-- The reusable terminal needs its own Ghostty `--class` so GTK single-instance mode does
-  not share the normal terminal's identity. Its helper addresses workspaces by ID
-  through Niri's JSON IPC, because CLI workspace numbers are per-monitor, and parks on a
-  dynamic empty workspace, because a named one would change the login workspace.
+  global keybindings can activate even outside GNOME, and GNOME's backend needs GNOME
+  Shell. Keep GlobalShortcuts on the local `niri-shortcuts` portal without disabling
+  Online Accounts or the keyring; GNOME still provides screen sharing.
+- Applications bind global shortcuts through xdg-desktop-portal, and Niri binds press
+  them with `pkgs.niri-shortcuts-portal.activateCommand`. IDs are chosen by the
+  application: Ghostty uses the trigger (`global:alt+t` binds `ALT+t`, verified with
+  Ghostty 1.3.1). The backend logs every bound ID to its journal. Its user unit lives
+  in `lib/systemd/user`: NixOS ignores packages' `share/systemd/user`, which breaks
+  D-Bus activation through `SystemdService=`.
+- Portal sessions die with the xdg-desktop-portal frontend, which Niri's startup
+  commands restart after Ghostty is up, so the Ghostty module reloads Ghostty after each
+  frontend start. In `niri-shortcuts-portal`, `XDG_DESKTOP_PORTAL_DIR` also replaces the
+  `portals.conf` search path, and registering a host app ID needs its desktop file with
+  a resolvable `TryExec`.
+- Live portal probes on a private session bus must not activate `xdg-document-portal`:
+  it takes over `$XDG_RUNTIME_DIR/doc` and the session's instance exits (restart
+  `xdg-document-portal.service`).
 
 # AppArmor
 
