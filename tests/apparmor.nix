@@ -82,6 +82,8 @@ pkgs.testers.runNixOSTest {
       };
 
       system.stateVersion = "26.05";
+      # apparmor.service compiles one policy per core.
+      virtualisation.cores = 4;
       hardware.graphics = {
         package = pkgs.mesa;
         package32 = pkgs.pkgsi686Linux.mesa;

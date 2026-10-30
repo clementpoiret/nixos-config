@@ -866,9 +866,11 @@ in
             if [ -n "$attachment" ]; then
               test -x "$attachment"
             fi
-            apparmor_parser --config-file /dev/null --quiet --skip-kernel-load --skip-cache \
-              --Include "$profile_directory" ${includeArguments} "$policy"
           done
+          # One call compiles the policies in parallel.
+          apparmor_parser --config-file /dev/null --quiet --skip-kernel-load --skip-cache \
+            --Include "$profile_directory" ${includeArguments} \
+            "$profile_directory"/bwrap "$profile_directory"/local-*
         done
 
         ${containerConfigChecks}
