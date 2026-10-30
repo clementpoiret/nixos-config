@@ -32,11 +32,13 @@ in
     gpg-agent = {
       allowRules = ''
         owner @{HOME}/.gnupg/S.gpg-agent{,.*} rw,
+        owner @{run}/user/[0-9]*/gnupg/S.gpg-agent{,.*} rw,
         owner @{HOME}/.gnupg/common.conf r,
         owner @{HOME}/.gnupg/trustdb.gpg rw,
       '';
       denyRules = ''
         audit deny @{HOME}/.gnupg/S.gpg-agent{,.*} rwklm,
+        audit deny @{run}/user/[0-9]*/gnupg/S.gpg-agent{,.*} rwklm,
       '';
       homeRoots = [ ".gnupg" ];
     };

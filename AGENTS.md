@@ -90,9 +90,10 @@
 
 - Confined systemd services must allow `config.systemd.package`, not `pkgs.systemd`: NixOS customizes the package used
   in unit PATHs. `apparmor-mode-matrix` checks both host registries.
-- GnuPG's sockets live in `/run/user/$UID/gnupg`, not `~/.gnupg`, which is all the shared `gpg-agent` sensitive group
-  covers. Only gpg-agent is socket-activated; the first gpg client autostarts keyboxd (`use-keyboxd` in `common.conf`)
-  and dirmngr, so they run under that client's profile (verified with `gpgconf --list-dirs` and process labels).
+- GnuPG's sockets live in `/run/user/$UID/gnupg`; `~/.gnupg` holds them only when no runtime directory exists, so socket
+  rules must cover both. Only gpg-agent is socket-activated; the first gpg client autostarts keyboxd (`use-keyboxd` in
+  `common.conf`) and dirmngr, so they run under that client's profile (verified with `gpgconf --list-dirs` and process
+  labels).
 - Container-engine policies must read the enabled `environment.etc` sources targeting `containers/`: `/etc` rules do not
   cover their store-backed symlink targets. Podman 6 uses drop-ins and omits empty registry settings;
   `apparmor-policy-parser` checks every such source.

@@ -423,9 +423,9 @@ in
           owner @{HOME}/.gnupg/{gnupg_spawn_keyboxd_sentinel,trustdb.gpg}.lock rwl,
           owner @{HOME}/.gnupg/openpgp-revocs.d/{,*.rev} w,
           owner @{HOME}/.gnupg/public-keys.d/{,**} rwkl,
-          owner @{run}/user/[0-9]*/gnupg/S.{gpg-agent,keyboxd} rw,
+          owner @{run}/user/[0-9]*/gnupg/S.keyboxd rw,
         '';
-        extraRulesRationale = "GnuPG updates its seed, trust-database locks, and new revocation certificates, and reaches the agent and keyboxd runtime sockets; keyboxd inherits this profile and its public keyring when gpg autostarts it.";
+        extraRulesRationale = "GnuPG updates its seed, trust-database locks, and new revocation certificates, and reaches the keyboxd runtime socket; keyboxd inherits this profile and its public keyring when gpg autostarts it.";
         sensitiveAccess = [ "gpg-agent" ];
         elevatedAccessRationale = "Mailvelope decrypts, signs, and generates keys through the user's GnuPG agent.";
       };
