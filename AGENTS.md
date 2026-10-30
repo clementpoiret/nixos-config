@@ -94,6 +94,9 @@
   rules must cover both. Only gpg-agent is socket-activated; the first gpg client autostarts keyboxd (`use-keyboxd` in
   `common.conf`) and dirmngr, so they run under that client's profile (verified with `gpgconf --list-dirs` and process
   labels).
+- Policy compile time is dominated by closure rules. Keep one alternation per store path, and avoid wildcards inside
+  store path names (`/nix/store/*-gvfs-*`): they multiply with every literal closure path (two made Logseq ~5× slower,
+  measured with `apparmor_parser -Q -K --skip-cache`).
 - Container-engine policies must read the enabled `environment.etc` sources targeting `containers/`: `/etc` rules do not
   cover their store-backed symlink targets. Podman 6 uses drop-ins and omits empty registry settings;
   `apparmor-policy-parser` checks every such source.

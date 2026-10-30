@@ -284,43 +284,28 @@ let
     ] config
   ) config.environment.etc."profiles/per-user/${username}".source;
 
-  readOnlyClosureBaseRules = [
-    "$path r"
-    "$path/etc/** r"
-    "$path/share/** mr"
-    "$path/**.node mr"
-    "$path/lib/**.so* mr"
-    "$path/lib64/**.so* mr"
-    "$path/lib/** r"
-    "$path/lib64/** r"
-  ];
+  # One alternation per store path compiles several times faster than one rule per suffix.
+  closureMapRules = [ "$path/{share/**,**.node,lib/**.so*,lib64/**.so*} mr" ];
+  closureReadRules = [ "$path{,/etc/**,/lib/**,/lib64/**} r" ] ++ closureMapRules;
+  closureRulesFor =
+    baseRules: name: roots:
+    pkgs.apparmorRulesFromClosure { inherit name baseRules; } roots;
   sourceReadRules = path: ''
     ${path}{,/**} r,
   '';
   profileDataReadRules = path: ''
     ${path}/share/{hunspell,mime}/{,**} r,
   '';
-  sessionClosureRules = pkgs.apparmorRulesFromClosure {
-    name = "local-session-read-only";
-    baseRules = readOnlyClosureBaseRules;
-  } sessionPackageReadRoots;
+  # Application profiles read the whole store, so their closures only add library mapping.
+  sessionClosureRules =
+    closureRulesFor closureMapRules "local-session-read-only"
+      sessionPackageReadRoots;
   sessionReadRules = pkgs.writeText "apparmor-local-session-read-only" ''
-    include "${sessionClosureRules}"
     ${lib.concatMapStrings sourceReadRules etcReadRoots}
     ${lib.concatMapStrings profileDataReadRules ([ config.system.path ] ++ userEnvironmentReadRoots)}
 
-    /nix/store/*-dconf-db r,
-    /nix/store/*-fc-cache/** r,
-    /nix/store/*-fontconfig-conf/etc/fonts/{,**} r,
     /nix/store/** r,
   '';
-
-  closureReadRules =
-    name: roots:
-    pkgs.apparmorRulesFromClosure {
-      inherit name;
-      baseRules = readOnlyClosureBaseRules;
-    } roots;
 
   directExecutionRules = path: ''
     ${path}/bin/** ixr,
@@ -682,9 +667,11 @@ let
         ++ executionPackages
         ++ lib.optional (app.bubblewrapPackage != null) app.bubblewrapPackage
       );
-      closureRules = lib.optionalString (!(hasCapability app "developer-exec")) (
-        closureReadRules profileName closureRoots
-      );
+      # Developer profiles already map the whole store.
+      closureRules = lib.optionalString (!(hasCapability app "developer-exec")) ''
+        include "${sessionClosureRules}"
+        include "${closureRulesFor closureMapRules profileName closureRoots}"
+      '';
       protectedConfigurationRules = lib.optionalString (state == "enforce") ''
         audit deny @{HOME}/nixos-config/{,**} wklm,
       '';
@@ -696,7 +683,7 @@ let
         owner /var/tmp/{,**} rwkl,
 
         include "${sessionReadRules}"
-        ${lib.optionalString (closureRules != "") ''include "${closureRules}"''}
+        ${closureRules}
 
         ${lib.concatMapStrings directExecutionRules executionPackages}
         ${lib.concatMapStringsSep "\n" (path: "${path} ixr,") app.extraExecutables}
@@ -758,7 +745,7 @@ let
           name;
       containerTools = app.containerToolsPackage;
       enginePackages = lib.unique ([ containerTools ] ++ containerTools.enginePackages);
-      closureRules = closureReadRules profileName enginePackages;
+      closureRules = closureRulesFor closureReadRules profileName enginePackages;
       engineExecutionRules = path: ''
         priority=100 ${path}/bin/** ixr,
         priority=100 ${path}/lib/** ixr,
@@ -928,7 +915,7 @@ let
       state = stateFor profileName service.stagedState;
       executionPackages = lib.unique (baseWrapperExecutionPackages ++ service.executionPackages);
       closureRoots = lib.unique (service.packageRoots ++ executionPackages);
-      closureRules = closureReadRules profileName closureRoots;
+      closureRules = closureRulesFor closureReadRules profileName closureRoots;
     in
     {
       inherit state;

@@ -374,13 +374,13 @@ in
           "${pkgs.logseq-appimage.appimageContents}/chrome_crashpad_handler"
           "${pkgs.logseq-appimage.appimageContents}/logseq"
         ];
+        # GIO_EXTRA_MODULES points GIO at the session's gvfs, which the session closure maps; gvfs builds
+        # outside it cannot load. A /nix/store/*-gvfs-* rule would allow them but compiles about 5x slower.
         extraRules = ''
           ${pkgs.logseq-appimage.appimageContents}/*.so* mr,
           owner @{HOME}/.local/bin/logseq rwkl,
-          /nix/store/*-gvfs-*/lib/gio/modules/libgvfsdbus.so mr,
-          /nix/store/*-gvfs-*/lib/gvfs/libgvfscommon.so mr,
         '';
-        extraRulesRationale = "Logseq maps its AppImage and GVFS libraries and maintains its CLI launcher.";
+        extraRulesRationale = "Logseq maps its AppImage libraries and maintains its CLI launcher.";
         homePaths = [
           ".logseq"
           ".config/Logseq"

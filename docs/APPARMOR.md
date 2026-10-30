@@ -52,7 +52,7 @@ All applications receive only the common baseline:
 - AppArmor base and strict name-service abstractions;
 - owner access to temporary files;
 - read-only access to the immutable Nix store and declared session assets;
-- read and library-mapping access to declared package closures;
+- library-mapping access to the desktop session closure and declared package closures;
 - inherited execution for the application's direct package output, Bash, glibc/coreutils wrapper helpers, desktop
   discovery helpers where applicable, and explicitly declared helper outputs;
 - ordinary user-write and download locations plus declared application state.
@@ -300,6 +300,10 @@ Do not add broad `/nix/store/** ix` outside `developer-exec`, `/proc/**`, `/run/
 D-Bus, Unix-socket, signal, or network rules to the common baseline. Add the relevant capability or exact workload rule.
 If a profile is not yet supportable, put the package in `localAppArmor.inventory` with a specific candidate or exemption
 rationale.
+
+Avoid wildcards inside store path names, such as `/nix/store/*-gvfs-*`. The parser combines each one with every literal
+closure path in the profile; two such rules made Logseq's profile compile about five times slower. Add the package to
+`extraClosureRoots` or name its exact output instead.
 
 `user-files` grants recursive read access below non-hidden top-level home directories, including DAC-readable mounted or
 remapped files not owned by the user, while write and lock access remains owner-only. This lets document-oriented
