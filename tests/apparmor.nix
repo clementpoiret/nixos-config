@@ -318,8 +318,8 @@ pkgs.testers.runNixOSTest {
             "/home/test/.local/state/apparmor-reports/logs.json"
         )
 
-    with subtest("agent container brokers and payloads are always enforced"):
-        machine.succeed(
+    with subtest("agent container brokers and payloads stay enforced across policy reloads"):
+        profile_modes = (
             "aa-status --json | ${pkgs.jq}/bin/jq -e "
             "'.profiles[\"local-codex-cli\"] == \"complain\" and "
             ".profiles[\"local-claude-code\"] == \"complain\" and "
@@ -328,6 +328,9 @@ pkgs.testers.runNixOSTest {
             ".profiles[\"local-agent-container-denied\"] == \"enforce\" and "
             ".profiles[\"local-agent-container-payload\"] == \"enforce\"'"
         )
+        machine.succeed(profile_modes)
+        machine.succeed("systemctl reload apparmor.service")
+        machine.succeed(profile_modes)
 
     with subtest("guarded rootless Buildah and Podman use isolated stores and the payload profile"):
         container_tools = "${pkgs.agent-container-tools}/bin"

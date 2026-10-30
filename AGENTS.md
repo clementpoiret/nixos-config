@@ -94,6 +94,9 @@
   rules must cover both. Only gpg-agent is socket-activated; the first gpg client autostarts keyboxd (`use-keyboxd` in
   `common.conf`) and dirmngr, so they run under that client's profile (verified with `gpgconf --list-dirs` and process
   labels).
+- `apparmor.service` blocks `sysinit.target`. Keep the module's `ExecStart`/`ExecReload` override: nixpkgs runs one
+  parser per policy in sequence, and the parser compiles in parallel only across files passed together. `--complain`
+  bypasses the policy cache, so `enableCache` alone would not help (verified in apparmor 5.0.2's `parser_main.c`).
 - Policy compile time is dominated by closure rules. Keep one alternation per store path, and avoid wildcards inside
   store path names (`/nix/store/*-gvfs-*`): they multiply with every literal closure path (two made Logseq ~5× slower,
   measured with `apparmor_parser -Q -K --skip-cache`).

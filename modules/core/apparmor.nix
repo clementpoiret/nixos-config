@@ -1258,6 +1258,47 @@ in
     environment.systemPackages = [ apparmorReport ];
     systemd.services =
       serviceAttachments
+      // {
+        # nixpkgs runs one parser per policy in sequence before sysinit.target; the parser
+        # compiles files passed together in parallel.
+        apparmor.serviceConfig =
+          let
+            policyDirectory = config.environment.etc."apparmor.d".source;
+            policiesIn =
+              state:
+              builtins.attrNames (
+                lib.filterAttrs (_: policy: policy.state == state) config.security.apparmor.policies
+              );
+            parserCommands =
+              operation:
+              lib.concatMap
+                (
+                  state:
+                  lib.optional (policiesIn state != [ ]) (
+                    lib.concatStringsSep " " (
+                      [
+                        "${pkgs.apparmor-parser}/bin/apparmor_parser"
+                        operation
+                        "--verbose"
+                        "--show-cache"
+                      ]
+                      ++ lib.optional (state == "complain") "--complain"
+                      ++ map (name: "${policyDirectory}/${name}") (policiesIn state)
+                    )
+                  )
+                )
+                [
+                  "enforce"
+                  "complain"
+                ];
+          in
+          {
+            ExecStart = lib.mkForce (parserCommands "--add");
+            ExecReload = lib.mkForce (
+              parserCommands "--replace" ++ [ "${pkgs.apparmor-utils}/bin/aa-remove-unknown" ]
+            );
+          };
+      }
       // lib.optionalAttrs cfg.debug.enable {
         apparmor-debug-report = {
           description = "Generate the periodic AppArmor debug report";

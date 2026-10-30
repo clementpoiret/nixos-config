@@ -341,6 +341,13 @@ The generator creates the policy and attaches it to the named systemd unit whene
 `disable`. Keep systemd filesystem, capability, address-family, and syscall controls aligned with the descriptor. Add a
 VM behavior test with at least one required allow and one meaningful denial.
 
+## Load time
+
+`apparmor.service` runs before `sysinit.target`, so compiling policies delays every boot and every switch that changes
+them. The module replaces nixpkgs' one-parser-per-policy commands with one `apparmor_parser` call per mode, which
+compiles the policies in parallel. The policy cache stays disabled: `--complain` bypasses it, and every store file has the
+same modification time, so the parser cannot notice that an included file changed.
+
 ## Verify a policy change
 
 Run the smallest checks first. None of these commands activates a host:
