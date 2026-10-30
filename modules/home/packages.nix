@@ -76,6 +76,8 @@ let
     owner @{run}/user/[0-9]*/devenv-*/{,**} rwkl,
   '';
 
+  gpgmeJson = "${pkgs.gpgme.dev}/bin/gpgme-json";
+
   softmakerApplication = name: {
     package = softmakerOffice;
     executable = "bin/softmaker-office-nx-${name}";
@@ -245,6 +247,7 @@ in
 
       # Security
       age # Simple modern file encryption
+      gpgme.dev # gpgme-json native messaging host for Mailvelope
       openssl # SSL/TLS protocol implementation
       proton-pass-beta # Password manager
       proton-pass-cli # CLI version :)
@@ -282,6 +285,17 @@ in
       yubikey-manager # Manage yubikeys :)
     ]
   );
+
+  # Mailvelope's GnuPG backend. Brave reads its own directory, not Chrome's.
+  xdg.configFile."BraveSoftware/Brave-Browser/NativeMessagingHosts/gpgmejson.json".text =
+    builtins.toJSON
+      {
+        name = "gpgmejson";
+        description = "JavaScript binding for GnuPG";
+        path = gpgmeJson;
+        type = "stdio";
+        allowed_origins = [ "chrome-extension://kajibbejlbohfaggdiogboambcijhkke/" ];
+      };
 
   localAppArmor = {
     applications = {
@@ -387,8 +401,9 @@ in
           /sys/devices/**/0003:1050:0407.*/report_descriptor r,
           /dev/ttyUSB[0-9]* rw,
           /run/udev/data/c188:[0-9]* r,
+          priority=100 ${gpgmeJson} Px -> local-gpgme-json,
         '';
-        extraRulesRationale = "Brave maps its downloaded Widevine CDM, accesses raw-HID FIDO authenticators such as YubiKeys, and uses USB serial adapters through Web Serial subject to device ACLs.";
+        extraRulesRationale = "Brave maps its downloaded Widevine CDM, accesses raw-HID FIDO authenticators such as YubiKeys, uses USB serial adapters through Web Serial subject to device ACLs, and starts Mailvelope's GnuPG host only through its separately confined profile.";
         homePaths = [
           ".cache/BraveSoftware"
           ".config/BraveSoftware"
@@ -396,6 +411,23 @@ in
         ];
         sensitiveAccess = [ "credential-broker" ];
         elevatedAccessRationale = "Brave uses the desktop secret-service broker for user-approved credentials.";
+      };
+      gpgme-json = {
+        package = pkgs.gpgme.dev;
+        # gpgme runs the gnupg it was built against, not the one on PATH.
+        executionPackages = [ pkgs.gnupg ];
+        extraRules = ''
+          owner /proc/[0-9]*/fd/ r,
+          owner @{HOME}/.gnupg/random_seed rwk,
+          owner @{HOME}/.gnupg/.#lk* rwk,
+          owner @{HOME}/.gnupg/{gnupg_spawn_keyboxd_sentinel,trustdb.gpg}.lock rwl,
+          owner @{HOME}/.gnupg/openpgp-revocs.d/{,*.rev} w,
+          owner @{HOME}/.gnupg/public-keys.d/{,**} rwkl,
+          owner @{run}/user/[0-9]*/gnupg/S.{gpg-agent,keyboxd} rw,
+        '';
+        extraRulesRationale = "GnuPG updates its seed, trust-database locks, and new revocation certificates, and reaches the agent and keyboxd runtime sockets; keyboxd inherits this profile and its public keyring when gpg autostarts it.";
+        sensitiveAccess = [ "gpg-agent" ];
+        elevatedAccessRationale = "Mailvelope decrypts, signs, and generates keys through the user's GnuPG agent.";
       };
       mullvad-browser = {
         package = pkgs.mullvad-browser;

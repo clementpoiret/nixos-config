@@ -168,6 +168,11 @@ Brave alone receives writable NSS database state and `/dev/hidraw[0-9]*` for dir
 HID rule can also expose other user-readable HID nodes, including keyboard firmware interfaces, so it is deliberately not
 part of the shared browser capability.
 
+Brave starts Mailvelope's `gpgme-json` native-messaging host only by transitioning into `local-gpgme-json`; the browser
+profile itself receives no GnuPG access. The host profile executes only the GnuPG build fixed into gpgme, reaches the
+agent and keyboxd sockets under `/run/user/$UID/gnupg`, and receives no private-key files. If keyboxd is not running,
+gpg autostarts it inside this profile, and the daemon keeps that label until it exits.
+
 Enforced applications deny undeclared access to these sensitive groups:
 
 ```text
