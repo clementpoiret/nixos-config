@@ -175,7 +175,14 @@
         ghostty = ghostty.packages.${system}.ghostty-releasefast;
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
-        hylki = hylki.packages.${system}.default;
+        hylki = hylki.packages.${system}.default.overrideAttrs (old: {
+          # 1.46.1's test expects three snooze presets, but its code offers two on Sundays from 17:00.
+          checkFlags =
+            (old.checkFlags or [ ])
+            ++ pkgs-unstable.lib.optionals (old.version == "1.46.1") [
+              "--skip=ui::later::tests::every_snooze_preset_is_later_than_now"
+            ];
+        });
         lumen = lumen.packages.${system}.lumen;
         opencode = opencode.packages.${system}.default.overrideAttrs {
           # Upstream's source filter omits script/native-arch.ts, used by the CLI build.
