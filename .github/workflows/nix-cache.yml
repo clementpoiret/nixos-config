@@ -37,17 +37,29 @@ jobs:
         run: |
           set -euo pipefail
 
+          latest_release_tag() {
+            gh api \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "repos/$1/releases/latest" \
+              --jq '.tag_name'
+          }
+
+          # Ghostty publishes stable versions only as tags; its sole GitHub release is the `tip` prerelease.
+          latest_stable_tag() {
+            gh api \
+              --paginate \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "repos/$1/tags" \
+              --jq '.[].name' \
+              | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+              | sort -V \
+              | tail -n 1
+          }
+
           update_release_input() {
             local repository="$1"
-            local tag
+            local tag="$2"
             local url_pattern
-
-            tag="$(
-              gh api \
-                --header "X-GitHub-Api-Version: 2022-11-28" \
-                "repos/${repository}/releases/latest" \
-                --jq '.tag_name'
-            )"
 
             if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "Refusing non-stable release tag for ${repository}: ${tag}" >&2
@@ -70,9 +82,9 @@ jobs:
             fi
           }
 
-          update_release_input ghostty-org/ghostty
-          update_release_input herdrdev/herdr
-          update_release_input yorukot/superfile
+          update_release_input ghostty-org/ghostty "$(latest_stable_tag ghostty-org/ghostty)"
+          update_release_input herdrdev/herdr "$(latest_release_tag herdrdev/herdr)"
+          update_release_input yorukot/superfile "$(latest_release_tag yorukot/superfile)"
 
       - name: Update Logseq AppImage
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
