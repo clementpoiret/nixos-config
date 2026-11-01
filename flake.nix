@@ -184,10 +184,19 @@
             ];
         });
         lumen = lumen.packages.${system}.lumen;
-        opencode = opencode.packages.${system}.default.overrideAttrs {
+        opencode = opencode.packages.${system}.default.overrideAttrs (old: {
           # Upstream's source filter omits script/native-arch.ts, used by the CLI build.
           src = opencode.outPath;
-        };
+          # v2.2.5 was tagged before upstream refreshed nix/hashes.json. Bun still checks every
+          # package against bun.lock's integrity hashes; this output hash matched on two machines.
+          node_modules =
+            if old.version == "2.2.5+9bbb8ce" then
+              old.node_modules.override {
+                hash = "sha256-+GgLX4lq8fPOJVoDGp220uiCTLB0ZwrBkcNo36q9MZU=";
+              }
+            else
+              old.node_modules;
+        });
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };
