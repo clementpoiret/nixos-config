@@ -92,7 +92,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     opencode = {
-      url = "github:anomalyco/opencode/v2.2.1";
+      url = "github:anomalyco/opencode/v2.2.5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     clementpoiret-skills = {
