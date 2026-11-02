@@ -44,6 +44,9 @@
   override `node_modules`' `hash` in `flake.nix` for that version only, once two machines build the same hash. The
   shared repository also publishes v1 releases, so `releases/latest` can be older than the installed v2;
   `pkgs/update-opencode.py` only advances to newer stable releases.
+- `pkgs/herdr-app` and `pkgs/herdr-core` are adapted from nixpkgs PR #581031 until herdr-app ships a flake. CI bumps
+  each to its latest `v*` tag with `nix-update --flake --version <x.y.z> --custom-dep zigDeps <package>` (verified).
+  The app's `distribution/core-version` is a minimum, so the core tracks its own tags.
 - Ghostty's flake install check validates launcher paths without executing Ghostty; keep it enabled for host-optimized
   builds on generic CI runners. Its documentation and resource generators use the build CPU, independently of `-Dcpu`
   (verified in the upstream build sources).
@@ -137,3 +140,5 @@
   preserving change IDs.
 - Fetching a rewritten imported `agent-base` can rebase the writable working change. Keep working-copy updates enabled
   for these fetches and use the current `@` for the following rebase: the pre-fetch commit ID can be obsolete.
+- Flake evaluation sees new files only after a `jj` command snapshots them as intent-to-add in the colocated Git index;
+  run `jj status` after creating files (verified with jj 0.46).

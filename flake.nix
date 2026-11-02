@@ -291,6 +291,10 @@
                 path = cfg.pkgs.flake.herdr;
               }
               {
+                name = "${hostName}-herdr-app";
+                path = cfg.pkgs.herdr-app;
+              }
+              {
                 name = "${hostName}-hylki";
                 path = cfg.pkgs.flake.hylki;
               }
@@ -324,10 +328,13 @@
           desktopCacheEntries = mkHostEntries "desktop";
           laptopCacheEntries = mkHostEntries "laptop";
           mkCacheRoot = name: entries: pkgs-unstable.linkFarm name entries;
+          herdr-core = pkgs-unstable.callPackage ./pkgs/herdr-core { };
         in
         {
           collabora-desktop-bin = pkgs-unstable.callPackage ./pkgs/collabora-desktop-bin { };
           brave = pkgs-unstable.callPackage ./pkgs/brave { upstreamBrave = pkgs-unstable.brave; };
+          inherit herdr-core;
+          herdr-app = pkgs-unstable.callPackage ./pkgs/herdr-app { inherit herdr-core; };
           proton-pass = pkgs-unstable.callPackage ./pkgs/proton-pass { };
           proton-pass-beta = pkgs-unstable.callPackage ./pkgs/proton-pass { channel = "beta"; };
           proton-pass-cli = pkgs-unstable.callPackage ./pkgs/proton-pass-cli { };

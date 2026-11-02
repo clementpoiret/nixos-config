@@ -1,6 +1,10 @@
 { pkgs, ... }:
 {
-  home.packages = [ pkgs.flake.herdr ];
+  home.packages = [
+    pkgs.flake.herdr
+    pkgs.herdr-app
+    pkgs.herdr-core
+  ];
 
   xdg.configFile."herdr/config.toml".text = # toml
     ''

@@ -127,9 +127,9 @@ The GitHub Actions workflow evaluates every flake check and builds selected shar
 checks plus both host toplevels on pushes to `main`. Scheduled runs occur on
 Wednesday and Sunday at 03:17 in `Europe/Paris`; manual dispatch uses the same
 update workflow. These runs update Ghostty, Herdr, Superfile, Logseq, Proton
-packages, Brave, and OpenCode release pins, plus all flake inputs. After the
-checks and both host builds succeed, the allowlisted dependency files are
-committed and pushed directly to `main`.
+packages, Brave, and OpenCode release pins, the local Herdr app and core
+packages, plus all flake inputs. After the checks and both host builds succeed,
+the allowlisted dependency files are committed and pushed directly to `main`.
 
 Configure a repository Actions secret named `CACHIX_AUTH_TOKEN` with a
 cache-scoped write token for the private `clementpoiret` Cachix cache. The
