@@ -43,12 +43,15 @@
   `nix/hashes.json`, never auto-accepted hashes. Releases can be tagged before that file is refreshed (v2.2.5); then
   override `node_modules`' `hash` in `flake.nix` for that version only, once two machines build the same hash. The
   shared repository also publishes v1 releases, so `releases/latest` can be older than the installed v2;
-  `pkgs/update-opencode.py` only advances to newer stable releases.
+  `pkgs/update-opencode.py` only advances to newer stable releases. The dependency hash is also Bun-sensitive: 1.4.4
+  changes peer contexts and libc filtering, so v2.2.5 needs separate hashes for older and newer Bun (verified by local
+  and CI builds and a tree comparison).
 - `pkgs/herdr-app` and `pkgs/herdr-core` are adapted from nixpkgs PR #581031 until herdr-app ships a flake. CI bumps
   each to its latest `v*` tag with `nix-update --flake --version <x.y.z> --custom-dep zigDeps <package>` (verified).
   The app's `distribution/core-version` is a minimum, so the core tracks its own tags. Discover both packages' Rust
   sources when redirecting `/var/tmp` to `$TMPDIR`: enumerating files misses newly added tests and breaks sandboxed
   builds. Remote-shell fixtures need local store tools, but generated remote commands must stay free of local paths.
+  Core's mocked macOS signing fixtures also run on Linux and need jq on the check PATH.
 - Ghostty's flake install check validates launcher paths without executing Ghostty; keep it enabled for host-optimized
   builds on generic CI runners. Its documentation and resource generators use the build CPU, independently of `-Dcpu`
   (verified in the upstream build sources).

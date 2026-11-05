@@ -10,6 +10,7 @@
   curl,
   gawk,
   git,
+  jq,
   gnused,
   gnutar,
   gzip,
@@ -89,7 +90,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       # one depends on /nix/store paths those machines may lack. Use the
       # statically linked release build for every machine instead.
       substituteInPlace crates/herdr-core/src/machines.rs \
-        --replace-fail 'let exe = if there == here {' 'let exe = if false {'
+        --replace-fail 'if there == here' 'if false'
 
       # The tests use /var/tmp, which the sandbox lacks.
       while IFS= read -r -d "" f; do
@@ -115,7 +116,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   nativeCheckInputs = [
+    # Installer and mocked signing fixtures also use the inherited check PATH.
+    curl
     git
+    jq
     python3
   ];
 

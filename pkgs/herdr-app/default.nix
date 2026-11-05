@@ -117,6 +117,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
             coreutils
           ]
         }")'
+  ''
+  + lib.optionalString (lib.versionAtLeast finalAttrs.version "0.1.13") ''
+    substituteInPlace src/core_bin.rs \
+      --replace-fail 'Command::new("/bin/test")' 'Command::new("${lib.getExe' coreutils "test"}")'
   '';
 
   preBuild = ''
@@ -134,9 +138,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     writableTmpDirAsHomeHook
   ];
 
+  # GPUI records element bounds only with debug assertions. Keep the installed build in release mode.
+  checkType = "debug";
+
   checkFlags = [
-    # Reads element bounds that only debug builds record.
-    "--skip=window::tests::fitted_popups_use_their_rendered_size_at_the_window_edge"
     # Races a thread against GPUI's test scheduler and fails now and then.
     "--skip=mods::lifecycle_tests::close_starts_native_work_before_releasing_the_copy"
     # Checks THIRD-PARTY-NOTICES against the vendored sources, which postPatch changes.
