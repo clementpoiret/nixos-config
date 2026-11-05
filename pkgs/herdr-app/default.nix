@@ -14,6 +14,8 @@
   makeDesktopItem,
   copyDesktopItems,
   fontconfig,
+  makeFontsConf,
+  dejavu_fonts,
   freetype,
   libxcb,
   libxkbcommon,
@@ -151,6 +153,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # The render and pixel tests draw real frames on Mesa's software Vulkan
   # driver; test binaries lack the RUNPATH entries added in postFixup.
   preCheck = ''
+    export FONTCONFIG_FILE=${makeFontsConf { fontDirectories = [ dejavu_fonts ]; }}
     export VK_DRIVER_FILES=${mesa}/share/vulkan/icd.d/lvp_icd.${stdenv.hostPlatform.parsed.cpu.name}.json
     export LD_LIBRARY_PATH=${lib.makeLibraryPath dlopenLibs}
   '';

@@ -52,6 +52,8 @@
   sources when redirecting `/var/tmp` to `$TMPDIR`: enumerating files misses newly added tests and breaks sandboxed
   builds. Remote-shell fixtures need local store tools, but generated remote commands must stay free of local paths.
   Core's mocked macOS signing fixtures also run on Linux and need jq on the check PATH.
+  App render checks need debug assertions for GPUI bounds and explicit fontconfig fonts for text screenshots; the Cargo
+  install hook preserves the release binaries built before checks.
 - Ghostty's flake install check validates launcher paths without executing Ghostty; keep it enabled for host-optimized
   builds on generic CI runners. Its documentation and resource generators use the build CPU, independently of `-Dcpu`
   (verified in the upstream build sources).
