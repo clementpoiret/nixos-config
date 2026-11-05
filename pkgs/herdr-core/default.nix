@@ -16,6 +16,7 @@
   gzip,
   libarchive,
   python3,
+  strace,
   versionCheckHook,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -42,6 +43,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   };
 
   nativeBuildInputs = [ installAgentSkills ];
+
+  patches = [ ./restart-lock-lifetime.patch ];
 
   env = {
     ZIG = lib.getExe zig_0_16;
@@ -146,8 +149,16 @@ rustPlatform.buildRustPackage (finalAttrs: {
     install -Dm644 LICENSE crates/herdr-core/THIRD-PARTY-NOTICES -t $out/share/licenses/herdr-core
   '';
 
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  nativeInstallCheckInputs = [
+    python3
+    strace
+    versionCheckHook
+  ];
   doInstallCheck = true;
+
+  postInstallCheck = ''
+    python3 ${./test-restart.py} "$out/bin/hc"
+  '';
 
   meta = {
     description = "Persistent terminal and coding agent backend for Herdr";

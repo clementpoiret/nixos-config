@@ -52,6 +52,8 @@
   sources when redirecting `/var/tmp` to `$TMPDIR`: enumerating files misses newly added tests and breaks sandboxed
   builds. Remote-shell fixtures need local store tools, but generated remote commands must stay free of local paths.
   Core's mocked macOS signing fixtures also run on Linux and need jq on the check PATH.
+  Keep Core's startup lock inside the server future: Tokio otherwise closes clients before releasing the lock, so a
+  replacement exits without starting. The install check delays `close` with strace to expose this race deterministically.
   App render checks need debug assertions for GPUI bounds and explicit fontconfig fonts for text screenshots; the Cargo
   install hook preserves the release binaries built before checks.
 - Ghostty's flake install check validates launcher paths without executing Ghostty; keep it enabled for host-optimized

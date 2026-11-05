@@ -1,0 +1,11 @@
+diff --git a/crates/herdr-core/src/server.rs b/crates/herdr-core/src/server.rs
+--- a/crates/herdr-core/src/server.rs
++++ b/crates/herdr-core/src/server.rs
+@@ -40,4 +40,7 @@ pub fn serve() -> io::Result<()> {
+     tokio::runtime::Builder::new_current_thread().enable_all().build()?.block_on(async {
++        // A restart caller launches the next core on EOF. Release the lock before
++        // runtime teardown closes the client connections, after final state writes.
++        let _lock = lock;
+         let mut listener = AsyncListener::serve(bound)?;
+         let kept = core.clone();
+         tokio::spawn(async move {
