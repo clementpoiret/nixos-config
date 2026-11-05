@@ -46,7 +46,9 @@
   `pkgs/update-opencode.py` only advances to newer stable releases.
 - `pkgs/herdr-app` and `pkgs/herdr-core` are adapted from nixpkgs PR #581031 until herdr-app ships a flake. CI bumps
   each to its latest `v*` tag with `nix-update --flake --version <x.y.z> --custom-dep zigDeps <package>` (verified).
-  The app's `distribution/core-version` is a minimum, so the core tracks its own tags.
+  The app's `distribution/core-version` is a minimum, so the core tracks its own tags. Discover both packages' Rust
+  sources when redirecting `/var/tmp` to `$TMPDIR`: enumerating files misses newly added tests and breaks sandboxed
+  builds. Remote-shell fixtures need local store tools, but generated remote commands must stay free of local paths.
 - Ghostty's flake install check validates launcher paths without executing Ghostty; keep it enabled for host-optimized
   builds on generic CI runners. Its documentation and resource generators use the build CPU, independently of `-Dcpu`
   (verified in the upstream build sources).

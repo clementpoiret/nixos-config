@@ -7,7 +7,10 @@
   zig_0_16,
   pkg-config,
   clang,
+  bash,
+  coreutils,
   curl,
+  git,
   makeDesktopItem,
   copyDesktopItems,
   fontconfig,
@@ -96,9 +99,24 @@ rustPlatform.buildRustPackage (finalAttrs: {
         '"Managed by nix: update it there."'
 
     # The tests use /var/tmp, which the sandbox lacks.
-    for f in src/{mod_files.rs,mods.rs,mods/lifecycle_tests.rs,mods/render_tests.rs,update_notes.rs}; do
+    while IFS= read -r -d "" f; do
       substituteInPlace "$f" --replace-fail /var/tmp "$TMPDIR"
-    done
+    done < <(grep -rlZ --include='*.rs' /var/tmp src)
+  ''
+  + lib.optionalString (lib.versionAtLeast finalAttrs.version "0.1.12") ''
+    # Only the local test runner gets store paths; generated remote commands must stay portable.
+    substituteInPlace src/remote_shell.rs \
+      --replace-fail '"/bin/bash"' '"${lib.getExe bash}"' \
+      --replace-fail '"/usr/bin/printf"' '"${lib.getExe' coreutils "printf"}"' \
+      --replace-fail 'cmd.args(&argv[1..])' \
+        'cmd.arg(&argv[1]).arg(argv[2].replace("/bin/sh", "${lib.getExe' bash "sh"}")).args(&argv[3..])' \
+      --replace-fail '.env("PATH", "/usr/bin:/bin:/usr/sbin:/sbin")' \
+        '.env("PATH", "${
+          lib.makeBinPath [
+            bash
+            coreutils
+          ]
+        }")'
   '';
 
   preBuild = ''
@@ -110,6 +128,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   nativeCheckInputs = [
     # The update check test fetches from a loopback server with curl.
     curl
+    # File-watching fixtures create Git repositories.
+    git
     # Some tests run programs in $HOME.
     writableTmpDirAsHomeHook
   ];

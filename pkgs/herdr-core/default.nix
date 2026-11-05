@@ -92,9 +92,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
         --replace-fail 'let exe = if there == here {' 'let exe = if false {'
 
       # The tests use /var/tmp, which the sandbox lacks.
-      for f in crates/herdr-core/{src/platform/systemd.rs,src/remote/tests.rs,src/runtime/tests.rs,tests/common/mod.rs,tests/m1.rs}; do
+      while IFS= read -r -d "" f; do
         substituteInPlace "$f" --replace-fail /var/tmp "$TMPDIR"
-      done
+      done < <(grep -rlZ --include='*.rs' /var/tmp crates/herdr-core)
 
       # The tests' fake ssh and installer runs use PATH=/usr/bin:/bin, which the sandbox lacks.
       substituteInPlace crates/herdr-core/tests/common/mod.rs \
