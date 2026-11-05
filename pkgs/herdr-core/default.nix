@@ -21,7 +21,7 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "herdr-core";
-  version = "0.1.16";
+  version = "0.1.18";
 
   __structuredAttrs = true;
 
@@ -30,10 +30,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     repo = "herdr-core";
     tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-TIOXZswCum0g3qcDK+RDZb9Y7lUu+bx+Oyja4EtKKh4=";
+    hash = "sha256-MSq0Tzlv0/aOQvuXkeuVuGx3vpUauxI1YAeLpKy7WG4=";
   };
 
-  cargoHash = "sha256-hMkych62liZ+Oe5huM2drN5/6ckpF8AEHH2dyskcivo=";
+  cargoHash = "sha256-d3dTX5qvikpkIABz0ecDjPu1pA0LsSmPu5j4Oum6R3c=";
 
   zigDeps = zig_0_16.fetchDeps {
     inherit (finalAttrs) pname version;
