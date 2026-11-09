@@ -18,7 +18,7 @@
 - Reuse Brave's builder from `nixpkgs-master` through the host's `callPackage`, not `master.brave`, so its runtime and
   graphics libraries use the same package set. `master` is added after the local overlay, so use `final.master` and
   append paths without string-coercing `pkgs.path` (verified by flake evaluation).
-- Keep Mail, Pass and Deezer on nixpkgs' Electron so their AppArmor execution rules apply. Pass's native `.node` modules
+- Keep Mail and Pass on nixpkgs' Electron so their AppArmor execution rules apply. Pass's native `.node` modules
   must be unpacked from the ASAR and patched against `libxkbcommon` and `libgcc`; only its install check, which loads
   them through Electron's ASAR resolver, exercises this.
 - Bridge's Go executable segfaults after patchelf 0.19.2. Keep the package-local 0.15.2 pin, its runtime version install
@@ -49,6 +49,8 @@
   `pkgs/update-opencode.py` only advances to newer stable releases. The dependency hash is also Bun-sensitive: 1.4.4
   changes peer contexts and libc filtering, so v2.2.5 needs separate hashes for older and newer Bun (verified by local
   and CI builds and a tree comparison).
+- OpenCode 2.2.6 with Bun 1.4.4 also needs a version-scoped dependency hash: the earlier local output and GitHub's
+  mismatch agree (verified by rehashing the existing local store output; no rebuild needed).
 - `pkgs/herdr-app` and `pkgs/herdr-core` are adapted from nixpkgs PR #581031 until herdr-app ships a flake. CI bumps
   each to its latest `v*` tag with `nix-update --flake --version <x.y.z> --custom-dep zigDeps <package>` (verified).
   The app's `distribution/core-version` is a minimum, so the core tracks its own tags. Discover both packages' Rust
@@ -67,6 +69,9 @@
 
 - Add explicitly cached applications to `mkHostEntries` in `flake.nix`, not only to the workflow's build targets: the
   per-host Cachix pins retain those roots.
+- Shared checks must wait for host cache publication and authenticate even with `skipPush`: the cache is private.
+  Include host AppArmor profile directories in the roots; generating their closure rules builds the applications.
+  `cachePaths` exposes individual members so failed builds can publish completed selections without realizing the root.
 - Cachix pushes recursive closures: keep kernel outputs and aggregate modules trees out of host roots and cache
   `boot.extraModulePackages` individually. Push roots explicitly rather than watching build dependencies; CI rejects
   roots containing kernel outputs.

@@ -182,7 +182,17 @@
             ];
         });
         lumen = lumen.packages.${system}.lumen;
-        opencode = opencode.packages.${system}.default;
+        opencode = opencode.packages.${system}.default.overrideAttrs (
+          old:
+          pkgs-unstable.lib.optionalAttrs
+            (old.version == "2.2.6+dc2ffcf" && pkgs-unstable.bun.version == "1.4.4")
+            {
+              # This release's upstream hash differs with Bun 1.4.4; local and CI outputs match.
+              node_modules = old.node_modules.override {
+                hash = "sha256-O2hF8pGUSArKgYBeP99oOW3iXVVZl5bV5WPTp3E7JIA=";
+              };
+            }
+        );
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };
@@ -292,6 +302,10 @@
                 name = "${hostName}-virtualbox-extpack";
                 path = virtualboxExtensionPack;
               }
+              {
+                name = "${hostName}-apparmor-profiles";
+                path = cfg.config.environment.etc."apparmor.d".source;
+              }
             ]
             # The aggregate modules tree would pull the cached kernel into this closure.
             ++ map (package: {
@@ -305,7 +319,11 @@
 
           desktopCacheEntries = mkHostEntries "desktop";
           laptopCacheEntries = mkHostEntries "laptop";
-          mkCacheRoot = name: entries: pkgs-unstable.linkFarm name entries;
+          mkCacheRoot =
+            name: entries:
+            (pkgs-unstable.linkFarm name entries).overrideAttrs {
+              passthru.cachePaths = map (entry: entry.path) entries;
+            };
           herdr-core = pkgs-unstable.callPackage ./pkgs/herdr-core { };
         in
         {

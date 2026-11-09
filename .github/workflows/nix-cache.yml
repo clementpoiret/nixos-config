@@ -236,7 +236,9 @@ jobs:
           retention-days: 1
 
   shared-checks:
-    needs: prepare
+    needs:
+      - prepare
+      - build-host
     runs-on: ubuntu-latest
     timeout-minutes: 360
     permissions:
@@ -263,6 +265,7 @@ jobs:
         uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
         with:
           name: clementpoiret
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           extraPullNames: nix-community,niri,nixos-cachyos-kernels
           skipPush: true
 
@@ -284,7 +287,6 @@ jobs:
             --no-link \
             --no-update-lock-file \
             --print-build-logs \
-            --keep-going \
             .#checks.x86_64-linux.proton-package-updates \
             .#checks.x86_64-linux.opencode-package-updates \
             .#checks.x86_64-linux.binary-release-signatures \
@@ -331,6 +333,7 @@ jobs:
         run: test -n "$CACHIX_AUTH_TOKEN"
 
       - name: Configure Cachix
+        id: cachix
         uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
         with:
           name: clementpoiret
@@ -338,7 +341,7 @@ jobs:
           extraPullNames: nix-community,niri,nixos-cachyos-kernels
           skipPush: true
 
-      - name: Build and cache selected host outputs
+      - name: Build selected host outputs
         shell: bash
         run: |
           set -euo pipefail
@@ -352,29 +355,11 @@ jobs:
             ".#nixosConfigurations.${{ matrix.host }}.pkgs.herdr-app" \
             ".#nixosConfigurations.${{ matrix.host }}.pkgs.flake.hylki"
 
-          root="$(
-            nix build \
-              --no-link \
-              --print-out-paths \
-              --no-update-lock-file \
-              ".#cache-root-${{ matrix.host }}"
-          )"
-
-          nix path-info --recursive "$root" > cache-closure
-          nix eval \
-            --no-update-lock-file \
-            --json \
-            ".#nixosConfigurations.${{ matrix.host }}.config.boot.kernelPackages.kernel" \
-            --apply 'kernel: map (output: toString (builtins.getAttr output kernel)) kernel.outputs' \
-            | jq -r '.[]' > kernel-outputs
-
-          if grep -Fxf kernel-outputs cache-closure; then
-            echo "Kernel outputs belong in nixos-cachyos-kernels, not clementpoiret" >&2
-            exit 1
-          fi
-
-          cachix push clementpoiret "$root"
-          cachix pin clementpoiret "host-optimized-${{ matrix.host }}" "$root" --keep-revisions 1
+      - name: Cache completed host outputs
+        if: ${{ !cancelled() && steps.cachix.outcome == 'success' }}
+        env:
+          HOST: ${{ matrix.host }}
+        run: bash .github/scripts/cache-host-outputs.sh "$HOST"
 
       - name: Build host configuration
         run: |

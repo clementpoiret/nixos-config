@@ -268,7 +268,6 @@ in
       flake.claude-code
       flake.codex-cli
       flake.opencode
-      deezer-enhanced
       dstask
       # flake.gemini-cli # Gemini protocol client
       # libation # Extract audio books
@@ -596,13 +595,6 @@ in
           ".config/dev.aninsomniacy.rayburst"
           ".local/share/dev.aninsomniacy.rayburst"
         ];
-      };
-      deezer = {
-        package = pkgs.deezer-enhanced;
-        executable = "bin/deezer-enhanced";
-        capabilities = electronCapabilities ++ [ "audio" ];
-        executionPackages = electronExecutionPackages;
-        homePaths = [ ".config/deezer-enhanced" ];
       };
       codex-cli = {
         package = pkgs.flake.codex-cli;
