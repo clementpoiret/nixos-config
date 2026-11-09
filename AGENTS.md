@@ -31,6 +31,8 @@
 - Rayburst's Tauri state is `dev.aninsomniacy.rayburst` and its native browser host `dev.aninsomniacy.rayburst.browser`.
   Registration atomically replaces JSON manifests through `.tmp*` files in the browser directories; its tray uses D-Bus,
   not runtime PNG files.
+  Keep SQLite in its `buildInputs`: Nixpkgs' Rust hook forces `libsqlite3-sys` to use the system library (verified by an
+  isolated link/run probe; flake evaluation cannot catch the missing library).
 - Measured boot: preserve the PCR 4 alternative budget in `modules/core/bootloader.nix` (bootloader versions × retained
   generations × specialisations). Host builds do not exercise the live TPM policy update; see `docs/MEASURED-BOOT.md`
   for the NH error.

@@ -209,6 +209,11 @@
             sphinxBuilders = "html man";
           });
 
+          rayburst = prev.rayburst.overrideAttrs (old: {
+            # The Rust setup hook forces libsqlite3-sys to use the system library.
+            buildInputs = old.buildInputs ++ [ final.sqlite ];
+          });
+
           # The pinned niri-flake package still requires libdisplay-info 0.2.
           libdisplay-info_0_2 = final.callPackage ./pkgs/libdisplay-info_0_2 { };
         })
