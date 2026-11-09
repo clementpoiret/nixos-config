@@ -13,11 +13,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # v1.1.0 predates autoEnrollKeys.includeFirmwareBuiltinKeys, which the
-    # Framework laptop needs to retain its OEM certificates. TODO: Pin the
-    # first stable release after v1.1.0 once it includes this option.
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/master";
+      url = "github:nix-community/lanzaboote/v1.2.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -92,7 +89,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     opencode = {
-      url = "github:anomalyco/opencode/v2.2.5";
+      url = "github:anomalyco/opencode/v2.2.6";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     clementpoiret-skills = {
@@ -185,24 +182,7 @@
             ];
         });
         lumen = lumen.packages.${system}.lumen;
-        opencode = opencode.packages.${system}.default.overrideAttrs (old: {
-          # Upstream's source filter omits script/native-arch.ts, used by the CLI build.
-          src = opencode.outPath;
-          # v2.2.5 was tagged before upstream refreshed nix/hashes.json. Bun still checks every
-          # package against bun.lock's integrity hashes; both hashes matched local and CI builds.
-          # Bun 1.4.4 changed peer contexts and libc filtering in the dependency tree.
-          node_modules =
-            if old.version == "2.2.5+9bbb8ce" then
-              old.node_modules.override {
-                hash =
-                  if pkgs-unstable.lib.versionAtLeast pkgs-unstable.bun.version "1.4.4" then
-                    "sha256-hV75d+Zs51vB6MfZ9luH1JB6jO+tqp9RYqqYyi3zQM4="
-                  else
-                    "sha256-+GgLX4lq8fPOJVoDGp220uiCTLB0ZwrBkcNo36q9MZU=";
-              }
-            else
-              old.node_modules;
-        });
+        opencode = opencode.packages.${system}.default;
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };
