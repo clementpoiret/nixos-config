@@ -5,7 +5,10 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import sys
 import tempfile
+from time import sleep
+from urllib.error import HTTPError
 from urllib.request import urlopen
 
 from verify_signature import verify_signature
@@ -13,6 +16,20 @@ from verify_signature import verify_signature
 
 VERSION_URL = "https://versions.brave.com/latest/release-linux-x64.version"
 RELEASE_URL = "https://github.com/brave/brave-browser/releases/download"
+
+
+def fetch_metadata(url):
+    for attempt in range(4):
+        try:
+            with urlopen(url, timeout=60) as response:
+                return response.read()
+        except HTTPError as error:
+            error.close()
+            if error.code not in (408, 429, 500, 502, 503, 504) or attempt == 3:
+                raise
+            delay = 2 ** (attempt + 1)
+            print(f"Download failed for {url}: {error}; retrying in {delay}s", file=sys.stderr)
+            sleep(delay)
 
 
 def version_key(version):
@@ -44,15 +61,12 @@ def release_pin(version, checksum, signature, key):
 def update_release(package):
     path = package / "release.json"
     current = json.loads(path.read_text())
-    with urlopen(VERSION_URL, timeout=60) as response:
-        version = response.read().decode("ascii").strip()
+    version = fetch_metadata(VERSION_URL).decode("ascii").strip()
     if version_key(version) < version_key(current["version"]):
         raise ValueError(f"Refusing to downgrade Brave from {current['version']} to {version}")
     url = f"{RELEASE_URL}/v{version}/brave-browser_{version}_amd64.deb"
-    with urlopen(url + ".sha256", timeout=60) as response:
-        checksum = response.read()
-    with urlopen(url + ".sha256.asc", timeout=60) as response:
-        signature = response.read()
+    checksum = fetch_metadata(url + ".sha256")
+    signature = fetch_metadata(url + ".sha256.asc")
     updated = release_pin(version, checksum, signature, package / "release-key.asc")
     if version == current["version"] and updated["sha256"] != current["sha256"]:
         raise ValueError(f"Checksum changed for existing Brave {version}")

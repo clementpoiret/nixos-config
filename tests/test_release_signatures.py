@@ -9,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
+from urllib.error import HTTPError
 
 
 ROOT = Path(__file__).parent.parent
@@ -61,30 +62,49 @@ class BraveUpdateTests(unittest.TestCase):
         self.checksum = (FIXTURES / "brave.sha256").read_bytes()
         self.signature = (FIXTURES / "brave.sha256.asc").read_bytes()
 
-    def run_update(self, version="1.97.56", signature=None):
+    def run_update(self, version="1.97.56", signature=None, checksum_errors=()):
         responses = [version.encode(), self.checksum, self.signature if signature is None else signature]
-        fetch = Mock(side_effect=[io.BytesIO(response) for response in responses])
-        with patch.dict(brave["update_release"].__globals__, urlopen=fetch):
+        responses = [io.BytesIO(response) for response in responses]
+        responses[1:1] = checksum_errors
+        fetch = Mock(side_effect=responses)
+        with patch.dict(brave["update_release"].__globals__, urlopen=fetch, sleep=Mock()):
             brave["update_release"](self.package)
         return fetch
 
     def test_updates_verified_release_and_is_idempotent(self):
-        self.manifest.write_text(json.dumps(self.current))
-        fetch = self.run_update()
-        self.assertEqual(fetch.call_args_list[0].args[0], brave["VERSION_URL"])
-        updated = self.manifest.read_bytes()
-        manifest = json.loads(updated)
-        self.assertEqual(manifest["version"], "1.97.56")
-        self.assertEqual(manifest["sha256"], "30e4cb89db380567e6fcdaab7110a17d6250517e22860c6bdb02eadf8993b669")
-        self.run_update()
-        self.assertEqual(self.manifest.read_bytes(), updated)
+        for errors in ((), (HTTPError("https://example.com/checksum", 504, "Gateway Time-out", {}, None),)):
+            with self.subTest(retry=bool(errors)):
+                self.manifest.write_text(json.dumps(self.current))
+                fetch = self.run_update(checksum_errors=errors)
+                self.assertEqual(fetch.call_args_list[0].args[0], brave["VERSION_URL"])
+                updated = self.manifest.read_bytes()
+                manifest = json.loads(updated)
+                self.assertEqual(manifest["version"], "1.97.56")
+                self.assertEqual(manifest["sha256"], "30e4cb89db380567e6fcdaab7110a17d6250517e22860c6bdb02eadf8993b669")
+                self.run_update()
+                self.assertEqual(self.manifest.read_bytes(), updated)
 
     def test_rejects_invalid_signature_without_changing_pin(self):
-        original = json.dumps(self.current)
-        self.manifest.write_text(original)
-        with self.assertRaises(subprocess.CalledProcessError):
-            self.run_update(signature=b"invalid-signature")
-        self.assertEqual(self.manifest.read_text(), original)
+        for errors in ((), (HTTPError("https://example.com/checksum", 504, "Gateway Time-out", {}, None),)):
+            with self.subTest(retry=bool(errors)):
+                original = json.dumps(self.current)
+                self.manifest.write_text(original)
+                with self.assertRaises(subprocess.CalledProcessError):
+                    self.run_update(signature=b"invalid-signature", checksum_errors=errors)
+                self.assertEqual(self.manifest.read_text(), original)
+
+    def test_preserves_pin_when_metadata_download_fails(self):
+        for status, failures in ((404, 1), (504, 4)):
+            with self.subTest(status=status):
+                original = json.dumps(self.current)
+                self.manifest.write_text(original)
+                errors = [
+                    HTTPError("https://example.com/checksum", status, "Download failed", {}, None)
+                    for _ in range(failures)
+                ]
+                with self.assertRaises(HTTPError):
+                    self.run_update(checksum_errors=errors)
+                self.assertEqual(self.manifest.read_text(), original)
 
     def test_rejects_wrong_filename_even_with_valid_signature(self):
         with self.assertRaisesRegex(ValueError, "Unexpected signed Brave checksum or filename"):
