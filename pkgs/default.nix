@@ -1,12 +1,18 @@
 {
   overlay =
-    final: prev:
+    final: _prev:
     let
       dirContents = builtins.readDir ./.;
       genPackage = name: {
         inherit name;
         value = final.callPackage (./. + "/${name}") (
-          if name == "brave" then { upstreamBrave = prev.brave; } else { }
+          if name == "brave" then
+            {
+              upstreamBrave =
+                (final.callPackage (final.master.path + "/pkgs/applications/networking/browsers/brave") { }).brave;
+            }
+          else
+            { }
         );
       };
       names = builtins.filter (

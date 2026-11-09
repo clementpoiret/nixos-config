@@ -601,6 +601,7 @@ in
         package = pkgs.deezer-enhanced;
         executable = "bin/deezer-enhanced";
         capabilities = electronCapabilities ++ [ "audio" ];
+        executionPackages = electronExecutionPackages;
         homePaths = [ ".config/deezer-enhanced" ];
       };
       codex-cli = {

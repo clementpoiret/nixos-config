@@ -15,9 +15,12 @@
 - Mail and Pass keep stable/beta pins in `releases.json`. Beta also considers stable releases to avoid downgrades and
   accepts only Mail's `EarlyAccess` or Pass's `Beta`, never Alpha. Bridge and Pass CLI are stable-only. Bridge's feed is
   `bridge/linux/x86/v1/version.json`; `bridge/version_linux.json` is stale.
-- Keep Mail and Pass on nixpkgs' Electron so their AppArmor execution rules apply. Pass's native `.node` modules must be
-  unpacked from the ASAR and patched against `libxkbcommon` and `libgcc`; only its install check, which loads them
-  through Electron's ASAR resolver, exercises this.
+- Reuse Brave's builder from `nixpkgs-master` through the host's `callPackage`, not `master.brave`, so its runtime and
+  graphics libraries use the same package set. `master` is added after the local overlay, so use `final.master` and
+  append paths without string-coercing `pkgs.path` (verified by flake evaluation).
+- Keep Mail, Pass and Deezer on nixpkgs' Electron so their AppArmor execution rules apply. Pass's native `.node` modules
+  must be unpacked from the ASAR and patched against `libxkbcommon` and `libgcc`; only its install check, which loads
+  them through Electron's ASAR resolver, exercises this.
 - Bridge's Go executable segfaults after patchelf 0.19.2. Keep the package-local 0.15.2 pin, its runtime version install
   check, and DEB signature verification.
 - Zotero's Gecko major must match `GECKO_VERSION_LINUX` in `app/config.sh` of `pkgs.zotero.src`; flake evaluation does

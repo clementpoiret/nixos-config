@@ -30,7 +30,7 @@
   ];
 
   services = {
-    scx.extraArgs = [ "--autopower" ];
+    scx-loader.config.scheds.scx_lavd.auto_mode = [ "--autopower" ];
 
     # thermald.enable = true;
     # cpupower-gui.enable = true;

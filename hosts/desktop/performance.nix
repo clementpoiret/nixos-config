@@ -9,7 +9,7 @@
 
     # Let LAVD adapt its scheduling policy to desktop load instead of pinning
     # it to the Balanced platform power profile selected below.
-    scx.extraArgs = [ "--autopilot" ];
+    scx-loader.config.scheds.scx_lavd.auto_mode = [ "--autopilot" ];
 
     # Keep GPU limits mutable until each LACT profile has been validated on the
     # desktop. A non-empty settings value would make the GUI configuration
@@ -68,7 +68,7 @@
       '';
     };
 
-    scx = {
+    scx_loader = {
       after = [
         "desktop-power-profile-balanced.service"
         "desktop-x3d-frequency.service"

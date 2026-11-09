@@ -22,6 +22,7 @@
   libGL,
   wayland,
   vulkan-loader,
+  zstd,
   mesa,
   writableTmpDirAsHomeHook,
   xdg-utils,
@@ -73,6 +74,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     freetype
     libxcb
     libxkbcommon
+    zstd
   ];
 
   env.ZIG = lib.getExe zig_0_16;

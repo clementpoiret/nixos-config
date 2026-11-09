@@ -176,6 +176,7 @@
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
         hylki = hylki.packages.${system}.default.overrideAttrs (old: {
+          buildInputs = old.buildInputs ++ [ pkgs-unstable.sqlite ];
           # 1.46.1's test expects three snooze presets, but its code offers two on Sundays from 17:00.
           checkFlags =
             (old.checkFlags or [ ])
@@ -212,14 +213,6 @@
           master = pkgs-master;
           stable = pkgs-stable;
           flake = pkgs-flake;
-
-          # Deezer bundles libffmpeg.so; its redundant NW.js dependency is insecure.
-          deezer-enhanced = (prev.deezer-enhanced.override { nwjs = null; }).overrideAttrs (oldAttrs: {
-            buildInputs = oldAttrs.buildInputs ++ [
-              final.libgbm
-              final.alsa-lib
-            ];
-          });
 
           # sphinxHook reads a scalar, not a Bash array, with structured attributes.
           khal = prev.khal.overridePythonAttrs (_: {
@@ -337,7 +330,12 @@
         in
         {
           collabora-desktop-bin = pkgs-unstable.callPackage ./pkgs/collabora-desktop-bin { };
-          brave = pkgs-unstable.callPackage ./pkgs/brave { upstreamBrave = pkgs-unstable.brave; };
+          brave = pkgs-unstable.callPackage ./pkgs/brave {
+            # Master restored Brave; instantiate its builder with the current package set's libraries.
+            upstreamBrave =
+              (pkgs-unstable.callPackage "${nixpkgs-master}/pkgs/applications/networking/browsers/brave" { })
+              .brave;
+          };
           inherit herdr-core;
           herdr-app = pkgs-unstable.callPackage ./pkgs/herdr-app { inherit herdr-core; };
           proton-pass = pkgs-unstable.callPackage ./pkgs/proton-pass { };
