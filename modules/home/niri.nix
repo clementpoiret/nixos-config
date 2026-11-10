@@ -26,7 +26,7 @@ let
       inherit (niriBasePackage) cargoBuildFeatures cargoBuildNoDefaultFeatures;
     };
   niriValidatedConfig =
-    inputs.niri.lib.internal."validated-config-for" pkgs pkgs.niri-baseline
+    inputs.niri.lib.internal."validated-config-for" pkgs pkgs.niri-build-tools
       config.programs.niri.finalConfig;
 
   displayPowerMode = pkgs.writeShellApplication {

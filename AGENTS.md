@@ -52,6 +52,10 @@
 - Build Niri's pinned source through the host overlay (`prev.niri-unstable`), not the input flake's package: Mesa loads
   from `/run/opengl-driver` and can require a newer glibc. Only `niri-mesa-runtime` exercises this; host builds miss it.
   The local `libdisplay-info_0_2` ABI override replaces the version unstable removed.
+  Keep the input's upstream package sets for `niri-build-tools`: its cached generic binary only validates configs and
+  generates completions, without compositor initialization. Do not use it as the runtime or make its Nixpkgs follow
+  the host. Its source/patch/feature alignment and CLI behavior are checked by
+  `nix build --no-link --no-update-lock-file .#checks.x86_64-linux.niri-build-tools` (verified).
 - Preserve CachyOS's `release` input, independent nixpkgs, and `overlays.pinned` to keep cache compatibility. GitHub
   runners need the kernel cache in `cachix-action.extraPullNames`; NixOS `nix.settings` do not apply there.
   Custom kernels need `kernelModuleSignOverride` to sign stripped modules and emit `.ko.cer` files. See `docs/KERNEL.md`.

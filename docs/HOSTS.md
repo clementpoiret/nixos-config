@@ -10,14 +10,25 @@ Both hosts use the unmodified cached CachyOS LTO Zen4 preset, with a 1000 Hz
 timer. The `hzTicks` facts apply only to the optional custom-kernel recipe, not
 the active preset. See [KERNEL.md](KERNEL.md) for compiled and runtime policy.
 
-Niri's source remains pinned, but its baseline and CPU-optimized binaries are built
+Niri's source remains pinned, and its CPU-optimized compositor binaries are built
 with the host package set. They dynamically load Mesa from `/run/opengl-driver`,
-so a prebuilt Niri from an older package set can fail at login with
+so a prebuilt compositor from an older package set can fail at login with
 `GLIBC_2.43 not found` even when both kernels boot successfully. To check this
 boundary without activating the configuration or acquiring a GPU:
 
 ```bash
 nix build --no-link --no-update-lock-file .#checks.x86_64-linux.niri-mesa-runtime
+```
+
+Config validation and completion generation use `pkgs.niri-build-tools`, the
+generic upstream-cached binary with its original locked package set. These
+commands return before compositor initialization, so they do not load the host's
+Mesa drivers. The tooling is not installed as the compositor. Its source,
+patches, and build features must match the host builds; verify both host configs,
+invalid-config rejection, and all four completion generators with:
+
+```bash
+nix build --no-link --no-update-lock-file .#checks.x86_64-linux.niri-build-tools
 ```
 
 If a new generation has a black login screen, boot a working generation and

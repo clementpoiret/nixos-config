@@ -193,6 +193,43 @@ in
         touch "$out"
       '';
 
+  niri-build-tools =
+    let
+      hosts = builtins.attrValues self.nixosConfigurations;
+      tools = self.nixosConfigurations.laptop.pkgs.niri-build-tools;
+    in
+    assert builtins.all (
+      host:
+      let
+        runtime = host.pkgs.niri-host;
+      in
+      toString runtime.src == toString tools.src
+      && runtime.patches == tools.patches
+      && runtime.cargoBuildFeatures == tools.cargoBuildFeatures
+      && runtime.cargoBuildNoDefaultFeatures == tools.cargoBuildNoDefaultFeatures
+    ) hosts;
+    pkgs-unstable.runCommand "niri-build-tools"
+      {
+        nativeBuildInputs = [ tools ];
+      }
+      ''
+        ${pkgs-unstable.lib.concatMapStringsSep "\n" (host: ''
+          niri validate -c ${host.config.home-manager.users.${username}.xdg.configFile."niri-config".source}
+        '') hosts}
+        for shell in bash zsh fish nushell; do
+          niri completions "$shell" > "$shell"
+          test -s "$shell"
+        done
+        bash -n bash
+        printf 'unknown-setting\n' > invalid-config.kdl
+        if niri validate -c invalid-config.kdl > invalid-config.log 2>&1; then
+          cat invalid-config.log
+          echo "Niri accepted an invalid config" >&2
+          exit 1
+        fi
+        touch "$out"
+      '';
+
   niri-mesa-runtime =
     let
       checkHost =
@@ -201,12 +238,11 @@ in
           pkgs = self.nixosConfigurations.${hostName}.pkgs;
         in
         ''
-          for binary in ${pkgs.niri-host}/bin/niri ${pkgs.niri-baseline}/bin/niri; do
-            loader=$(patchelf --print-interpreter "$binary")
-            library_path=$(patchelf --print-rpath "$binary")
-            "$loader" --library-path "$library_path" ./mesa-load \
-              ${pkgs.mesa}/lib/libgallium-${pkgs.mesa.version}.so
-          done
+          binary=${pkgs.niri-host}/bin/niri
+          loader=$(patchelf --print-interpreter "$binary")
+          library_path=$(patchelf --print-rpath "$binary")
+          "$loader" --library-path "$library_path" ./mesa-load \
+            ${pkgs.mesa}/lib/libgallium-${pkgs.mesa.version}.so
         '';
     in
     pkgs-unstable.runCommandCC "niri-mesa-runtime"

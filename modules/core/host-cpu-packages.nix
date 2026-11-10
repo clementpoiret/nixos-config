@@ -1,5 +1,6 @@
 {
   hostFacts,
+  inputs,
   lib,
   ...
 }:
@@ -39,12 +40,12 @@ let
     );
 
   replaceNiriCompletionGenerator =
-    baseline: postInstall:
+    buildTools: postInstall:
     let
       optimizedCommand = "$out/bin/niri completions";
     in
     if lib.hasInfix optimizedCommand postInstall then
-      lib.replaceStrings [ optimizedCommand ] [ "${baseline}/bin/niri completions" ] postInstall
+      lib.replaceStrings [ optimizedCommand ] [ "${buildTools}/bin/niri completions" ] postInstall
     else
       throw "host-cpu-packages: Niri no longer generates completions with its installed binary";
 
@@ -66,13 +67,13 @@ in
           NIX_CFLAGS_COMPILE = appendFlag (old.NIX_CFLAGS_COMPILE or null) "-march=${cpuTarget}";
         });
         herdrHost = rustFor prev.flake.herdr;
+        niriBuildTools = inputs.niri.packages.${prev.stdenv.buildPlatform.system}.niri-unstable;
         # Build the pinned source with the host libraries: Mesa is loaded from
         # /run/opengl-driver and can require a newer glibc than flake packages use.
-        niriBaseline = prev.niri-unstable;
-        niriHost = (rustFor niriBaseline).overrideAttrs (old: {
+        niriHost = (rustFor prev.niri-unstable).overrideAttrs (old: {
           # GitHub's generic builders cannot execute host-optimized binaries.
-          # Use the baseline package only to generate architecture-independent completions.
-          postInstall = replaceNiriCompletionGenerator niriBaseline (old.postInstall or "");
+          # Upstream's cached generic build generates architecture-independent completions.
+          postInstall = replaceNiriCompletionGenerator niriBuildTools (old.postInstall or "");
         });
         ghosttyHost = prev.flake.ghostty.overrideAttrs (old: {
           zigBuildFlags = replaceGhosttyCpu old.zigBuildFlags;
@@ -88,7 +89,7 @@ in
         quickshell = quickshellHost;
 
         niri-host = niriHost;
-        niri-baseline = niriBaseline;
+        niri-build-tools = niriBuildTools;
         niri = niriHost;
         niri-unstable = niriHost;
 
