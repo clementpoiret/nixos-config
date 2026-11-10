@@ -181,7 +181,13 @@
               "--skip=ui::later::tests::every_snooze_preset_is_later_than_now"
             ];
         });
-        lumen = lumen.packages.${system}.lumen;
+        lumen = lumen.packages.${system}.lumen.overrideAttrs (old: {
+          # Nixpkgs' Rust hooks select native libraries instead of vendored copies.
+          buildInputs = old.buildInputs ++ [
+            pkgs-unstable.libgit2
+            pkgs-unstable.zlib
+          ];
+        });
         opencode = opencode.packages.${system}.default.overrideAttrs (
           old:
           pkgs-unstable.lib.optionalAttrs

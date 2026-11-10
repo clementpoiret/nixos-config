@@ -33,6 +33,8 @@
   not runtime PNG files.
   Keep SQLite in its `buildInputs`: Nixpkgs' Rust hook forces `libsqlite3-sys` to use the system library (verified by an
   isolated link/run probe; flake evaluation cannot catch the missing library).
+- Lumen's `libgit2-sys` 0.18 requires system libgit2 >=1.9.2 and <1.10 when Nixpkgs disables vendoring. Keep libgit2
+  and zlib in its `buildInputs` (verified with an isolated pkg-config/link/run probe against libgit2 1.9.7).
 - Measured boot: preserve the PCR 4 alternative budget in `modules/core/bootloader.nix` (bootloader versions × retained
   generations × specialisations). Host builds do not exercise the live TPM policy update; see `docs/MEASURED-BOOT.md`
   for the NH error.
