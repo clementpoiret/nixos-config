@@ -6,6 +6,12 @@
 - Temporary tests are allowed to reproduce issues and probe behavior. Once they pass, delete them unless they protect
   critical system functionality or security, or cover especially tricky behavior that warrants regression protection.
 
+# Workaround inventory
+
+- Keep `README.md`'s "Manual Upstream Workarounds" section synchronized with local patches, package overrides, test
+  exceptions, and compatibility adapters. Record the implementation and removal/verification criteria; distinguish
+  dormant workarounds and intentional policy from active upstream fixes.
+
 # Dependency updates
 
 - Binary updaters: `python3 pkgs/update-proton.py` and `python3 pkgs/update-brave.py` (both verified; GnuPG must be on
