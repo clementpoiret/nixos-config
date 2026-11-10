@@ -680,7 +680,7 @@ when the upstream package declares them itself.
 
 | Fix and implementation | What is carried locally | Removal criteria and verification |
 | --- | --- | --- |
-| Hylki SQLite — [flake.nix](flake.nix), `pkgs-flake.hylki` | Adds system SQLite because the Rust build hooks select it instead of the bundled library. | Drop the dependency override when the Hylki flake supplies SQLite. Build Hylki with its tests; evaluation alone cannot prove native linking. The separate version-gated test skip is listed below. |
+| Hylki SQLite — [flake.nix](flake.nix), `pkgs-flake.hylki` | Adds system SQLite because the Rust build hooks select it instead of the bundled library. | Drop the dependency override when the Hylki flake supplies SQLite. Build Hylki with its tests; evaluation alone cannot prove native linking. |
 | Lumen native libraries — [flake.nix](flake.nix), `pkgs-flake.lumen` | Adds libgit2 and zlib alongside upstream's OpenSSL. `libgit2-sys` 0.18 needs libgit2 ≥1.9.2 and <1.10 when vendoring is disabled. | Drop the override when Lumen's flake declares compatible native libraries. Check the crate's version range with `pkg-config`, then build Lumen. Do not bypass `LIBGIT2_NO_VENDOR` instead. |
 | Rayburst SQLite — [flake.nix](flake.nix), `customOverlays` | Adds SQLite to Nixpkgs' Rayburst package; otherwise the final Rust link fails with `cannot find -lsqlite3`. | Remove when the selected Nixpkgs package declares SQLite. Verify the native link and build Rayburst, including its launcher/fixup phases. |
 | Khal structured attributes — [flake.nix](flake.nix), `customOverlays` | Changes `sphinxBuilders` from an array to the scalar `"html man"` expected by `sphinxHook`. | Remove when Nixpkgs' Khal/Sphinx integration supports the supplied value under structured attributes. Build Khal's documentation and tests. |
@@ -742,10 +742,18 @@ local derivations.
 
 | Fix and implementation | What is carried locally | Removal criteria and verification |
 | --- | --- | --- |
+| Lanzaboote protected-boot retention pin — [flake.nix](flake.nix), [flake.lock](flake.lock) | Pins upstream `4b983330` because v1.2.0 predates protected-system support and retention of the booted bootloader's measurements. | Replace with a tagged release containing [protected-system support](https://github.com/nix-community/lanzaboote/commit/c57a9234747eea6fe498d0eb601583f7ba378f06) and [booted-measurement protection](https://github.com/nix-community/lanzaboote/commit/d6c805ed883dfa23a5e4c032101913d9bcb41467). Run `lanzaboote-historical-retention` and follow the measured-boot runbook for live validation. The version string alone still reports 1.2.0. |
 | Retired Lanzaboote specialisation — [bootloader.nix](modules/core/bootloader.nix), [source patch](modules/core/lanzaboote-drop-latest-nixos.patch) | Skips `latest-nixos` still embedded in retained generations' `boot.json`, allowing its obsolete boot entries and PCR measurements to be collected. | Remove after no retained/bootable generation contains that specialisation, or upstream provides equivalent safe filtering. Run `lanzaboote-historical-retention` and verify a real bootloader install. Keep the separate PCR 4 alternative-budget assertion. |
 | TPM enrollment limitations — [measured-boot runbook](docs/MEASURED-BOOT.md#configure-measured-boot-and-tpm-unlock) | Manually enrolls both laptop LUKS volumes with TPM plus PIN rather than enabling Lanzaboote's single-device, no-PIN automatic enrollment. | Replace the manual procedure only when upstream supports both volumes and the required PIN/recovery semantics. Host builds cannot verify live TPM policy updates or recovery. |
 | Framework panel self-refresh — [laptop/default.nix](hosts/laptop/default.nix), `options.boot.kernelParams.apply`; [host notes](docs/HOSTS.md) | Filters nixos-hardware's `amdgpu.dcdebugmask=0x10` parameter while preserving the other inherited parameters. | Remove the filter if upstream stops adding the parameter and the desired command line is unchanged. Verify AC/battery display behavior and suspend/resume; restore the upstream workaround if hangs return. |
 | Shutdown timeout — [system.nix](modules/core/system.nix), `DefaultTimeoutStopSec` | Caps the system manager's default service stop timeout at 10 seconds to avoid getting stuck at shutdown. No particular upstream defect is recorded. | Treat as a local compatibility policy, not a confirmed upstream patch. Identify the blocking service and test clean shutdown/data persistence before reverting to the upstream timeout. |
+
+The `latest-nixos` filter is still required while retained desktop generations
+contain that specialisation. The `lanzaboote-historical-retention` fixture uses
+a temporary ESP to verify removal of its images and PCR predictions while
+keeping an older protected generation within the four-generation limit. This
+does not exercise a live TPM policy update; see the
+[measured-boot runbook](docs/MEASURED-BOOT.md#configure-measured-boot-and-tpm-unlock).
 
 ### Local replacement packages, release pins, and external forks
 
@@ -757,7 +765,7 @@ normal Nix packaging just because a vendor release is newer.
 | Package / implementation | Locally maintained behavior | Retirement gate |
 | --- | --- | --- |
 | Herdr App and Core — [App](pkgs/herdr-app/default.nix), [Core](pkgs/herdr-core/default.nix), [PR #581031](https://github.com/NixOS/nixpkgs/pull/581031) | Separate source packages, locked Rust/Zig dependencies, runtime integration, and the adaptations listed above. | Adopt maintained upstream Nixpkgs packages or upstream flakes that preserve those fixes and checks, then remove the corresponding local package directories/update plumbing. |
-| Hylki flake — [input and override](flake.nix), [external packaging repository](https://github.com/clementpoiret/hylki-flake) | Uses separately maintained Nix packaging for Hylki, plus the SQLite/test adaptations in this inventory. | Replace when maintained upstream packaging is equivalent. Removing the input must also update its package consumers, CI targets, and cache roots. |
+| Hylki flake — [input and override](flake.nix), [external packaging repository](https://github.com/clementpoiret/hylki-flake) | Uses separately maintained Nix packaging for Hylki, plus the SQLite adaptation in this inventory. | Replace when maintained upstream packaging is equivalent. Removing the input must also update its package consumers, CI targets, and cache roots. |
 | CachyOS kernel fork — [flake input](flake.nix), [kernel module](modules/core/hardware.nix), [external release branch](https://github.com/clementpoiret/nix-cachyos-kernel/tree/release), [kernel notes](docs/KERNEL.md) | Carries LLVM/VirtualBox module build fixes and post-strip external-module signing with `.ko.cer` output; uses the fork's independent pinned Nixpkgs and published cache. | Change inputs only when the replacement preserves module build flags, signing/certificates, and cache compatibility. Do not drop `kernelModuleSignOverride` merely because a kernel builds. |
 | Brave builder and signed release pins — [builder selection](pkgs/default.nix), [exported package](flake.nix), [package](pkgs/brave/default.nix), [updater](pkgs/update-brave.py) | Reuses the builder restored in `nixpkgs-master` with host libraries, overrides the vendor version/source, verifies signed checksums, and replaces Nixpkgs' update script with local pin management. | Drop the master-builder detour when root Nixpkgs supplies a suitable builder. Retire the local package/updater only if upstream also preserves the required release tracking, signature verification, runtime libraries, and install check. |
 | Proton Mail and Pass desktop — [Mail](pkgs/protonmail-desktop/default.nix), [Pass](pkgs/proton-pass/default.nix), [updater](pkgs/update-proton.py) | Maintains stable/beta vendor pins; rewrites Electron resource lookup for Nixpkgs' Electron. Pass unpacks `.node` modules and patches libxkbcommon/libgcc dependencies. Matching the system Electron also keeps AppArmor execution rules applicable. | Replace with upstream packages preserving channels, resource paths, native modules, and confinement. Run Pass's ASAR-resolved native-module install check and launch both applications. |
@@ -770,11 +778,6 @@ normal Nix packaging just because a vendor release is newer.
 
 ### Dormant, command-scoped, and already-resolved items
 
-- **Hylki Sunday test:** [flake.nix](flake.nix) skips
-  `ui::later::tests::every_snooze_preset_is_later_than_now` **only for 1.46.1**,
-  whose expected presets disagree with the code on Sundays after 17:00.
-  Remove the guarded branch when that release no longer needs supporting or its
-  corrected test passes at the affected time. It is not a blanket test disable.
 - **AMD microcode SHA bypass:** `microcode.amd_sha_check=off` is commented out
   in both [desktop](hosts/desktop/default.nix) and
   [laptop](hosts/laptop/default.nix). It is **not an active workaround**.

@@ -43,7 +43,8 @@ in
     lanzaboote = {
       enable = true;
       # Two bootloader versions × four generations × one kernel choice = eight
-      # PCR 4 alternatives. Lanzaboote keeps the booted generation within this limit.
+      # PCR 4 alternatives. Lanzaboote counts the protected booted generation
+      # within this limit, not in addition to it.
       configurationLimit = lib.mkDefault 4;
       # Retained generations still embed the retired specialisation in boot.json.
       # Skip it during installation so its entries and PCR measurements are collected.

@@ -258,8 +258,17 @@ bootloader update, two bootloader versions × four generations × one kernel
 image produce eight PCR 4 alternatives. Adding a kernel specialisation would
 produce sixteen alternatives and fail policy generation. The installer also
 skips `latest-nixos` in retained older generations, allowing its obsolete boot
-entries and measurements to be collected. Lanzaboote counts the protected
-booted generation within the retention limit.
+entries and measurements to be collected.
+
+The pinned upstream Lanzaboote revision `4b983330` passes
+`--protected-system=/run/booted-system` by default. When the booted system still
+has a generation link, it remains installed even outside the newest four;
+Lanzaboote replaces the oldest otherwise-selected generation rather than
+exceeding the limit. The `lanzaboote-historical-retention` fixture exercises
+this retention and specialisation cleanup on a temporary ESP, without a TPM.
+Do not downgrade to the v1.2.0 tag: it lacks protected-system support and the
+later booted-bootloader measurement protection, despite reporting the same
+installer version as this revision.
 
 Do not put `tpm2-pin=yes` or PCR selections in `crypttabExtraOpts`. The LUKS2
 systemd token written during enrollment records the PIN requirement and PCR

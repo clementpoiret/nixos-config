@@ -44,6 +44,9 @@
 - Measured boot: preserve the PCR 4 alternative budget in `modules/core/bootloader.nix` (bootloader versions × retained
   generations × specialisations). Host builds do not exercise the live TPM policy update; see `docs/MEASURED-BOOT.md`
   for the NH error.
+  Keep Lanzaboote's protected-system and booted-bootloader measurement support: the v1.2.0 tag lacks both, while the
+  pinned `4b983330` still reports version 1.2.0. Its module defaults to `/run/booted-system`; the protected generation
+  counts within the limit (verified with the unchanged temporary-ESP fixture against a cached same-source installer).
 - Nixpkgs removed `boot.initrd.systemd.enable`; omit it even as `true`. Keep `boot.initrd.systemd.tpm2.enable` for TPM
   unlocking.
 - Build Niri's pinned source through the host overlay (`prev.niri-unstable`), not the input flake's package: Mesa loads

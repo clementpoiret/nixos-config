@@ -14,7 +14,8 @@
     };
 
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v1.2.0";
+      # v1.2.0 predates protected-system and booted bootloader measurement retention.
+      url = "github:nix-community/lanzaboote/4b98333073bdaf9b1b5dd7d87c2dab96883b234e";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -174,12 +175,6 @@
         herdr = herdr.packages.${system}.default;
         hylki = hylki.packages.${system}.default.overrideAttrs (old: {
           buildInputs = old.buildInputs ++ [ pkgs-unstable.sqlite ];
-          # 1.46.1's test expects three snooze presets, but its code offers two on Sundays from 17:00.
-          checkFlags =
-            (old.checkFlags or [ ])
-            ++ pkgs-unstable.lib.optionals (old.version == "1.46.1") [
-              "--skip=ui::later::tests::every_snooze_preset_is_later_than_now"
-            ];
         });
         lumen = lumen.packages.${system}.lumen.overrideAttrs (old: {
           # Nixpkgs' Rust hooks select native libraries instead of vendored copies.
