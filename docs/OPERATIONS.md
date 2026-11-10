@@ -137,13 +137,12 @@ checks stop on build failure rather than continuing expensive unrelated builds.
 Configure a repository Actions secret named `CACHIX_AUTH_TOKEN` with a
 cache-scoped write token for the private `clementpoiret` Cachix cache. The
 workflow fails before building if this secret is unavailable. Keep the cache
-private because the curated host outputs include the non-redistributable
-VirtualBox Extension Pack. Existing paths are pulled from configured binary
-caches; curated runtime closures are uploaded and the current optimized
-roots are pinned in Cachix. The roots include each host's AppArmor profile
-directory and its referenced application closures, so policy checks do not
-rebuild those applications on another runner. Shared checks authenticate to the
-private cache with the same token as the host jobs. A failed selected-output
+private: curated host outputs include proprietary applications. Existing paths
+are pulled from configured binary caches; curated runtime closures are uploaded
+and the current optimized roots are pinned in Cachix. The roots include each
+host's AppArmor profile directory and its referenced application closures, so
+policy checks do not rebuild those applications on another runner. Shared checks
+use the host jobs' token to access the private cache. A failed selected-output
 build still uploads its completed root members when the runner remains available;
 only complete roots replace the host pins. An abrupt runner shutdown can prevent
 this cleanup step from running. Kernel outputs are maintained in

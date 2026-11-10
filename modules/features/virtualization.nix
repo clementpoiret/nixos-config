@@ -17,17 +17,11 @@
       enable = true;
       qemu.swtpm.enable = true;
     };
-
-    virtualbox.host = {
-      enable = true;
-      enableExtensionPack = true;
-    };
   };
 
   users.users.${username}.extraGroups = [
     "libvirtd"
     "podman"
-    "vboxusers"
   ];
 
   programs.virt-manager.enable = true;

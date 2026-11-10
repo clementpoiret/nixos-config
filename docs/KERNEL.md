@@ -4,7 +4,7 @@ Both hosts use `linuxPackages-cachyos-latest-lto-zen4` from
 `github:clementpoiret/nix-cachyos-kernel/release`. Keep the flake's own nixpkgs
 input and `overlays.pinned`: the release branch and unmodified preset match
 the kernels published to `https://nixos-cachyos-kernels.cachix.org`.
-The package set includes LLVM and VirtualBox module build fixes and applies the
+The package set includes LLVM module build fixes and applies the
 `kernelModuleSignOverride` helper. It signs external modules such as `acpi_call`
 and `framework_laptop` after stripping when their installers skip Kbuild's
 signing step, producing the `.ko.cer` certificates Nixpkgs' module-tree
@@ -79,20 +79,9 @@ let
   };
 
   cachyosHelpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
-  customKernelPackages =
-    let
-      kernelPackages = cachyosHelpers.kernelModuleLLVMOverride (
-        pkgs.linuxKernel.packagesFor customKernel
-      );
-    in
-    kernelPackages.extend (
-      _final: prev: {
-        # VirtualBox does not inherit the custom kernel's LLVM build flags.
-        virtualbox = prev.virtualbox.overrideAttrs (oldAttrs: {
-          makeFlags = (oldAttrs.makeFlags or [ ]) ++ kernelPackages.kernel.commonMakeFlags;
-        });
-      }
-    );
+  customKernelPackages = cachyosHelpers.kernelModuleLLVMOverride (
+    pkgs.linuxKernel.packagesFor customKernel
+  );
 in
 ```
 

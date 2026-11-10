@@ -265,15 +265,6 @@
             hostName:
             let
               cfg = self.nixosConfigurations.${hostName};
-              virtualbox =
-                pkgs-unstable.lib.findFirst (package: pkgs-unstable.lib.getName package == "virtualbox")
-                  (throw "virtualbox is missing from ${hostName} environment.systemPackages")
-                  cfg.config.environment.systemPackages;
-              virtualboxExtensionPack =
-                if (virtualbox.extensionPack or null) != null then
-                  virtualbox.extensionPack
-                else
-                  throw "virtualbox extension pack is missing for ${hostName}";
             in
             [
               {
@@ -299,14 +290,6 @@
               {
                 name = "${hostName}-quickshell";
                 path = cfg.pkgs.quickshell-host;
-              }
-              {
-                name = "${hostName}-virtualbox";
-                path = virtualbox;
-              }
-              {
-                name = "${hostName}-virtualbox-extpack";
-                path = virtualboxExtensionPack;
               }
               {
                 name = "${hostName}-apparmor-profiles";
