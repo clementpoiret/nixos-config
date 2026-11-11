@@ -267,12 +267,12 @@ in
       bibiman # Bibliography management CLI
       flake.claude-code
       flake.codex-cli
-      flake.opencode
       dstask
       # flake.gemini-cli # Gemini protocol client
       # libation # Extract audio books
       libnotify # Desktop notification library
       logseq-appimage # Manually using AppImage because plugins are broken in the nixpkgs version
+      opencode
       # poweralertd # Power alert daemon (low battery/etc.)
       qbittorrent
       qmk

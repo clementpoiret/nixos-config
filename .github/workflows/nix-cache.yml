@@ -198,12 +198,6 @@ jobs:
           nix shell --no-update-lock-file --inputs-from . nixpkgs#python3 nixpkgs#gnupg \
             --command python3 pkgs/update-brave.py
 
-      - name: Update OpenCode stable release
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 pkgs/update-opencode.py
-
       - name: Update flake inputs
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: nix flake update
@@ -288,7 +282,6 @@ jobs:
             --no-update-lock-file \
             --print-build-logs \
             .#checks.x86_64-linux.proton-package-updates \
-            .#checks.x86_64-linux.opencode-package-updates \
             .#checks.x86_64-linux.binary-release-signatures \
             .#checks.x86_64-linux.niri-build-tools \
             .#checks.x86_64-linux.niri-mesa-runtime \

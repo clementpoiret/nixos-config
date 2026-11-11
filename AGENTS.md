@@ -59,15 +59,10 @@
 - Preserve CachyOS's `release` input, independent nixpkgs, and `overlays.pinned` to keep cache compatibility. GitHub
   runners need the kernel cache in `cachix-action.extraPullNames`; NixOS `nix.settings` do not apply there.
   Custom kernels need `kernelModuleSignOverride` to sign stripped modules and emit `.ko.cer` files. See `docs/KERNEL.md`.
-- OpenCode's `bun.lock` can change before upstream's hash bot catches up, so keep the source pinned and use upstream
-  `nix/hashes.json`, never auto-accepted hashes. Releases can be tagged before that file is refreshed (v2.2.5); then
-  override `node_modules`' `hash` in `flake.nix` for that version only, once two machines build the same hash. The
-  shared repository also publishes v1 releases, so `releases/latest` can be older than the installed v2;
-  `pkgs/update-opencode.py` only advances to newer stable releases. The dependency hash is also Bun-sensitive: 1.4.4
-  changes peer contexts and libc filtering, so v2.2.5 needs separate hashes for older and newer Bun (verified by local
-  and CI builds and a tree comparison).
-- OpenCode 2.2.6 with Bun 1.4.4 also needs a version-scoped dependency hash: the earlier local output and GitHub's
-  mismatch agree (verified by rehashing the existing local store output; no rebuild needed).
+- Use `pkgs.opencode` from `nixos-unstable` rather than `github:anomalyco/opencode`: upstream's `bot-nix-hashes` PR
+  (`#60957`) can stall without merging, `tag-release.sh` rewrites `package.json` and `bun.lock` at tag time without
+  refreshing `nix/hashes.json`, `check-nix.yml` runs only `nix eval`, and `inputs.nixpkgs.follows` breaks FOD hashes
+  across Bun updates. Switch back only if upstream gates release tags on a real Nix build with matching Bun.
 - `pkgs/herdr-app` and `pkgs/herdr-core` are adapted from nixpkgs PR #581031 until herdr-app ships a flake. CI bumps
   each to its latest `v*` tag with `nix-update --flake --version <x.y.z> --custom-dep zigDeps <package>` (verified).
   The app's `distribution/core-version` is a minimum, so the core tracks its own tags. Discover both packages' Rust

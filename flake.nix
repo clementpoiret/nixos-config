@@ -88,10 +88,6 @@
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    opencode = {
-      url = "github:anomalyco/opencode/v2.2.6";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     clementpoiret-skills = {
       url = "github:clementpoiret/skills";
       flake = false;
@@ -136,7 +132,6 @@
       nixpkgs,
       nixpkgs-master,
       nixpkgs-stable,
-      opencode,
       stylix,
       superfile,
       ...
@@ -182,17 +177,6 @@
             pkgs-unstable.zlib
           ];
         });
-        opencode = opencode.packages.${system}.default.overrideAttrs (
-          old:
-          pkgs-unstable.lib.optionalAttrs
-            (old.version == "2.2.6+dc2ffcf" && pkgs-unstable.bun.version == "1.4.4")
-            {
-              # This release's upstream hash differs with Bun 1.4.4; local and CI outputs match.
-              node_modules = old.node_modules.override {
-                hash = "sha256-O2hF8pGUSArKgYBeP99oOW3iXVVZl5bV5WPTp3E7JIA=";
-              };
-            }
-        );
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
       };

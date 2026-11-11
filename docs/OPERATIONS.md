@@ -127,7 +127,7 @@ The GitHub Actions workflow evaluates every flake check and builds selected shar
 checks plus both host toplevels on pushes to `main`. Scheduled runs occur on
 Wednesday and Sunday at 03:17 in `Europe/Paris`; manual dispatch uses the same
 update workflow. These runs update Ghostty, Herdr, Superfile, Logseq, Proton
-packages, Brave, and OpenCode release pins, the local Herdr app and core
+packages, and Brave release pins, the local Herdr app and core
 packages, plus all flake inputs. After the checks and both host builds succeed,
 the allowlisted dependency files are committed and pushed directly to `main`.
 The host jobs run in parallel; shared checks wait for both to succeed and finish
