@@ -1,7 +1,7 @@
 {
   "stable": {
-    "version": "1.16.0",
-    "hash": "sha512-HgpDZR25OhXuVWgJErkErQ6LDHym4WlyxOVy7lUs6UezfEkwkEeZCSnPmR7eFEmCjGlm0SxvU+F0tb/KBx+4Mw=="
+    "version": "1.16.1",
+    "hash": "sha512-XiWFSZNR6vAlrdB3gj46hCgzxXkiJ0p2BaypP1akr3WEEzYmuGn/5uENuB4rggBLnRIrIp2f1Tzhs3volMUZBQ=="
   },
   "beta": {
     "version": "1.16.1",

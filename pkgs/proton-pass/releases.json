@@ -1,10 +1,10 @@
 {
   "stable": {
-    "version": "1.43.0",
-    "hash": "sha512-rBkALdfl5hEP1cpdNC0srL0lKNlZZug8Gsjfko6GUGkn2crR/6+qG1QrtuvxOqqPe15tZJlTGmKqgrv4KnBsYg=="
+    "version": "1.43.1",
+    "hash": "sha512-AGAjcFL8py10+YX22ToJQ8l6g1kt82juJRbrrMBX3k9FH8i4RY82fzEb1XANpYSdgVs8zIVDcY27IvgL082Umw=="
   },
   "beta": {
-    "version": "1.43.0",
-    "hash": "sha512-rBkALdfl5hEP1cpdNC0srL0lKNlZZug8Gsjfko6GUGkn2crR/6+qG1QrtuvxOqqPe15tZJlTGmKqgrv4KnBsYg=="
+    "version": "1.43.1",
+    "hash": "sha512-AGAjcFL8py10+YX22ToJQ8l6g1kt82juJRbrrMBX3k9FH8i4RY82fzEb1XANpYSdgVs8zIVDcY27IvgL082Umw=="
   }
 }
