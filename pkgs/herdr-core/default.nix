@@ -1,6 +1,7 @@
 # Adapted from nixpkgs PR #581031; replace with upstream's package once herdr ships a flake.
 {
   lib,
+  stdenv,
   rustPlatform,
   fetchFromGitHub,
   zig_0_16,
@@ -103,7 +104,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
       # The tests' fake ssh and installer runs use PATH=/usr/bin:/bin, which the sandbox lacks.
       substituteInPlace crates/herdr-core/tests/common/mod.rs \
         --replace-fail ':/usr/bin:/bin ' ':${remoteBin} ' \
-        --replace-fail 'PATH=/usr/bin:/bin ' 'PATH=${remoteBin} '
+        --replace-fail 'PATH=/usr/bin:/bin ' 'PATH=${remoteBin} ' \
+        --replace-fail '.env("HOME", &self.root)' \
+          '.env("HERDR_RELEASES_URL", std::env::var("HERDR_RELEASES_URL").unwrap()).env("HOME", &self.root)'
       substituteInPlace crates/herdr-core/tests/distribution.rs \
         --replace-fail '.env("PATH", "/usr/bin:/bin")' '.env("PATH", "${installerBin}")' \
         --replace-fail '"{}:/usr/bin:/bin"' '"{}:${installerBin}"'
@@ -131,15 +134,16 @@ rustPlatform.buildRustPackage (finalAttrs: {
     python3
   ];
 
-  # postPatch makes hc download a release build for every machine it sets up,
-  # and these tests set one up without network access.
-  checkFlags = [
-    "--skip=a_box_without_hc_gets_this_one_when_you_say_yes"
-    "--skip=a_machine_reached_through_any_command_works_like_one_over_ssh"
-  ];
-
-  # Upstream CI's settings for slow runners.
   preCheck = ''
+    # Fake SSH peers share this sandbox's store, so the local build is a runnable release fixture.
+    releaseDir="$TMPDIR/test-releases/core/${finalAttrs.version}"
+    mkdir -p "$releaseDir"
+    tar -czf "$releaseDir/herdr-core-linux-${stdenv.hostPlatform.parsed.cpu.name}.tar.gz" \
+      -C "target/${stdenv.hostPlatform.rust.cargoShortTarget}/$cargoBuildType" herdr-core
+    export HERDR_RELEASES_URL="file://$TMPDIR/test-releases"
+    RELEASES_URL="$HERDR_RELEASES_URL" scripts/manifest "$releaseDir" > "$releaseDir/manifest.json"
+
+    # Upstream CI's settings for slow runners.
     export HC_TEST_WATCHDOG_S=120
     export HC_TEST_SLOW_RUNNER=1
   '';

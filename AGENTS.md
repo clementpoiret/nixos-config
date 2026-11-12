@@ -71,6 +71,8 @@
   Core's mocked macOS signing fixtures also run on Linux and need jq on the check PATH.
   Generated Bash shebangs inside Rust test strings need store paths before compilation: `patchShebangs` cannot see
   them, and Nix's sandbox supplies `/bin/sh` but not `/bin/bash`.
+  Remote-install tests use a local release archive and upstream's manifest generator; forward `HERDR_RELEASES_URL`
+  through the common fixture's cleared environment. Fake SSH peers share the sandbox's store, unlike real remotes.
   Keep Core's startup lock inside the server future: Tokio otherwise closes clients before releasing the lock, so a
   replacement exits without starting. The install check delays `close` with strace to expose this race deterministically.
   App render checks need debug assertions for GPUI bounds and explicit fontconfig fonts for text screenshots; the Cargo
@@ -169,6 +171,8 @@
 - Promotion accepts a linear stack rooted at the exact protected baseline, with every revision conflict-free and
   carrying a Conventional Commit subject. An empty writable tip is excluded; `fetch` rebases the whole pending stack,
   preserving change IDs.
+- Treat promoted revisions as immutable even if the writable clone still permits edits. Put follow-up fixes in a new
+  child of the exact protected baseline; amending the promoted revision breaks the next promotion's ancestry check.
 - Fetching a rewritten imported `agent-base` can rebase the writable working change. Keep working-copy updates enabled
   for these fetches and use the current `@` for the following rebase: the pre-fetch commit ID can be obsolete.
 - Flake evaluation sees new files only after a `jj` command snapshots them as intent-to-add in the colocated Git index;
