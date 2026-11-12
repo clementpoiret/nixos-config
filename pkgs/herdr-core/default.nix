@@ -108,6 +108,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
         --replace-fail '.env("PATH", "/usr/bin:/bin")' '.env("PATH", "${installerBin}")' \
         --replace-fail '"{}:/usr/bin:/bin"' '"{}:${installerBin}"'
 
+      # patchShebangs cannot see the generated scripts inside Rust strings.
+      while IFS= read -r -d "" f; do
+        substituteInPlace "$f" --replace-fail '#!/bin/bash' '#!${lib.getExe bash}'
+      done < <(grep -rlZ --include='*.rs' '#!/bin/bash' crates/herdr-core/tests)
+
       # tests/distribution.rs runs this python3 script.
       patchShebangs scripts/manifest
     '';
