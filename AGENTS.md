@@ -77,6 +77,8 @@
   replacement exits without starting. The install check delays `close` with strace to expose this race deterministically.
   App render checks need debug assertions for GPUI bounds and explicit fontconfig fonts for text screenshots; the Cargo
   install hook preserves the release binaries built before checks.
+  App's `/bin/test` substitution applies only to 0.1.13–0.1.14: 0.1.15 uses the shell builtin, so applying the old
+  replacement makes `postPatch` fail. Keep its upper version bound until the older pin is retired.
 - Ghostty's flake install check validates launcher paths without executing Ghostty; keep it enabled for host-optimized
   builds on generic CI runners. Its documentation and resource generators use the build CPU, independently of `-Dcpu`
   (verified in the upstream build sources).

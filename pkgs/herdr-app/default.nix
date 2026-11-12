@@ -122,10 +122,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
           ]
         }")'
   ''
-  + lib.optionalString (lib.versionAtLeast finalAttrs.version "0.1.13") ''
-    substituteInPlace src/core_bin.rs \
-      --replace-fail 'Command::new("/bin/test")' 'Command::new("${lib.getExe' coreutils "test"}")'
-  '';
+  +
+    lib.optionalString
+      (lib.versionAtLeast finalAttrs.version "0.1.13" && lib.versionOlder finalAttrs.version "0.1.15")
+      ''
+        substituteInPlace src/core_bin.rs \
+          --replace-fail 'Command::new("/bin/test")' 'Command::new("${lib.getExe' coreutils "test"}")'
+      '';
 
   preBuild = ''
     export ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
