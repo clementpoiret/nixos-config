@@ -36,6 +36,11 @@ inspect the failed boot's greeter logs with
 `journalctl -b -1 -t dms-greeter/niri --no-pager`. Select the appropriate boot index
 from `journalctl --list-boots` if more than one boot was attempted.
 
+DMS greeter uses a host-optimized runtime: older source revisions launch
+Quickshell, while newer ones embed `dux-qt-base`. Both are built against the
+host's Nixpkgs with its CPU target. The session shell independently uses
+host-optimized Quickshell; it cannot replace the greeter's embedded library.
+
 ## desktop
 
 Desktop workstation with an MSI MAG X870E Tomahawk WiFi motherboard, Ryzen 9

@@ -73,6 +73,8 @@
   them, and Nix's sandbox supplies `/bin/sh` but not `/bin/bash`.
   Remote-install tests use a local release archive and upstream's manifest generator; forward `HERDR_RELEASES_URL`
   through the common fixture's cleared environment. Fake SSH peers share the sandbox's store, unlike real remotes.
+  Core's watchdog aborts the test process, discarding libtest's captured output; keep uncaptured test diagnostics so
+  watchdog and panic messages survive an abort. This is diagnostic policy, not a workaround for hung tests.
   Keep Core's startup lock inside the server future: Tokio otherwise closes clients before releasing the lock, so a
   replacement exits without starting. The install check delays `close` with strace to expose this race deterministically.
   App render checks need debug assertions for GPUI bounds and explicit fontconfig fonts for text screenshots; the Cargo
@@ -111,6 +113,11 @@
 
 # Niri desktop
 
+- DMS greeter's runtime API depends on its source revision: the older pin uses `quickshell.package`, while newer
+  revisions embed `duxQtBase.package` and reject the old option. Keep host CPU flags on both runtimes, building the
+  pinned `dux-qt-base` through the host package set. Standalone Quickshell cannot replace the embedded library.
+  Keep greeter checks and completions enabled on generic builders: upstream's `qtbase.MaybeRunAndExit` loads the
+  native library only for the `qs` subcommand, not the Go completion commands (verified in the upstream source).
 - GNOME Control Center provides the D-Bus GlobalShortcutsProvider, which Ghostty's global keybindings can activate even
   outside GNOME, and GNOME's backend needs GNOME Shell. Keep GlobalShortcuts on the local `niri-shortcuts` portal
   without disabling Online Accounts or the keyring; GNOME still provides screen sharing.

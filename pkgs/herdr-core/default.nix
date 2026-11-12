@@ -134,6 +134,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
     python3
   ];
 
+  # The watchdog aborts without flushing libtest's captured diagnostics.
+  checkFlags = [ "--nocapture" ];
+
   preCheck = ''
     # Fake SSH peers share this sandbox's store, so the local build is a runnable release fixture.
     releaseDir="$TMPDIR/test-releases/core/${finalAttrs.version}"

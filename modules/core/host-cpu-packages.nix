@@ -17,6 +17,12 @@ let
     else
       "${old} ${flag}";
 
+  cxxFor =
+    pkg:
+    pkg.overrideAttrs (old: {
+      NIX_CFLAGS_COMPILE = appendFlag (old.NIX_CFLAGS_COMPILE or null) "-march=${cpuTarget}";
+    });
+
   rustFor =
     pkg:
     pkg.overrideAttrs (
@@ -63,9 +69,7 @@ in
     (
       _final: prev:
       let
-        quickshellHost = prev.quickshell.overrideAttrs (old: {
-          NIX_CFLAGS_COMPILE = appendFlag (old.NIX_CFLAGS_COMPILE or null) "-march=${cpuTarget}";
-        });
+        quickshellHost = cxxFor prev.quickshell;
         herdrHost = rustFor prev.flake.herdr;
         niriBuildTools = inputs.niri.packages.${prev.stdenv.buildPlatform.system}.niri-unstable;
         # Build the pinned source with the host libraries: Mesa is loaded from
@@ -95,6 +99,11 @@ in
 
         ghostty-host = ghosttyHost;
         ghostty = ghosttyHost;
+      }
+      // lib.optionalAttrs (inputs.dank-greeter.inputs ? dux-qt-base) {
+        dux-qt-base-host = cxxFor (
+          (inputs.dank-greeter.inputs.dux-qt-base.overlays.default prev prev).dux-qt-base
+        );
       }
     )
   ];

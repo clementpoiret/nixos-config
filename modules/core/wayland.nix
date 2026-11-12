@@ -1,6 +1,7 @@
 {
   inputs,
   lib,
+  options,
   pkgs,
   username,
   ...
@@ -23,8 +24,13 @@ in
     enable = true;
     compositor.name = "niri";
     configHome = "/home/${username}";
-    quickshell.package = pkgs.quickshell-host;
-  };
+  }
+  // (
+    if options.programs.dms-greeter ? duxQtBase then
+      { duxQtBase.package = pkgs.dux-qt-base-host; }
+    else
+      { quickshell.package = pkgs.quickshell-host; }
+  );
 
   environment = {
     systemPackages = [
