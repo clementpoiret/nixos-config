@@ -217,8 +217,6 @@ in
       # flake.helium
       mullvad-browser
       # flake.orion-browser
-      vivaldi # Feature-rich web browser
-      vivaldi-ffmpeg-codecs # Vivaldi media codecs
 
       # Graphics
       gifsicle # GIF image manipulation
@@ -237,6 +235,7 @@ in
       hunspell # Spell checker engine
       hunspellDicts.fr-any # French Hunspell dictionary
       # libreoffice-fresh # Office suite
+      marktext # Markdown editor
       # onlyoffice-desktopeditors # Office suite
       pdftk # PDF document manipulation toolkit
       poppler # PDF rendering library (CLI tools)
@@ -350,6 +349,12 @@ in
           ".config/drawio"
         ];
       };
+      marktext = {
+        package = pkgs.marktext;
+        capabilities = electronDocumentCapabilities;
+        executionPackages = electronExecutionPackages;
+        homePaths = [ ".config/marktext" ];
+      };
       zotero = {
         package = pkgs.zotero;
         executable = "bin/zotero";
@@ -439,21 +444,6 @@ in
         sensitiveAccess = [ "credential-broker" ];
         elevatedAccessRationale = "Mullvad Browser uses the desktop secret-service broker for user-approved credentials.";
       };
-      vivaldi = {
-        package = pkgs.vivaldi;
-        capabilities = browserCapabilities;
-        extraRules = ''
-          owner @{HOME}/.local/lib/vivaldi/media-codecs-*/libffmpeg.so mr,
-        '';
-        extraRulesRationale = "Vivaldi maps the locally installed versioned media codec.";
-        homePaths = [
-          ".cache/vivaldi"
-          ".config/vivaldi"
-          ".pki/nssdb"
-        ];
-        sensitiveAccess = [ "credential-broker" ];
-        elevatedAccessRationale = "Vivaldi uses the desktop secret-service broker for user-approved credentials.";
-      };
       thunderbird = {
         package = pkgs.thunderbird;
         capabilities = acceleratedDocumentCapabilities ++ [
@@ -517,7 +507,6 @@ in
           owner @{HOME}/.mozilla/native-messaging-hosts/me.proton.pass.nm.json rwkl,
           owner @{HOME}/.librewolf/native-messaging-hosts/me.proton.pass.nm.json rwkl,
           owner @{HOME}/.config/BraveSoftware/Brave-Browser/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
-          owner @{HOME}/.config/vivaldi/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
           owner @{HOME}/.config/chromium/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
           owner @{HOME}/.config/google-chrome/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
           owner @{HOME}/.config/microsoft-edge/NativeMessagingHosts/me.proton.pass.nm.json rwkl,
