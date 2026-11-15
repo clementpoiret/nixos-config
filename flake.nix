@@ -308,6 +308,9 @@
           };
           inherit herdr-core;
           herdr-app = pkgs-unstable.callPackage ./pkgs/herdr-app { inherit herdr-core; };
+          nix-update = pkgs-unstable.nix-update.overrideAttrs (old: {
+            patches = (old.patches or [ ]) ++ [ ./pkgs/nix-update/materialize-flake-source.patch ];
+          });
           proton-pass = pkgs-unstable.callPackage ./pkgs/proton-pass { };
           proton-pass-beta = pkgs-unstable.callPackage ./pkgs/proton-pass { channel = "beta"; };
           proton-pass-cli = pkgs-unstable.callPackage ./pkgs/proton-pass-cli { };

@@ -100,7 +100,7 @@ jobs:
               return
             fi
 
-            nix run --no-update-lock-file --inputs-from . nixpkgs#nix-update -- \
+            nix run --no-update-lock-file .#nix-update -- \
               --flake --version "${tag#v}" --custom-dep zigDeps "$package"
           }
 

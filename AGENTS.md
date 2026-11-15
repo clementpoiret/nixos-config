@@ -14,6 +14,10 @@
 
 # Dependency updates
 
+- Nix 2.35 can report unmaterialized source paths from `nix flake metadata`; a one-time prefetch stops helping after
+  package edits. CI must use the patched `.#nix-update` (build and repeated dirty-flake evaluations verified), not the
+  unpatched Nixpkgs tool. Use prefetch's `storePath`: metadata's path can predate its lockfile writes (fixture verified).
+  See the README workaround inventory for removal criteria.
 - Binary updaters: `python3 pkgs/update-proton.py` and `python3 pkgs/update-brave.py` (both verified; GnuPG must be on
   PATH). They pin vendor checksums, which Nix verifies. Brave's checksum file and Bridge's feed and DEB are verified
   against public keys pinned from the vendors' signing-key pages; key rotations need review and stay outside CI's update
