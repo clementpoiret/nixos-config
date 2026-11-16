@@ -39,7 +39,7 @@ let
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "herdr-app";
-  version = "0.1.15";
+  version = "0.1.16";
 
   __structuredAttrs = true;
 
@@ -48,10 +48,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     repo = "herdr-app";
     tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-CNktD+tQrMMN4vpzFPZkZWnwDalaTkUV0A2UiLVeO3E=";
+    hash = "sha256-yR8tu/a5TXJktYTdb9mkqXY4jKPGljfTQbYraP/S8Ss=";
   };
 
-  cargoHash = "sha256-usCdairGam65XVKtb1jJpRC0tNXnoafAnMFQjPgvgqQ=";
+  cargoHash = "sha256-mO00lakVFzV2pDsMVR9l1N8IBSkFiMCN3Agk66/ePoQ=";
 
   zigDeps = zig_0_16.fetchDeps {
     inherit (finalAttrs) pname version;
