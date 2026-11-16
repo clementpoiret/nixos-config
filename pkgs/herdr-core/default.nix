@@ -18,6 +18,7 @@
   libarchive,
   python3,
   strace,
+  util-linux,
   versionCheckHook,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -118,6 +119,16 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
       # tests/distribution.rs runs this python3 script.
       patchShebangs scripts/manifest
+    ''
+    + lib.optionalString (lib.versionAtLeast finalAttrs.version "0.1.21") ''
+      # The noexec fixture invokes its installer shell inside a generated command.
+      substituteInPlace crates/herdr-core/tests/distribution.rs \
+        --replace-fail '/usr/bin/sh' '${lib.getExe' bash "sh"}'
+      # Login capture needs a real shell in tests and env at runtime.
+      substituteInPlace crates/herdr-core/tests/login_environment.rs \
+        --replace-fail '/bin/bash' '${lib.getExe bash}'
+      substituteInPlace crates/herdr-core/src/platform/linux_login.rs \
+        --replace-fail '/usr/bin/env' '${lib.getExe' coreutils "env"}'
     '';
 
   preBuild = ''
@@ -132,6 +143,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     git
     jq
     python3
+    # The noexec installer fixture creates its own user and mount namespaces.
+    util-linux
   ];
 
   # The watchdog aborts without flushing libtest's captured diagnostics.

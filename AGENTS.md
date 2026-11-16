@@ -75,6 +75,13 @@
   Core's mocked macOS signing fixtures also run on Linux and need jq on the check PATH.
   Generated Bash shebangs inside Rust test strings need store paths before compilation: `patchShebangs` cannot see
   them, and Nix's sandbox supplies `/bin/sh` but not `/bin/bash`.
+  Core's noexec installer fixture (from 0.1.21) needs util-linux on the check PATH and a packaged shell instead of
+  `/usr/bin/sh` inside its generated commands; its login-environment fixtures also need packaged Bash for `SHELL` and
+  the matching log assertions. Keep these substitutions version-guarded while 0.1.20 remains pinned;
+  both source versions, a real noexec mount, and the full 0.1.21 package suite/install checks were verified.
+  Core's Linux SSH login capture also invokes `/usr/bin/env` at runtime from 0.1.21; substitute coreutils' `env`, not
+  only the fixture shell, or successful login profiles silently fall back without their exports (sandboxed capture
+  of the actual source script verified).
   Remote-install tests use a local release archive and upstream's manifest generator; forward `HERDR_RELEASES_URL`
   through the common fixture's cleared environment. Fake SSH peers share the sandbox's store, unlike real remotes.
   Core's watchdog aborts the test process, discarding libtest's captured output; keep uncaptured test diagnostics so
