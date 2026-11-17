@@ -6,90 +6,65 @@ Project-level instructions override these.
 
 - A request to implement, fix, refactor, or investigate authorizes the local edits and checks needed to finish it. Don't
   stop to re-ask, and don't end by offering to do work that was already in scope.
-- For nontrivial work, state the plan and how you'll verify it in a sentence or two, then start.
+- For nontrivial work, state the plan and verification check in a sentence or two, then start.
 - Resolve low-risk ambiguity with the narrowest reasonable reading. Ask only when the choice materially affects
   behavior, public APIs, data, security, or cost. Push back on unsafe or needlessly complex approaches.
 - Get explicit approval before: discarding work you didn't create; destructive resets or deletions beyond the task;
   rewriting shared history or force-pushing; pushing, merging, opening PRs, publishing, or deploying; touching
   production data, credentials, permissions, or infrastructure; incurring material cost.
-- The machine is likely NixOS: don't assume standard Linux paths (use `command -v` and `#!/usr/bin/env` shebangs), and
-  never install tools system-wide (`apt`, `sudo pip`, `npm -g`); add them to the project's devenv.sh environment
-  (`devenv.nix`, run through `devenv shell`), and ask before creating one in a repo that doesn't have it, or use
-  `nix shell nixpkgs#<tool>` for one-off tools.
+- NixOS host: don't assume FHS paths (use `command -v` and `#!/usr/bin/env` shebangs), and never install tools
+  system-wide (`apt`, `sudo pip`, `npm -g`). Use the repo's existing environment first (`devenv shell`, `nix develop`,
+  `direnv`); add persistent project tools to `devenv.nix` (ask before initializing devenv in a repo without it), or use
+  `nix shell nixpkgs#<tool>` for one-off commands.
 
 ## Implementation
 
-- Make the smallest *complete* change that fits the codebase's existing patterns; fewest lines is not the goal. Fix the
-  root cause, not the symptom.
-- Write for the next reader: plain, obvious code over clever or compact code; early returns and shallow nesting; names
-  that say what things are. Match the surrounding code's naming, structure, and error handling.
-- Add a function, class, or layer only when it removes real duplication or names a real concept. A few repeated lines
-  beat a premature abstraction. No speculative config options, compatibility shims, or guards for impossible states.
-- Prefer the standard library and existing dependencies. Add a dependency only when it clearly earns its place, and say
-  why.
-- If the solution keeps growing in complexity, stop and look for a simpler design, or explain the tradeoff before
-  continuing.
-- Comments explain why, not what. No comments narrating the change ("added X", "now handles Y") and no commented-out
-  code.
+- Make the smallest *complete* change that fits existing patterns; fix the root cause, not the symptom.
+- Prefer plain, shallow, obvious code that matches surrounding naming, structure, and error handling. Add an abstraction
+  only when it removes real duplication or names a real concept—no speculative config, compatibility shims, or guards
+  for impossible states.
+- Prefer the standard library and existing dependencies; justify any new dependency.
+- Comments explain *why*, never *what* or change history ("added X"), and never leave commented-out code.
 - Handle failures that can actually happen. Never swallow exceptions or add silent fallbacks (`except: return None`,
   quietly defaulting to empty values) unless the contract calls for it.
-- Stay in scope: no adjacent refactors, dependency or toolchain upgrades, lockfile regeneration, broad renames, or
-  repo-wide formatting unless the task needs them. Mention unrelated bugs instead of fixing them.
-- Preserve the user's uncommitted work. Remove code your change made obsolete; leave pre-existing dead code alone.
-- Plans and roadmaps you are given are private and disposable. Never carry their vocabulary into anything that persists:
-  revision descriptions, code, identifiers, comments, docs, test names, file names, or bookmarks. That means no phase
-  numbers or names ("phase 1", "milestone B", "step 3"), plan codenames, or references to plan files. Name things for
-  what they are and do. Don't copy or commit plans.
+- Stay in scope: no adjacent refactors, dependency upgrades, lockfile churn, broad renames, or repo-wide formatting
+  unless needed. Mention unrelated bugs instead of fixing them. Preserve uncommitted user work, and remove only code
+  your change made obsolete.
+- Plans and roadmaps are private and disposable. Never leak plan vocabulary ("phase 1", "step 3", milestone/plan names,
+  or plan file paths) into commits, code, identifiers, comments, docs, tests, or bookmarks, and don't commit plan files.
 
 ## Version control
 
-- In repos with a `.jj` directory, use jj, not git. Use git only for read-only inspection; never run mutating git
-  commands in a colocated repo. Don't initialize jj in a repo without asking. In git-only repos, don't commit unless
-  asked.
-- At the start of a task that will change files, check `jj status` and `jj log`, then create a fresh revision on top of
-  the current working copy with `jj new -m "<description>"`. If the working-copy revision is already empty and
-  undescribed, reuse it with `jj describe -m` instead of stacking another empty one. Follow-up requests on the same task
-  stay in the same revision.
-- Descriptions follow Conventional Commits: `type(scope): summary`. Use `feat`, `fix`, `refactor`, `perf`, `test`,
-  `docs`, `build`, `ci`, or `chore`; the optional scope is the affected component; the summary is imperative, lowercase,
-  without a trailing period, and states what the change does. Update the description with `jj describe -m` if the scope
-  changes.
-- Always pass `-m`, and avoid anything that opens an editor or interactive UI (`jj describe` without `-m`, `jj split`,
-  `-i`/`--interactive` flags); it will hang.
-- Creating and describing your own revisions is part of the task. Get approval before `jj git push`, moving or deleting
-  bookmarks, abandoning, rebasing, or squashing revisions you didn't create, `jj op restore`, or `--ignore-immutable`.
+- In repos with `.jj`, use `jj` (never mutating `git` commands). Don't initialize `jj` without asking, and in Git-only
+  repos don't commit unless asked.
+- Start file-changing tasks in `.jj` repos by checking `jj status` and `jj log`, then run `jj new -m "<description>"`
+  (or `jj describe -m` if `@` is already empty and undescribed). Keep follow-ups on the same task in the same revision,
+  updating `jj describe -m` if scope shifts.
+- Descriptions follow Conventional Commits (`type(scope): summary` using `feat`, `fix`, `refactor`, `perf`, `test`,
+  `docs`, `build`, `ci`, or `chore`—imperative, lowercase, no trailing period).
+- Never run interactive `jj` commands that open an editor or TUI (`jj describe` without `-m`, bare `jj split` without
+  filesets and `-m`, `-i`/`--interactive`).
+- Get approval before `jj git push`, moving or deleting bookmarks, abandoning/rebasing/squashing revisions you didn't
+  create, `jj op restore`, or `--ignore-immutable`.
 
-## Verification
+## Verification and disk bounds
 
-- Define success as something observable. Start with the narrowest check that proves it; widen when you change shared
-  boundaries.
-- Scratch tests that reproduce a bug or probe behavior are fine while you work. Delete them before finishing unless they
-  earn a permanent place.
-- A test that stays must protect behavior the project cares about going forward, not just record the incident that
-  prompted it. Keep a regression test only when a plausible future change could break that behavior again.
-- Integrate kept tests into the suite: put them with related tests, reuse existing fixtures and helpers, and name them
-  for the behavior ("rejects empty header"), not the fix ("fix issue 123"). Extend an existing test or parametrized case
-  before adding a near-duplicate.
-- Never weaken, skip, or special-case tests, or hardcode expected outputs, to get green. A test that mirrors the
-  implementation is not evidence.
-- Read the actual output, not just the exit code or success message.
-- If repeated attempts produce no new information, change approach.
-- Keep disk use bounded. Before work that can write gigabytes (datasets, checkpoints, training or benchmark runs, image
-  builds), check free space with `df -h`. Projects under `~/Sync` are replicated by Syncthing, so write generated output
-  only to a sync-ignored directory such as `artifact-staging/` (patterns in `~/Sync/Projects/.syncthing-ignore`), never
-  to tracked or synced paths, and never to `/tmp`, which is RAM-backed. Remove the temp files, outputs, processes,
-  containers, images, and volumes you created once they are no longer needed, unless the project says to keep them.
+- Start with the narrowest check that proves the behavior; widen when crossing shared boundaries. Delete scratch repro
+  tests before finishing unless they protect behavior a plausible future change could break.
+- Integrate kept tests into existing suites and fixtures, extending parametrized cases before adding near-duplicates,
+  and name them for the behavior ("rejects empty header"), not the incident ("fix issue 123").
+- Derive expected values from requirements—never weaken/skip tests, hardcode fixture outputs, or call the code under
+  test to compute its own expected result.
+- Keep disk use bounded: check `df -h` before multi-GB work (datasets, checkpoints, builds, benchmarks). `~/Sync` is
+  replicated by Syncthing and `/tmp` is RAM-backed `tmpfs`—write large generated outputs only to a sync-ignored path
+  such as `artifact-staging/` (`~/Sync/Projects/.syncthing-ignore`), never to synced/tracked paths or `/tmp` (small
+  scratch files in `/tmp` are fine). Clean up temporary outputs, processes, and containers when done.
 
-## Reporting
+## Reporting and repository memory
 
-- Report the outcome, what you verified and how, and what failed or remains. Keep "done and verified", "done but
-  unverified", and "not done" clearly separate.
-- If blocked, finish the independent work and name exactly what's missing: a decision, access, or information.
-
-## Repository memory
-
-When a repo-changing task uncovers durable, non-obvious knowledge (a command with prerequisites, a pitfall with a
-confirmed fix, an invariant and why it holds), add it to the nearest relevant AGENTS.md, or the repo's existing
-equivalent such as CLAUDE.md; don't duplicate between them. Keep entries short, mark commands you ran versus only read
-in config, never record secrets, transient state, or task progress, and edit surgically rather than regenerating. Skip
-it when there's nothing durable to add, and mention any memory edits in your report.
+- Separate **done and verified**, **done but unverified**, and **not done**, stating what you ran to verify. If blocked,
+  finish independent work and name the exact missing decision, access, or input.
+- When a repo-changing task uncovers durable, non-obvious knowledge (commands with prerequisites, confirmed pitfalls,
+  invariants), add a short surgical note to an existing `AGENTS.md` or `CLAUDE.md` without duplicating between them (ask
+  before creating one in a repo that has neither). Never record secrets, transient state, or task progress, and mention
+  any memory edits in your report.
