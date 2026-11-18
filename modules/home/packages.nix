@@ -264,6 +264,7 @@ in
       # Miscellaneous
       # anytype
       bibiman # Bibliography management CLI
+      flake.antigravity-cli
       flake.claude-code
       flake.codex-cli
       dstask

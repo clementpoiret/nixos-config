@@ -80,6 +80,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    antigravity = {
+      url = "github:jacopone/antigravity-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     claude-code = {
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -116,6 +120,7 @@
     {
       self,
 
+      antigravity,
       # bibli-ls,
       claude-code,
       codex-cli,
@@ -161,6 +166,7 @@
         });
       pkgs-flake = {
         agent-container-tools = agentContainerTools;
+        antigravity-cli = antigravity.packages.${system}.google-antigravity-cli;
         # bibli-ls = bibli-ls.packages.${system}.default;
         claude-code = wrapAgent "claude" claude-code.packages.${system}.default;
         codex-cli = wrapAgent "codex" codex-cli.packages.${system}.default;
