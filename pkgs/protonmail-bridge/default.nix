@@ -13,7 +13,7 @@
 }:
 
 let
-  signatureHash = "sha256-euM3BpMhLA3eaTdzIsE/D+ilK09Ooq7JhOj9+FPLtD4=";
+  signatureHash = "sha256-KxL4yUn6pVAzjXT3Gqu6VVTsciEJsx3nJ/H9OqOSD2c=";
   # Patchelf 0.19.2 corrupts this vendor Go executable; keep the working ELF rewriter.
   bridgePatchelf = patchelf.overrideAttrs {
     version = "0.15.2";
@@ -25,11 +25,11 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "protonmail-bridge";
-  version = "3.27.1";
+  version = "3.27.2";
 
   src = fetchurl {
     url = "https://proton.me/download/bridge/protonmail-bridge_${finalAttrs.version}-1_amd64.deb";
-    hash = "sha512-xOKcs3r07Y7LUxHzDbOsXaVbdMOVpAjzHjI8FOcNT50pbJWFl4XN47KlyhdZeSKZZBIypbGp5uYBTP1PLmA1Wg==";
+    hash = "sha512-wsqaHFBSR/eTkrjkHsb9XW6KnFl0GnJevlGNW3cBbClgF1zP1zf4YCVZhRq81Gj1PL2gibsPQTwjmuYp9bNECw==";
   };
 
   nativeBuildInputs = [
