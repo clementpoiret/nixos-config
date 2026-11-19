@@ -40,7 +40,7 @@ in
         backend = "gpg";
         key = "71F084CEA427B23537934233CC6B0EED323A6C13";
       };
-      git.sign-on-push = true;
+      revsets.git-sign-on-push = "~signed() & mine()";
       ui = {
         editor = "hx";
         merge-editor = "hx";
