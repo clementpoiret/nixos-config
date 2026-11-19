@@ -35,9 +35,13 @@ in
       };
       ".claude/CLAUDE.md" = {
         force = true;
-        source = ./agent-instructions/CLAUDE.md;
+        source = ./agent-instructions/AGENTS.md;
       };
       ".config/opencode/AGENTS.md" = {
+        force = true;
+        source = ./agent-instructions/AGENTS.md;
+      };
+      ".gemini/AGENTS.md" = {
         force = true;
         source = ./agent-instructions/AGENTS.md;
       };
