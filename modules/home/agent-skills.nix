@@ -5,15 +5,16 @@
 }:
 let
   skillNames = [
-    "change-contract"
     "cross-agent"
     "jujutsu"
-    "simplify-after-green"
-    "simplify-tests-after-green"
+    "optimize"
+    "precision-review"
+    "simplify"
   ];
   skillDirectories = [
     ".agents/skills"
     ".claude/skills"
+    ".gemini/skills"
   ];
 in
 {
