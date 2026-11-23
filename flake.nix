@@ -104,6 +104,10 @@
       url = "github:clementpoiret/hylki-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    t3code = {
+      url = "github:clementpoiret/t3code-flake";
+      inputs.nixpkgs-unstable.follows = "nixpkgs";
+    };
 
     # orion-browser = {
     #   url = "github:dokokitsune/orion-browser-flake";
@@ -139,6 +143,7 @@
       nixpkgs-stable,
       stylix,
       superfile,
+      t3code,
       ...
     }@inputs:
     let
@@ -164,12 +169,28 @@
               --set-default HERDR_AGENT ${name}
           '';
         });
+      antigravityCli = antigravity.packages.${system}.google-antigravity-cli;
+      claudeCode = wrapAgent "claude" claude-code.packages.${system}.default;
+      codexCli = wrapAgent "codex" codex-cli.packages.${system}.default;
+      t3codeOverrides = {
+        codex = codexCli;
+        claude-code = claudeCode;
+        antigravity-cli = antigravityCli;
+        enableCodex = true;
+        enableClaude = true;
+        enableOpenCode = true;
+        enableAntigravity = true;
+        enableGit = true;
+        enableJujutsu = true;
+        enableGitHub = true;
+        enableGitLab = true;
+      };
       pkgs-flake = {
         agent-container-tools = agentContainerTools;
-        antigravity-cli = antigravity.packages.${system}.google-antigravity-cli;
+        antigravity-cli = antigravityCli;
         # bibli-ls = bibli-ls.packages.${system}.default;
-        claude-code = wrapAgent "claude" claude-code.packages.${system}.default;
-        codex-cli = wrapAgent "codex" codex-cli.packages.${system}.default;
+        claude-code = claudeCode;
+        codex-cli = codexCli;
         ghostty = ghostty.packages.${system}.ghostty-releasefast;
         # helium = helium.packages.${system}.default;
         herdr = herdr.packages.${system}.default;
@@ -185,6 +206,8 @@
         });
         # orion-browser = orion-browser.packages.${system}.default;
         superfile = superfile.packages.${system}.default;
+        t3code = t3code.packages.${system}.t3code.override t3codeOverrides;
+        t3code-desktop = t3code.packages.${system}.t3code-desktop.override t3codeOverrides;
       };
 
       customOverlays = [

@@ -267,6 +267,8 @@ in
       flake.antigravity-cli
       flake.claude-code
       flake.codex-cli
+      flake.t3code
+      flake.t3code-desktop
       dstask
       # flake.gemini-cli # Gemini protocol client
       # libation # Extract audio books
